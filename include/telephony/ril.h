@@ -33,7 +33,9 @@
 #define ANDROID_RIL_H 1
 
 #include <stdlib.h>
+#ifndef FEATURE_UNIT_TEST
 #include <sys/time.h>
+#endif /* !FEATURE_UNIT_TEST */
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,7 +58,13 @@ typedef enum {
                                                    call on a Class C GPRS device */
     RIL_E_OP_NOT_ALLOWED_BEFORE_REG_TO_NW = 9,  /* data ops are not allowed before device
                                                    registers in network */
-    RIL_E_SMS_SEND_FAIL_RETRY = 10		/* fail to send sms and need retry */	
+    RIL_E_SMS_SEND_FAIL_RETRY = 10,             /* fail to send sms and need retry */    
+    RIL_E_SIM_ABSENT = 11,                      /* fail to set the location where CDMA subscription 
+                                               shall be retrieved because of SIM or RUIM card absent */
+#ifdef FEATURE_MULTIMODE_ANDROID 
+    RIL_E_SUBSCRIPTION_NOT_AVAILABLE = 12,      /* fail to find CDMA subscription from specified location */
+    RIL_E_MODE_NOT_SUPPORTED = 13               /* HW does not support preferred network type */
+#endif 
 } RIL_Errno;
 
 typedef enum {
@@ -74,12 +82,18 @@ typedef enum {
     RADIO_STATE_SIM_NOT_READY = 2,      /* Radio is on, but the SIM interface is not ready */
     RADIO_STATE_SIM_LOCKED_OR_ABSENT = 3, /* SIM PIN locked, PUK required, network 
                                personalization locked, or SIM absent */
-    RADIO_STATE_SIM_READY = 4           /* Radio is on and SIM interface is available */
+    RADIO_STATE_SIM_READY = 4,             /* Radio is on and SIM interface is available */
+    RADIO_STATE_RUIM_NOT_READY = 5,        /* Radio is on, but the RUIM interface is not ready */
+    RADIO_STATE_RUIM_READY = 6,            /* Radio is on and the RUIM interface is available */
+    RADIO_STATE_RUIM_LOCKED_OR_ABSENT = 7, /* RUIM PIN locked, PUK required, network 
+                                              personalization locked, or RUIM absent */
+    RADIO_STATE_NV_NOT_READY = 8,          /* Radio is on, but the NV interface is not available */
+    RADIO_STATE_NV_READY = 9               /* Radio is on and the NV interface is available */
 } RIL_RadioState;
 
 typedef struct {
     RIL_CallState   state;
-    int             index;      /* GSM Index for use with, eg, AT+CHLD */
+    int             index;      /* Connection Index for use with, eg, AT+CHLD */
     int             toa;        /* type of address, eg 145 = intl */
     char            isMpty;     /* nonzero if is mpty call */
     char            isMT;       /* nonzero if call is mobile terminated */
@@ -157,7 +171,7 @@ typedef struct {
                                  * status is:
                                  * 0 = disable
                                  * 1 = enable
-                                 * 2 = interrogate
+                                 * 2 = not used
                                  * 3 = registeration
                                  * 4 = erasure
                                  */
@@ -166,7 +180,7 @@ typedef struct {
     int             serviceClass;/* From 27.007 +CCFC/+CLCK "class"
                                     See table for Android mapping from
                                     MMI service code 
-				    0 means user doesn't input class */
+                    0 means user doesn't input class */
     int             toa;        /* "type" from TS 27.007 7.11 */
     char *          number;     /* "number" from TS 27.007 7.11. May be NULL */
     int             timeSeconds; /* for CF no reply only */
@@ -208,17 +222,104 @@ typedef struct {
                                    (MT only, may be NULL). */
 } RIL_SuppSvcNotification;
 
-/* see RIL_REQUEST_GET_SIM_STATUS */
-#define RIL_SIM_ABSENT      		0
-#define RIL_SIM_NOT_READY   		1
+#define RIL_SIM_ABSENT              0
+#define RIL_SIM_NOT_READY           1
 /* RIL_SIM_READY means that the radio state is RADIO_STATE_SIM_READY. 
  * This is more
  * than "+CPIN: READY". It also means the radio is ready for SIM I/O
  */
-#define RIL_SIM_READY       		2
-#define RIL_SIM_PIN         		3
-#define RIL_SIM_PUK         		4
+#define RIL_SIM_READY               2
+#define RIL_SIM_PIN                 3
+#define RIL_SIM_PUK                 4
 #define RIL_SIM_NETWORK_PERSONALIZATION 5
+
+/* see RIL_REQUEST_GET_SIM_STATUS */
+
+#define RIL_CARD_MAX_APPS     8
+
+typedef enum {
+    RIL_CARDSTATE_ABSENT   = 0,
+    RIL_CARDSTATE_PRESENT  = 1,
+    RIL_CARDSTATE_ERROR    = 2
+} RIL_CardState;
+
+typedef enum {
+    RIL_PERSOSUBSTATE_UNKNOWN                   = 0, /* initial state */
+    RIL_PERSOSUBSTATE_IN_PROGRESS               = 1, /* in between each lock transition */
+    RIL_PERSOSUBSTATE_READY                     = 2, /* when either SIM or RUIM Perso is finished since 
+                                                        each app can only have 1 active perso involved */
+    RIL_PERSOSUBSTATE_SIM_NETWORK               = 3,
+    RIL_PERSOSUBSTATE_SIM_NETWORK_SUBSET        = 4,
+    RIL_PERSOSUBSTATE_SIM_CORPORATE             = 5,
+    RIL_PERSOSUBSTATE_SIM_SERVICE_PROVIDER      = 6,
+    RIL_PERSOSUBSTATE_SIM_SIM                   = 7,
+    RIL_PERSOSUBSTATE_SIM_NETWORK_PUK           = 8, /* When the corresponding perso lock is blocked */
+    RIL_PERSOSUBSTATE_SIM_NETWORK_SUBSET_PUK    = 9,
+    RIL_PERSOSUBSTATE_SIM_CORPORATE_PUK         = 10,
+    RIL_PERSOSUBSTATE_SIM_SERVICE_PROVIDER_PUK  = 11,
+    RIL_PERSOSUBSTATE_SIM_SIM_PUK               = 12,
+    RIL_PERSOSUBSTATE_RUIM_NETWORK1             = 13,
+    RIL_PERSOSUBSTATE_RUIM_NETWORK2             = 14,
+    RIL_PERSOSUBSTATE_RUIM_HRPD                 = 15,
+    RIL_PERSOSUBSTATE_RUIM_CORPORATE            = 16,
+    RIL_PERSOSUBSTATE_RUIM_SERVICE_PROVIDER     = 17,
+    RIL_PERSOSUBSTATE_RUIM_RUIM                 = 18,
+    RIL_PERSOSUBSTATE_RUIM_NETWORK1_PUK         = 19, /* When the corresponding perso lock is blocked */
+    RIL_PERSOSUBSTATE_RUIM_NETWORK2_PUK         = 20,
+    RIL_PERSOSUBSTATE_RUIM_HRPD_PUK             = 21,
+    RIL_PERSOSUBSTATE_RUIM_CORPORATE_PUK        = 22,
+    RIL_PERSOSUBSTATE_RUIM_SERVICE_PROVIDER_PUK = 23,
+    RIL_PERSOSUBSTATE_RUIM_RUIM_PUK             = 24
+} RIL_PersoSubstate;
+
+typedef enum {
+    RIL_APPSTATE_UNKNOWN               = 0,
+    RIL_APPSTATE_DETECTED              = 1,
+    RIL_APPSTATE_PIN                   = 2, /* If PIN1 or UPin is required */
+    RIL_APPSTATE_PUK                   = 3, /* If PUK1 or Puk for UPin is required */
+    RIL_APPSTATE_SUBSCRIPTION_PERSO    = 4, /* perso_substate should be look at 
+                                               when app_state is assigned to this value */
+    RIL_APPSTATE_READY                 = 5
+} RIL_AppState;
+
+typedef enum {
+    RIL_PINSTATE_UNKNOWN              = 0,
+    RIL_PINSTATE_ENABLED_NOT_VERIFIED = 1,
+    RIL_PINSTATE_ENABLED_VERIFIED     = 2,
+    RIL_PINSTATE_DISABLED             = 3,
+    RIL_PINSTATE_ENABLED_BLOCKED      = 4,
+    RIL_PINSTATE_ENABLED_PERM_BLOCKED = 5
+} RIL_PinState;
+
+typedef enum {
+  RIL_APPTYPE_UNKNOWN = 0,
+  RIL_APPTYPE_SIM     = 1,
+  RIL_APPTYPE_USIM    = 2,
+  RIL_APPTYPE_RUIM    = 3,
+  RIL_APPTYPE_CSIM    = 4
+} RIL_AppType;
+
+typedef struct
+{
+  RIL_AppType      app_type;    
+  RIL_AppState     app_state;     
+  RIL_PersoSubstate perso_substate; /* applicable only if app_state == RIL_APPSTATE_SUBSCRIPTION_PERSO */
+  char             *aid_ptr;        /* null terminated string, e.g., from 0xA0, 0x00 -> 0x41, 0x30, 0x30, 0x30 */
+  char             *app_label_ptr;  /* null terminated string */
+  int              pin1_replaced;  /* applicable to USIM and CSIM */
+  RIL_PinState     pin1;           
+  RIL_PinState     pin2;          
+} RIL_AppStatus;
+
+typedef struct
+{
+  RIL_CardState card_state;                      
+  RIL_PinState  universal_pin_state;             /* applicable to USIM and CSIM: RIL_PINSTATE_xxx */
+  int           gsm_umts_subscription_app_index; /* value < RIL_CARD_MAX_APPS */
+  int           cdma_subscription_app_index;     /* value < RIL_CARD_MAX_APPS */
+  int           num_applications;                /* value <= RIL_CARD_MAX_APPS */
+  RIL_AppStatus applications[RIL_CARD_MAX_APPS];
+} RIL_CardStatus;
 
 /* The result of a SIM refresh, returned in data[0] of RIL_UNSOL_SIM_REFRESH */
 typedef enum {
@@ -226,9 +327,22 @@ typedef enum {
     SIM_FILE_UPDATE = 0,
     /* SIM initialized.  All files should be re-read. */
     SIM_INIT = 1,
-    /* SIM reset.  SIM power required, SIM may be locked and all files should be re-read. */
+    /* SIM reset.  SIM may be locked, and all files should be re-read. */
     SIM_RESET = 2
 } RIL_SimRefreshResult;
+
+/* Used by RIL_REQUEST_GET_BROADCAST_CONFIG and RIL_REQUEST_SET_BROADCAST_CONFIG */
+
+typedef struct {
+  int uFromServiceID;
+  int uToserviceID;
+  unsigned char bSelected;
+} RIL_BroadcastServiceInfo;
+
+typedef struct {
+  int size;
+  RIL_BroadcastServiceInfo *entries;
+} RIL_BroadcastSMSConfig;
 
 /** 
  * RIL_REQUEST_GET_SIM_STATUS
@@ -237,8 +351,8 @@ typedef enum {
  * 
  * "data" is NULL
  *
- * "response" must be an int * pointing to RIL_SIM_* constant 
- * This should always succeed (RIL_SUCCESS)
+ * "response" is const RIL_CardStatus *
+
  *
  * If the radio is off or unavailable, return RIL_SIM_NOT_READY 
  *
@@ -466,7 +580,7 @@ typedef enum {
  * Hang up a specific line (like AT+CHLD=1x)
  *
  * "data" is an int * 
- * (int *)data)[0] contains GSM call index (value of 'x' in CHLD above)
+ * (int *)data)[0] contains Connection index (value of 'x' in CHLD above)
  *
  * "response" is NULL
  *
@@ -621,15 +735,32 @@ typedef enum {
  *
  * "data" is NULL
  * "response" is a "char **"
- * ((const char **)response)[0] is registration state 0-5 from TS 27.007 7.2
- * ((const char **)response)[1] is LAC if registered or NULL if not
- * ((const char **)response)[2] is CID if registered or NULL if not
- *
- * LAC and CID are in hexadecimal format.
- * valid LAC are 0x0000 - 0xffff
- * valid CID are 0x00000000 - 0xffffffff
+ * ((const char **)response)[0] is registration state 0-6,
+ *                                  0 - Not registered, MT is not currently searching a new operator to register
+ *                                  1 - Registered, home network
+ *                                  2 - Not registered, but MT is currently searching a new operator to register
+ *                                  3 - Registration denied
+ *                                  4 - Unknown
+ *                                  5 - Registered, roaming
+ *                                  6 - Registered, roaming affiliates
+ * ((const char **)response)[1] is LAC if registered on a GSM/WCDMA system or NULL if not. Valid LAC are 0x0000 - 0xffff
+ * ((const char **)response)[2] is CID if registered on a * GSM/WCDMA or NULL if not. Valid CID are 0x00000000 - 0xffffffff
+ * ((const char **)response)[3] indicates the available radio technology 0-7,
+ *                                  0 - Unknown, 1 - GPRS, 2 - EDGE, 3 - UMTS, 4 - IS95A, 5 - IS95B, 6 - 1xRTT, 7 - EvDo
+ * ((const char **)response)[4] is Base Station ID if registered on a CDMA system or NULL if not.
+ *                                  Base Station ID in hexadecimal format
+ * ((const char **)response)[5] is Base Station latitude if registered on a CDMA system or NULL if not.
+ *                                  Base Station latitude in hexadecimal format
+ * ((const char **)response)[6] is Base Station longitude if registered on a CDMA system or NULL if not.
+ *                                  Base Station longitude in hexadecimal format
+ * ((const char **)response)[7] is concurrent services support indicator if registered on a CDMA system 0-1,
+ *                                  0 - Concurrent services not supported, 1 - Concurrent services supported
+ * ((const char **)response)[8] is System ID if registered on a CDMA system or NULL if not.
+ *                                  Valid System ID are 0 - 32767
+ * ((const char **)response)[9] is Network ID if registered on a CDMA system or NULL if not.
+ *                                  Valid System ID are 0 - 65535
  * 
- * Please note that registration state 4 ("unknown") is treated 
+ * Please note that registration state 4 ("unknown") is treated as "out of service" in the Android telephony system
  * as "out of service" in the Android telephony system
  *
  * Valid errors:
@@ -683,6 +814,11 @@ typedef enum {
  *                                  or NULL if unregistered
  * ((const char **)response)[2] is 5 or 6 digit numeric code (MCC + MNC)
  *                                  or NULL if unregistered
+ * ((const char **)response)[3] is system type, range from 0 to 3 or NULL if unregistered,
+ *                                  0 - WCDMA system,
+ *                                  1 - GSM system, 
+ *                                  2 - 1x system,
+ *                                  3 - EVDO system
  *                                  
  * Valid errors:
  *  SUCCESS
@@ -1042,10 +1178,11 @@ typedef enum {
 #define RIL_REQUEST_SMS_ACKNOWLEDGE  37
 
 /**
- * RIL_REQUEST_GET_IMEI
+ * RIL_REQUEST_GET_IMEI - DEPRECATED
  *
  * Get the device IMEI, including check digit
  *
+ * The request is DECRECATED, use RIL_REQUEST_DEVICE_IDENTITY
  * Valid when RadioState is not RADIO_STATE_UNAVAILABLE
  *
  * "data" is NULL
@@ -1060,10 +1197,11 @@ typedef enum {
 #define RIL_REQUEST_GET_IMEI 38
 
 /**
- * RIL_REQUEST_GET_IMEISV
+ * RIL_REQUEST_GET_IMEISV - DEPRECATED
  *
  * Get the device IMEISV, which should be two decimal digits
  *
+ * The request is DECRECATED, use RIL_REQUEST_DEVICE_IDENTITY
  * Valid when RadioState is not RADIO_STATE_UNAVAILABLE
  *
  * "data" is NULL
@@ -1352,7 +1490,8 @@ typedef enum {
  * TS 27.007 "AT+CHLD=2x"
  * 
  * "data" is an int * 
- * (int *)data)[0] contains GSM call index (value of 'x' in CHLD above)
+ * (int *)data)[0] contains Connection index (value of 'x' in CHLD above) "response" is NULL
+ *
  * "response" is NULL
  *
  * Valid errors:
@@ -1634,6 +1773,19 @@ typedef enum {
  * ((int *)data)[0] is == 3 for "JPN band" (WCDMA-800 / WCDMA-IMT-2000)
  * ((int *)data)[0] is == 4 for "AUS band" (GSM-900 / DCS-1800 / WCDMA-850 / WCDMA-IMT-2000)
  * ((int *)data)[0] is == 5 for "AUS band 2" (GSM-900 / DCS-1800 / WCDMA-850)
+ * ((int *)data)[0] is == 6 for "Cellular (800-MHz Band)"
+ * ((int *)data)[0] is == 7 for "PCS (1900-MHz Band)"
+ * ((int *)data)[0] is == 8 for "Band Class 3 (JTACS Band)"
+ * ((int *)data)[0] is == 9 for "Band Class 4 (Korean PCS Band)"
+ * ((int *)data)[0] is == 10 for "Band Class 5 (450-MHz Band)"
+ * ((int *)data)[0] is == 11 for "Band Class 6 (2-GMHz IMT2000 Band)"
+ * ((int *)data)[0] is == 12 for "Band Class 7 (Upper 700-MHz Band)"
+ * ((int *)data)[0] is == 13 for "Band Class 8 (1800-MHz Band)"
+ * ((int *)data)[0] is == 14 for "Band Class 9 (900-MHz Band)"
+ * ((int *)data)[0] is == 15 for "Band Class 10 (Secondary 800-MHz Band)"
+ * ((int *)data)[0] is == 16 for "Band Class 11 (400-MHz European PAMR Band)"
+ * ((int *)data)[0] is == 17 for "Band Class 15 (AWS Band)"
+ * ((int *)data)[0] is == 18 for "Band Class 16 (US 2.5-GHz Band)"
  *
  * "response" is NULL
  *
@@ -1661,6 +1813,19 @@ typedef enum {
  *  3 for "JPN band" (WCDMA-800 / WCDMA-IMT-2000)
  *  4 for "AUS band" (GSM-900 / DCS-1800 / WCDMA-850 / WCDMA-IMT-2000)
  *  5 for "AUS band 2" (GSM-900 / DCS-1800 / WCDMA-850)
+ *  6 for "Cellular (800-MHz Band)"
+ *  7 for "PCS (1900-MHz Band)"
+ *  8 for "Band Class 3 (JTACS Band)"
+ *  9 for "Band Class 4 (Korean PCS Band)"
+ *  10 for "Band Class 5 (450-MHz Band)"
+ *  11 for "Band Class 6 (2-GMHz IMT2000 Band)"
+ *  12 for "Band Class 7 (Upper 700-MHz Band)"
+ *  13 for "Band Class 8 (1800-MHz Band)"
+ *  14 for "Band Class 9 (900-MHz Band)"
+ *  15 for "Band Class 10 (Secondary 800-MHz Band)"
+ *  16 for "Band Class 11 (400-MHz European PAMR Band)"
+ *  17 for "Band Class 15 (AWS Band)"
+ *  18 for "Band Class 16 (US 2.5-GHz Band)"
  *
  * Valid errors:
  *  SUCCESS
@@ -1789,16 +1954,23 @@ typedef enum {
  * (CS/PS domain, RAT, and operation mode)
  *
  * "data" is int *
- * ((int *)data)[0] is == 0 for WCDMA preferred (auto mode)
+ * 
+ * ((int *)data)[0] is == 0 for GSM/WCDMA (WCDMA preferred)
  * ((int *)data)[0] is == 1 for GSM only
  * ((int *)data)[0] is == 2 for WCDMA only
+ * ((int *)data)[0] is == 3 for GSM/WCDMA (auto mode)
+ * ((int *)data)[0] is == 4 for CDMA and EvDo (auto mode, according to PRL)
+ * ((int *)data)[0] is == 5 for CDMA only
+ * ((int *)data)[0] is == 6 for EvDo only
+ * ((int *)data)[0] is == 7 for GSM/WCDMA, CDMA, and EvDo (auto mode, according to PRL)
  *
  * "response" is NULL
  *
  * Valid errors:
- *  RIL_E_SUCCESS
- *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  MODE_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE 73
 
@@ -1811,9 +1983,14 @@ typedef enum {
  * "data" is NULL
  *
  * "response" is int *
- * ((int *)response)[0] is == 0 for WCDMA preferred (auto mode)
+ * ((int *)response)[0] is == 0 for GSM/WCDMA (WCDMA preferred)
  * ((int *)response)[0] is == 1 for GSM only
  * ((int *)response)[0] is == 2 for WCDMA only
+ * ((int *)response)[0] is == 3 for GSM/WCDMA (auto mode, according to PRL)
+ * ((int *)response)[0] is == 4 for CDMA and EvDo (auto mode, according to PRL)
+ * ((int *)response)[0] is == 5 for CDMA only
+ * ((int *)response)[0] is == 6 for EvDo only
+ * ((int *)response)[0] is == 7 for GSM/WCDMA, CDMA, and EvDo (auto mode, according to PRL)
  *
  * Valid errors:
  *  SUCCESS
@@ -1850,17 +2027,402 @@ typedef enum {
 #define RIL_REQUEST_GET_NEIGHBORING_CELL_IDS 75
 
 /**
- * RIL_REQUEST_SET_LOCATION_UPDATES
- *
- * Enables/disables network state change notifications due to changes in
+ * RIL_REQUEST_DEVICE_IDENTITY
+ * 
+ * Request the device ESN / MEID / IMEI / IMEISV. 
  * LAC and/or CID (basically, +CREG=2 vs. +CREG=1).  
  *
- * Note:  The RIL implementation should default to "updates enabled"
- * when the screen is on and "updates disabled" when the screen is off.
+ * When CDMA subscription is changed the ESN/MEID may change.  The application 
+ * layer should re-issue the request to update the device identity in this case.
  *
- * "data" is int *
+ * accessing the device.
  * ((int *)data)[0] is == 1 for updates enabled (+CREG=2)
  * ((int *)data)[0] is == 0 for updates disabled (+CREG=1)
+ *
+ * "response" is const char **
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RIL_E_SUBSCRIPTION_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ * See also: RIL_REQUEST_SCREEN_STATE, RIL_UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+ */
+#define RIL_REQUEST_SET_LOCATION_UPDATES 76
+
+/**
+ * RIL_REQUEST_CDMA_SET_SUBSCRIPTION
+ * 
+ * Request to set the location where the CDMA subscription shall
+ * be retrieved
+ *
+ * "data" is int *
+ * ((int *)data)[0] is == 0 from RUIM/SIM (default)
+ * ((int *)data)[0] is == 1 from NV
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *  SIM_ABSENT
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ */
+#define RIL_REQUEST_CDMA_SET_SUBSCRIPTION 77
+
+/**
+ * RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE
+ * 
+ * Request to set the roaming preferences in CDMA
+ *
+ * "data" is int *
+ * ((int *)data)[0] is == 0 for Home Networks only, as defined in PRL
+ * ((int *)data)[0] is == 1 for Roaming on Affiliated networks, as defined in PRL
+ * ((int *)data)[0] is == 2 for Roaming on Any Network, as defined in the PRL
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE 78
+
+/**
+ * RIL_REQUEST_CDMA_QUERY_ROAMING_PREFERENCE
+ * 
+ * Request the actual setting of the roaming preferences in CDMA in the modem
+ *
+ * "data" is NULL
+ * 
+ * "response" is int *
+ * ((int *)response)[0] is == 0 for Home Networks only, as defined in PRL
+ * ((int *)response)[0] is == 1 for Roaming on Affiliated networks, as defined in PRL
+ * ((int *)response)[0] is == 2 for Roaming on Any Network, as defined in the PRL
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_CDMA_QUERY_ROAMING_PREFERENCE 79
+
+/**
+ * RIL_REQUEST_SET_TTY_MODE
+ * 
+ * Request to set the TTY mode
+ *
+ * "data" is int *
+ * ((int *)data)[0] is == 0 for TTY off
+ * ((int *)data)[0] is == 1 for TTY on
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SET_TTY_MODE 80
+
+/**
+ * RIL_REQUEST_QUERY_TTY_MODE
+ * 
+ * Request the setting of TTY mode
+ *
+ * "data" is NULL
+ * 
+ * "response" is int *
+ * ((int *)response)[0] is == 0 for TTY off
+ * ((int *)response)[0] is == 1 for TTY on
+ *
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_QUERY_TTY_MODE 81
+
+/**
+ * RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE
+ *
+ * Request to set the preferred voice privacy mode used in voice
+ * scrambling
+ *
+ * "data" is int *
+ * ((int *)data)[0] is == 0 for Standard Privacy Mode (Public Long Code Mask)
+ * ((int *)data)[0] is == 1 for Enhanced Privacy Mode (Private Long Code Mask)
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE 82
+
+/**
+ * RIL_REQUEST_CDMA_QUERY_PREFERRED_VOICE_PRIVACY_MODE
+ * 
+ * Request the setting of preferred voice privacy mode
+ *
+ * "data" is NULL
+ * 
+ * "response" is int *
+ * ((int *)response)[0] is == 0 for Standard Privacy Mode (Public Long Code Mask)
+ * ((int *)response)[0] is == 1 for Enhanced Privacy Mode (Private Long Code Mask)
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_CDMA_QUERY_PREFERRED_VOICE_PRIVACY_MODE 83
+
+/**
+ * RIL_REQUEST_CDMA_FLASH
+ *
+ * Send FLASH
+ *
+ * "data" is const char *
+ * ((const char *)data)[0] is a FLASH string
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_FLASH 84
+
+/**
+ * RIL_REQUEST_CDMA_BURST_DTMF
+ *
+ * Send DTMF string
+ *
+ * "data" is const char *
+ * ((const char *)data)[0] is a DTMF string
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_BURST_DTMF 85
+
+/**
+ * RIL_REQUEST_CDMA_VALIDATE_AKEY
+ *
+ * Validate AKey.
+ *
+ * "data" is const char *
+ * ((const char *)data)[0] is a AKey string
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_VALIDATE_AKEY 86
+
+/**
+ * RIL_REQUEST_CDMA_SEND_SMS
+ *
+ * Send a CDMA SMS message
+ *
+ * "data" is const RIL_CDMA_SMS_Message *
+ * 
+ * "response" is a const RIL_SMS_Response *
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_SEND_SMS 87
+
+/**
+ * RIL_REQUEST_CDMA_SMS_ACKNOWLEDGE
+ *
+ * Acknowledge the success or failure in the receipt of SMS
+ * previously indicated via RIL_UNSOL_RESPONSE_NEW_CDMA_SMS
+ *
+ * "data" is const RIL_CDMA_SMS_Ack *
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_SMS_ACKNOWLEDGE 88
+
+/**
+ * RIL_REQUEST_GET_BROADCAST_CONFIG
+ *
+ * Request the setting of GSM/WCDMA Cell Broadcast SMS config
+ * 
+ * "data" is NULL
+ * 
+ * "response" is const RIL_BroadcastSMSConfig *
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_GET_BROADCAST_CONFIG 89
+
+/**
+ * RIL_REQUEST_SET_BROADCAST_CONFIG
+ *
+ * Set GSM/WCDMA Cell Broadcast SMS config
+ *
+ * "data" is const RIL_BroadcastSMSConfig *
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_SET_BROADCAST_CONFIG 90
+
+/**
+ * RIL_REQUEST_BROADCAST_ACTIVATION
+ *
+ * Enable or disable the reception of GSM/WCDMA Cell Broadcast SMS
+ *
+ * "data" is const int *
+ * (const int *)data[0] indicates to activate or turn off the
+ * reception of GSM/WCDMA Cell Broadcast SMS, 0-1,
+ *                       0 - Activate, 1 - Turn off
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_BROADCAST_ACTIVATION 91
+
+/**
+ * RIL_REQUEST_CDMA_GET_BROADCAST_CONFIG
+ *
+ * Request the setting of CDMA Broadcast SMS config
+ *
+ * "data" is NULL
+ * 
+ * "response" is const RIL_CDMA_BroadcastSMSConfig *
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_GET_BROADCAST_CONFIG 92
+
+/**
+ * RIL_REQUEST_CDMA_SET_BROADCAST_CONFIG
+ *
+ * Set CDMA Broadcast SMS config
+ *
+ * "data" is const RIL_CDMA_BroadcastSMSConfig *
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_SET_BROADCAST_CONFIG 93
+
+/**
+ * RIL_REQUEST_CDMA_BROADCAST_ACTIVATION
+ *
+ * Enable or disable the reception of CDMA Broadcast SMS
+ *
+ * "data" is const int *
+ * (const int *)data[0] indicates to activate or turn off the
+ * reception of CDMA Broadcast SMS, 0-1,
+ *                       0 - Activate, 1 - Turn off
+ * 
+ * "response" is NULL
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_BROADCAST_ACTIVATION 94
+
+/**
+ * RIL_REQUEST_SETUP_DATA_CALL
+ *
+ * Setup a packet data connection
+ *
+ * "data" is a const char **
+ * ((const char **)data)[0] indicates whether to setup connection on radio technology CDMA or GSM/UMTS, 0-1
+ *                             0 - CDMA, 1-GSM/UMTS
+ * 
+ * ((const char **)data)[1] Profile Number or NULL to indicate default profile
+ * ((const char **)data)[2] is the APN to connect to if radio technology is GSM/UMTS. 
+ *                          This APN will override the one in the profile. NULL indicates no APN overrride.
+ * ((const char **)data)[3] is the username for APN, or NULL
+ * ((const char **)data)[4] is the password for APN, or NULL
+ *
+ * "response" is a char **
+ * ((char **)response)[0] indicating PDP CID, which is generated by RIL. This Connection ID is used in GSM/UMTS and CDMA
+ * ((char **)response)[1] indicating the network interface name for GSM/UMTS or CDMA
+ * ((char **)response)[2] indicating the IP address for this interface for GSM/UMTS and NULL for CDMA
+ *
+ * FIXME may need way to configure QoS settings
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ * See also: RIL_REQUEST_DEACTIVATE_DATA_CALL
+ */
+#define RIL_REQUEST_SETUP_DATA_CALL 95
+
+/**
+ * RIL_REQUEST_DEACTIVATE_DATA_CALL
+ *
+ * Deactivate packet data connection
+ *
+ * "data" is const char **
+ * ((char**)data)[0] indicating CID
  *
  * "response" is NULL
  *
@@ -1869,11 +2431,135 @@ typedef enum {
  *  RADIO_NOT_AVAILABLE
  *  GENERIC_FAILURE
  *
- * See also: RIL_REQUEST_SCREEN_STATE, RIL_UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+ * See also: RIL_REQUEST_SETUP_DATA_CALL
  */
-#define RIL_REQUEST_SET_LOCATION_UPDATES 76
+#define RIL_REQUEST_DEACTIVATE_DATA_CALL 96
+
+/**
+ * RIL_REQUEST_CDMA_ENCODE_SMS
+ *
+ * Encode a CDMA SMS message
+ *
+ * "data" is const RIL_CDMA_SMS_ClientBd *
+ * 
+ * "response" is RIL_CDMA_Encoded_SMS *
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_ENCODE_SMS 97
+
+/**
+ * RIL_REQUEST_CDMA_DECODE_SMS
+ *
+ * Encode a CDMA SMS message
+ * 
+ * "data" is RIL_CDMA_Encoded_SMS *
+ *
+ * "response" is const RIL_CDMA_SMS_ClientBd *
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_DECODE_SMS 98
+/**
+ * RIL_REQUEST_CDMA_SUBSCRIPTION
+ *
+ * Request the device MDN / H_SID / H_NID.
+ *
+ * The request is only allowed when CDMA subscription is available.  When CDMA
+ * subscription is changed, application layer should re-issue the request to
+ * update the subscription information.
+ *
+ * If a NULL value is returned for any of the device id, it means that error
+ * accessing the device.
+ *
+ * "response" is const char **
+ * ((const char **)response)[0] is MDN if CDMA subscription is available
+ * ((const char **)response)[1] is H_SID (Home SID) if CDMA subscription is available
+ * ((const char **)response)[2] is H_NID (Home SID) if CDMA subscription is available
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RIL_E_SUBSCRIPTION_NOT_AVAILABLE
+ */
+
+#define RIL_REQUEST_CDMA_SUBSCRIPTION 99
+
+/**
+ * RIL_REQUEST_CDMA_WRITE_SMS_TO_RUIM
+ *
+ * Stores a CDMA SMS message to RUIM memory.
+ *
+ * "data" is RIL_CDMA_SMS_WriteArgs *
+ *
+ * "response" is int *
+ * ((const int *)response)[0] is the record index where the message is stored.
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_WRITE_SMS_TO_RUIM 100
+
+/**
+ * RIL_REQUEST_CDMA_DELETE_SMS_ON_RUIM
+ *
+ * Deletes a CDMA SMS message from RUIM memory.
+ *
+ * "data" is int  *
+ * ((int *)data)[0] is the record index of the message to delete.
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_CDMA_DELETE_SMS_ON_RUIM 101
+
+/**
+ * RIL_REQUEST_DEVICE_IDENTITY
+ * 
+ * Request the device ESN / MEID / IMEI / IMEISV. 
+ * 
+ * The request is always allowed and contains GSM and CDMA device identity;
+ * it substitutes the deprecated requests RIL_REQUEST_GET_IMEI and 
+ * RIL_REQUEST_GET_IMEISV.
+ * 
+ * If a NULL value is returned for any of the device id, it means that error 
+ * accessing the device.
+ * 
+ * When CDMA subscription is changed the ESN/MEID may change.  The application 
+ * layer should re-issue the request to update the device identity in this case.
+ * 
+ * "response" is const char **
+ * ((const char **)response)[0] is IMEI if GSM subscription is available 
+ * ((const char **)response)[1] is IMEISV if GSM subscription is available 
+ * ((const char **)response)[2] is ESN if CDMA subscription is available 
+ * ((const char **)response)[3] is MEID if CDMA subscription is available 
+ * 
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_DEVICE_IDENTITY 102
+
+
 
 /***********************************************************************/
+
 
 #define RIL_UNSOL_RESPONSE_BASE 1000
 
@@ -2143,10 +2829,60 @@ typedef enum {
  */
 #define RIL_UNSOL_CALL_RING 1018
 
+/**
+ * RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
+ *
+ * Indicates that SIM state changes.
+ * 
+ * Callee will invoke RIL_REQUEST_GET_SIM_STATUS on main thread
+
+ * "data" is null
+ */
+#define RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED 1019
+
+/**
+ * RIL_UNSOL_RESPONSE_CDMA_NEW_SMS
+ *
+ * Called when new CDMA SMS is received
+ * 
+ * "data" is const RIL_CDMA_SMS_Message *
+ * 
+ * Callee will subsequently confirm the receipt of the SMS with
+ * a RIL_REQUEST_CDMA_SMS_ACKNOWLEDGE
+ * 
+ * No new RIL_UNSOL_RESPONSE_CDMA_NEW_SMS should be sent until
+ * RIL_REQUEST_CDMA_SMS_ACKNOWLEDGE has been received
+ * 
+ */
+#define RIL_UNSOL_RESPONSE_CDMA_NEW_SMS 1020
+
+/**
+ * RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS
+ *
+ * Called when new Broadcast SMS is received
+ * 
+ * "data" is const char * of 88 bytes which indicates each page
+ * of a CBS Message sent to the MS by the BTS as coded in 3GPP
+ * 23.041 Section 9.4.1.1
+ *
+ */
+#define RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS 1021
+
+/**
+ * RIL_UNSOL_CDMA_RUIM_SMS_STORAGE_FULL
+ *
+ * Indicates that SMS storage on the RUIM is full.  Messages
+ * cannot be saved on the RUIM until space is freed.
+ *
+ * "data" is null
+ *
+ */
+#define RIL_UNSOL_CDMA_RUIM_SMS_STORAGE_FULL 1022
+
 /***********************************************************************/
 
 
-/**
+/*
  * RIL_Request Function pointer
  *
  * @param request is one of RIL_REQUEST_*
@@ -2159,12 +2895,12 @@ typedef enum {
 typedef void (*RIL_RequestFunc) (int request, void *data, 
                                     size_t datalen, RIL_Token t);
 
-/**
+/*
  * This function should return the current radio state synchronously
  */
 typedef RIL_RadioState (*RIL_RadioStateRequest)();
 
-/**
+/*
  * This function returns "1" if the specified RIL_REQUEST code is
  * supported and 0 if it is not
  *
@@ -2272,24 +3008,24 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
 void RIL_register (const RIL_RadioFunctions *callbacks);
 
 
-/**
+/*
  *
  * RIL_onRequestComplete will return as soon as possible
  *
- * @param t is parameter passed in on previous call to RIL_Notification
- *          routine.
- * @param e error code
- *          if "e" != SUCCESS, then response can be null/is ignored
- * @param response is owned by caller, and should not be modified or
+ * "t" is parameter passed in on previous call to RIL_Notification
+ * routine.
+ *
+ * If "e" != SUCCESS, then response can be null/is ignored
+ * "response" is owned by caller, and should not be modified or 
  *                 freed by callee
- * @param responselen the length of response in byte
+ *
  */
 void RIL_onRequestComplete(RIL_Token t, RIL_Errno e, 
                            void *response, size_t responselen);
 
 /**
- * @param unsolResponse is one of RIL_UNSOL_RESPONSE_*
- * @param data is pointer to data defined for that RIL_UNSOL_RESPONSE_*
+ * "unsolResponse" is one of RIL_UNSOL_RESPONSE_*
+ * "data" is pointer to data defined for that RIL_UNSOL_RESPONSE_*
  *     "data" is owned by caller, and should not be modified or freed by callee
  * @param datalen the length of data in byte
  */

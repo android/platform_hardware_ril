@@ -15,7 +15,7 @@
 ** limitations under the License.
 */
     {0, NULL, NULL},                   //none
-    {RIL_REQUEST_GET_SIM_STATUS,dispatchVoid, responseInts},
+    {RIL_REQUEST_GET_SIM_STATUS, dispatchVoid, responseSimStatus},
     {RIL_REQUEST_ENTER_SIM_PIN, dispatchStrings, responseVoid},
     {RIL_REQUEST_ENTER_SIM_PUK, dispatchStrings, responseVoid},
     {RIL_REQUEST_ENTER_SIM_PIN2, dispatchStrings, responseVoid},
@@ -90,4 +90,30 @@
     {RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE, dispatchInts, responseVoid},
     {RIL_REQUEST_GET_PREFERRED_NETWORK_TYPE, dispatchVoid, responseInts},
     {RIL_REQUEST_GET_NEIGHBORING_CELL_IDS, dispatchVoid, responseStrings},
-    {RIL_REQUEST_SET_LOCATION_UPDATES, dispatchInts, responseVoid}
+    {RIL_REQUEST_SET_LOCATION_UPDATES, dispatchInts, responseVoid},
+    {RIL_REQUEST_CDMA_SET_SUBSCRIPTION, dispatchInts, responseVoid},
+    {RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE, dispatchInts, responseVoid},
+    {RIL_REQUEST_CDMA_QUERY_ROAMING_PREFERENCE, dispatchVoid, responseInts},
+    {RIL_REQUEST_SET_TTY_MODE, dispatchInts, responseVoid},
+    {RIL_REQUEST_QUERY_TTY_MODE, dispatchVoid, responseInts},
+    {RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE, dispatchInts, responseVoid},
+    {RIL_REQUEST_CDMA_QUERY_PREFERRED_VOICE_PRIVACY_MODE, dispatchVoid, responseInts},
+    {RIL_REQUEST_CDMA_FLASH, dispatchString, responseVoid},
+    {RIL_REQUEST_CDMA_BURST_DTMF, dispatchString, responseVoid},
+    {RIL_REQUEST_CDMA_SEND_SMS, dispatchCDMA_SMS, responseVoid}, //new DISPATCH function
+    {RIL_REQUEST_CDMA_SMS_ACKNOWLEDGE, dispatchCDMA_SMS_ACK, responseVoid}, //new DISPATCH function
+    {RIL_REQUEST_GET_BROADCAST_CONFIG, dispatchVoid, responseBR_SMS_CNF}, //new RESPONSE function
+    {RIL_REQUEST_SET_BROADCAST_CONFIG, dispatchBR_SMS_CNF, responseVoid}, //new DISPATCH function
+    {RIL_REQUEST_CDMA_GET_BROADCAST_CONFIG, dispatchVoid, responseCDMA_BR_CNF}, //new RESPONSE function
+    {RIL_REQUEST_CDMA_SET_BROADCAST_CONFIG, dispatchCDMA_BR_SMS_CNF, responseVoid}, //new DISPATCH unction
+    {RIL_REQUEST_BROADCAST_ACTIVATION, dispatchInts, responseVoid},
+    {RIL_REQUEST_SETUP_DATA_CALL, dispatchStrings, responseStrings},
+    {RIL_REQUEST_DEACTIVATE_DATA_CALL, dispatchStrings, responseVoid},
+    {RIL_REQUEST_CDMA_VALIDATE_AKEY, dispatchString, responseVoid},
+    {RIL_REQUEST_CDMA_BROADCAST_ACTIVATION, dispatchInts, responseVoid},
+    {RIL_REQUEST_CDMA_ENCODE_SMS, dispatchRIL_CDMA_SMS_ClientBd, responseRIL_CDMA_Encoded_SMS},
+    {RIL_REQUEST_CDMA_DECODE_SMS, dispatchRIL_CDMA_Encoded_SMS, responseRIL_CDMA_SMS_ClientBd},
+    {RIL_REQUEST_CDMA_SUBSCRIPTION, dispatchVoid, responseStrings},//Assumption Made here to use DispatchVoid!
+    {RIL_REQUEST_CDMA_WRITE_SMS_TO_RUIM, dispatchRIL_CDMA_SMS_WriteArgs, responseInts}, //new DISPATCH function
+    {RIL_REQUEST_CDMA_DELETE_SMS_ON_RUIM, dispatchInts, responseVoid},
+    {RIL_REQUEST_DEVICE_IDENTITY, dispatchVoid, responseStrings}				
