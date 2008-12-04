@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "zee4be43d1d677de146ec4b7cd5cde5cb",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Please explain while RIL_CARDSTATE_PRESENT, what other fields should be looked to decide the card registration status.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zc136d88c3dc47f5e16132e50682abbab",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Add comment for RIL_CARDSTATE_ERROR. What kind of errors it reports and which other fields state the error type. ",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zf27f6ea509bed9268f09765fb8de6d2f",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Add comment to describe RIL_PERSOSUBSTATE_SIM_NETWORK. What it represents and what it for.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zdc5c65cde040362b4b34421337729de5",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Please add comments to each of RIL_PERSOSUBSTATE_*",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zbda4ccdf4dad0be5fbb5c4b78e003409",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Comments for RIL_APPSTATE_UNKNOWN. Is it a transient state? If no, what should app do, i.e., should reset radio?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z6cb6c4d598a9e8b538fbc54053c44a78",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Is it a transient state? add comment.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z2b2311ef73e6c1e7670b11061816d7b4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Comments, please.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z73fbc3a042a185dcf9ebfbf7bbf89dbd",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "What RIL_APPTYPE_UNKNOWN means? Is it a valid state?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zaa501c8b24fcc2089aba439fb39ff1e0",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "is cdma_subscription_app_index and gsm_umts_subscription_app_index mutual exclusive? Can use one index and RIL_AppStatus to decide?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zc794294903512f7e704baab3cd82be04",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "How often we need 8 apps array? Can we separate to two structures to let GET_SIM_STATUS only return a small size struct?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z5c943198d85884e69e67e5b4427ef6fa",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Need better comments for RIL_CardStatus, better to have a flowchart or finite state machine to explain each valid state and state transfer. ",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z03215accc7e6d3d73e90666dcb96ceba",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "Using RIL_CardStatus as response will break the backward compatibility. \nPlease consider create separate request, i.e., RIL_REQUEST_GET_CDMA_SIM_STATUS\n",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z88fd688afeb3b65cbdb5ed3b60434dc7",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3019,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "The original comment format is better.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ze51f1cbe02409c976e383938864f6eea",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3028,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-04T21:59:06Z",
+      "side": 1,
+      "message": "The original comment format is better.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
