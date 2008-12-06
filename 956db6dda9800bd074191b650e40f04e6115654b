@@ -206,6 +206,40 @@
     },
     {
       "key": {
+        "uuid": "z2cd3286b1d1715bdcfbb1c00ae6dd079",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1770,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "auto mode if for GSM or CDMA or combined.\nShould we have a GSM auto (select among 1 - 5), CDMA auto(select among 6 - 18), and unspecified (select among 1 - 18)?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z5bad9510683e36811fa2127597e357aa",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1961,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Difference between 3 and 0? Are they all auto w/ WCDMA preferred?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z88fd688afeb3b65cbdb5ed3b60434dc7",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -234,6 +268,125 @@
       "writtenOn": "2008-12-04T21:59:06Z",
       "side": 1,
       "message": "The original comment format is better.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zb9607a106300755ba9db7ff001fa1581",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2062,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Indents.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zc88d6da1a5b56aefd540278e856c981c",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2264,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Remove if not in use",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z7bba872bff21f0a45ed299eeb8914162",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2637,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Indent. The old one is ok.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z15d0dcbf5548e01361f8d0bc949b23df",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2656,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Indent. The old one is ok.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z66b2ccff9e82542466c79249df85d893",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Acronyms are treated as words and only the first letter is capitalized. Suggest change the function name from dispatchCDMA_SMS to dispatchCdmaSms",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z5c584fc5700bbb76f4132e48ea751b82",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Similar to capitalize the first letter of acronyms, dispatchRilCdmaSmsWriteArgs",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zd68918531b4594adb888745108b92b98",
+        "filename": "libril/ril_unsol_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2008-12-06T01:21:45Z",
+      "side": 1,
+      "message": "Acronyms are treated as words and only the first letter is capitalized. Suggest change the function name from responseCDMA_SMS to responseCdmaSms",
       "revId": "956db6dda9800bd074191b650e40f04e6115654b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
