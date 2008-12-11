@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "z213ff6250e70c687268d62aacc734dd9",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\n\r\nWhen in RIL_CARDSTATE_PRESENT, whether a registration to the network is allowed or not will be based on\r\n- AppState for the GSM/CDMA subscription application(s)\r\n\r\ni.e., user needs to look at RIL_CardStatus.applications[RIL_CardStatus.gsm_umts_subscription_app_index].app_state for GSM subscription and\r\nRIL_CardStatus.applications[RIL_CardStatus.cdma_subscription_app_index].app_state for CDMA subscription",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zc136d88c3dc47f5e16132e50682abbab",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "z742c7ac5f8ee62bc5fc988d630af656d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\nRIL_CARDSTATE_ERROR currently is equivalent to RIL_CARDSTATE_ABSENT.  This is for radio devices that have the ability to differentiate a card error, e.g., erroneous physical link connection, from someone removing the card.\r\n",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zf27f6ea509bed9268f09765fb8de6d2f",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -47,6 +81,23 @@
       "writtenOn": "2008-12-04T21:59:06Z",
       "side": 1,
       "message": "Add comment to describe RIL_PERSOSUBSTATE_SIM_NETWORK. What it represents and what it for.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z6ee94a6d6f702d277afccb853708bebb",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\nSIM_NETWORK stands for the Network Personalization per spec 02.22.\r\nUsing PERSOSUBSTATE_SIM_ to denote it is applicable to SIM/USIM\r\nand PERSOSUBSTATE_RUIM_ to denote it is applicable to RUIM/CSIM.\r\nWill add comments for all PERSOSUBSTATE.\r\n",
       "revId": "956db6dda9800bd074191b650e40f04e6115654b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -87,6 +138,23 @@
     },
     {
       "key": {
+        "uuid": "zf39f86bec242e828d31956fa24302155",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\n\r\nThis is the initial state before the phone is aware of any application on the card.\r\nThis is also the state for applications when the card_state is RIL_CARDSTATE_ABSENT.\r\n\r\nApplication should not nothing other than waiting for the state to change to the rest of the states",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z6cb6c4d598a9e8b538fbc54053c44a78",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -98,6 +166,23 @@
       "writtenOn": "2008-12-04T21:59:06Z",
       "side": 1,
       "message": "Is it a transient state? add comment.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z0347b786265f2085b3697c39312b4af1",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\nYes, it is a transient state.\r\nFor a subscription application, e.g., USIM, the app will be in the DETECTED state before its PIN/PUK/Perso status is known or before it is ready to be used for registration. \r\nFor non subscription application, e.g., ISIM, this is the state for which the radio device realises that the application exists but has not selected the application for communication.  \r\nIt is also the state where the radio device has deselected the application for any further communication.  \r\nNote, this is applicable to UICC architecture but we have extend it to both ICC and UICC card.\r\n",
       "revId": "956db6dda9800bd074191b650e40f04e6115654b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -138,6 +223,23 @@
     },
     {
       "key": {
+        "uuid": "z4633bb4e4fe0c1a0cea997c72ae4731c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\nRadio device does not necessarily know all the application types because there are proprietary applications possible on the card, as defined in EF-DIR for a UICC card, which may only be known to a specific phone application written specifically for it.  In such case, this apptype will be used.\r\n\r\ne.g., ISIM application is not going to be parsed by radio device, hence, ISIM application will carry an apptype of UNKNOWN\r\n",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zaa501c8b24fcc2089aba439fb39ff1e0",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -149,6 +251,23 @@
       "writtenOn": "2008-12-04T21:59:06Z",
       "side": 1,
       "message": "is cdma_subscription_app_index and gsm_umts_subscription_app_index mutual exclusive? Can use one index and RIL_AppStatus to decide?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zfea332a4112ea9b056ee653f19a5e825",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\nThey are exclusive.\r\nIn ICC, we will report two applications (1 for SIM and 1 for RUIM)\r\nIn UICC, when CSIM is supported, we will report two applications (1 for USIM and 1 for CSIM)",
       "revId": "956db6dda9800bd074191b650e40f04e6115654b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -172,6 +291,23 @@
     },
     {
       "key": {
+        "uuid": "z760154d3612afc5734cc1ebf59fe8938",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\nCan you please elaborate what do you mean by 2 structures?  RIL_CardStatus is a structure for the entire card, it has been created to accomodate for a UICC which can defined numerous applications (up to 8 max supported by radio device and defined by the spec), e.g., USIM, ISIM, CSIM etc.  For 2G card, the same structure will return up to 2 applications (SIM and RUIM). ",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z5c943198d85884e69e67e5b4427ef6fa",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -189,6 +325,23 @@
     },
     {
       "key": {
+        "uuid": "z0884ff8b35a96601b9878f5e3937bbd2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\nWe will enhance the comments and indicate trigger points for state transition.\r\n",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z03215accc7e6d3d73e90666dcb96ceba",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -200,6 +353,23 @@
       "writtenOn": "2008-12-04T21:59:06Z",
       "side": 1,
       "message": "Using RIL_CardStatus as response will break the backward compatibility. \nPlease consider create separate request, i.e., RIL_REQUEST_GET_CDMA_SIM_STATUS\n",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z4f1891d389bf24cc795d9289ffbe0217",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1001330
+      },
+      "writtenOn": "2008-12-11T23:09:53Z",
+      "side": 1,
+      "message": "On 2008/12/04 21:59:06, Tingmui Li wrote:\r\n\r\nPlease note, RIL_CardStatus is not specific to CDMA.  It incorporates concept for UICC as well.\r\n\r\nRequire internal discussion regarding new API.  We will provide updates.",
       "revId": "956db6dda9800bd074191b650e40f04e6115654b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
