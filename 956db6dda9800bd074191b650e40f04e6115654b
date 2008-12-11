@@ -342,6 +342,23 @@
     },
     {
       "key": {
+        "uuid": "z64a16925e49a325e1f1f06125dd7a474",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1000368
+      },
+      "writtenOn": "2008-12-11T23:11:58Z",
+      "side": 1,
+      "message": "Ting Mui is gong to respond to RIL_CardStatus comments.  I have responded to all other comments.\n",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z03215accc7e6d3d73e90666dcb96ceba",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -376,6 +393,23 @@
     },
     {
       "key": {
+        "uuid": "zf06abc895cb801522b9f8c3b7ceb54f2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1000368
+      },
+      "writtenOn": "2008-12-11T23:11:58Z",
+      "side": 1,
+      "message": "It is my understanding that backward compatibility in the RIL interface is not a requirement here.  If that isn\u0027t the case we have lots of other problems e.g. RIL_REQUEST_REGISTRATION_STATE.  Also, this is not CDMA SIM status, this is \"Generic 3G SIM status\".",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z2cd3286b1d1715bdcfbb1c00ae6dd079",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -387,6 +421,23 @@
       "writtenOn": "2008-12-06T01:21:45Z",
       "side": 1,
       "message": "auto mode if for GSM or CDMA or combined.\nShould we have a GSM auto (select among 1 - 5), CDMA auto(select among 6 - 18), and unspecified (select among 1 - 18)?",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z536c09160ddba4fe77275b184d686194",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1770,
+      "author": {
+        "id": 1000368
+      },
+      "writtenOn": "2008-12-11T23:11:58Z",
+      "side": 1,
+      "message": "RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE determines CDMA, GSM or both, and the radio already knows it can\u0027t attempt GSM acquisition on a CDMA band or vice versa, so I think there is no change required here.",
       "revId": "956db6dda9800bd074191b650e40f04e6115654b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -410,6 +461,23 @@
     },
     {
       "key": {
+        "uuid": "zec9061222045c370f5f74deff597f6da",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1961,
+      "author": {
+        "id": 1000368
+      },
+      "writtenOn": "2008-12-11T23:11:58Z",
+      "side": 1,
+      "message": "They are different but I agree that 3 can be removed.  If we want to leave it the comment should be, \"according to PRL\"...",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z88fd688afeb3b65cbdb5ed3b60434dc7",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -421,6 +489,23 @@
       "writtenOn": "2008-12-04T21:59:06Z",
       "side": 1,
       "message": "The original comment format is better.",
+      "revId": "956db6dda9800bd074191b650e40f04e6115654b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "za5edc3308e48d53234a8b53bcfabfc0b",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3019,
+      "author": {
+        "id": 1000368
+      },
+      "writtenOn": "2008-12-11T23:11:58Z",
+      "side": 1,
+      "message": "I think we are missing a merge with some of your latest doxygen comment updates.  I agree this submission should not remove any doxygen compatibility.\n",
       "revId": "956db6dda9800bd074191b650e40f04e6115654b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
