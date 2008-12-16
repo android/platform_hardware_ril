@@ -201,13 +201,13 @@ static void dispatchCallForward(Parcel& p, RequestInfo *pRI);
 static void dispatchRaw(Parcel& p, RequestInfo *pRI);
 static void dispatchSmsWrite (Parcel &p, RequestInfo *pRI);
 
-static void dispatchCDMA_SMS(Parcel &p, RequestInfo *pRI);
-static void dispatchCDMA_SMS_ACK(Parcel &p, RequestInfo *pRI);
-static void dispatchBR_SMS_CNF(Parcel &p, RequestInfo *pRI);
-static void dispatchCDMA_BR_SMS_CNF(Parcel &p, RequestInfo *pRI);
-static void dispatchRIL_CDMA_SMS_ClientBd(Parcel &p, RequestInfo *pRI);
-static void dispatchRIL_CDMA_Encoded_SMS(Parcel &p, RequestInfo *pRI);
-static void dispatchRIL_CDMA_SMS_WriteArgs(Parcel &p, RequestInfo *pRI);
+static void dispatchCdmaSms(Parcel &p, RequestInfo *pRI);
+static void dispatchCdmaSmsAck(Parcel &p, RequestInfo *pRI);
+static void dispatchBrSmsCnf(Parcel &p, RequestInfo *pRI);
+static void dispatchCdmaBrSmsCnf(Parcel &p, RequestInfo *pRI);
+static void dispatchRilCdmaSmsClientBd(Parcel &p, RequestInfo *pRI);
+static void dispatchRilCdmaEncodedSms(Parcel &p, RequestInfo *pRI);
+static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI);
 static int responseInts(Parcel &p, void *response, size_t responselen);
 static int responseStrings(Parcel &p, void *response, size_t responselen);
 static int responseString(Parcel &p, void *response, size_t responselen);
@@ -220,11 +220,11 @@ static int responseContexts(Parcel &p, void *response, size_t responselen);
 static int responseRaw(Parcel &p, void *response, size_t responselen);
 static int responseSsn(Parcel &p, void *response, size_t responselen);
 static int responseSimStatus(Parcel &p, void *response, size_t responselen);
-static int responseBR_SMS_CNF(Parcel &p, void *response, size_t responselen);
-static int responseCDMA_BR_CNF(Parcel &p, void *response, size_t responselen);
-static int responseCDMA_SMS(Parcel &p, void *response, size_t responselen);
-static int responseRIL_CDMA_SMS_ClientBd(Parcel &p, void *response, size_t responselen);
-static int responseRIL_CDMA_Encoded_SMS(Parcel &p, void *response, size_t responselen);
+static int responseBrSmsCnf(Parcel &p, void *response, size_t responselen);
+static int responseCdmaBrCnf(Parcel &p, void *response, size_t responselen);
+static int responseCdmaSms(Parcel &p, void *response, size_t responselen);
+static int responseRilCdmaSmsClientBd(Parcel &p, void *response, size_t responselen);
+static int responseRilCdmaEncodedSms(Parcel &p, void *response, size_t responselen);
 
 extern "C" const char * requestToString(int request);
 extern "C" const char * failCauseToString(RIL_Errno);
@@ -790,7 +790,7 @@ invalid:
  * Change needed for ril_QC_20080819.h
  ****************************************/
 static void 
-dispatchCDMA_SMS(Parcel &p, RequestInfo *pRI) {
+dispatchCdmaSms(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_SMS_Message rcsm;
     int32_t  t;
     uint8_t ut;
@@ -878,7 +878,7 @@ invalid:
 }
 
 static void 
-dispatchCDMA_SMS_ACK(Parcel &p, RequestInfo *pRI) {
+dispatchCdmaSmsAck(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_SMS_Ack rcsa;
     int32_t  t;
     status_t status;
@@ -913,7 +913,7 @@ invalid:
 }
 
 static void 
-dispatchBR_SMS_CNF(Parcel &p, RequestInfo *pRI) {
+dispatchBrSmsCnf(Parcel &p, RequestInfo *pRI) {
     RIL_BroadcastSMSConfig rbsc;
     int32_t  t;
     uint8_t ut;
@@ -959,7 +959,7 @@ invalid:
 }
 
 static void 
-dispatchCDMA_BR_SMS_CNF(Parcel &p, RequestInfo *pRI) {
+dispatchCdmaBrSmsCnf(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_BroadcastSMSConfig rcbsc;
     int32_t  t;
     uint8_t ut;
@@ -1002,7 +1002,7 @@ invalid:
 
 }
 
-static void dispatchRIL_CDMA_SMS_ClientBd(Parcel &p, RequestInfo *pRI) {
+static void dispatchRilCdmaSmsClientBd(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_SMS_ClientBd rcscb;
     int32_t  t;
     uint32_t ut;
@@ -1119,9 +1119,6 @@ static void dispatchRIL_CDMA_SMS_ClientBd(Parcel &p, RequestInfo *pRI) {
                 rcscb.user_data.headers[i].u.text_formating.text_color_background = (RIL_CDMA_SMS_UdhTextColor) t;
             } break;
 
-            //case RIL_CDMA_SMS_UDH_SMSC_CONTROL :{rcscb.user_data.headers[i].u = (RIL_CDMA_SMS_UdhId) t;} break;
-            //case RIL_CDMA_SMS_UDH_WCMP :{rcscb.user_data.headers[i].u = (RIL_CDMA_SMS_UdhId) t;} break;
-            //case RIL_CDMA_SMS_UDH_SOURCE :{rcscb.user_data.headers[i].u = (RIL_CDMA_SMS_UdhId) t;} break;
             case RIL_CDMA_SMS_UDH_PRE_DEF_SOUND : {
                 status = p.read(&uct,sizeof(uct));
                 rcscb.user_data.headers[i].u.pre_def_sound.position= (uint8_t) uct;
@@ -1496,7 +1493,7 @@ invalid:
  * New Dispatch functions added here 
  * Change needed for ril_QC_20081024.h
  ****************************************/
-static void dispatchRIL_CDMA_Encoded_SMS(Parcel &p, RequestInfo *pRI) {
+static void dispatchRilCdmaEncodedSms(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_Encoded_SMS rces;
     uint8_t  uct;
     status_t status;
@@ -1531,7 +1528,7 @@ invalid:
     return;
 }
 
-static void dispatchRIL_CDMA_SMS_WriteArgs(Parcel &p, RequestInfo *pRI) {
+static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_SMS_WriteArgs rcsw;
     int32_t  t;
     uint32_t ut;
@@ -2051,22 +2048,22 @@ static int responseSimStatus(Parcel &p, void *response, size_t responselen) {
         p.writeInt32(p_cur->applications[i].pin2);
         appendPrintBuf("%s[app_type=%d,app_state=%d,perso_substate=%d,aid_ptr=%s,\
                 app_label_ptr=%s,pin1_replaced=%d,pin1=%d,pin2=%d],",
-            printBuf,
-            p_cur->applications[i].app_type,
-            p_cur->applications[i].app_state,
-            p_cur->applications[i].perso_substate,
-            p_cur->applications[i].aid_ptr,
-            p_cur->applications[i].app_label_ptr,
-            p_cur->applications[i].pin1_replaced,
-            p_cur->applications[i].pin1,
-            p_cur->applications[i].pin2);
+                printBuf,
+                p_cur->applications[i].app_type,
+                p_cur->applications[i].app_state,
+                p_cur->applications[i].perso_substate,
+                p_cur->applications[i].aid_ptr,
+                p_cur->applications[i].app_label_ptr,
+                p_cur->applications[i].pin1_replaced,
+                p_cur->applications[i].pin1,
+                p_cur->applications[i].pin2);
     }
     closeResponse;
 
     return 0;    
 } 
  
-static int responseBR_SMS_CNF(Parcel &p, void *response, size_t responselen) {
+static int responseBrSmsCnf(Parcel &p, void *response, size_t responselen) {
     int num;
     
     if (response == NULL && responselen != 0) {
@@ -2100,7 +2097,7 @@ static int responseBR_SMS_CNF(Parcel &p, void *response, size_t responselen) {
 return 0;
 }
 
-static int responseCDMA_BR_CNF(Parcel &p, void *response, size_t responselen) {
+static int responseCdmaBrCnf(Parcel &p, void *response, size_t responselen) {
     int num;
     
     if (response == NULL && responselen != 0) {
@@ -2133,7 +2130,7 @@ static int responseCDMA_BR_CNF(Parcel &p, void *response, size_t responselen) {
 return 0;
 }
 
-static int responseCDMA_SMS(Parcel &p, void *response, size_t responselen) {
+static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
 
     int num;
     int digitCount;
@@ -2188,7 +2185,7 @@ return 0;
 }
 
 
-static int responseRIL_CDMA_SMS_ClientBd(Parcel &p, void *response, size_t responselen) {
+static int responseRilCdmaSmsClientBd(Parcel &p, void *response, size_t responselen) {
     int num;
     int digitCount;
     uint8_t uct;
@@ -2261,9 +2258,6 @@ static int responseRIL_CDMA_SMS_ClientBd(Parcel &p, void *response, size_t respo
                 p.writeInt32(p_cur->user_data.headers[i].u.text_formating.text_color_background );
             } break;
 
-            //case RIL_CDMA_SMS_UDH_SMSC_CONTROL :{p_cur->user_data.headers[i].u = (RIL_CDMA_SMS_UdhId) t;} break;
-            //case RIL_CDMA_SMS_UDH_WCMP :{p_cur->user_data.headers[i].u = (RIL_CDMA_SMS_UdhId) t;} break;
-            //case RIL_CDMA_SMS_UDH_SOURCE :{p_cur->user_data.headers[i].u = (RIL_CDMA_SMS_UdhId) t;} break;
             case RIL_CDMA_SMS_UDH_PRE_DEF_SOUND : {
                 p.write(&p_cur->user_data.headers[i].u.pre_def_sound.position, sizeof(uct)) ;
                 p.write(&p_cur->user_data.headers[i].u.pre_def_sound.snd_number, sizeof(uct)) ;
@@ -2470,7 +2464,7 @@ static int responseRIL_CDMA_SMS_ClientBd(Parcel &p, void *response, size_t respo
  * START : New Response functions added here 
  * Change needed for ril_QC_20081024.h
  ****************************************/ 
-static int responseRIL_CDMA_Encoded_SMS(Parcel &p, void *response, size_t responselen) {
+static int responseRilCdmaEncodedSms(Parcel &p, void *response, size_t responselen) {
     unsigned char length;
     
     if (response == NULL && responselen != 0) {
@@ -2634,7 +2628,7 @@ static void listenCallback (int fd, short flags, void *param) {
         LOGE("Error on accept() errno:%d", errno);
         /* start listening for new connections again */
         ril_event_add(&s_listen_event);
-    return;
+        return;
     }
 
     /* check the credential of the other side and only accept socket from
@@ -2655,7 +2649,7 @@ static void listenCallback (int fd, short flags, void *param) {
       LOGE("RILD can't accept socket from process %s", pwd->pw_name);
     }
       } else {
-    LOGE("Error on getpwuid() errno: %d", errno);
+        LOGE("Error on getpwuid() errno: %d", errno);
       }
     } else {
       LOGD("Error on getsockopt() errno: %d", errno);
