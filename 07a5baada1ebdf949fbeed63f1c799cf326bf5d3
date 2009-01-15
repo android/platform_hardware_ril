@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "z0842a5e27170db7cf7da55be79c060f2",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2009-01-15T22:50:52Z",
+      "side": 1,
+      "message": "There are still a few \"after\" comments. Also, in\ngeneral please be consistent. Some of the new\nmultiline comments are inconsistent. I suggest all\nmultiline comments look like this:\n/*\n * First line\n * more comment...\n */\n",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zd51ceb1072cfa9a35d23b27fcab29a5d",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2009-01-15T22:50:52Z",
+      "side": 1,
+      "message": "Comment needs to preceed",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zd7356cf8b508aebd79d924737e216080",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2009-01-15T22:50:52Z",
+      "side": 1,
+      "message": "comment needs to preceed.",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z861eb4d1f38afc0811c179cf5553b4b8",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2009-01-15T22:50:52Z",
+      "side": 1,
+      "message": "Comment needs to preceed.",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z7a2152a47b7166beba8c156726ab86d6",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2009-01-15T22:50:52Z",
+      "side": 1,
+      "message": "Comment needs to preceed",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
