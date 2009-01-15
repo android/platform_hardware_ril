@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "z38dd2f538b77d74e6371bcd84eea7677",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z54c0325cea4e8276c532cd9f9ef98f03",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -30,6 +47,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "line to long",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zdc8aecda103ad59fc5056043733a90f1",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -53,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "zc301eeff8f819c82d8e3b3d565f8fd9a",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zda169e55d5d8f94b4cf8369244853777",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -64,6 +115,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "Align",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z8a7c638bc7235a9ebbf6bf16fafef918",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -87,6 +155,23 @@
     },
     {
       "key": {
+        "uuid": "z2343048f5c715dc11db40611674b567b",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zbec8dd649bb13faae6a82cbc7ed72be1",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -98,6 +183,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "LTL",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zbc73349ae784b5f0c847bcca89f59b4f",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -121,6 +223,23 @@
     },
     {
       "key": {
+        "uuid": "z58799b16aafaa5842350853dfbdd9385",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zcd9c00d36e8cfe021fd435d1d46784b3",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -132,6 +251,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "LTL",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z8b559ceb9f5624dc27d13e6d9547f2f0",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -155,6 +291,23 @@
     },
     {
       "key": {
+        "uuid": "zbcfe88a72c455cda413368daa09fba7c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z8db27e7a13a3b977469734885d57ed82",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -166,6 +319,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "LTL\u0027s below.",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zae47ea7065181fb67d52d25a007c7e8a",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -189,6 +359,23 @@
     },
     {
       "key": {
+        "uuid": "z4e1d73334c9bfda04dd97edb71d5ed55",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z8889fd302b2d64dad048e4cdcc2379a2",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -200,6 +387,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "LTL\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zb9829c6fecb027d581aa5fe8e533b5b4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 955,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -223,6 +427,23 @@
     },
     {
       "key": {
+        "uuid": "zb3bebab607ee7ad90f3e6a4acabae4fe",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 957,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "za5bdf1b3ece41b9990610b3d7fc14cc2",
         "filename": "include/telephony/ril_cdma_sms.h",
         "patchSetId": 3
@@ -234,6 +455,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "Fix various alignment issues and do not place comments\nafter declarations. Place them either before or following.",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z3b4c2c255dad3e9dcf54e61fdb79be53",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -257,6 +495,23 @@
     },
     {
       "key": {
+        "uuid": "zd7721c67da387b6d9592f00f92c03d92",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zf3e7f2f0fdd3bf6ecca74f4e0ddeb91b",
         "filename": "include/telephony/ril_cdma_sms.h",
         "patchSetId": 3
@@ -268,6 +523,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "Align or single space.",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zb44dc50916ab9dda331181d7a1fcb3d8",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -291,6 +563,23 @@
     },
     {
       "key": {
+        "uuid": "zab22d746d6ed9ee0e3de595447292b32",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zdefcc29abf33f9ccfcde372a63825751",
         "filename": "include/telephony/ril_cdma_sms.h",
         "patchSetId": 3
@@ -302,6 +591,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "align",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z4a45c38d64405ebd66c6ede41b39acbe",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -325,6 +631,23 @@
     },
     {
       "key": {
+        "uuid": "z201e570df24dc2b9ee9531e99fa28f7c",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z5ae816aa719c64dabdc1db8b921079b6",
         "filename": "include/telephony/ril_cdma_sms.h",
         "patchSetId": 3
@@ -336,6 +659,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "align with above?",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z96362b3238da0b49afd4fd767846fe1b",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -359,6 +699,23 @@
     },
     {
       "key": {
+        "uuid": "zb89a68e2a2b335278d47abf4c9b94ec1",
+        "filename": "include/telephony/ril_cdma_sms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z2822354b889f961b860252dee52f0856",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -370,6 +727,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "Add test of status and goto invalid on errors.",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z3e3e68cfe3177a39d95e68260e2a1bb1",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 854,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -393,6 +767,23 @@
     },
     {
       "key": {
+        "uuid": "zb0b6361cbfa9aa09853449bb939aed04",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z1c74c6ddd475eb0fe06ab8425f5c260c",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -404,6 +795,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "check status goto invalid?",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zea642fd313ad19179b634236cc167f02",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 937,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -427,6 +835,23 @@
     },
     {
       "key": {
+        "uuid": "z3747c8276557797a3c4133d33d46ae0f",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 982,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z721381013a73502a0c0e52098e6ce152",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -438,6 +863,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "line to long",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z20ea81177ef6afe6ecfa82b3c8863daf",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -461,6 +903,23 @@
     },
     {
       "key": {
+        "uuid": "za2f89f037196f9b89921802b2d357cbc",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zfd08c8fa4ff05e9e1efb6c8d94edfd20",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -472,6 +931,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "\u003d p",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zbe017b539edfd548872549f5e826f6f2",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1061,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -495,6 +971,23 @@
     },
     {
       "key": {
+        "uuid": "z0c49e1836bb304a002f68effff2a7f12",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1064,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z3630f8e9d2d8f9037ec8baaeb64f0508",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -506,6 +999,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "LTL",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z9fabc5440f2c8b26f3470a9f745a7e96",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1095,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -529,6 +1039,23 @@
     },
     {
       "key": {
+        "uuid": "z59a3af24aabfe29e37df3f5b65956b02",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1116,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zf8fe511b62139a7bbca22b9adb1663e0",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -540,6 +1067,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "LTL",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z87912edca582ebffb834518562e82158",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1119,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -563,6 +1107,23 @@
     },
     {
       "key": {
+        "uuid": "z5af710584950995e2aba0f5a8c4fae86",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1460,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zf25c5f9f89e99a4227159ddfdb911db0",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -574,6 +1135,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "check status goto invalid?",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z6e82e82685af5e5ed6fbd405e77fe7d0",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1594,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -597,6 +1175,23 @@
     },
     {
       "key": {
+        "uuid": "zfba3b89a7d6d40a47e6340576f05cfd5",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2098,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z423d0b596d81d5052af6b500f3d3c81f",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -608,6 +1203,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "indent",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z98069b50643f9a9218b724710e308492",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2131,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -631,6 +1243,23 @@
     },
     {
       "key": {
+        "uuid": "ze9338e0f90b301e22a5e29bb7f3668cb",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2135,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zc01cf6792ebefd19d5c83fce4aa56bf7",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -642,6 +1271,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "indent",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "zcd1deebaa22792ce3c0fb760ee5e4d0d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2185,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -665,6 +1311,23 @@
     },
     {
       "key": {
+        "uuid": "z7d1744719c2ecca47b1408e9ef265791",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2189,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "za8fa05b7c95335d147fd7fd9843dd746",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -676,6 +1339,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "align",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z6588f8936500d2a37b5e9b4cb11a48db",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2195,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -699,6 +1379,23 @@
     },
     {
       "key": {
+        "uuid": "zb1adc3c985ffed4935a10303fdc1a585",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2250,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z0426836a8acfd72f0de4b7c72b3b2cd7",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -710,6 +1407,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "LTL here and next two lines",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z1c1c20e7e7bd49c7298e71e144bf283c",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2255,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -733,6 +1447,23 @@
     },
     {
       "key": {
+        "uuid": "z2cd4a7d3941dd4cf8266375073abf0a7",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2271,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update\n",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "zf9075cf1f5c1b0c9c9cad43ea0407b0a",
         "filename": "libril/ril.cpp",
         "patchSetId": 3
@@ -744,6 +1475,23 @@
       "writtenOn": "2009-01-14T22:46:36Z",
       "side": 1,
       "message": "Remove if not needed",
+      "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z28143ffa332b6b8ee54fcb3d8f03281e",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2428,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-15T13:33:03Z",
+      "side": 1,
+      "message": "ok, fixed with next update",
       "revId": "ec4d0fac8aa81ac68a3153f782100ebd6730b46b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
