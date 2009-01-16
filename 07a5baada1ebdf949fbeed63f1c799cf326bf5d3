@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "z1c41fd9084db4fb1bb31e793a8b545bc",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 1001202
+      },
+      "writtenOn": "2009-01-16T05:59:58Z",
+      "side": 1,
+      "message": "What is different between GSM/WCDMA (WCDMA preferred)  and GSM/WCDMA (auto mode).\nShould that be the same?",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "z95d3c210ee7b9fcd0c2baa3b644e05c2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 2252,
+      "author": {
+        "id": 1001202
+      },
+      "writtenOn": "2009-01-16T05:59:58Z",
+      "side": 1,
+      "message": "Why not just keep the same way as UMTS to encode/decode SMS in telephony framework?\nThen the interfaces of SMS would be the same as UMTS.",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "za50718bdf622c6acdec183b6a6b883fc",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 2397,
+      "author": {
+        "id": 1001202
+      },
+      "writtenOn": "2009-01-16T05:59:58Z",
+      "side": 1,
+      "message": "Compare to RIL_REQUEST_SETUP_DEFAULT_PDP.\nIt would be more compatible to move radio technology to ((const char **)data)[3], Profile Number to ((const char **)data)[4], and keep ((const char **)data)[0], ((const char **)data)[1] and ((const char **)data)[2] the same as RIL_REQUEST_SETUP_DEFAULT_PDP.\n\nThere is no way to know what is the content of Profile and no way to set/query. How could upper layer know what should Profile Number be? ",
+      "revId": "07a5baada1ebdf949fbeed63f1c799cf326bf5d3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "z0842a5e27170db7cf7da55be79c060f2",
         "filename": "include/telephony/ril_cdma_sms.h",
         "patchSetId": 4
