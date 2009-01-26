@@ -41,7 +41,8 @@
     {RIL_REQUEST_DTMF, dispatchString, responseVoid},
     {RIL_REQUEST_SEND_SMS, dispatchStrings, responseSMS},
     {RIL_REQUEST_SEND_SMS_EXPECT_MORE, dispatchStrings, responseSMS},
-    {RIL_REQUEST_SETUP_DEFAULT_PDP, dispatchStrings, responseStrings},
+    {RIL_REQUEST_SETUP_DATA_CALL, dispatchStrings, responseStrings},
+//    {RIL_REQUEST_SETUP_DEFAULT_PDP, dispatchStrings, responseStrings}, //DEPRECATED use RIL_REQUEST_SETUP_DATA_CALL
     {RIL_REQUEST_SIM_IO, dispatchSIM_IO, responseSIM_IO},
     {RIL_REQUEST_SEND_USSD, dispatchString, responseVoid},
     {RIL_REQUEST_CANCEL_USSD, dispatchVoid, responseVoid},
@@ -55,7 +56,7 @@
     {RIL_REQUEST_GET_IMEI, dispatchVoid, responseString},
     {RIL_REQUEST_GET_IMEISV, dispatchVoid, responseString},
     {RIL_REQUEST_ANSWER,dispatchVoid, responseVoid},
-    {RIL_REQUEST_DEACTIVATE_DEFAULT_PDP, dispatchStrings, responseVoid},
+    {RIL_REQUEST_DEACTIVATE_DATA_CALL, dispatchStrings, responseVoid},
     {RIL_REQUEST_QUERY_FACILITY_LOCK, dispatchStrings, responseInts},    
     {RIL_REQUEST_SET_FACILITY_LOCK, dispatchStrings, responseVoid},
     {RIL_REQUEST_CHANGE_BARRING_PASSWORD, dispatchStrings, responseVoid},
@@ -70,8 +71,8 @@
     {RIL_REQUEST_SET_MUTE, dispatchInts, responseVoid},
     {RIL_REQUEST_GET_MUTE, dispatchVoid, responseInts},
     {RIL_REQUEST_QUERY_CLIP, dispatchVoid, responseInts},
-    {RIL_REQUEST_LAST_PDP_FAIL_CAUSE, dispatchVoid, responseInts},
-    {RIL_REQUEST_PDP_CONTEXT_LIST, dispatchVoid, responseContexts},
+    {RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE, dispatchVoid, responseInts},
+    {RIL_REQUEST_DATA_CALL_LIST, dispatchVoid, responseDataCallList}, //DEPRECATED use RIL_REQUEST_DATA_CALL_LIST
     {RIL_REQUEST_RESET_RADIO, dispatchVoid, responseVoid},
     {RIL_REQUEST_OEM_HOOK_RAW, dispatchRaw, responseRaw},
     {RIL_REQUEST_OEM_HOOK_STRINGS, dispatchStrings, responseStrings},
@@ -107,12 +108,8 @@
     {RIL_REQUEST_CDMA_GET_BROADCAST_CONFIG, dispatchVoid, responseCdmaBrCnf}, //new RESPONSE function
     {RIL_REQUEST_CDMA_SET_BROADCAST_CONFIG, dispatchCdmaBrSmsCnf, responseVoid}, //new DISPATCH unction
     {RIL_REQUEST_BROADCAST_ACTIVATION, dispatchInts, responseVoid},
-    {RIL_REQUEST_SETUP_DATA_CALL, dispatchStrings, responseStrings},
-    {RIL_REQUEST_DEACTIVATE_DATA_CALL, dispatchStrings, responseVoid},
     {RIL_REQUEST_CDMA_VALIDATE_AKEY, dispatchString, responseVoid},
     {RIL_REQUEST_CDMA_BROADCAST_ACTIVATION, dispatchInts, responseVoid},
-    {RIL_REQUEST_CDMA_ENCODE_SMS, dispatchRilCdmaSmsClientBd, responseRilCdmaEncodedSms},
-    {RIL_REQUEST_CDMA_DECODE_SMS, dispatchRilCdmaEncodedSms, responseRilCdmaSmsClientBd},
     {RIL_REQUEST_CDMA_SUBSCRIPTION, dispatchVoid, responseStrings},//Assumption Made here to use DispatchVoid!
     {RIL_REQUEST_CDMA_WRITE_SMS_TO_RUIM, dispatchRilCdmaSmsWriteArgs, responseInts}, //new DISPATCH function
     {RIL_REQUEST_CDMA_DELETE_SMS_ON_RUIM, dispatchInts, responseVoid},

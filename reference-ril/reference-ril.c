@@ -39,7 +39,7 @@
 
 #define MAX_AT_RESPONSE 0x1000
 
-/* pathname returned from RIL_REQUEST_SETUP_DEFAULT_PDP */
+/* pathname returned from RIL_REQUEST_SETUP_DATA_CALL / RIL_REQUEST_SETUP_DEFAULT_PDP */
 #define PPP_TTY_PATH "/dev/omap_csmi_tty1"
 
 #ifdef USE_TI_COMMANDS
@@ -64,6 +64,7 @@ static const char *getVersion();
 static int isRadioOn();
 static int getSIMStatus();
 static void onPDPContextListChanged(void *param);
+static void onDataCallListChanged(void *param);
 
 extern const char * requestToString(int request);
 
@@ -268,19 +269,36 @@ error:
     RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
 }
 
-static void requestOrSendPDPContextList(RIL_Token *t);
+static void requestOrSendPDPContextList(RIL_Token *t); //TODO Deprecate, use requestOrSendDataCallList
+static void requestOrSendDataCallList(RIL_Token *t);
 
-static void onPDPContextListChanged(void *param)
+static void onPDPContextListChanged(void *param)  //TODO Deprecate, use onDataCallListChanged
 {
     requestOrSendPDPContextList(NULL);
 }
 
-static void requestPDPContextList(void *data, size_t datalen, RIL_Token t)
+static void onDataCallListChanged(void *param)
 {
-    requestOrSendPDPContextList(&t);
+    requestOrSendDataCallList(NULL);
 }
 
-static void requestOrSendPDPContextList(RIL_Token *t)
+
+static void requestPDPContextList(void *data, size_t datalen, RIL_Token t) //TODO Deprecate, use requestDataCallList
+{
+    requestOrSendPDPContextList(&t); 
+}
+
+static void requestDataCallList(void *data, size_t datalen, RIL_Token t)
+{
+    requestOrSendDataCallList(&t);
+}
+
+static void requestOrSendPDPContextList(RIL_Token *t) //TODO Deprecate, use requestOrSendDataCallList
+{
+    requestOrSendDataCallList(&t);
+}
+
+static void requestOrSendDataCallList(RIL_Token *t)
 {
     ATResponse *p_response;
     ATLine *p_cur;
@@ -293,7 +311,7 @@ static void requestOrSendPDPContextList(RIL_Token *t)
         if (t != NULL)
             RIL_onRequestComplete(*t, RIL_E_GENERIC_FAILURE, NULL, 0);
         else
-            RIL_onUnsolicitedResponse(RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED,
+            RIL_onUnsolicitedResponse(RIL_UNSOL_DATA_CALL_LIST_CHANGED,
                                       NULL, 0);
         return;
     }
@@ -302,8 +320,8 @@ static void requestOrSendPDPContextList(RIL_Token *t)
          p_cur = p_cur->p_next)
         n++;
 
-    RIL_PDP_Context_Response *responses =
-        alloca(n * sizeof(RIL_PDP_Context_Response));
+    RIL_Data_Call_Response *responses =
+        alloca(n * sizeof(RIL_Data_Call_Response));
 
     int i;
     for (i = 0; i < n; i++) {
@@ -314,7 +332,7 @@ static void requestOrSendPDPContextList(RIL_Token *t)
         responses[i].address = "";
     }
 
-    RIL_PDP_Context_Response *response = responses;
+    RIL_Data_Call_Response *response = responses;
     for (p_cur = p_response->p_intermediates; p_cur != NULL;
          p_cur = p_cur->p_next) {
         char *line = p_cur->line;
@@ -341,7 +359,7 @@ static void requestOrSendPDPContextList(RIL_Token *t)
         if (t != NULL)
             RIL_onRequestComplete(*t, RIL_E_GENERIC_FAILURE, NULL, 0);
         else
-            RIL_onUnsolicitedResponse(RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED,
+            RIL_onUnsolicitedResponse(RIL_UNSOL_DATA_CALL_LIST_CHANGED,
                                       NULL, 0);
         return;
     }
@@ -399,11 +417,11 @@ static void requestOrSendPDPContextList(RIL_Token *t)
 
     if (t != NULL)
         RIL_onRequestComplete(*t, RIL_E_SUCCESS, responses,
-                              n * sizeof(RIL_PDP_Context_Response));
+                              n * sizeof(RIL_Data_Call_Response));
     else
-        RIL_onUnsolicitedResponse(RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED,
+        RIL_onUnsolicitedResponse(RIL_UNSOL_DATA_CALL_LIST_CHANGED,
                                   responses,
-                                  n * sizeof(RIL_PDP_Context_Response));
+                                  n * sizeof(RIL_Data_Call_Response));
 
     return;
 
@@ -411,7 +429,7 @@ error:
     if (t != NULL)
         RIL_onRequestComplete(*t, RIL_E_GENERIC_FAILURE, NULL, 0);
     else
-        RIL_onUnsolicitedResponse(RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED,
+        RIL_onUnsolicitedResponse(RIL_UNSOL_DATA_CALL_LIST_CHANGED,
                                   NULL, 0);
 
     at_response_free(p_response);
@@ -941,7 +959,7 @@ error:
     at_response_free(p_response);
 }
 
-static void requestSetupDefaultPDP(void *data, size_t datalen, RIL_Token t)
+static void requestSetupDataCall(void *data, size_t datalen, RIL_Token t)
 {
     const char *apn;
     char *cmd;
@@ -949,7 +967,7 @@ static void requestSetupDefaultPDP(void *data, size_t datalen, RIL_Token t)
     ATResponse *p_response = NULL;
     char *response[2] = { "1", PPP_TTY_PATH };
 
-    apn = ((const char **)data)[0];
+    apn = ((const char **)data)[2];
 
 #ifdef USE_TI_COMMANDS
     // Config for multislot class 10 (probably default anyway eh?)
@@ -1347,8 +1365,8 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         case RIL_REQUEST_SEND_SMS:
             requestSendSMS(data, datalen, t);
             break;
-        case RIL_REQUEST_SETUP_DEFAULT_PDP:
-            requestSetupDefaultPDP(data, datalen, t);
+        case RIL_REQUEST_SETUP_DATA_CALL:
+            requestSetupDataCall(data, datalen, t);
             break;
         case RIL_REQUEST_SMS_ACKNOWLEDGE:
             requestSMSAcknowledge(data, datalen, t);
@@ -1405,8 +1423,8 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             at_send_command("AT+COPS=0", NULL);
             break;
 
-        case RIL_REQUEST_PDP_CONTEXT_LIST:
-            requestPDPContextList(data, datalen, t);
+        case RIL_REQUEST_DATA_CALL_LIST:
+            requestDataCallList(data, datalen, t);
             break;
 
         case RIL_REQUEST_QUERY_NETWORK_SELECTION_MODE:
@@ -1831,7 +1849,7 @@ static void onUnsolicited (const char *s, const char *sms_pdu)
             RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED,
             NULL, 0);
 #ifdef WORKAROUND_FAKE_CGEV
-        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL);
+        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL); //TODO use new function
 #endif /* WORKAROUND_FAKE_CGEV */
     } else if (strStartsWith(s,"+CREG:")
                 || strStartsWith(s,"+CGREG:")
@@ -1840,7 +1858,7 @@ static void onUnsolicited (const char *s, const char *sms_pdu)
             RIL_UNSOL_RESPONSE_NETWORK_STATE_CHANGED,
             NULL, 0);
 #ifdef WORKAROUND_FAKE_CGEV
-        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL);
+        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL); //TODO use new function
 #endif /* WORKAROUND_FAKE_CGEV */
     } else if (strStartsWith(s, "+CMT:")) {
         RIL_onUnsolicitedResponse (
@@ -1853,13 +1871,13 @@ static void onUnsolicited (const char *s, const char *sms_pdu)
     } else if (strStartsWith(s, "+CGEV:")) {
         /* Really, we can ignore NW CLASS and ME CLASS events here,
          * but right now we don't since extranous
-         * RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED calls are tolerated
+         * RIL_UNSOL_DATA_CALL_LIST_CHANGED calls are tolerated
          */
         /* can't issue AT commands here -- call on main thread */
-        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL);
+        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL); //TODO use new function
 #ifdef WORKAROUND_FAKE_CGEV
     } else if (strStartsWith(s, "+CME ERROR: 150")) {
-        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL);
+        RIL_requestTimedCallback (onPDPContextListChanged, NULL, NULL); //TODO use new function
 #endif /* WORKAROUND_FAKE_CGEV */
     }
 }

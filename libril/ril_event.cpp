@@ -326,6 +326,16 @@ void ril_event_del(struct ril_event * ev)
     dlog("~~~~ -ril_event_del ~~~~");
 }
 
+static void printReadies(fd_set * rfds)
+{
+    for (int i = 0; (i < MAX_FD_EVENTS); i++) {
+        struct ril_event * rev = watch_table[i];
+        if (rev != NULL && FD_ISSET(rev->fd, rfds)) {
+          dlog("DON: fd=%d is ready", rev->fd);
+        }
+    }
+}
+
 void ril_event_loop()
 {
     int n;
@@ -346,7 +356,9 @@ void ril_event_loop()
             dlog("~~~~ blocking for %ds + %dus ~~~~", (int)tv.tv_sec, (int)tv.tv_usec);
             ptv = &tv;
         }
+        printReadies(&rfds);
         n = select(nfds, &rfds, NULL, NULL, ptv);
+        printReadies(&rfds);
         dlog("~~~~ %d events fired ~~~~", n);
         if (n < 0) {
             if (errno == EINTR) continue;

@@ -74,6 +74,8 @@ namespace android {
 
 #define NUM_ELEMS(a)     (sizeof (a) / sizeof (a)[0])
 
+#define MIN(a,b) ((a)<(b) ? (a) : (b))
+
 /* Constants for response types */
 #define RESPONSE_SOLICITED 0
 #define RESPONSE_UNSOLICITED 1
@@ -205,8 +207,6 @@ static void dispatchCdmaSms(Parcel &p, RequestInfo *pRI);
 static void dispatchCdmaSmsAck(Parcel &p, RequestInfo *pRI);
 static void dispatchBrSmsCnf(Parcel &p, RequestInfo *pRI);
 static void dispatchCdmaBrSmsCnf(Parcel &p, RequestInfo *pRI);
-static void dispatchRilCdmaSmsClientBd(Parcel &p, RequestInfo *pRI);
-static void dispatchRilCdmaEncodedSms(Parcel &p, RequestInfo *pRI);
 static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI);
 static int responseInts(Parcel &p, void *response, size_t responselen);
 static int responseStrings(Parcel &p, void *response, size_t responselen);
@@ -216,15 +216,13 @@ static int responseCallList(Parcel &p, void *response, size_t responselen);
 static int responseSMS(Parcel &p, void *response, size_t responselen);
 static int responseSIM_IO(Parcel &p, void *response, size_t responselen);
 static int responseCallForwards(Parcel &p, void *response, size_t responselen);
-static int responseContexts(Parcel &p, void *response, size_t responselen);
+static int responseDataCallList(Parcel &p, void *response, size_t responselen);
 static int responseRaw(Parcel &p, void *response, size_t responselen);
 static int responseSsn(Parcel &p, void *response, size_t responselen);
 static int responseSimStatus(Parcel &p, void *response, size_t responselen);
 static int responseBrSmsCnf(Parcel &p, void *response, size_t responselen);
 static int responseCdmaBrCnf(Parcel &p, void *response, size_t responselen);
 static int responseCdmaSms(Parcel &p, void *response, size_t responselen);
-static int responseRilCdmaSmsClientBd(Parcel &p, void *response, size_t responselen);
-static int responseRilCdmaEncodedSms(Parcel &p, void *response, size_t responselen);
 
 extern "C" const char * requestToString(int request);
 extern "C" const char * failCauseToString(RIL_Errno);
@@ -783,12 +781,7 @@ invalid:
     invalidCommandBlock(pRI);
     return;
 }
-/****************************************
- * STARTING POINT!!
- *
- * New Dispatch functions added here 
- * Change needed for ril_QC_20080819.h
- ****************************************/
+
 static void 
 dispatchCdmaSms(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_SMS_Message rcsm;
@@ -796,6 +789,7 @@ dispatchCdmaSms(Parcel &p, RequestInfo *pRI) {
     uint8_t ut;
     status_t status;
     int32_t digitCount;
+    int digitLimit;
     
     memset(&rcsm, 0, sizeof(rcsm));
 
@@ -808,7 +802,7 @@ dispatchCdmaSms(Parcel &p, RequestInfo *pRI) {
     status = p.readInt32(&t);
     rcsm.uServicecategory = (int) t;
 
-     status = p.readInt32(&t);
+    status = p.readInt32(&t);
     rcsm.sAddress.digit_mode = (RIL_CDMA_SMS_DigitMode) t;
 
     status = p.readInt32(&t);
@@ -823,7 +817,8 @@ dispatchCdmaSms(Parcel &p, RequestInfo *pRI) {
     status = p.read(&ut,sizeof(ut));
     rcsm.sAddress.number_of_digits= (uint8_t) ut;
 
-    for(digitCount =0 ; digitCount < RIL_CDMA_SMS_ADDRESS_MAX; digitCount ++) {
+    digitLimit= MIN((rcsm.sAddress.number_of_digits), RIL_CDMA_SMS_ADDRESS_MAX);
+    for(digitCount =0 ; digitCount < digitLimit; digitCount ++) {
         status = p.read(&ut,sizeof(ut));
         rcsm.sAddress.digits[digitCount] = (uint8_t) ut;
     }
@@ -836,21 +831,25 @@ dispatchCdmaSms(Parcel &p, RequestInfo *pRI) {
 
     status = p.read(&ut,sizeof(ut));
     rcsm.sSubAddress.number_of_digits = (uint8_t) ut;
-   
-    for(digitCount =0 ; digitCount < RIL_CDMA_SMS_SUBADDRESS_MAX; digitCount ++) {
+
+    digitLimit= MIN((rcsm.sSubAddress.number_of_digits), RIL_CDMA_SMS_SUBADDRESS_MAX);
+    for(digitCount =0 ; digitCount < digitLimit; digitCount ++) {   
         status = p.read(&ut,sizeof(ut)); 
         rcsm.sSubAddress.digits[digitCount] = (uint8_t) ut;
     }
 
-
     status = p.readInt32(&t); 
     rcsm.uBearerDataLen = (int) t;
-   
-    for(digitCount =0 ; digitCount < RIL_CDMA_SMS_BEARER_DATA_MAX; digitCount ++) {
+
+    digitLimit= MIN((rcsm.uBearerDataLen), RIL_CDMA_SMS_BEARER_DATA_MAX);
+    for(digitCount =0 ; digitCount < digitLimit; digitCount ++) {     
         status = p.read(&ut, sizeof(ut)); 
         rcsm.aBearerData[digitCount] = (uint8_t) ut;
     }
 
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
 
     startRequest;
     appendPrintBuf("%suTeleserviceID=%d, bIsServicePresent=%d, uServicecategory=%d, \
@@ -872,9 +871,6 @@ dispatchCdmaSms(Parcel &p, RequestInfo *pRI) {
 invalid:
     invalidCommandBlock(pRI);
     return;
-
-   
-
 }
 
 static void 
@@ -883,7 +879,7 @@ dispatchCdmaSmsAck(Parcel &p, RequestInfo *pRI) {
     int32_t  t;
     status_t status;
     int32_t digitCount;
-    
+
     memset(&rcsa, 0, sizeof(rcsa));
 
     status = p.readInt32(&t);
@@ -891,12 +887,16 @@ dispatchCdmaSmsAck(Parcel &p, RequestInfo *pRI) {
 
     status = p.readInt32(&t);
     rcsa.uSMSCauseCode = (int) t;
-    
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
     startRequest;
     appendPrintBuf("%suBearerReplySeq=%d, uErrorClass=%d, uTLStatus=%d, ",
             printBuf, rcsa.uBearerReplySeq,rcsa.uErrorClass,rcsa.uSMSCauseCode);
     closeRequest;
-   
+
     printRequest(pRI->token, pRI->pCI->requestNumber);
 
     s_callbacks.onRequest(pRI->pCI->requestNumber, &rcsa, sizeof(rcsa),pRI);
@@ -919,7 +919,7 @@ dispatchBrSmsCnf(Parcel &p, RequestInfo *pRI) {
     uint8_t ut;
     status_t status;
     int32_t digitCount;
-    
+
     memset(&rbsc, 0, sizeof(rbsc));
 
     status = p.readInt32(&t);
@@ -931,9 +931,13 @@ dispatchBrSmsCnf(Parcel &p, RequestInfo *pRI) {
     status = p.readInt32(&t);
     rbsc.entries->uToserviceID = (int) t;
 
-    //useage of read function on assumption that it reads any length given as 2nd argument
+    //usage of read function on assumption that it reads any length given as 2nd argument
     status = p.read(&ut,sizeof(ut));
     rbsc.entries->bSelected = (uint8_t) ut;
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
 
     startRequest;
     appendPrintBuf("%ssize=%d, uServicecategory=%d, entries.uFromServiceID=%d, \
@@ -941,7 +945,7 @@ dispatchBrSmsCnf(Parcel &p, RequestInfo *pRI) {
             rbsc.size,rbsc.entries->uFromServiceID, rbsc.entries->uToserviceID,
             rbsc.entries->bSelected);
     closeRequest;
-   
+
     printRequest(pRI->token, pRI->pCI->requestNumber);
 
     s_callbacks.onRequest(pRI->pCI->requestNumber, &rbsc, sizeof(rbsc),pRI);
@@ -965,7 +969,7 @@ dispatchCdmaBrSmsCnf(Parcel &p, RequestInfo *pRI) {
     uint8_t ut;
     status_t status;
     int32_t digitCount;
-    
+
     memset(&rcbsc, 0, sizeof(rcbsc));
 
     status = p.readInt32(&t);
@@ -979,13 +983,17 @@ dispatchCdmaBrSmsCnf(Parcel &p, RequestInfo *pRI) {
 
     status = p.read(&ut, sizeof(ut));
     rcbsc.entries->bSelected = (uint8_t) ut;
-   
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
     startRequest;
     appendPrintBuf("%sbIsEnabled=%d, size=%d, entries.uServicecategory=%d, \
             entries.uLanguage =%d, entries.bSelected =%d, ", printBuf, rcbsc.bIsEnabled,rcbsc.size,
             rcbsc.entries->uServiceCategory,rcbsc.entries->uLanguage, rcbsc.entries->bSelected);
     closeRequest;
-   
+
     printRequest(pRI->token, pRI->pCI->requestNumber);
 
     s_callbacks.onRequest(pRI->pCI->requestNumber, &rcbsc, sizeof(rcbsc),pRI);
@@ -1002,532 +1010,6 @@ invalid:
 
 }
 
-static void dispatchRilCdmaSmsClientBd(Parcel &p, RequestInfo *pRI) {
-    RIL_CDMA_SMS_ClientBd rcscb;
-    int32_t  t;
-    uint32_t ut;
-    uint8_t uct;
-    uint16_t ust;
-    status_t status;
-    int32_t digitCount;
-    signed char sc;
-    int i;
-
-    memset(&rcscb, 0, sizeof(rcscb));
-
-    status = p.read(&ut,sizeof(ut));
-    rcscb.mask = (uint32_t) ut;
-
-    status = p.readInt32(&t);
-    rcscb.message_id.type = (RIL_CDMA_SMS_BdMessageType) t;
-    
-    status = p.read(&ut,sizeof(ut));    
-    rcscb.message_id.id_number = (RIL_CDMA_SMS_MessageNumber) ut;
-    
-    status = p.read(&uct,sizeof(uct));
-    rcscb.message_id.udh_present = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.user_data.num_headers = (uint8_t) uct;
-   
-    for( int i = 0; i< RIL_CDMA_SMS_MAX_UD_HEADERS; i++) {
-        status = p.readInt32(&t);    
-        rcscb.user_data.headers[i].header_id = (RIL_CDMA_SMS_UdhId) t;
-        
-        switch(rcscb.user_data.headers[i].header_id) {
-            case RIL_CDMA_SMS_UDH_CONCAT_8 : {
-                status = p.read(&uct,sizeof(uct));
-                    rcscb.user_data.headers[i].u.concat_8.msg_ref = (uint8_t) uct;
-                
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.concat_8.total_sm = (uint8_t) uct;
-                
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.concat_8.seq_num = (uint8_t) uct; 
-            } break;
-            
-            case RIL_CDMA_SMS_UDH_SPECIAL_SM : {
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.special_sm.msg_waiting = (RIL_CDMA_SMS_GWMsgWaiting) t;
-
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.special_sm.msg_waiting_kind = (RIL_CDMA_SMS_GWMsgWaitingKind) t;
-                
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.special_sm.message_count = (uint8_t) uct;
-            } break;
-    
-            case RIL_CDMA_SMS_UDH_PORT_8 : {
-                status  =p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.wap_8.dest_port = (uint8_t) uct;
-                
-                status  =p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.wap_8.orig_port = (uint8_t) uct;
-            } break;
-      
-            case RIL_CDMA_SMS_UDH_PORT_16 : {
-                status = p.read(&ust,sizeof(ust));
-                rcscb.user_data.headers[i].u.wap_16.dest_port = (uint16_t) ust;
-                
-                status = p.read(&uct,sizeof(ust));
-                rcscb.user_data.headers[i].u.wap_16.orig_port = (uint16_t) ust;
-            } break;
-            
-            case RIL_CDMA_SMS_UDH_CONCAT_16  : {
-                status  =p.read(&ust,sizeof(ust));
-                rcscb.user_data.headers[i].u.concat_16.msg_ref=  (uint16_t) ust;
-
-                status  =p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.concat_16.total_sm= (uint8_t) uct;
-
-                status  =p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.concat_16.seq_num= (uint8_t) uct;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_TEXT_FORMATING  : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.text_formating.start_position = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.text_formating.text_formatting_length = (uint8_t) uct;
-
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.text_formating.alignment_type = (RIL_CDMA_SMS_UdhAlignment) t;
-
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.text_formating.font_size = (RIL_CDMA_SMS_UdhFontSize) t;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.text_formating.style_bold = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.text_formating.style_italic = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.text_formating.style_underlined = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.text_formating.style_strikethrough = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.text_formating.is_color_present = (uint8_t) uct;
-
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.text_formating.text_color_foreground = (RIL_CDMA_SMS_UdhTextColor) t;
-
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.text_formating.text_color_background = (RIL_CDMA_SMS_UdhTextColor) t;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_PRE_DEF_SOUND : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.pre_def_sound.position= (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.pre_def_sound.snd_number = (uint8_t) uct;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_USER_DEF_SOUND : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.user_def_sound.data_length= (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.user_def_sound.position= (uint8_t) uct;
-
-                for (int j = 0; j < RIL_CDMA_SMS_UDH_MAX_SND_SIZE; j++) {
-                    status = p.read(&uct,sizeof(uct));
-                    rcscb.user_data.headers[i].u.user_def_sound.user_def_sound[j]= (uint8_t) uct;
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_PRE_DEF_ANIM : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.pre_def_anim.position = (uint8_t) uct; 
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.pre_def_anim.animation_number = (uint8_t) uct;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_LARGE_ANIM : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.large_anim.position = (uint8_t) uct;
-
-                for(int j = 0; j<RIL_CDMA_SMS_UDH_ANIM_NUM_BITMAPS; j++) {
-                    for (int k = 0; k<RIL_CDMA_SMS_UDH_LARGE_BITMAP_SIZE; k++) {
-                        status = p.read(&uct,sizeof(uct));
-                        rcscb.user_data.headers[i].u.large_anim.data[j][k] = (uint8_t) uct;
-                    }
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_SMALL_ANIM : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.small_anim.position=  (uint8_t) uct;
-                for(int j = 0; j<RIL_CDMA_SMS_UDH_ANIM_NUM_BITMAPS; j++) {
-                    for (int k = 0; k<RIL_CDMA_SMS_UDH_SMALL_BITMAP_SIZE; k++) {
-                        status = p.read(&uct,sizeof(uct));
-                        rcscb.user_data.headers[i].u.small_anim.data[j][k] = (uint8_t) uct;
-                    }
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_LARGE_PICTURE : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.large_picture.position = (uint8_t) uct;
-
-                for ( int j = 0; j < RIL_CDMA_SMS_UDH_LARGE_PIC_SIZE; j++) {
-                    status = p.read(&uct,sizeof(uct));
-                    rcscb.user_data.headers[i].u.large_picture.data[j] = (uint8_t) uct;
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_SMALL_PICTURE : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.small_picture.position = (uint8_t) uct;
-
-                for ( int j = 0; j< RIL_CDMA_SMS_UDH_SMALL_PIC_SIZE; j++) {
-                    status = p.read(&uct,sizeof(uct));
-                    rcscb.user_data.headers[i].u.small_picture.data[j] = (uint8_t) uct;
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_VAR_PICTURE : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.var_picture.position = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.var_picture.width = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.var_picture.height = (uint8_t) uct;
-
-                for ( int j = 0; j < RIL_CDMA_SMS_UDH_VAR_PIC_SIZE; j++) {
-                    status = p.read(&uct,sizeof(uct));
-                    rcscb.user_data.headers[i].u.var_picture.data[j] = (uint8_t) uct;
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_USER_PROMPT : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.user_prompt.number_of_objects = (uint8_t) uct;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_EXTENDED_OBJECT : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.eo.content.length = (uint8_t) uct;
-
-                for ( int j = 0; j < RIL_CDMA_SMS_UDH_EO_DATA_SEGMENT_MAX; j++) {
-                    status = p.read(&uct,sizeof(uct));
-                    rcscb.user_data.headers[i].u.eo.content.data[j] = (uint8_t) uct;
-                }
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.eo.first_segment = (uint8_t) uct;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.eo.reference = (uint8_t) uct;
-
-                status = p.read(&ust,sizeof(ust));
-                rcscb.user_data.headers[i].u.eo.length = (uint16_t) ust;
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.eo.control = (uint8_t) uct;
-
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.eo.type = (RIL_CDMA_SMS_UdhEoId) t;
-
-                status = p.read(&ust,sizeof(ust));
-                rcscb.user_data.headers[i].u.eo.position = (uint16_t) ust;
-            } break;
-
-            /* 15 - 1F    Reserved for future EMS */
-
-            case RIL_CDMA_SMS_UDH_RFC822 : {
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.rfc822.header_length = (uint8_t) uct;
-            } break;
-
-            /*  21 - 6F    Reserved for future use */
-            /*  70 - 7f    Reserved for (U)SIM Toolkit Security Headers */
-            /*  80 - 9F    SME to SME specific use */
-            /*  A0 - BF    Reserved for future use */
-            /*  C0 - DF    SC specific use */
-            /*  E0 - FF    Reserved for future use */
-
-            case RIL_CDMA_SMS_UDH_OTHER : {
-                status = p.readInt32(&t);
-                rcscb.user_data.headers[i].u.other.header_id = (RIL_CDMA_SMS_UdhId) t; 
-
-                status = p.read(&uct,sizeof(uct));
-                rcscb.user_data.headers[i].u.other.header_length = (uint8_t) uct;
-
-                for( int j = 0 ; j<RIL_CDMA_SMS_UDH_OTHER_SIZE; j++) {
-                    status = p.read(&uct,sizeof(uct));
-                    rcscb.user_data.headers[i].u.other.data[j] = (uint8_t) uct;
-                }
-            } break;   
-    
-        }// end of switch(rcscb.user_data.headers[i].header_id) 
-    }
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.user_response = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.mc_time.year = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.mc_time.month = (uint8_t) uct;
-    
-    status = p.read(&uct,sizeof(uct));
-    rcscb.mc_time.day = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.mc_time.hour = (uint8_t) uct;
-    
-    status = p.read(&uct,sizeof(uct));
-    rcscb.mc_time.minute = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.mc_time.second = (uint8_t) uct;
-    
-    status = p.read(&sc,sizeof(sc));
-    rcscb.mc_time.timezone = (signed char) sc;
-
-    status = p.read(&uct,sizeof(uct));    
-    rcscb.validity_absolute.year = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_absolute.month = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_absolute.day = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_absolute.hour = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_absolute.minute = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_absolute.second = (uint8_t) uct;
-
-    status = p.read(&sc,sizeof(sc));
-    rcscb.validity_absolute.timezone = (signed char) sc;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_relative.year  = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_relative.month = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_relative.day = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_relative.hour = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_relative.minute = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.validity_relative.second = (uint8_t) uct;
-
-    status = p.read(&sc,sizeof(sc));
-    rcscb.validity_relative.timezone = (signed char) sc;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_absolute.year  = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_absolute.month = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_absolute.day = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_absolute.hour = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_absolute.minute = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_absolute.second = (uint8_t) uct;
-
-    status = p.read(&sc,sizeof(sc));
-    rcscb.deferred_absolute.timezone = (signed char) sc;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_relative.year  = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_relative.month = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_relative.day = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_relative.hour = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_relative.minute = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.deferred_relative.second = (uint8_t) uct;
-
-    status = p.read(&sc,sizeof(sc));
-    rcscb.deferred_relative.timezone = (signed char) sc;  
-
-    status = p.readInt32(&t);
-    rcscb.priority = (RIL_CDMA_SMS_Priority)  t;
-
-    status = p.readInt32(&t);
-    rcscb.privacy = (RIL_CDMA_SMS_Privacy) t;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.reply_option.user_ack_requested = (uint8_t) uct; 
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.reply_option.delivery_ack_requested = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.reply_option.read_ack_requested = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.num_messages = (uint8_t) uct;
-
-    status = p.readInt32(&t);
-    rcscb.alert_mode = (RIL_CDMA_SMS_AlertMode) t;
-
-    status = p.readInt32(&t);
-    rcscb.language = (RIL_CDMA_SMS_Language) t;
-
-    status = p.readInt32(&t);
-    rcscb.callback.digit_mode = (RIL_CDMA_SMS_DigitMode) t;
-
-    status = p.readInt32(&t);
-    rcscb.callback.number_mode = (RIL_CDMA_SMS_NumberMode) t;
-
-    status = p.readInt32(&t);
-    rcscb.callback.number_type = (RIL_CDMA_SMS_NumberType) t;
-
-    status = p.readInt32(&t);
-    rcscb.callback.number_plan = (RIL_CDMA_SMS_NumberPlan) t;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.callback.number_of_digits = (uint8_t) uct;
-
-    for(int j =0; j<RIL_CDMA_SMS_ADDRESS_MAX;j++) {
-        status = p.read(&uct,sizeof(uct));
-        rcscb.callback.digits[j] = (uint8_t) uct;
-    }
-    
-    status = p.readInt32(&t);
-    rcscb.display_mode = (RIL_CDMA_SMS_DisplayMode) t;
-
-    // removed in latest QC RIL
-    // status = p.readInt32(&t);
-    // rcscb.download_mode = (RIL_CDMA_SMS_DownloadMode) t;
-
-    status = p.readInt32(&t);
-    rcscb.delivery_status.error_class = (RIL_CDMA_SMS_ErrorClass) t;
-
-    status = p.readInt32(&t);
-    rcscb.delivery_status.status = (RIL_CDMA_SMS_DeliveryStatusE) t;
-
-    status = p.read(&uct,sizeof(ut));
-    rcscb.deposit_index = (uint32_t) ut;
-
-    for(int j = 0; j<RIL_CDMA_SMS_IP_ADDRESS_SIZE; j++) {
-        status = p.read(&uct,sizeof(uct));
-        rcscb.ip_address.address[j] = (uint8_t) uct;
-    }
-    
-    status = p.read(&uct,sizeof(uct));
-    rcscb.ip_address.is_valid = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.rsn_no_notify = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.other.input_other_len = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    rcscb.other.desired_other_len = (uint8_t) uct;
-
-    status = p.read(&uct,sizeof(uct));
-    *(rcscb.other.other_data) = (uint8_t) uct;// a pointer!
- 
-    startRequest;
-    appendPrintBuf("%s message_id,id_number %d, mc_time.hour%d, mc_time.min%d",
-            printBuf, rcscb.message_id.id_number, rcscb.mc_time.hour,rcscb.mc_time.minute);
-    closeRequest;
-       
-    printRequest(pRI->token, pRI->pCI->requestNumber);
-    
-    s_callbacks.onRequest(pRI->pCI->requestNumber, &rcscb, sizeof(rcscb),pRI);
-    
-#ifdef MEMSET_FREED
-    memset(&rcscb, 0, sizeof(rcscb));
-#endif
-
-    return;
-
-invalid:
-    invalidCommandBlock(pRI);
-    return;
-
-}
-
-/****************************************
- * END POINT!!
- *
- * New Dispatch functions added here 
- * Change needed for ril_QC_20080819.h
- ****************************************/
-
-
-/****************************************
- * STARTING POINT!!
- *
- * New Dispatch functions added here 
- * Change needed for ril_QC_20081024.h
- ****************************************/
-static void dispatchRilCdmaEncodedSms(Parcel &p, RequestInfo *pRI) {
-    RIL_CDMA_Encoded_SMS rces;
-    uint8_t  uct;
-    status_t status;
-
-    memset(&rces, 0, sizeof(rces));   
-
-    status = p.read(&uct,sizeof(uct)); 
-    rces.length = uct;
-    
-    if (status != NO_ERROR) {
-        goto invalid;
-    }
-
-    rces.data = (unsigned char*)(strdupReadString(p));
-    
-    startRequest;
-    appendPrintBuf("%slength=%d, data=%s", printBuf, rces.length, rces.data);
-    closeRequest;
-   
-    printRequest(pRI->token, pRI->pCI->requestNumber);
-
-    s_callbacks.onRequest(pRI->pCI->requestNumber, &rces, sizeof(rces),pRI);
-
-#ifdef MEMSET_FREED
-    memset(&rces, 0, sizeof(rces));
-#endif
-
-    return;   
-     
-invalid:
-    invalidCommandBlock(pRI);
-    return;
-}
-
 static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI) {
     RIL_CDMA_SMS_WriteArgs rcsw;
     int32_t  t;
@@ -1535,7 +1017,7 @@ static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI) {
     uint8_t  uct;
     status_t status;
     int32_t  digitCount;
-    
+
     memset(&rcsw, 0, sizeof(rcsw));
 
     status = p.readInt32(&t);
@@ -1578,7 +1060,7 @@ static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI) {
 
     status = p.read(&uct,sizeof(uct));
     rcsw.message.sSubAddress.number_of_digits = (uint8_t) uct;
-   
+
     for(digitCount = 0 ; digitCount < RIL_CDMA_SMS_SUBADDRESS_MAX; digitCount ++) {
         status = p.read(&uct,sizeof(uct)); 
         rcsw.message.sSubAddress.digits[digitCount] = (uint8_t) uct;
@@ -1590,6 +1072,10 @@ static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI) {
     for(digitCount = 0 ; digitCount < RIL_CDMA_SMS_BEARER_DATA_MAX; digitCount ++) {
         status = p.read(&uct, sizeof(uct)); 
         rcsw.message.aBearerData[digitCount] = (uint8_t) uct;
+    }
+
+    if (status != NO_ERROR) {
+        goto invalid;
     }
 
     startRequest;
@@ -1616,15 +1102,8 @@ static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI) {
 invalid:
     invalidCommandBlock(pRI);
     return;
-    
-}
 
-/****************************************
- * END POINT!!
- *
- * New Dispatch functions added here 
- * Change needed for ril_QC_20081024.h
- ****************************************/
+}
 
 static int
 blockingWrite(int fd, const void *buffer, size_t len) {
@@ -1858,22 +1337,23 @@ static int responseSMS(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseContexts(Parcel &p, void *response, size_t responselen) {
+static int responseDataCallList(Parcel &p, void *response, size_t responselen)
+{
     if (response == NULL && responselen != 0) {
         LOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
     }
 
-    if (responselen % sizeof(RIL_PDP_Context_Response) != 0) {
+    if (responselen % sizeof(RIL_Data_Call_Response) != 0) {
         LOGE("invalid response length %d expected multiple of %d", 
-                (int)responselen, (int)sizeof(RIL_PDP_Context_Response));
+                (int)responselen, (int)sizeof(RIL_Data_Call_Response));
         return RIL_ERRNO_INVALID_RESPONSE;
     }
 
-    int num = responselen / sizeof(RIL_PDP_Context_Response);
+    int num = responselen / sizeof(RIL_Data_Call_Response);
     p.writeInt32(num);
 
-    RIL_PDP_Context_Response *p_cur = (RIL_PDP_Context_Response *) response;
+    RIL_Data_Call_Response *p_cur = (RIL_Data_Call_Response *) response;
     startResponse;
     int i;
     for (i = 0; i < num; i++) {
@@ -2008,12 +1488,6 @@ static int responseSsn(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-/****************************************
- * STARTING POINT!!
- *
- * New Dispatch functions added here 
- * Change needed for ril_QC_20080819.h
- ****************************************/
 static int responseSimStatus(Parcel &p, void *response, size_t responselen) {
     int i;
 
@@ -2027,7 +1501,7 @@ static int responseSimStatus(Parcel &p, void *response, size_t responselen) {
             (int)responselen, (int)sizeof (RIL_CardStatus *));
         return RIL_ERRNO_INVALID_RESPONSE;
     }
-    
+
     RIL_CardStatus *p_cur = ((RIL_CardStatus *) response);
 
     p.writeInt32(p_cur->card_state);
@@ -2037,7 +1511,7 @@ static int responseSimStatus(Parcel &p, void *response, size_t responselen) {
     p.writeInt32(p_cur->num_applications);
 
     startResponse;
-    for (i = 0; i < p_cur->num_applications; i++) {            
+    for (i = 0; i < p_cur->num_applications; i++) {
         p.writeInt32(p_cur->applications[i].app_type);
         p.writeInt32(p_cur->applications[i].app_state);
         p.writeInt32(p_cur->applications[i].perso_substate);
@@ -2060,12 +1534,12 @@ static int responseSimStatus(Parcel &p, void *response, size_t responselen) {
     }
     closeResponse;
 
-    return 0;    
+    return 0;
 } 
- 
+
 static int responseBrSmsCnf(Parcel &p, void *response, size_t responselen) {
     int num;
-    
+
     if (response == NULL && responselen != 0) {
         LOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2094,12 +1568,12 @@ static int responseBrSmsCnf(Parcel &p, void *response, size_t responselen) {
             p_cur->.entries->uToserviceID,p_cur->entries->bSelected);
     closeResponse;
 
-return 0;
+    return 0;
 }
 
 static int responseCdmaBrCnf(Parcel &p, void *response, size_t responselen) {
     int num;
-    
+
     if (response == NULL && responselen != 0) {
         LOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2120,22 +1594,23 @@ static int responseCdmaBrCnf(Parcel &p, void *response, size_t responselen) {
     p.writeInt32(p_cur->entries->uServiceCategory);
     p.writeInt32(p_cur->entries->uLanguage);
     p.write(&(p_cur->entries->bSelected),sizeof(p_cur->entries->bSelected));
-    
+
     startResponse;
     appendPrintBuf("%ssize=%d, entries.uServicecategory=%d, entries.uLanguage =%d, \
             entries.bSelected =%d, ", printBuf,p_cur->size, p_cur->entries->uServiceCategory,
             p_cur->entries->uLanguage, p_cur->entries->bSelected);
     closeResponse;
 
-return 0;
+    return 0;
 }
 
 static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
-
     int num;
     int digitCount;
+    int digitLimit;
     uint8_t uct;
-    
+    void* dest;
+
     if (response == NULL && responselen != 0) {
         LOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2160,20 +1635,25 @@ static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
     p.writeInt32(p_cur->sAddress.number_type);
     p.writeInt32(p_cur->sAddress.number_plan);
     p.write(&(p_cur->sAddress.number_of_digits), sizeof(uct));
-    for(digitCount =0 ; digitCount < RIL_CDMA_SMS_ADDRESS_MAX; digitCount ++) {
+    digitLimit= MIN((p_cur->sAddress.number_of_digits), RIL_CDMA_SMS_ADDRESS_MAX);
+    for(digitCount =0 ; digitCount < digitLimit; digitCount ++) {
         p.write(&(p_cur->sAddress.digits[digitCount]),sizeof(uct));
     }
+
     p.writeInt32(p_cur->sSubAddress.subaddressType);
     p.write(&(p_cur->sSubAddress.odd),sizeof(uct));
     p.write(&(p_cur->sSubAddress.number_of_digits),sizeof(uct));
-    for(digitCount =0 ; digitCount < RIL_CDMA_SMS_SUBADDRESS_MAX; digitCount ++) {
+    digitLimit= MIN((p_cur->sAddress.number_of_digits), RIL_CDMA_SMS_SUBADDRESS_MAX);
+    for(digitCount =0 ; digitCount < digitLimit; digitCount ++) {
         p.write(&(p_cur->sSubAddress.digits[digitCount]),sizeof(uct));
     }
+
+    digitLimit= MIN((p_cur->uBearerDataLen), RIL_CDMA_SMS_BEARER_DATA_MAX);
     p.writeInt32(p_cur->uBearerDataLen);
-    for(digitCount =0 ; digitCount < RIL_CDMA_SMS_BEARER_DATA_MAX; digitCount ++) {
+    for(digitCount =0 ; digitCount < digitLimit; digitCount ++) {
        p.write(&(p_cur->aBearerData[digitCount]), sizeof(uct));
     }
-    
+
     startResponse;
     appendPrintBuf("%suTeleserviceID=%d, bIsServicePresent=%d, uServicecategory=%d, \
             sAddress.digitmode=%d, sAddress.NumberMode=%d, sAddress.numberType=%d, ", 
@@ -2181,317 +1661,9 @@ static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
             p_cur->sAddress.digit_mode, p_cur->sAddress.number_mode,p_cur->sAddress.number_type);
     closeResponse;
 
-return 0;
-}
-
-
-static int responseRilCdmaSmsClientBd(Parcel &p, void *response, size_t responselen) {
-    int num;
-    int digitCount;
-    uint8_t uct;
-    uint16_t ust;
-    uint32_t ut;
-      signed char sc;
-    
-    if (response == NULL && responselen != 0) {
-        LOGE("invalid response: NULL");
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (responselen % sizeof(RIL_CDMA_SMS_ClientBd*) != 0) {
-        LOGE("invalid response length %d expected multiple of %d", 
-                (int)responselen, (int)sizeof(RIL_CDMA_SMS_ClientBd*));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    RIL_CDMA_SMS_ClientBd *p_cur = (RIL_CDMA_SMS_ClientBd *) response;
-    
-    p.writeInt32(p_cur->mask );
-
-    p.writeInt32(p_cur->message_id.type);
-    p.writeInt32(p_cur->message_id.id_number);
-    p.write(&p_cur->message_id.udh_present, sizeof(uct)) ;
-      p.write(&p_cur->user_data.num_headers, sizeof(uct)) ;
-
-    for( int i = 0; i< RIL_CDMA_SMS_MAX_UD_HEADERS; i++) {
-        p.writeInt32(p_cur->user_data.headers[i].header_id);
-        switch(p_cur->user_data.headers[i].header_id) {
-              case RIL_CDMA_SMS_UDH_CONCAT_8 : {
-                p.write(&p_cur->user_data.headers[i].u.concat_8.msg_ref, sizeof(uct)) ;
-                p.write(& p_cur->user_data.headers[i].u.concat_8.total_sm, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.concat_8.seq_num, sizeof(uct)) ;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_SPECIAL_SM : {
-                p.writeInt32(p_cur->user_data.headers[i].u.special_sm.msg_waiting);
-                p.writeInt32( p_cur->user_data.headers[i].u.special_sm.msg_waiting_kind );
-                p.write(&p_cur->user_data.headers[i].u.special_sm.message_count ,sizeof(uct)) ;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_PORT_8 : {
-                p.write(&p_cur->user_data.headers[i].u.wap_8.dest_port, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.wap_8.orig_port, sizeof(uct)) ;
-            } break;
-        
-            case RIL_CDMA_SMS_UDH_PORT_16 : {
-                p.write(&p_cur->user_data.headers[i].u.wap_16.dest_port, sizeof(ust));
-                p.write(&p_cur->user_data.headers[i].u.wap_16.orig_port, sizeof(ust));
-            } break;
-        
-            case RIL_CDMA_SMS_UDH_CONCAT_16  : {
-                p.write(&p_cur->user_data.headers[i].u.concat_16.msg_ref, sizeof(ust));
-                p.write(&p_cur->user_data.headers[i].u.concat_16.total_sm, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.concat_16.seq_num, sizeof(uct)) ;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_TEXT_FORMATING  : {
-                p.write(&p_cur->user_data.headers[i].u.text_formating.start_position, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.text_formating.text_formatting_length, sizeof(uct)) ;
-                p.writeInt32(p_cur->user_data.headers[i].u.text_formating.alignment_type);
-                p.writeInt32(p_cur->user_data.headers[i].u.text_formating.font_size);
-                p.write(&p_cur->user_data.headers[i].u.text_formating.style_bold, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.text_formating.style_italic, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.text_formating.style_underlined, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.text_formating.style_strikethrough, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.text_formating.is_color_present, sizeof(uct)) ;
-                p.writeInt32(p_cur->user_data.headers[i].u.text_formating.text_color_foreground );
-                p.writeInt32(p_cur->user_data.headers[i].u.text_formating.text_color_background );
-            } break;
-
-            case RIL_CDMA_SMS_UDH_PRE_DEF_SOUND : {
-                p.write(&p_cur->user_data.headers[i].u.pre_def_sound.position, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.pre_def_sound.snd_number, sizeof(uct)) ;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_USER_DEF_SOUND : {
-                p.write(&p_cur->user_data.headers[i].u.user_def_sound.data_length, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.user_def_sound.position, sizeof(uct)) ;
-                for (int j = 0; j < RIL_CDMA_SMS_UDH_MAX_SND_SIZE; j++) {
-                    p.write(&p_cur->user_data.headers[i].u.user_def_sound.user_def_sound[j], sizeof(uct)) ;
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_PRE_DEF_ANIM : {
-                p.write(&p_cur->user_data.headers[i].u.pre_def_anim.position, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.pre_def_anim.animation_number, sizeof(uct)) ;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_LARGE_ANIM : {
-                p.write(&p_cur->user_data.headers[i].u.large_anim.position, sizeof(uct)) ;
-                for(int j = 0; j<RIL_CDMA_SMS_UDH_ANIM_NUM_BITMAPS; j++) {
-                    for (int k = 0; k<RIL_CDMA_SMS_UDH_LARGE_BITMAP_SIZE; k++) {
-                        p.write(&p_cur->user_data.headers[i].u.large_anim.data[j][k], sizeof(uct)) ;
-                    }
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_SMALL_ANIM : {
-                p.write(&p_cur->user_data.headers[i].u.small_anim.position, sizeof(uct)) ;
-                for(int j = 0; j<RIL_CDMA_SMS_UDH_ANIM_NUM_BITMAPS; j++) {
-                    for (int k = 0; k<RIL_CDMA_SMS_UDH_SMALL_BITMAP_SIZE; k++) {
-                        p.write(&p_cur->user_data.headers[i].u.small_anim.data[j][k], sizeof(uct)) ;
-                    }
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_LARGE_PICTURE : {
-                p.write(&p_cur->user_data.headers[i].u.large_picture.position, sizeof(uct)) ;
-                for ( int j = 0; j < RIL_CDMA_SMS_UDH_LARGE_PIC_SIZE; j++) {
-                    p.write(&p_cur->user_data.headers[i].u.large_picture.data[j], sizeof(uct)) ;
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_SMALL_PICTURE : {
-                p.write(&p_cur->user_data.headers[i].u.small_picture.position, sizeof(uct)) ;
-                for ( int j = 0; j< RIL_CDMA_SMS_UDH_SMALL_PIC_SIZE; j++) {
-                    p.write(&p_cur->user_data.headers[i].u.small_picture.data[j], sizeof(uct)) ;
-                }
-            } break;
-
-            case RIL_CDMA_SMS_UDH_VAR_PICTURE : {
-                p.write(&p_cur->user_data.headers[i].u.var_picture.position, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.var_picture.width, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.var_picture.height, sizeof(uct)) ;
-                for ( int j = 0; j < RIL_CDMA_SMS_UDH_VAR_PIC_SIZE; j++) {
-                    p.write(&p_cur->user_data.headers[i].u.var_picture.data[j], sizeof(uct)) ;
-                }
-            } break;
-    
-            case RIL_CDMA_SMS_UDH_USER_PROMPT : {
-                p.write(&p_cur->user_data.headers[i].u.user_prompt.number_of_objects, sizeof(uct)) ;
-            } break;
-
-            case RIL_CDMA_SMS_UDH_EXTENDED_OBJECT : {
-                p.write(&p_cur->user_data.headers[i].u.eo.content.length, sizeof(uct)) ;
-                for ( int j = 0; j < RIL_CDMA_SMS_UDH_EO_DATA_SEGMENT_MAX; j++) {
-                    p.write(&p_cur->user_data.headers[i].u.eo.content.data[j], sizeof(uct)) ;
-                }
-                p.write(&p_cur->user_data.headers[i].u.eo.first_segment, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.eo.reference, sizeof(uct)) ;
-                p.write(&p_cur->user_data.headers[i].u.eo.length, sizeof(ust)) ;
-                p.write(&p_cur->user_data.headers[i].u.eo.control, sizeof(uct)) ;
-                p.writeInt32(p_cur->user_data.headers[i].u.eo.type );
-                p.write(&p_cur->user_data.headers[i].u.eo.position, sizeof(ust)) ;
-            } break;
-
-            /* 15 - 1F    Reserved for future EMS */
-            case RIL_CDMA_SMS_UDH_RFC822 : {
-                p.write(&p_cur->user_data.headers[i].u.rfc822.header_length, sizeof(uct)) ;
-            } break;
-
-            /*  21 - 6F    Reserved for future use */
-            /*  70 - 7f    Reserved for (U)SIM Toolkit Security Headers */
-            /*  80 - 9F    SME to SME specific use */
-            /*  A0 - BF    Reserved for future use */
-            /*  C0 - DF    SC specific use */
-            /*  E0 - FF    Reserved for future use */
-
-            case RIL_CDMA_SMS_UDH_OTHER : {
-                p.writeInt32(p_cur->user_data.headers[i].u.other.header_id );
-                p.write(&p_cur->user_data.headers[i].u.other.header_length, sizeof(uct)) ;
-                for( int j ; j<RIL_CDMA_SMS_UDH_OTHER_SIZE; j++) {
-                    p.write(&p_cur->user_data.headers[i].u.other.data[j], sizeof(uct)) ;
-                }
-            } break;
-        }
-    }
-
-    p.write(&p_cur->user_response, sizeof(uct)) ;
-
-    p.write(&p_cur->mc_time.year, sizeof(uct)) ;
-    p.write(&p_cur->mc_time.month, sizeof(uct)) ;
-    p.write(&p_cur->mc_time.day, sizeof(uct)) ;
-    p.write(&p_cur->mc_time.hour, sizeof(uct)) ;
-    p.write(&p_cur->mc_time.minute, sizeof(uct)) ;
-    p.write(&p_cur->mc_time.second, sizeof(uct)) ;
-    p.write(&p_cur->mc_time.timezone, sizeof(sc));
-    
-    p.write(&p_cur->validity_absolute.year, sizeof(uct)) ;
-    p.write(&p_cur->validity_absolute.month, sizeof(uct)) ;
-    p.write(&p_cur->validity_absolute.day, sizeof(uct)) ;
-    p.write(&p_cur->validity_absolute.hour, sizeof(uct)) ;
-    p.write(&p_cur->validity_absolute.minute, sizeof(uct)) ;
-    p.write(&p_cur->validity_absolute.second, sizeof(uct)) ;
-    p.write(&p_cur->validity_absolute.timezone, sizeof(sc));
-
-    p.write(&p_cur->validity_relative.year, sizeof(uct)) ;
-    p.write(&p_cur->validity_relative.month, sizeof(uct)) ;
-    p.write(&p_cur->validity_relative.day, sizeof(uct)) ;
-    p.write(&p_cur->validity_relative.hour, sizeof(uct)) ;
-    p.write(&p_cur->validity_relative.minute, sizeof(uct)) ;
-    p.write(&p_cur->validity_relative.second, sizeof(uct)) ;
-    p.write(&p_cur->validity_relative.timezone, sizeof(sc));
-
-    p.write(&p_cur->deferred_absolute.year, sizeof(uct)) ;
-    p.write(&p_cur->deferred_absolute.month, sizeof(uct)) ;
-    p.write(&p_cur->deferred_absolute.day, sizeof(uct)) ;
-    p.write(&p_cur->deferred_absolute.hour, sizeof(uct)) ;
-    p.write(&p_cur->deferred_absolute.minute, sizeof(uct)) ;
-    p.write(&p_cur->deferred_absolute.second, sizeof(uct)) ;
-    p.write(&p_cur->deferred_absolute.timezone, sizeof(sc));
-
-    p.write(&p_cur->deferred_relative.year, sizeof(uct)) ;
-    p.write(&p_cur->deferred_relative.month, sizeof(uct)) ;
-    p.write(&p_cur->deferred_relative.day, sizeof(uct)) ;
-    p.write(&p_cur->deferred_relative.hour, sizeof(uct)) ;
-    p.write(&p_cur->deferred_relative.minute, sizeof(uct)) ;
-    p.write(&p_cur->deferred_relative.second, sizeof(uct)) ;
-    p.write(&p_cur->deferred_relative.timezone, sizeof(sc)); 
-
-    p.writeInt32(p_cur->priority);
-
-    p.writeInt32(p_cur->privacy );
-
-    p.write(&p_cur->reply_option.user_ack_requested, sizeof(uct)) ; 
-    p.write(&p_cur->reply_option.delivery_ack_requested, sizeof(uct)) ;
-    p.write(&p_cur->reply_option.read_ack_requested, sizeof(uct)) ;
-
-    p.write(&p_cur->num_messages, sizeof(uct)) ;
-
-    p.writeInt32(p_cur->alert_mode);
-
-    p.writeInt32(p_cur->language);
-
-    p.writeInt32(p_cur->callback.digit_mode);
-    p.writeInt32(p_cur->callback.number_mode);
-    p.writeInt32(p_cur->callback.number_type);
-    p.writeInt32(p_cur->callback.number_plan);
-    p.write(&p_cur->callback.number_of_digits, sizeof(uct)) ;
-    
-    for(int j =0; j<RIL_CDMA_SMS_ADDRESS_MAX;j++) {
-        p.write(&p_cur->callback.digits[j], sizeof(uct)) ;
-    }
-
-    p.writeInt32(p_cur->display_mode );
-
-    // removed in latest QC RIL
-    // p.writeInt32(p_cur->download_mode);
-
-    p.writeInt32(p_cur->delivery_status.error_class );
-    p.writeInt32(p_cur->delivery_status.status );
-
-    p.write(&p_cur->deposit_index, sizeof(uct)) ;
-
-    for(int j = 0; j<RIL_CDMA_SMS_IP_ADDRESS_SIZE; j++) {
-        p.write(&p_cur->ip_address.address[j], sizeof(uct)) ;
-    }
-    p.write(&p_cur->ip_address.is_valid, sizeof(uct)) ;
-
-    p.write(&p_cur->rsn_no_notify, sizeof(uct)) ;
-
-    p.write(&p_cur->other.input_other_len, sizeof(uct)) ;
-    p.write(&p_cur->other.desired_other_len, sizeof(uct)) ;
-    p.write((p_cur->other.other_data), sizeof(uct)) ;// a pointer!
-    
-    startRequest;
-    appendPrintBuf("%s message_id,id_number %d, mc_time.hour%d, mc_time.min%d", 
-            printBuf, p_cur->message_id.id_number, p_cur->mc_time.hour,p_cur->mc_time.minute);
-    closeRequest;
- 
     return 0;
 }
 
-
-/****************************************
- * END POINT!!
- *
- * New Dispatch functions added here 
- * Change needed for ril_QC_20080819.h
- ****************************************/
-
-
-/****************************************
- * START : New Response functions added here 
- * Change needed for ril_QC_20081024.h
- ****************************************/ 
-static int responseRilCdmaEncodedSms(Parcel &p, void *response, size_t responselen) {
-    unsigned char length;
-    
-    if (response == NULL && responselen != 0) {
-        LOGE("invalid response: NULL");
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (responselen % sizeof(RIL_CDMA_Encoded_SMS *) != 0) {
-        LOGE("invalid response length %d expected multiple of %d", 
-                (int)responselen, (int)sizeof(RIL_CDMA_Encoded_SMS *));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    RIL_CDMA_Encoded_SMS *p_cur = (RIL_CDMA_Encoded_SMS *) response;
-    p.write(&p_cur->length, sizeof(length));
-    writeStringToParcel (p, (const char *)p_cur->data);
-      
-    startResponse;
-    appendPrintBuf("%s length=%s, data=%s", printBuf, p_cur->length, p_cur->data);
-    closeResponse;
-
-return 0;
-}
-/****************************************
- * END : New Response functions added here 
- * Change needed for ril_QC_20081024.h
- ****************************************/
 /**
  * A write on the wakeup fd is done just to pop us out of select()
  * We empty the buffer here and then ril_event will reset the timers on the
@@ -2636,23 +1808,23 @@ static void listenCallback (int fd, short flags, void *param) {
      */ 
     errno = 0;
     is_phone_socket = 0;
-    
+
     err = getsockopt(s_fdCommand, SOL_SOCKET, SO_PEERCRED, &creds, &szCreds);
-    
+
     if (err == 0 && szCreds > 0) {
-      errno = 0;
-      pwd = getpwuid(creds.uid);
-      if (pwd != NULL) {
-    if (strcmp(pwd->pw_name, PHONE_PROCESS) == 0) {
-      is_phone_socket = 1;
+        errno = 0;
+        pwd = getpwuid(creds.uid);
+        if (pwd != NULL) {
+            if (strcmp(pwd->pw_name, PHONE_PROCESS) == 0) {
+                is_phone_socket = 1;
+            } else {
+                LOGE("RILD can't accept socket from process %s", pwd->pw_name);
+            }
+        } else {
+            LOGE("Error on getpwuid() errno: %d", errno);
+        }
     } else {
-      LOGE("RILD can't accept socket from process %s", pwd->pw_name);
-    }
-      } else {
-        LOGE("Error on getpwuid() errno: %d", errno);
-      }
-    } else {
-      LOGD("Error on getsockopt() errno: %d", errno);
+        LOGD("Error on getsockopt() errno: %d", errno);
     }
 
     if ( !is_phone_socket ) {
@@ -2790,14 +1962,14 @@ static void debugCallback (int fd, short flags, void *param) {
             issueLocalRequest(RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC, NULL, 0);
             break;
         case 6:
-            LOGI("Debug port: Setup PDP, Apn :%s\n", args[1]);
+            LOGI("Debug port: Setup Data Call, Apn :%s\n", args[1]);
             actData[0] = args[1];
-            issueLocalRequest(RIL_REQUEST_SETUP_DEFAULT_PDP, &actData, 
+            issueLocalRequest(RIL_REQUEST_SETUP_DATA_CALL, &actData, 
                               sizeof(actData));
             break;
         case 7:
-            LOGI("Debug port: Deactivate PDP");
-            issueLocalRequest(RIL_REQUEST_DEACTIVATE_DEFAULT_PDP, &deactData, 
+            LOGI("Debug port: Deactivate Data Call");
+            issueLocalRequest(RIL_REQUEST_DEACTIVATE_DATA_CALL, &deactData, 
                               sizeof(deactData));
             break;
         case 8:
@@ -2935,11 +2107,11 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
 
     // Little self-check
 
-    for (int i = 0; i < (int)NUM_ELEMS(s_commands) ; i++) {
+    for (int i = 0; i < (int)NUM_ELEMS(s_commands); i++) {
         assert(i == s_commands[i].requestNumber);
     }
 
-    for (int i = 0; i < (int)NUM_ELEMS(s_unsolResponses) ; i++) {
+    for (int i = 0; i < (int)NUM_ELEMS(s_unsolResponses); i++) {
         assert(i + RIL_UNSOL_RESPONSE_BASE 
                 == s_unsolResponses[i].requestNumber);
     }
@@ -3161,6 +2333,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, void *data,
                                 size_t datalen) {
     int unsolResponseIndex;
     int ret;
+    int modemState;
 
     if (s_registerCalled == 0) {
         // Ignore RIL_onUnsolicitedResponse before RIL_register
@@ -3189,9 +2362,10 @@ void RIL_onUnsolicitedResponse(int unsolResponse, void *data,
     // some things get more payload
     switch(unsolResponse) {
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
-            p.writeInt32(s_callbacks.onStateRequest());
+            modemState = s_callbacks.onStateRequest();
+            p.writeInt32(modemState);
             appendPrintBuf("%s {%s}", printBuf,
-                radioStateToString(s_callbacks.onStateRequest()));
+                radioStateToString(modemState));
         break;
 
 
@@ -3255,8 +2429,8 @@ void RIL_onUnsolicitedResponse(int unsolResponse, void *data,
             s_last_wake_timeout_info->userParam = (void *)1;
         }
         
-        s_last_wake_timeout_info 
-            = internalRequestTimedCallback(wakeTimeoutCallback, NULL, 
+        s_last_wake_timeout_info = 
+            internalRequestTimedCallback(wakeTimeoutCallback, NULL, 
                                             &TIMEVAL_WAKE_TIMEOUT);
     }
 }
@@ -3267,7 +2441,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, void *data,
 static UserCallbackInfo *
 internalRequestTimedCallback (RIL_TimedCallback callback, void *param, 
                                 const struct timeval *relativeTime)
- {
+{
     struct timeval myRelativeTime;
     UserCallbackInfo *p_info;
     int ret;
@@ -3400,7 +2574,7 @@ requestToString(int request) {
         case RIL_REQUEST_DTMF: return "DTMF";
         case RIL_REQUEST_SEND_SMS: return "SEND_SMS";
         case RIL_REQUEST_SEND_SMS_EXPECT_MORE: return "SEND_SMS_EXPECT_MORE";
-        case RIL_REQUEST_SETUP_DEFAULT_PDP: return "SETUP_DEFAULT_PDP";
+        case RIL_REQUEST_SETUP_DATA_CALL: return "SETUP_DATA_CALL";
         case RIL_REQUEST_SIM_IO: return "SIM_IO";
         case RIL_REQUEST_SEND_USSD: return "SEND_USSD";
         case RIL_REQUEST_CANCEL_USSD: return "CANCEL_USSD";
@@ -3414,7 +2588,7 @@ requestToString(int request) {
         case RIL_REQUEST_GET_IMEI: return "GET_IMEI";
         case RIL_REQUEST_GET_IMEISV: return "GET_IMEISV";
         case RIL_REQUEST_ANSWER: return "ANSWER";
-        case RIL_REQUEST_DEACTIVATE_DEFAULT_PDP: return "DEACTIVATE_DEFAULT_PDP";
+        case RIL_REQUEST_DEACTIVATE_DATA_CALL: return "DEACTIVATE_DATA_CALL";
         case RIL_REQUEST_QUERY_FACILITY_LOCK: return "QUERY_FACILITY_LOCK";
         case RIL_REQUEST_SET_FACILITY_LOCK: return "SET_FACILITY_LOCK";
         case RIL_REQUEST_CHANGE_BARRING_PASSWORD: return "CHANGE_BARRING_PASSWORD";
@@ -3432,8 +2606,8 @@ requestToString(int request) {
         case RIL_REQUEST_SET_MUTE: return "SET_MUTE";
         case RIL_REQUEST_GET_MUTE: return "GET_MUTE";
         case RIL_REQUEST_QUERY_CLIP: return "QUERY_CLIP";
-        case RIL_REQUEST_LAST_PDP_FAIL_CAUSE: return "LAST_PDP_FAIL_CAUSE";
-        case RIL_REQUEST_PDP_CONTEXT_LIST: return "PDP_CONTEXT_LIST";
+        case RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE: return "LAST_DATA_CALL_FAIL_CAUSE";
+        case RIL_REQUEST_DATA_CALL_LIST: return "DATA_CALL_LIST";
         case RIL_REQUEST_RESET_RADIO: return "RESET_RADIO";
         case RIL_REQUEST_OEM_HOOK_RAW: return "OEM_HOOK_RAW";
         case RIL_REQUEST_OEM_HOOK_STRINGS: return "OEM_HOOK_STRINGS";
@@ -3463,12 +2637,7 @@ requestToString(int request) {
         case RIL_REQUEST_CDMA_GET_BROADCAST_CONFIG:return "CDMA_GET_BROADCAST_CONFIG";
         case RIL_REQUEST_CDMA_SET_BROADCAST_CONFIG:return "SET_CDMA_BROADCAST_CONFIG";
         case RIL_REQUEST_BROADCAST_ACTIVATION:return "BROADCAST_ACTIVATION"; 
-        case RIL_REQUEST_SETUP_DATA_CALL:return "SETUP_DATA_CALL";
-        case RIL_REQUEST_DEACTIVATE_DATA_CALL:return "DEACTIVATE_DATA_CALL";
-
         case RIL_REQUEST_CDMA_VALIDATE_AKEY: return"CDMA_VALIDATE_AKEY";
-        case RIL_REQUEST_CDMA_ENCODE_SMS: return"CDMA_ENCODE_SMS";
-        case RIL_REQUEST_CDMA_DECODE_SMS: return"CDMA_DECODE_SMS";
         case RIL_REQUEST_CDMA_SUBSCRIPTION: return"CDMA_SUBSCRIPTION";
         case RIL_REQUEST_CDMA_WRITE_SMS_TO_RUIM: return "CDMA_WRITE_SMS_TO_RUIM";
         case RIL_REQUEST_CDMA_DELETE_SMS_ON_RUIM: return "CDMA_DELETE_SMS_ON_RUIM";
@@ -3489,11 +2658,11 @@ requestToString(int request) {
         case RIL_UNSOL_STK_CALL_SETUP: return "UNSOL_STK_CALL_SETUP";
         case RIL_UNSOL_SIM_SMS_STORAGE_FULL: return "UNSOL_SIM_SMS_STORAGE_FUL";
         case RIL_UNSOL_SIM_REFRESH: return "UNSOL_SIM_REFRESH";
-        case RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED: return "UNSOL_PDP_CONTEXT_LIST_CHANGED";
+        case RIL_UNSOL_DATA_CALL_LIST_CHANGED: return "UNSOL_DATA_CALL_LIST_CHANGED";
         case RIL_UNSOL_CALL_RING: return "UNSOL_CALL_RING";
-        case RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED: return "RESPONSE_SIM_STATUS_CHANGED";
-        case RIL_UNSOL_RESPONSE_CDMA_NEW_SMS: return "NEW_CDMA_SMS";
-        case RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS: return "NEW_BROADCAST_SMS";
+        case RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED: return "UNSOL_RESPONSE_SIM_STATUS_CHANGED";
+        case RIL_UNSOL_RESPONSE_CDMA_NEW_SMS: return "UNSOL_NEW_CDMA_SMS";
+        case RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS: return "UNSOL_NEW_BROADCAST_SMS";
         case RIL_UNSOL_CDMA_RUIM_SMS_STORAGE_FULL: return "UNSOL_CDMA_RUIM_SMS_STORAGE_FULL";
         default: return "<unknown request>";
     }
