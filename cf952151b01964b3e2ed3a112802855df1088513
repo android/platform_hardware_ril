@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///80\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 981,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-30T13:13:25Z",
+      "side": 1,
+      "message": "yes, will be removed in next upload",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///9g\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -30,6 +47,23 @@
       "writtenOn": "2009-01-30T03:13:56Z",
       "side": 1,
       "message": "RIL_REQUEST_DEACTIVATE_DEFAULT_PDP is not in use anymore. Remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///8w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1272,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-30T13:13:25Z",
+      "side": 1,
+      "message": "yes, will be removed in next upload",
       "revId": "cf952151b01964b3e2ed3a112802855df1088513",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -53,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///8s\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1608,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-30T13:13:25Z",
+      "side": 1,
+      "message": "yes, will be removed in next upload",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///9Y\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -64,6 +115,23 @@
       "writtenOn": "2009-01-30T03:13:56Z",
       "side": 1,
       "message": "Same here for RIL_REQUEST_PDP_CONTEXT_LIST.  Remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///8o\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1627,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-30T13:13:25Z",
+      "side": 1,
+      "message": "yes, will be removed in next upload",
       "revId": "cf952151b01964b3e2ed3a112802855df1088513",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -87,6 +155,23 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///8k\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2672,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-30T13:13:25Z",
+      "side": 1,
+      "message": "yes, will be removed in next upload",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///9M\u003d",
         "filename": "libril/ril_commands.h",
         "patchSetId": 1
@@ -104,6 +189,23 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///8g\u003d",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-30T13:13:25Z",
+      "side": 1,
+      "message": "yes, to be delivered in the next upload",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///9Q\u003d",
         "filename": "libril/ril_commands.h",
         "patchSetId": 1
@@ -115,6 +217,23 @@
       "writtenOn": "2009-01-30T03:13:56Z",
       "side": 1,
       "message": "unnecessary comment\n \n//DEPRECATED use RIL_REQUEST_DATA_CALL_LIST",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///8c\u003d",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-01-30T13:13:25Z",
+      "side": 1,
+      "message": "yes, to be delivered in next upload",
       "revId": "cf952151b01964b3e2ed3a112802855df1088513",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
