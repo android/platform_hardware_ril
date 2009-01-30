@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///9k\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "RIL_REQUEST_SETUP_DEFAULT_PDP is not in use anymore. And no reuse of REQUEST number 27. Remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9g\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1271,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "RIL_REQUEST_DEACTIVATE_DEFAULT_PDP is not in use anymore. Remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9c\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1607,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "RIL_REQUEST_LAST_PDP_FAIL_CAUSE is not in use anymore. Remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9Y\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1626,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "Same here for RIL_REQUEST_PDP_CONTEXT_LIST.  Remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9U\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2671,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED is not in use anymore. Remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9M\u003d",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "unnecessary comment. remove?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9Q\u003d",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "unnecessary comment\n \n//DEPRECATED use RIL_REQUEST_DATA_CALL_LIST",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9E\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "Do we need keep this function after the change of ril.h in this checkin?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///9I\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1852,
+      "author": {
+        "id": 1000687
+      },
+      "writtenOn": "2009-01-30T03:13:56Z",
+      "side": 1,
+      "message": "Do we need this workaround after the change of ril.h in this checkin?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
