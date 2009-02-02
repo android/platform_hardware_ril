@@ -257,6 +257,23 @@
     },
     {
       "key": {
+        "uuid": "AAAACH///+I\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-02-02T08:42:28Z",
+      "side": 1,
+      "message": "no, we don\u0027t, we will remove the functions requestOrSendPDPContextList(), onPDPContestListChanged() and requestPDPContextList() within the next delivery",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///9I\u003d",
         "filename": "reference-ril/reference-ril.c",
         "patchSetId": 1
@@ -268,6 +285,23 @@
       "writtenOn": "2009-01-30T03:13:56Z",
       "side": 1,
       "message": "Do we need this workaround after the change of ril.h in this checkin?",
+      "revId": "cf952151b01964b3e2ed3a112802855df1088513",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///+E\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1852,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-02-02T08:42:28Z",
+      "side": 1,
+      "message": "we will replace onPDPContestListChanged with onDataCallListChanged according to comment above line 272 and remove TODO",
       "revId": "cf952151b01964b3e2ed3a112802855df1088513",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
