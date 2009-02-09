@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAADn///+M\u003d",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1001572
+      },
+      "writtenOn": "2009-02-09T02:08:03Z",
+      "side": 1,
+      "message": "Why not keep the CALL_FORWARD setting? I\u0027m afraid that will break the compatibility with GSM system.",
+      "revId": "bf2760d35a180975fab271249e9c09c524a6ac38",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
