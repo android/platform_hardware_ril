@@ -16,6 +16,23 @@
       "revId": "bf2760d35a180975fab271249e9c09c524a6ac38",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAADn///9Q\u003d",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000095
+      },
+      "writtenOn": "2009-02-09T09:09:35Z",
+      "side": 1,
+      "message": "Sorry something happened during fixing other comments. We will bring it back in next upload",
+      "revId": "bf2760d35a180975fab271249e9c09c524a6ac38",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
