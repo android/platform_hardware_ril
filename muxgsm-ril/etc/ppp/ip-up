@@ -1,0 +1,10 @@
+#!/system/bin/sh
+
+/system/bin/setprop "net.interfaces.defaultroute" "gprs"
+/system/bin/setprop "net.gprs.dns1" "$DNS1"
+/system/bin/setprop "net.gprs.dns2" "$DNS2" 
+/system/bin/setprop "net.gprs.local-ip" "$IPLOCAL" 
+/system/bin/setprop "net.gprs.remote-ip" "$IPREMOTE" 
+
+exit 0
+
