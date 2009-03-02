@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAI3///+s\u003d",
+        "filename": "muxgsm-ril/atchannel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1001622
+      },
+      "writtenOn": "2009-03-02T21:07:09Z",
+      "side": 1,
+      "message": "Is basic mode going to be supported?",
+      "revId": "558d08ff271f0ee023e57aec02d42120c003873e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAI3///+w\u003d",
+        "filename": "muxgsm-ril/atchannel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 1001622
+      },
+      "writtenOn": "2009-03-02T21:07:09Z",
+      "side": 1,
+      "message": "The baud rate 921600 is supported in the muxgsm-ril.c file so it should also be here.",
+      "revId": "558d08ff271f0ee023e57aec02d42120c003873e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
