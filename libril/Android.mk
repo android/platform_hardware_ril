@@ -9,7 +9,8 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_SHARED_LIBRARIES := \
     libutils \
-    libcutils 
+    libcutils \
+    libhardware_legacy
 
 LOCAL_CFLAGS := 
 

@@ -32,4 +32,14 @@
     {RIL_UNSOL_STK_CALL_SETUP, responseInts, WAKE_PARTIAL},
     {RIL_UNSOL_SIM_SMS_STORAGE_FULL, responseVoid, WAKE_PARTIAL},
     {RIL_UNSOL_SIM_REFRESH, responseInts, WAKE_PARTIAL},
-    {RIL_UNSOL_CALL_RING, responseVoid, WAKE_PARTIAL}
+    {RIL_UNSOL_CALL_RING, responseVoid, WAKE_PARTIAL},
+    /* import unsolicited CDMA notifications, need change response type
+     * of CDMA_NEW_SMS when do real CDMA merge
+     */
+    {RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED, responseVoid, WAKE_PARTIAL},
+    {RIL_UNSOL_RESPONSE_CDMA_NEW_SMS, responseVoid, WAKE_PARTIAL},
+    {RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS, responseString, WAKE_PARTIAL},
+    {RIL_UNSOL_CDMA_RUIM_SMS_STORAGE_FULL, responseVoid, WAKE_PARTIAL},
+    /* end of import unsolicited CDMA notifications */
+    {RIL_UNSOL_RESTRICTED_STATE_CHANGED, responseInts, WAKE_PARTIAL}
+
