@@ -833,26 +833,21 @@ sendResponseRaw (const void *data, size_t dataSize)
     
 
     // FIXME is blocking here ok? issue #550970
-
     pthread_mutex_lock(&s_writeMutex);
 
     header = htonl(dataSize);
 
     ret = blockingWrite(fd, (void *)&header, sizeof(header));
-
     if (ret < 0) {
-        return ret;
+        goto error;
     }
 
-    blockingWrite(fd, data, dataSize);
+    ret = blockingWrite(fd, data, dataSize);
 
-    if (ret < 0) {
-        return ret;
-    }
-
+error:
     pthread_mutex_unlock(&s_writeMutex);
 
-    return 0;
+    return ret < 0 ? ret : 0;
 }
 
 static int
