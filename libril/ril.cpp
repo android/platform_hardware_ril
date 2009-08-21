@@ -1181,12 +1181,14 @@ sendResponseRaw (const void *data, size_t dataSize) {
     ret = blockingWrite(fd, (void *)&header, sizeof(header));
 
     if (ret < 0) {
+        pthread_mutex_unlock(&s_writeMutex);
         return ret;
     }
 
     ret = blockingWrite(fd, data, dataSize);
 
     if (ret < 0) {
+        pthread_mutex_unlock(&s_writeMutex);
         return ret;
     }
 
