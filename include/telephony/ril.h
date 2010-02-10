@@ -2959,6 +2959,22 @@ typedef struct {
  */
 #define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
 
+/**
+ * RIL_REQUEST_CDMA_PRL_VERSION
+ *
+ * Request the PRL (preferred roaming list) version.
+ *
+ * "response" is const char *
+ * (const char *)response is PRL version if PRL is loaded and NULL if not
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ * See also: RIL_UNSOL_CDMA_PRL_CHANGED
+ */
+#define RIL_REQUEST_CDMA_PRL_VERSION 106
 
 /***********************************************************************/
 
@@ -3376,6 +3392,46 @@ typedef struct {
  * "data" is null
  */
 #define RIL_UNSOL_RESEND_INCALL_MUTE 1030
+
+/**
+ * RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED
+ *
+ * Called when CDMA subscription source changes.
+ *
+ * Callee will invoke the following request on the main thread:
+ *
+ * RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE
+ *
+ * "data" is NULL
+ */
+#define RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED 1034
+
+/**
+ * RIL_UNSOL_CDMA_PRL_CHANGED
+ *
+ * Called when PRL (preferred roaming list) changes.
+ *
+ * Callee will invoke the following request on the main thread:
+ *
+ * RIL_REQUEST_CDMA_PRL_VERSION
+ *
+ * "data" is NULL
+ */
+#define RIL_UNSOL_CDMA_PRL_CHANGED 1035
+
+/**
+ * RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE
+ *
+ * Called when data network states has changed
+ *
+ * Indicates that the radio system selection module has
+ * exited emergency callback mode.
+ *
+ * "data" is NULL
+ *
+ */
+#define RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE 1037
+
 /***********************************************************************/
 
 
