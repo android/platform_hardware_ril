@@ -570,7 +570,9 @@ invalid:
 static void
 dispatchDial (Parcel &p, RequestInfo *pRI) {
     RIL_Dial dial;
+    RIL_UUS_Info uusInfo;
     int32_t t;
+    int32_t uusPresent;
     status_t status;
 
     memset (&dial, 0, sizeof(dial));
@@ -584,8 +586,49 @@ dispatchDial (Parcel &p, RequestInfo *pRI) {
         goto invalid;
     }
 
+    status = p.readInt32(&uusPresent);
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    if (uusPresent == 0) {
+        dial.uusInfo = NULL;
+    } else {
+        int32_t len;
+
+        memset(&uusInfo, 0, sizeof(RIL_UUS_Info));
+
+        status = p.readInt32(&t);
+        uusInfo.uusType = (RIL_UUS_Type) t;
+
+        status = p.readInt32(&t);
+        uusInfo.uusDcs = (RIL_UUS_DCS) t;
+
+        status = p.readInt32(&len);
+        if (status != NO_ERROR) {
+            goto invalid;
+        }
+
+        // The java code writes -1 for null arrays
+        if (((int) len) == -1) {
+            uusInfo.uusData = NULL;
+            len = 0;
+        } else {
+            uusInfo.uusData = (char*) p.readInplace(len);
+        }
+
+        uusInfo.uusLength = len;
+        dial.uusInfo = &uusInfo;
+    }
+
     startRequest;
     appendPrintBuf("%snum=%s,clir=%d", printBuf, dial.address, dial.clir);
+    if (uusPresent) {
+        appendPrintBuf("%s,uusType=%d,uusDcs=%d,uusLen=%d", printBuf,
+                dial.uusInfo->uusType, dial.uusInfo->uusDcs,
+                dial.uusInfo->uusLength);
+    }
     closeRequest;
     printRequest(pRI->token, pRI->pCI->requestNumber);
 
@@ -598,6 +641,7 @@ dispatchDial (Parcel &p, RequestInfo *pRI) {
     free (dial.address);
 
 #ifdef MEMSET_FREED
+    memset(&uusInfo, 0, sizeof(RIL_UUS_Info));
     memset(&dial, 0, sizeof(dial));
 #endif
 
@@ -1323,6 +1367,16 @@ static int responseCallList(Parcel &p, void *response, size_t responselen) {
         p.writeInt32(p_cur->numberPresentation);
         writeStringToParcel(p, p_cur->name);
         p.writeInt32(p_cur->namePresentation);
+        if (p_cur->uusInfo == NULL || p_cur->uusInfo->uusData == NULL) {
+            p.writeInt32(0); /* UUS Information is absent */
+        } else {
+            RIL_UUS_Info *uusInfo = p_cur->uusInfo;
+            p.writeInt32(1); /* UUS Information is present */
+            p.writeInt32(uusInfo->uusType);
+            p.writeInt32(uusInfo->uusDcs);
+            p.writeInt32(uusInfo->uusLength);
+            p.write(uusInfo->uusData, uusInfo->uusLength);
+        }
         appendPrintBuf("%s[id=%d,%s,toa=%d,",
             printBuf,
             p_cur->index,
