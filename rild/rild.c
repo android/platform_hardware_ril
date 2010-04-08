@@ -91,7 +91,7 @@ void switchUser() {
     struct __user_cap_data_struct cap;
     header.version = _LINUX_CAPABILITY_VERSION;
     header.pid = 0;
-    cap.effective = cap.permitted = 1 << CAP_NET_ADMIN;
+    cap.effective = cap.permitted = (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW);
     cap.inheritable = 0;
     capset(&header, &cap);
 }
