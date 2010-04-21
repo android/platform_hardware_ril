@@ -1020,7 +1020,8 @@ typedef struct {
  *                                  0 - Unknown, 1 - GPRS, 2 - EDGE, 3 - UMTS,
  *                                  4 - IS95A, 5 - IS95B, 6 - 1xRTT,
  *                                  7 - EvDo Rev. 0, 8 - EvDo Rev. A,
- *                                  9 - HSDPA, 10 - HSUPA, 11 - HSPA
+ *                                  9 - HSDPA, 10 - HSUPA, 11 - HSPA,
+ *                                  12 - EVDO Rev B
  * ((const char **)response)[4] is Base Station ID if registered on a CDMA
  *                              system or NULL if not.  Base Station ID in
  *                              decimal format
