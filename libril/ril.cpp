@@ -142,7 +142,6 @@ typedef struct UserCallbackInfo {
     struct UserCallbackInfo *p_next;
 } UserCallbackInfo;
 
-
 /*******************************************************************/
 
 RIL_RadioFunctions s_callbacks = {0, NULL, NULL, NULL, NULL, NULL};
@@ -240,8 +239,9 @@ extern "C" void RIL_onUnsolicitedResponse(int unsolResponse, void *data,
 #endif
 
 static UserCallbackInfo * internalRequestTimedCallback
-    (RIL_TimedCallback callback, void *param,
-        const struct timeval *relativeTime);
+    (RIL_TimedCallback callback, void *param, const struct timeval *relativeTime);
+
+static void internalRemoveTimedCallback(void *callbackInfo);
 
 /** Index == requestNumber */
 static CommandInfo s_commands[] = {
@@ -2862,7 +2862,7 @@ error_exit:
 */
 static UserCallbackInfo *
 internalRequestTimedCallback (RIL_TimedCallback callback, void *param,
-                                const struct timeval *relativeTime)
+                              const struct timeval *relativeTime)
 {
     struct timeval myRelativeTime;
     UserCallbackInfo *p_info;
@@ -2871,7 +2871,6 @@ internalRequestTimedCallback (RIL_TimedCallback callback, void *param,
 
     p_info->p_callback = callback;
     p_info->userParam = param;
-
     if (relativeTime == NULL) {
         /* treat null parameter as a 0 relative time */
         memset (&myRelativeTime, 0, sizeof(myRelativeTime));
@@ -2888,11 +2887,27 @@ internalRequestTimedCallback (RIL_TimedCallback callback, void *param,
     return p_info;
 }
 
+static void
+internalRemoveTimedCallback(void *callbackInfo)
+{
+    UserCallbackInfo *p_info;
+    p_info = (UserCallbackInfo *)callbackInfo;
+    LOGI("remove timer callback event");
+    if(p_info) {
+        ril_timer_delete(&(p_info->event));
+        free(p_info);
+    }
+}
 
-extern "C" void
+extern "C" void *
 RIL_requestTimedCallback (RIL_TimedCallback callback, void *param,
                                 const struct timeval *relativeTime) {
-    internalRequestTimedCallback (callback, param, relativeTime);
+   return internalRequestTimedCallback (callback, param, relativeTime);
+}
+
+extern "C" void
+RIL_removeTimedCallback (void *callbackInfo) {
+    internalRemoveTimedCallback(callbackInfo);
 }
 
 const char *
