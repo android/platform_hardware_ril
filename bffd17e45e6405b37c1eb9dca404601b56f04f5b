@@ -16,6 +16,24 @@
       "revId": "bffd17e45e6405b37c1eb9dca404601b56f04f5b",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA0n///+Y\u003d",
+        "filename": "libril/ril_event.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-06-22T17:13:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAA0n///+k\u003d",
+      "revId": "bffd17e45e6405b37c1eb9dca404601b56f04f5b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
