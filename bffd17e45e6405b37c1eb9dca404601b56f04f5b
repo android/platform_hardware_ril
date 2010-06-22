@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA0n///+k\u003d",
+        "filename": "libril/ril_event.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1002951
+      },
+      "writtenOn": "2010-06-22T17:05:39Z",
+      "side": 1,
+      "message": "Should this do the MUTEX_ACQUIRE(); / MUTEX_RELEASE(); ?",
+      "revId": "bffd17e45e6405b37c1eb9dca404601b56f04f5b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
