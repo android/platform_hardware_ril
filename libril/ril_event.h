@@ -47,6 +47,9 @@ void ril_timer_add(struct ril_event * ev, struct timeval * tv);
 // Remove event from watch list
 void ril_event_del(struct ril_event * ev);
 
+// Remove event from timer list
+void ril_timer_delete(struct ril_event * ev);
+
 // Event loop
 void ril_event_loop();
 
