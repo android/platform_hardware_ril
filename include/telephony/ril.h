@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-#define RIL_VERSION 3
+#define RIL_VERSION 4
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
@@ -68,8 +68,9 @@ typedef enum {
                                                    location */
     RIL_E_MODE_NOT_SUPPORTED = 13,              /* HW does not support preferred network type */
     RIL_E_FDN_CHECK_FAILURE = 14,               /* command failed because recipient is not on FDN list */
-    RIL_E_ILLEGAL_SIM_OR_ME = 15                /* network selection failed due to
+    RIL_E_ILLEGAL_SIM_OR_ME = 15,               /* network selection failed due to
                                                    illegal SIM or ME */
+    RIL_E_SETUP_DATA_CALL_FAILURE = 16          /* data call setup failed with a reason */
 } RIL_Errno;
 
 typedef enum {
@@ -157,9 +158,14 @@ typedef struct {
 typedef struct {
     int             cid;        /* Context ID */
     int             active;     /* 0=inactive, 1=active/physical link down, 2=active/physical link up */
-    char *          type;       /* X.25, IP, IPV6, etc. */
+    char *          type;       /* One of the PDP_type values in TS 27.007 section 10.1.1.
+                                   For example, "IP", "IPV6", "IPV4V6", or "PPP". */
     char *          apn;
-    char *          address;
+    char *          address;    /* A space-delimited list of addresses, e.g., "192.0.1.3" or
+                                   "192.0.1.11 2001:db8::1". */
+    int             inactiveReason; /* if the data call went inactive(0),
+                                       then the reason for being inactive.
+                                       defined in RIL_DataCallDropCause */
 } RIL_Data_Call_Response;
 
 typedef struct {
@@ -281,8 +287,13 @@ typedef enum {
     CALL_FAIL_ERROR_UNSPECIFIED = 0xffff
 } RIL_LastCallFailCause;
 
-/* See RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE */
 typedef enum {
+    /* an integer cause code defined in TS 24.008
+       section 6.1.3.1.3 or TS 24.301 Release 8+ Annex B.
+       If the implementation does not have access to the exact cause codes,
+       then it should return one of the following values,
+       as the UI layer needs to distinguish these
+       cases for error notification and potential retries. */
     PDP_FAIL_OPERATOR_BARRED = 0x08,               /* no retry */
     PDP_FAIL_INSUFFICIENT_RESOURCES = 0x1A,
     PDP_FAIL_MISSING_UKNOWN_APN = 0x1B,            /* no retry */
@@ -293,13 +304,29 @@ typedef enum {
     PDP_FAIL_SERVICE_OPTION_NOT_SUPPORTED = 0x20,  /* no retry */
     PDP_FAIL_SERVICE_OPTION_NOT_SUBSCRIBED = 0x21, /* no retry */
     PDP_FAIL_SERVICE_OPTION_OUT_OF_ORDER = 0x22,
-    PDP_FAIL_NSAPI_IN_USE      = 0x23,             /* no retry */
+    PDP_FAIL_NSAPI_IN_USE = 0x23,                  /* no retry */
+    PDP_FAIL_ONLY_IPV4_ALLOWED = 0x32,             /* no retry */
+    PDP_FAIL_ONLY_IPV6_ALLOWED = 0x33,             /* no retry */
+    PDP_FAIL_ONLY_SINGLE_BEARER_ALLOWED = 0x34,
     PDP_FAIL_PROTOCOL_ERRORS   = 0x6F,             /* no retry */
     PDP_FAIL_ERROR_UNSPECIFIED = 0xffff,  /* This and all other cases: retry silently */
     /* Not mentioned in the specification */
     PDP_FAIL_REGISTRATION_FAIL = -1,
     PDP_FAIL_GPRS_REGISTRATION_FAIL = -2,
-} RIL_LastDataCallActivateFailCause;
+} RIL_DataCallFailCause;
+
+typedef enum {
+    /* reasons for data call drop - network/modem disconnect */
+    PDP_FAIL_UNKNOWN = 0,                 /* unknown reason */
+    PDP_FAIL_SIGNAL_LOST = 1,
+    PDP_FAIL_PREF_RADIO_TECH_CHANGED = 2, /* preferred technology has changed, will retry
+                                             with parameters appropriate for new technology */
+    PDP_FAIL_RADIO_POWER_OFF = 3,         /* data call was disconnected because radio was resetting,
+                                             powered off - no retry */
+    PDP_FAIL_TETHERED_CALL_ACTIVE = 4,    /* data call was disconnected by the modem because tethered
+                                             mode was up on same APN/data profile - no retry until
+                                             tethered call is off */
+} RIL_DataCallDropCause;
 
 /* See RIL_REQUEST_SETUP_DATA_CALL */
 typedef enum {
@@ -1290,8 +1317,9 @@ typedef struct {
  * Setup a packet data connection
  *
  * "data" is a const char **
- * ((const char **)data)[0] indicates whether to setup connection on radio technology CDMA
- *                              or GSM/UMTS, 0-1. 0 - CDMA, 1-GSM/UMTS
+ * ((const char **)data)[0] indicates whether to setup connection on radio
+ *                          technology 3GPP or 3GPP2
+ *                          0 - 3GPP2, 1 - 3GPP
  *
  * ((const char **)data)[1] is a RIL_DataProfile (support is optional)
  * ((const char **)data)[2] is the APN to connect to if radio technology is GSM/UMTS. This APN will
@@ -1303,12 +1331,15 @@ typedef struct {
  *                          1 => PAP may be performed; CHAP is never performed.
  *                          2 => CHAP may be performed; PAP is never performed.
  *                          3 => PAP / CHAP may be performed - baseband dependent.
+ * ((const char **)data)[6] is the PDP type to request if the radio technology is GSM/UMTS.
+ *                          Must be one of the PDP_type values in TS 27.007 section 10.1.1.
+ *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
  *
  * "response" is a char **
  * ((char **)response)[0] indicating PDP CID, which is generated by RIL. This Connection ID is
  *                          used in GSM/UMTS and CDMA
  * ((char **)response)[1] indicating the network interface name for GSM/UMTS or CDMA
- * ((char **)response)[2] indicating the IP address for this interface for GSM/UMTS
+ * ((char **)response)[2] a space-separated list of IP addresses for this interface for GSM/UMTS
  *                          and NULL for CDMA
  *
  * FIXME may need way to configure QoS settings
@@ -1318,12 +1349,12 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
+ *  SETUP_DATA_CALL_FAILURE "response" is a RIL_DataCallFailCause
  *  GENERIC_FAILURE
  *
  * See also: RIL_REQUEST_DEACTIVATE_DATA_CALL
  */
 #define RIL_REQUEST_SETUP_DATA_CALL 27
-
 
 
 /**
@@ -1936,7 +1967,7 @@ typedef struct {
 #define RIL_REQUEST_QUERY_CLIP 55
 
 /**
- * RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE
+ * RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE - DEPRECATED
  *
  * Requests the failure cause code for the most recently failed PDP
  * context or CDMA data connection active
@@ -1950,7 +1981,7 @@ typedef struct {
  *
  * If the implementation does not have access to the exact cause codes,
  * then it should return one of the values listed in
- * RIL_LastDataCallActivateFailCause, as the UI layer needs to distinguish these
+ * RIL_DataCallFailCause, as the UI layer needs to distinguish these
  * cases for error notification
  * and potential retries.
  *
