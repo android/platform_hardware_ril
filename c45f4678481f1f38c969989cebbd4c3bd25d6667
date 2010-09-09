@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7X///l0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2010-09-09T23:39:07Z",
+      "side": 0,
+      "message": "this is removed. Connectivity service can get ipaddress directly from the interface. Or else we will have to make this an array, if multiple IP is associated with an interface.",
+      "revId": "c45f4678481f1f38c969989cebbd4c3bd25d6667",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7X///l8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2010-09-09T23:39:07Z",
+      "side": 1,
+      "message": "does it make sense combining these drop causes with ones above?",
+      "revId": "7e7194a7ce93f4ff5998107863da167eb800e139",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7X///l4\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1966,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2010-09-09T23:39:07Z",
+      "side": 1,
+      "message": "This is deprecated because it causes problems when several pdns are active or tried simultaneously.",
+      "revId": "7e7194a7ce93f4ff5998107863da167eb800e139",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
