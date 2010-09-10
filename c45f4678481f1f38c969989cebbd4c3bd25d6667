@@ -34,6 +34,24 @@
       "revId": "c45f4678481f1f38c969989cebbd4c3bd25d6667",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7X///kY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2010-09-10T02:05:30Z",
+      "side": 0,
+      "message": "yeah..I can do that change. Telephony service doesnt really use these IP address, which is why I removed it. It ends up being used in connectivity service, and i think there are better ways of getting it there from interfacename.\n\nI will put it back, and there is a similar , list required up in RIL_Data_Call_Response too..",
+      "parentUuid": "AAAA7X///lQ\u003d",
+      "revId": "c45f4678481f1f38c969989cebbd4c3bd25d6667",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
