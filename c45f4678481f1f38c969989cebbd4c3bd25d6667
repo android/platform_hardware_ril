@@ -16,6 +16,24 @@
       "revId": "c45f4678481f1f38c969989cebbd4c3bd25d6667",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7X///lQ\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 1000835
+      },
+      "writtenOn": "2010-09-10T00:47:40Z",
+      "side": 0,
+      "message": "I just checked in a change to make this a \"space-delimited set of IP addresses\". That is backwards compatible, since an IP address is a \"space-delimited set of IP addresses\" with one element. In Java land, this can be easily parsed and turned into a string. We should probably do that instead of removing this field completely.",
+      "parentUuid": "AAAA7X///l0\u003d",
+      "revId": "c45f4678481f1f38c969989cebbd4c3bd25d6667",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }

@@ -36,6 +36,41 @@
     },
     {
       "key": {
+        "uuid": "AAAA7X///lI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1000835
+      },
+      "writtenOn": "2010-09-10T00:47:40Z",
+      "side": 1,
+      "message": "Are these codes vendor-specific or are they based on 3GPP standards?",
+      "parentUuid": "AAAA7X///l8\u003d",
+      "revId": "7e7194a7ce93f4ff5998107863da167eb800e139",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7X///lM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1331,
+      "author": {
+        "id": 1000835
+      },
+      "writtenOn": "2010-09-10T00:47:40Z",
+      "side": 1,
+      "message": "If this is a string, then it should be a string, not a string representing an integer. I just checked in a change to make this string be one of the PDP_type values in TS 27.007 section 10.1.1 (\"IP\", \"IPV6\", \"IPV4V6\", etc.).",
+      "revId": "7e7194a7ce93f4ff5998107863da167eb800e139",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7X///l4\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
