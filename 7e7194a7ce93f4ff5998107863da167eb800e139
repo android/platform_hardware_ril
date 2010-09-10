@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA7X///lg\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2010-09-10T00:17:03Z",
+      "side": 1,
+      "message": "change tab to whitespace.",
+      "revId": "7e7194a7ce93f4ff5998107863da167eb800e139",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7X///l8\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
