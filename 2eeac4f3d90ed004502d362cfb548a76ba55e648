@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7X///Vs\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3403,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-13T17:12:44Z",
+      "side": 1,
+      "message": "We need to add support for this message as well.",
+      "revId": "2eeac4f3d90ed004502d362cfb548a76ba55e648",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7X///Vw\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3425,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-13T17:12:44Z",
+      "side": 1,
+      "message": "Comment is not very clear as to what the message exactly indicates.",
+      "revId": "2eeac4f3d90ed004502d362cfb548a76ba55e648",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
