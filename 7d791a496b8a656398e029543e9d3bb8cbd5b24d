@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7n///70\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1322,
+      "author": {
+        "id": 1000835
+      },
+      "writtenOn": "2010-09-15T23:34:04Z",
+      "side": 1,
+      "message": "The rest of this file and of the android framework calls 3GPP2 \"CDMA\" and 3GPP \"GSM/UMTS\", so we should probably not change this.",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///7w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1337,
+      "author": {
+        "id": 1000835
+      },
+      "writtenOn": "2010-09-15T23:34:04Z",
+      "side": 1,
+      "message": "Remove extra blank line for consistency with the rest of the file.",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///7s\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1000835
+      },
+      "writtenOn": "2010-09-15T23:34:04Z",
+      "side": 1,
+      "message": "It seems like a bad idea to have the type of the return parameter (which is char* in all current cases) change depending on what error code was returned.\n\nWink, what do we do here? Add an extra parameter to the response containing a status code?",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
