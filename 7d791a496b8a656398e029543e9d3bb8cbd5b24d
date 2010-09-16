@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA7n///1Q\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1322,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-16T16:38:24Z",
+      "side": 1,
+      "message": "When it was defined as CDMA, and GSM/UMTS those were the only technologies that were supported. But now CDMA is not just CDMA, CDMA could also mean EVDO. GSM/UMTS could mean HSPA as well. In the future we will support LTE as well. With LTE, we will be supporting CDMA+LTE handsets. So it will be ambiguous to use CDMA in those cases. Hence changing it to 3GPP and 3GPP2.",
+      "parentUuid": "AAAA7n///70\u003d",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7n///7w\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2010-09-15T23:34:04Z",
       "side": 1,
       "message": "Remove extra blank line for consistency with the rest of the file.",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///1E\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1337,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-16T16:38:24Z",
+      "side": 1,
+      "message": "Will do. Probably will wait till wink replies to your next comment till I upload a new patch though.",
+      "parentUuid": "AAAA7n///7w\u003d",
       "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
