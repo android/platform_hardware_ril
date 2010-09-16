@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA7n///yE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2010-09-16T18:34:42Z",
+      "side": 1,
+      "message": "Adding extra fields is a problem.",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///yM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2010-09-16T18:34:42Z",
+      "side": 1,
+      "message": "Why change the name?",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7n///70\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 2
@@ -101,6 +135,24 @@
       "writtenOn": "2010-09-15T23:34:04Z",
       "side": 1,
       "message": "It seems like a bad idea to have the type of the return parameter (which is char* in all current cases) change depending on what error code was returned.\n\nWink, what do we do here? Add an extra parameter to the response containing a status code?",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///yI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2010-09-16T18:34:42Z",
+      "side": 1,
+      "message": "I agree with Lorenzo, not a good idea, lets add a ((char **)response[3] which is the error code. And a value of zero should mean success.",
+      "parentUuid": "AAAA7n///7s\u003d",
       "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
