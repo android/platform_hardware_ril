@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7n///ts\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2010-09-17T05:16:17Z",
+      "side": 1,
+      "message": "To be able to accept the additional field, we still need to preserve backwards compatibility with existing vendor rils and we would need to update the framework to use this field. So would need to see those changes to better evaluate the consequences of this change.\n\nAlso, this should just be the \"reason\" as this structure is returned when a call is initially setup and when it changes. This would imply that this field should cover both cases. As such, it would seem the RIL_DataCallDropCause values should just be added to \"RIL_DataCallFailCause\" with 0 being success.\n\nAnother possibility we *might* consider is to extend RIL_Errno to include necessary error codes and then we shouldn\u0027t need this field.",
+      "revId": "2cfd6a498b4f37d155ae2cf9adfb2f5d6091c496",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
