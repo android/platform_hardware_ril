@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA7n///uM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-17T00:47:03Z",
+      "side": 1,
+      "message": "I understand your concern but in this case and we are increasing the RIL_VERSION with this change.\n\nIf RILs use the structure, it should be easy to set this field since the problem will be caught at compilation time. If RILs do not set this field, can we initialize to some known value in ril.cpp.\n\nThis field will really help optimize the retry logic in Android.",
+      "parentUuid": "AAAA7n///yE\u003d",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7n///yM\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2010-09-16T18:34:42Z",
       "side": 1,
       "message": "Why change the name?",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///uI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-17T00:47:03Z",
+      "side": 1,
+      "message": "Because it is not for the last setup data call anymore. It can be used to return the failure for the current SETUP_DATA_CALL request.",
+      "parentUuid": "AAAA7n///yM\u003d",
       "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -153,6 +189,24 @@
       "side": 1,
       "message": "I agree with Lorenzo, not a good idea, lets add a ((char **)response[3] which is the error code. And a value of zero should mean success.",
       "parentUuid": "AAAA7n///7s\u003d",
+      "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///uE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-17T00:47:03Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "AAAA7n///yI\u003d",
       "revId": "7d791a496b8a656398e029543e9d3bb8cbd5b24d",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
