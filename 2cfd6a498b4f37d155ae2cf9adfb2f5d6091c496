@@ -34,6 +34,24 @@
       "revId": "2cfd6a498b4f37d155ae2cf9adfb2f5d6091c496",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///b8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-22T22:21:26Z",
+      "side": 1,
+      "message": "That will only cover the scenario where call setup fails. The idea was that if the call was dropped due to some reason, Android telephony can know that from this field and would know if it needs to retry the data call setup again.",
+      "parentUuid": "AAAA7n///cQ\u003d",
+      "revId": "2cfd6a498b4f37d155ae2cf9adfb2f5d6091c496",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
