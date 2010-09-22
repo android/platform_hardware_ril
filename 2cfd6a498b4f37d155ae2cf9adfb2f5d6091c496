@@ -16,6 +16,24 @@
       "revId": "2cfd6a498b4f37d155ae2cf9adfb2f5d6091c496",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///cQ\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1000835
+      },
+      "writtenOn": "2010-09-22T19:48:19Z",
+      "side": 1,
+      "message": "How about we remove this field from the structure and we add a new string to the return value of RIL_REQUEST_SETUP_DATA_CALL? It would look something like this:\n\n((char **)response)[3]  An integer, the reason why the call failed. If the call failed, must be one of the values of RIL_DataCallFailCause. If the call succeeded, must be 0.",
+      "parentUuid": "AAAA7n///ts\u003d",
+      "revId": "2cfd6a498b4f37d155ae2cf9adfb2f5d6091c496",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
