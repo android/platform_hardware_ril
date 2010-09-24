@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7n///Sg\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 3054,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-24T18:22:45Z",
+      "side": 1,
+      "message": "Please add a case for GET_SUBSCRIPTION_SOURCE as well",
+      "revId": "d8f50b2d03db183021510f225b49c9ff1485acae",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///SY\u003d",
+        "filename": "libril/ril_unsol_commands.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-24T18:22:45Z",
+      "side": 1,
+      "message": "What about UNSOL_PRL_VERSION_CHANGED ?",
+      "revId": "d8f50b2d03db183021510f225b49c9ff1485acae",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
