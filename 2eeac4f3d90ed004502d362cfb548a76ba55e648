@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA7n///Wk\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3403,
+      "author": {
+        "id": 1003956
+      },
+      "writtenOn": "2010-09-24T00:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAA7X///NM\u003d",
+      "revId": "2eeac4f3d90ed004502d362cfb548a76ba55e648",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7X///Vw\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -72,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA7n///Wc\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3425,
+      "author": {
+        "id": 1003956
+      },
+      "writtenOn": "2010-09-24T00:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAA7X///NI\u003d",
+      "revId": "2eeac4f3d90ed004502d362cfb548a76ba55e648",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7X///NQ\u003d",
         "filename": "reference-ril/reference-ril.c",
         "patchSetId": 1
@@ -89,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA7n///WU\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1003956
+      },
+      "writtenOn": "2010-09-24T00:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAA7X///NQ\u003d",
+      "revId": "2eeac4f3d90ed004502d362cfb548a76ba55e648",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7X///NU\u003d",
         "filename": "reference-ril/reference-ril.c",
         "patchSetId": 1
@@ -100,6 +154,24 @@
       "writtenOn": "2010-09-14T16:25:57Z",
       "side": 1,
       "message": "I think the constant should read 0x0000000f instead.",
+      "revId": "2eeac4f3d90ed004502d362cfb548a76ba55e648",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///WQ\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1003956
+      },
+      "writtenOn": "2010-09-24T00:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAA7X///NU\u003d",
       "revId": "2eeac4f3d90ed004502d362cfb548a76ba55e648",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
