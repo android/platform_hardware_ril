@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7n///PI\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-24T20:25:04Z",
+      "side": 1,
+      "message": "Can you add these in ril.h ?",
+      "revId": "583ea3266a3b81b3425d89cd6f6a5a2be5b64cc7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///PE\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-24T20:25:04Z",
+      "side": 1,
+      "message": "Does it make sense to add this also in ril.h?",
+      "revId": "583ea3266a3b81b3425d89cd6f6a5a2be5b64cc7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///PA\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-24T20:25:04Z",
+      "side": 1,
+      "message": "Can we move this to ril.h as well?",
+      "revId": "583ea3266a3b81b3425d89cd6f6a5a2be5b64cc7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
