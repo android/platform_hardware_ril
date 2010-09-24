@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA7n///O0\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3054,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-24T20:36:09Z",
+      "side": 1,
+      "message": "Coding style nit: Can you add spaces around return?",
+      "revId": "583ea3266a3b81b3425d89cd6f6a5a2be5b64cc7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///Ow\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3080,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-24T20:36:09Z",
+      "side": 1,
+      "message": "Ditto",
+      "revId": "583ea3266a3b81b3425d89cd6f6a5a2be5b64cc7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA7n///PI\u003d",
         "filename": "reference-ril/reference-ril.c",
         "patchSetId": 3
