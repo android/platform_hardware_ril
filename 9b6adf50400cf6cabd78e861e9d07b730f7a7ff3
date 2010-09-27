@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7n///DM\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-27T19:24:10Z",
+      "side": 1,
+      "message": "You can remove this now. The definitions come from ril.h",
+      "revId": "9b6adf50400cf6cabd78e861e9d07b730f7a7ff3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n///DI\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2010-09-27T19:24:10Z",
+      "side": 1,
+      "message": "Can you directly use CDMA_SSRV_xx from ril.h?",
+      "revId": "9b6adf50400cf6cabd78e861e9d07b730f7a7ff3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
