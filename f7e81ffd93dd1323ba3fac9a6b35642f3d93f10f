@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA7n//++I\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3012,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2010-09-28T04:44:12Z",
+      "side": 1,
+      "message": "This needs to be 104 - can\u0027t have gaps, otherwise ril_commands.h breaks.",
+      "revId": "f7e81ffd93dd1323ba3fac9a6b35642f3d93f10f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
