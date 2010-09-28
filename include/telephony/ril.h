@@ -82,18 +82,9 @@ typedef enum {
 } RIL_CallState;
 
 typedef enum {
-    RADIO_STATE_OFF = 0,                   /* Radio explictly powered off (eg CFUN=0) */
+    RADIO_STATE_OFF = 0,                   /* Radio explicitly powered off (eg CFUN=0) */
     RADIO_STATE_UNAVAILABLE = 1,           /* Radio unavailable (eg, resetting or not booted) */
-    RADIO_STATE_SIM_NOT_READY = 2,         /* Radio is on, but the SIM interface is not ready */
-    RADIO_STATE_SIM_LOCKED_OR_ABSENT = 3,  /* SIM PIN locked, PUK required, network
-                                              personalization locked, or SIM absent */
-    RADIO_STATE_SIM_READY = 4,             /* Radio is on and SIM interface is available */
-    RADIO_STATE_RUIM_NOT_READY = 5,        /* Radio is on, but the RUIM interface is not ready */
-    RADIO_STATE_RUIM_READY = 6,            /* Radio is on and the RUIM interface is available */
-    RADIO_STATE_RUIM_LOCKED_OR_ABSENT = 7, /* RUIM PIN locked, PUK required, network
-                                              personalization locked, or RUIM absent */
-    RADIO_STATE_NV_NOT_READY = 8,          /* Radio is on, but the NV interface is not available */
-    RADIO_STATE_NV_READY = 9               /* Radio is on and the NV interface is available */
+    RADIO_STATE_ON = 2                     /* Radio is on */
 } RIL_RadioState;
 
 typedef enum {
@@ -541,11 +532,21 @@ typedef struct {
     int signalNoiseRatio; /* Valid values are 0-8.  8 is the highest signal to noise ratio. */
 } RIL_EVDO_SignalStrength;
 
+typedef struct {
+    int signalStrength;  /* Valid values are (0-31, 99) as defined in TS 27.007 8.5 */
+    int rsrp;            /* The current Reference Signal Receive Power in dBm.
+                          * Range: -44 to -140 dBm
+                          */
+    int rsrq;            /* The current Reference Signal Receive Quality in dB.
+                          * Range: -20 to-3 dB.
+                          */
+} RIL_LTE_SignalStrength;
 
 typedef struct {
     RIL_GW_SignalStrength   GW_SignalStrength;
     RIL_CDMA_SignalStrength CDMA_SignalStrength;
     RIL_EVDO_SignalStrength EVDO_SignalStrength;
+    RIL_LTE_SignalStrength  LTE_SignalStrength;
 } RIL_SignalStrength;
 
 /* Names of the CDMA info records (C.S0005 section 3.7.5) */
@@ -879,7 +880,7 @@ typedef struct {
  *
  * Get the SIM IMSI
  *
- * Only valid when radio state is "RADIO_STATE_SIM_READY"
+ * Only valid when radio state is "RADIO_STATE_ON"
  *
  * "data" is NULL
  * "response" is a const char * containing the IMSI
@@ -1082,12 +1083,8 @@ typedef struct {
  *                                            in 16 bits
  *                                    In UMTS, CID is UMTS Cell Identity
  *                                             (see TS 25.331) in 28 bits
- * ((const char **)response)[3] indicates the available radio technology 0-7,
- *                                  0 - Unknown, 1 - GPRS, 2 - EDGE, 3 - UMTS,
- *                                  4 - IS95A, 5 - IS95B, 6 - 1xRTT,
- *                                  7 - EvDo Rev. 0, 8 - EvDo Rev. A,
- *                                  9 - HSDPA, 10 - HSUPA, 11 - HSPA,
- *                                  12 - EVDO Rev B
+ * ((const char **)response)[3] indicates the available radio technology.
+ *                              Valid values asm given in RIL_RadioTechnology enum
  * ((const char **)response)[4] is Base Station ID if registered on a CDMA
  *                              system or NULL if not.  Base Station ID in
  *                              decimal format
@@ -2368,6 +2365,10 @@ typedef struct {
  * ((int *)data)[0] is == 5 for CDMA only
  * ((int *)data)[0] is == 6 for EvDo only
  * ((int *)data)[0] is == 7 for GSM/WCDMA, CDMA, and EvDo (auto mode, according to PRL)
+ * ((int *)data)[0] is == 8 for LTE, CDMA and EvDo
+ * ((int *)data)[0] is == 9 for LTE, GSM/WCDMA
+ * ((int *)data)[0] is == 10 for LTE, CDMA, EvDo, GSM/WCDMA
+ * ((int *)data)[0] is == 11 for LTE only
  *
  * "response" is NULL
  *
@@ -2396,6 +2397,10 @@ typedef struct {
  * ((int *)response)[0] is == 5 for CDMA only
  * ((int *)response)[0] is == 6 for EvDo only
  * ((int *)response)[0] is == 7 for GSM/WCDMA, CDMA, and EvDo (auto mode, according to PRL)
+ * ((int *)response)[0] is == 8 for LTE, CDMA and EvDo
+ * ((int *)response)[0] is == 9 for LTE, GSM/WCDMA
+ * ((int *)response)[0] is == 10 for LTE, CDMA, EvDo, GSM/WCDMA
+ * ((int *)response)[0] is == 11 for LTE only
  *
  * Valid errors:
  *  SUCCESS
@@ -3028,6 +3033,23 @@ typedef struct {
  */
 #define RIL_REQUEST_CDMA_PRL_VERSION 105
 
+/**
+ * RIL_REQUEST_VOICE_RADIO_TECH
+ *
+ * Query the radio technology type (3GPP/3GPP2) used for voice. Query is valid only
+ * when radio state is RADIO_STATE_ON
+ *
+ * "data" is NULL
+ * "response" is int *
+ * ((int *) response)[0] is of type const RIL_RadioTechnologyFamily
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_VOICE_RADIO_TECH 106
+
 /***********************************************************************/
 
 
@@ -3281,8 +3303,8 @@ typedef struct {
  * ((int *)data)[1] is the EFID of the updated file if the result is
  * SIM_FILE_UPDATE or NULL for any other result.
  *
- * Note: If the radio state changes as a result of the SIM refresh (eg,
- * SIM_READY -> SIM_LOCKED_OR_ABSENT), RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED
+ * Note: If the SIM state changes as a result of the SIM refresh (eg,
+ * SIM_READY -> SIM_LOCKED_OR_ABSENT), RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
  * should be sent.
  */
 #define RIL_UNSOL_SIM_REFRESH 1017
@@ -3483,6 +3505,15 @@ typedef struct {
  *
  */
 #define RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE 1033
+
+/**
+ * RIL_UNSOL_VOICE_RADIO_TECH_CHANGED
+ *
+ * Indicates that voice technology has changed.
+ * Callee will invoke the following requests on main thread: RIL_REQUEST_VOICE_RADIO_TECH
+ *
+ */
+#define RIL_UNSOL_VOICE_RADIO_TECH_CHANGED 1034
 
 /***********************************************************************/
 
