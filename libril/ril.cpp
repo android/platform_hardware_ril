@@ -1807,12 +1807,17 @@ static int responseRilSignalStrength(Parcel &p,
         p.writeInt32(p_cur->EVDO_SignalStrength.dbm);
         p.writeInt32(p_cur->EVDO_SignalStrength.ecio);
         p.writeInt32(p_cur->EVDO_SignalStrength.signalNoiseRatio);
+        p.writeInt32(p_cur->LTE_SignalStrength.signalStrength);
+        p.writeInt32(p_cur->LTE_SignalStrength.rsrp);
+        p.writeInt32(p_cur->LTE_SignalStrength.rsrq);
 
         startResponse;
-        appendPrintBuf("%s[signalStrength=%d,bitErrorRate=%d,\
+        appendPrintBuf("%s[GW_SignalStrength=%d,GW_SignalStrength.bitErrorRate=%d,\
                 CDMA_SignalStrength.dbm=%d,CDMA_SignalStrength.ecio=%d,\
                 EVDO_SignalStrength.dbm =%d,EVDO_SignalStrength.ecio=%d,\
-                EVDO_SignalStrength.signalNoiseRatio=%d]",
+                EVDO_SignalStrength.signalNoiseRatio=%d,\
+                LTE_SignalStrength.signalStrength =%d,LTE_SignalStrength.rsrp=%d,\
+                LTE_SignalStrength.rsrq=%d]",
                 printBuf,
                 p_cur->GW_SignalStrength.signalStrength,
                 p_cur->GW_SignalStrength.bitErrorRate,
@@ -1820,7 +1825,10 @@ static int responseRilSignalStrength(Parcel &p,
                 p_cur->CDMA_SignalStrength.ecio,
                 p_cur->EVDO_SignalStrength.dbm,
                 p_cur->EVDO_SignalStrength.ecio,
-                p_cur->EVDO_SignalStrength.signalNoiseRatio);
+                p_cur->EVDO_SignalStrength.signalNoiseRatio,
+                p_cur->LTE_SignalStrength.signalStrength,
+                p_cur->LTE_SignalStrength.rsrp,
+                p_cur->LTE_SignalStrength.rsrq);
 
         closeResponse;
 
@@ -1832,7 +1840,7 @@ static int responseRilSignalStrength(Parcel &p,
 
         // With the Old RIL we see one or 2 integers.
         size_t num = responselen / sizeof (int); // Number of integers from ril
-        size_t totalIntegers = 7; // Number of integers in RIL_SignalStrength
+        size_t totalIntegers = 10; // Number of integers in RIL_SignalStrength
         size_t i;
 
         appendPrintBuf("%s[", printBuf);
@@ -1840,12 +1848,12 @@ static int responseRilSignalStrength(Parcel &p,
             appendPrintBuf("%s %d", printBuf, *p_cur);
             p.writeInt32(*p_cur++);
         }
-        appendPrintBuf("%s]", printBuf);
 
         // Fill the remainder with zero's.
         for (; i < totalIntegers; i++) {
             p.writeInt32(0);
         }
+        appendPrintBuf("%s]", printBuf);
 
         closeResponse;
     } else {
@@ -2924,14 +2932,7 @@ radioStateToString(RIL_RadioState s) {
     switch(s) {
         case RADIO_STATE_OFF: return "RADIO_OFF";
         case RADIO_STATE_UNAVAILABLE: return "RADIO_UNAVAILABLE";
-        case RADIO_STATE_SIM_NOT_READY: return "RADIO_SIM_NOT_READY";
-        case RADIO_STATE_SIM_LOCKED_OR_ABSENT: return "RADIO_SIM_LOCKED_OR_ABSENT";
-        case RADIO_STATE_SIM_READY: return "RADIO_SIM_READY";
-        case RADIO_STATE_RUIM_NOT_READY:return"RADIO_RUIM_NOT_READY";
-        case RADIO_STATE_RUIM_READY:return"RADIO_RUIM_READY";
-        case RADIO_STATE_RUIM_LOCKED_OR_ABSENT:return"RADIO_RUIM_LOCKED_OR_ABSENT";
-        case RADIO_STATE_NV_NOT_READY:return"RADIO_NV_NOT_READY";
-        case RADIO_STATE_NV_READY:return"RADIO_NV_READY";
+        case RADIO_STATE_ON: return "RADIO_ON";
         default: return "<unknown state>";
     }
 }
@@ -3064,6 +3065,12 @@ requestToString(int request) {
         case RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING: return "REPORT_STK_SERVICE_IS_RUNNING";
         case RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE: return "CDMA_GET_SUBSCRIPTION_SOURCE";
         case RIL_REQUEST_CDMA_PRL_VERSION: return "CDMA_PRL_VERSION";
+        case RIL_REQUEST_DELETE_SMS_ON_SIM: return "DELETE_SMS_ON_SIM";
+        case RIL_REQUEST_GSM_SMS_BROADCAST_ACTIVATION: return "GSM_SMS_BROADCAST_ACTIVATION";
+        case RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING: return "REPORT_STK_SERVICE_IS_RUNNING";
+        case RIL_REQUEST_SET_SUPP_SVC_NOTIFICATION: return "SET_SUPP_SVC_NOTIFICATION";
+        case RIL_REQUEST_VOICE_RADIO_TECH: return "VOICE_RADIO_TECH";
+        case RIL_REQUEST_WRITE_SMS_TO_SIM: return "WRITE_SMS_TO_SIM";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_NETWORK_STATE_CHANGED: return "UNSOL_RESPONSE_NETWORK_STATE_CHANGED";
@@ -3096,6 +3103,8 @@ requestToString(int request) {
         case RIL_UNSOL_RESEND_INCALL_MUTE: return "UNSOL_RESEND_INCALL_MUTE";
         case RIL_UNSOL_CDMA_PRL_CHANGED: return "UNSOL_CDMA_PRL_CHANGED";
         case RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED: return "UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED";
+        case RIL_UNSOL_VOICE_RADIO_TECH_CHANGED: return "RIL_UNSOL_VOICE_RADIO_TECH_CHANGED";
+        case RIL_UNSOL_SUPP_SVC_NOTIFICATION: return "UNSOL_SUPP_SVC_NOTIFICATION";
         default: return "<unknown request>";
     }
 }
