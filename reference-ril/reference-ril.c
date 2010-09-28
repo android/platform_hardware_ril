@@ -57,7 +57,6 @@
 #define WORKAROUND_FAKE_CGEV 1
 #endif
 
-
 /* Modem Technology bits */
 #define MDM_GSM         0x01
 #define MDM_WCDMA       0x02
@@ -367,11 +366,7 @@ static void requestRadioPower(void *data, size_t datalen, RIL_Token t)
                 goto error;
             }
         }
-        LOGD("tech: %d. bit: %d", TECH(sMdmInfo), TECH_BIT(sMdmInfo));
-        if(TECH_BIT(sMdmInfo) == MDM_GSM)
-        setRadioState(RADIO_STATE_SIM_NOT_READY);
-        else if(TECH_BIT(sMdmInfo) == MDM_CDMA)
-        setRadioState(RADIO_STATE_RUIM_NOT_READY);
+        setRadioState(RADIO_STATE_ON);
     }
 
     at_response_free(p_response);
@@ -2066,6 +2061,16 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         case RIL_REQUEST_CHANGE_SIM_PIN2:
             requestEnterSimPin(data, datalen, t);
             break;
+
+        case RIL_REQUEST_VOICE_RADIO_TECH:
+            {
+                int techfam = techFamilyFromModemType(TECH(sMdmInfo));
+                if (techfam < 0 )
+                    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+                else
+                    RIL_onRequestComplete(t, RIL_E_SUCCESS, &techfam, sizeof(&techfam));
+            }
+            break;
         case RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE:
             requestSetPreferredNetworkType(request, data, datalen, t);
             break;
@@ -2169,7 +2174,6 @@ static void
 setRadioTechnology(ModemInfo *mdm, int newtech)
 {
     LOGD("setRadioTechnology(%d)", newtech);
-    RIL_RadioState newState = -1;
 
     int oldtech = TECH(mdm);
 
@@ -2177,18 +2181,7 @@ setRadioTechnology(ModemInfo *mdm, int newtech)
         LOGD("Tech change (%d => %d)", oldtech, newtech);
         TECH(mdm) = newtech;
         if (techFamilyFromModemType(newtech) != techFamilyFromModemType(oldtech)) {
-            switch(techFamilyFromModemType(newtech)) {
-                case RADIO_TECH_3GPP:
-                    newState = RADIO_STATE_SIM_READY;
-                    break;
-                case RADIO_TECH_3GPP2:
-                    if (SSOURCE(mdm) == CDMA_SUBSCRIPTION_SOURCE_RUIM_SIM)
-                        newState = RADIO_STATE_RUIM_NOT_READY;
-                    else
-                        newState = RADIO_STATE_NV_READY;
-                    break;
-            }
-            setRadioState(newState);
+            RIL_onUnsolicitedResponse(RIL_UNSOL_VOICE_RADIO_TECH_CHANGED, NULL, 0);
         }
     }
 }
@@ -2231,15 +2224,7 @@ setRadioState(RIL_RadioState newState)
          * Currently, this doesn't happen, but if that changes then these
          * will need to be dispatched on the request thread
          */
-        if ((sState == RADIO_STATE_SIM_READY) ||
-            (sState == RADIO_STATE_RUIM_READY)||
-            (sState == RADIO_STATE_NV_READY)) {
-            LOGD("setRadioState: calling onSIMReady");
-            onSIMReady();
-        } else if (sState == RADIO_STATE_SIM_NOT_READY ||
-                sState == RADIO_STATE_RUIM_NOT_READY ||
-                sState == RADIO_STATE_NV_NOT_READY) {
-            LOGD("setRadioState: calling onRadioPowerOn()");
+        if (sState == RADIO_STATE_ON) {
             onRadioPowerOn();
         }
     }
@@ -2487,24 +2472,15 @@ static void pollSIMState (void *param)
 {
     ATResponse *p_response;
     int ret;
-    SIM_Status s;
 
-    if (sState != RADIO_STATE_SIM_NOT_READY && sState != RADIO_STATE_RUIM_NOT_READY) {
-        // no longer valid to poll
-        return;
-    }
-
-    s = getSIMStatus();
-    switch(s) {
+    switch(getSIMStatus()) {
         case SIM_ABSENT:
         case SIM_PIN:
         case SIM_PUK:
         case SIM_NETWORK_PERSONALIZATION:
         default:
-            if(TECH(sMdmInfo) == MDM_GSM)
-            setRadioState(RADIO_STATE_SIM_LOCKED_OR_ABSENT);
-            else if (TECH(sMdmInfo) == MDM_CDMA)
-            setRadioState(RADIO_STATE_RUIM_LOCKED_OR_ABSENT);
+            LOGI("SIM ABSENT or LOCKED");
+            RIL_onUnsolicitedResponse(RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED, NULL, 0);
         return;
 
         case SIM_NOT_READY:
@@ -2512,15 +2488,9 @@ static void pollSIMState (void *param)
         return;
 
         case SIM_READY:
-            if(TECH_BIT(sMdmInfo) == MDM_GSM)
-                setRadioState(RADIO_STATE_SIM_READY);
-            else if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                if (SSOURCE(sMdmInfo) == CDMA_SUBSCRIPTION_SOURCE_RUIM_SIM) {
-                    setRadioState(RADIO_STATE_RUIM_READY);
-                } else {
-                    setRadioState(RADIO_STATE_NV_READY);
-                }
-            }
+            LOGI("SIM_READY");
+            onSIMReady();
+            RIL_onUnsolicitedResponse(RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED, NULL, 0);
         return;
     }
 }
@@ -2799,7 +2769,7 @@ static void initializeCallback(void *param)
 
     /* assume radio is off on error */
     if (isRadioOn() > 0) {
-        setRadioState (RADIO_STATE_SIM_NOT_READY);
+        setRadioState (RADIO_STATE_ON);
     }
 }
 
