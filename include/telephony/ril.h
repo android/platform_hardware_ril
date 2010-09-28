@@ -82,18 +82,9 @@ typedef enum {
 } RIL_CallState;
 
 typedef enum {
-    RADIO_STATE_OFF = 0,                   /* Radio explictly powered off (eg CFUN=0) */
+    RADIO_STATE_OFF = 0,                   /* Radio explicitly powered off (eg CFUN=0) */
     RADIO_STATE_UNAVAILABLE = 1,           /* Radio unavailable (eg, resetting or not booted) */
-    RADIO_STATE_SIM_NOT_READY = 2,         /* Radio is on, but the SIM interface is not ready */
-    RADIO_STATE_SIM_LOCKED_OR_ABSENT = 3,  /* SIM PIN locked, PUK required, network
-                                              personalization locked, or SIM absent */
-    RADIO_STATE_SIM_READY = 4,             /* Radio is on and SIM interface is available */
-    RADIO_STATE_RUIM_NOT_READY = 5,        /* Radio is on, but the RUIM interface is not ready */
-    RADIO_STATE_RUIM_READY = 6,            /* Radio is on and the RUIM interface is available */
-    RADIO_STATE_RUIM_LOCKED_OR_ABSENT = 7, /* RUIM PIN locked, PUK required, network
-                                              personalization locked, or RUIM absent */
-    RADIO_STATE_NV_NOT_READY = 8,          /* Radio is on, but the NV interface is not available */
-    RADIO_STATE_NV_READY = 9               /* Radio is on and the NV interface is available */
+    RADIO_STATE_ON = 2                     /* Radio is on */
 } RIL_RadioState;
 
 
@@ -105,6 +96,11 @@ typedef enum {
     CDMA_SUBSCRIPTION_SOURCE_NV = 1,       /* Non-volatile RAM in the device
                                               contains the subscription information*/
 } RIL_CdmaSubscriptionSource;
+
+typedef enum {
+    RADIO_TECH_3GPP = 1, /* 3GPP Technologies - GSM, WCDMA, LTE */
+    RADIO_TECH_3GPP2 = 2 /* 3GPP2 Technologies - CDMA, EVDO */
+} RIL_RadioTechnologyFamily;
 
 typedef enum {
     RADIO_TECH_UNKNOWN = 0,
@@ -879,7 +875,7 @@ typedef struct {
  *
  * Get the SIM IMSI
  *
- * Only valid when radio state is "RADIO_STATE_SIM_READY"
+ * Only valid when radio state is "RADIO_STATE_ON"
  *
  * "data" is NULL
  * "response" is a const char * containing the IMSI
@@ -1082,12 +1078,8 @@ typedef struct {
  *                                            in 16 bits
  *                                    In UMTS, CID is UMTS Cell Identity
  *                                             (see TS 25.331) in 28 bits
- * ((const char **)response)[3] indicates the available radio technology 0-7,
- *                                  0 - Unknown, 1 - GPRS, 2 - EDGE, 3 - UMTS,
- *                                  4 - IS95A, 5 - IS95B, 6 - 1xRTT,
- *                                  7 - EvDo Rev. 0, 8 - EvDo Rev. A,
- *                                  9 - HSDPA, 10 - HSUPA, 11 - HSPA,
- *                                  12 - EVDO Rev B
+ * ((const char **)response)[3] indicates the available radio technology.
+ *                              Valid values as given in RIL_RadioTechnology enum
  * ((const char **)response)[4] is Base Station ID if registered on a CDMA
  *                              system or NULL if not.  Base Station ID in
  *                              decimal format
@@ -3015,6 +3007,24 @@ typedef struct {
  */
 #define RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE 104
 
+/**
+ * RIL_REQUEST_VOICE_RADIO_TECH
+ *
+ * Query the radio technology type (3GPP/3GPP2) used for voice. Query is valid only
+ * when radio state is RADIO_STATE_ON
+ *
+ * "data" is NULL
+ * "response" is int *
+ * ((int *) response)[0] is of type const RIL_RadioTechnologyFamily
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_VOICE_RADIO_TECH 105
+
+
 /***********************************************************************/
 
 
@@ -3268,8 +3278,8 @@ typedef struct {
  * ((int *)data)[1] is the EFID of the updated file if the result is
  * SIM_FILE_UPDATE or NULL for any other result.
  *
- * Note: If the radio state changes as a result of the SIM refresh (eg,
- * SIM_READY -> SIM_LOCKED_OR_ABSENT), RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED
+ * Note: If the SIM state changes as a result of the SIM refresh (eg,
+ * SIM_READY -> SIM_LOCKED_OR_ABSENT), RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
  * should be sent.
  */
 #define RIL_UNSOL_SIM_REFRESH 1017
@@ -3473,6 +3483,15 @@ typedef struct {
  *
  */
 #define RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE 1033
+
+/**
+ * RIL_UNSOL_VOICE_RADIO_TECH_CHANGED
+ *
+ * Indicates that voice technology has changed.
+ * Callee will invoke the following requests on main thread: RIL_REQUEST_VOICE_RADIO_TECH
+ *
+ */
+#define RIL_UNSOL_VOICE_RADIO_TECH_CHANGED 1034
 
 /***********************************************************************/
 
