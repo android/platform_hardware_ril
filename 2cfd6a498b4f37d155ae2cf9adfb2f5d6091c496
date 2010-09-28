@@ -52,6 +52,24 @@
       "revId": "2cfd6a498b4f37d155ae2cf9adfb2f5d6091c496",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA7n//+70\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2010-09-28T17:04:41Z",
+      "side": 1,
+      "message": "to move this forward, i am getting rid of inactiveReason for the time being. We can revisit this later. its an optimization as opposed to a must have feature.\n\nSo Lorenzo,\n\nAre we suggesting that RIL_REQUEST_SETUP_DATA_CALL always return array of size 4 - even if E_SUCESS/E_GENERIC_FAILURE etc..? Fine by me, but char[0-2] would be null/meaningless if incase of failure - which is OK i suppose.",
+      "parentUuid": "AAAA7n///b8\u003d",
+      "revId": "2cfd6a498b4f37d155ae2cf9adfb2f5d6091c496",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
