@@ -139,7 +139,7 @@ RIL_Errno RspGetSimStatus(
     ril_proto::RspGetSimStatus *rsp = new ril_proto::RspGetSimStatus();
     rsp->ParseFromArray(buffer->data(), buffer->length());
     const ril_proto::RilCardStatus& r = rsp->card_status();
-    RIL_CardStatus cardStatus;
+    RIL_CardStatus_v6 cardStatus;
     cardStatus.card_state = RIL_CardState(r.card_state());
     cardStatus.universal_pin_state = RIL_PinState(r.universal_pin_state());
     cardStatus.gsm_umts_subscription_app_index = r.gsm_umts_subscription_app_index();

@@ -25,7 +25,7 @@
     {RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION, dispatchStrings, responseInts},
     {RIL_REQUEST_GET_CURRENT_CALLS, dispatchVoid, responseCallList},
     {RIL_REQUEST_DIAL, dispatchDial, responseVoid},
-    {RIL_REQUEST_GET_IMSI, dispatchVoid, responseString},
+    {RIL_REQUEST_GET_IMSI, dispatchStrings, responseString},
     {RIL_REQUEST_HANGUP, dispatchInts, responseVoid},
     {RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND, dispatchVoid, responseVoid},
     {RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND, dispatchVoid, responseVoid},

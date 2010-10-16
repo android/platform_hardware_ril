@@ -157,8 +157,8 @@ static void onCancel (RIL_Token t);
 static const char *getVersion();
 static int isRadioOn();
 static SIM_Status getSIMStatus();
-static int getCardStatus(RIL_CardStatus **pp_card_status);
-static void freeCardStatus(RIL_CardStatus *p_card_status);
+static int getCardStatus(RIL_CardStatus_v6 **pp_card_status);
+static void freeCardStatus(RIL_CardStatus_v6 *p_card_status);
 static void onDataCallListChanged(void *param);
 
 extern const char * requestToString(int request);
@@ -1608,14 +1608,15 @@ static void  requestSIM_IO(void *data, size_t datalen, RIL_Token t)
     RIL_SIM_IO_Response sr;
     int err;
     char *cmd = NULL;
-    RIL_SIM_IO *p_args;
+    RIL_SIM_IO_v6 *p_args;
     char *line;
 
     memset(&sr, 0, sizeof(sr));
 
-    p_args = (RIL_SIM_IO *)data;
+    p_args = (RIL_SIM_IO_v6 *)data;
 
     /* FIXME handle pin2 */
+    /* FIXME handle aidPtr */
 
     if (p_args->data == NULL) {
         asprintf(&cmd, "AT+CRSM=%d,%d,%d,%d,%d",
@@ -1670,7 +1671,7 @@ static void  requestEnterSimPin(void*  data, size_t  datalen, RIL_Token  t)
 
     if ( datalen == sizeof(char*) ) {
         asprintf(&cmd, "AT+CPIN=%s", strings[0]);
-    } else if ( datalen == 2*sizeof(char*) ) {
+    } else if ( datalen == 2*sizeof(char*) || datalen == 3 * sizeof(char*)) {
         asprintf(&cmd, "AT+CPIN=%s,%s", strings[0], strings[1]);
     } else
         goto error;
@@ -1802,7 +1803,7 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
 
     switch (request) {
         case RIL_REQUEST_GET_SIM_STATUS: {
-            RIL_CardStatus *p_card_status;
+            RIL_CardStatus_v6 *p_card_status;
             char *p_buffer;
             int buffer_size;
 
@@ -2212,11 +2213,6 @@ setRadioState(RIL_RadioState newState)
         RIL_onUnsolicitedResponse (RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED,
                                     NULL, 0);
 
-        /* FIXME onSimReady() and onRadioPowerOn() cannot be called
-         * from the AT reader thread
-         * Currently, this doesn't happen, but if that changes then these
-         * will need to be dispatched on the request thread
-         */
         if (sState == RADIO_STATE_ON) {
             onRadioPowerOn();
         }
@@ -2385,7 +2381,7 @@ done:
  * This must be freed using freeCardStatus.
  * @return: On success returns RIL_E_SUCCESS
  */
-static int getCardStatus(RIL_CardStatus **pp_card_status) {
+static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
     static RIL_AppStatus app_status_array[] = {
         // SIM_ABSENT = 0
         { RIL_APPTYPE_UNKNOWN, RIL_APPSTATE_UNKNOWN, RIL_PERSOSUBSTATE_UNKNOWN,
@@ -2419,11 +2415,12 @@ static int getCardStatus(RIL_CardStatus **pp_card_status) {
     }
 
     // Allocate and initialize base card status.
-    RIL_CardStatus *p_card_status = malloc(sizeof(RIL_CardStatus));
+    RIL_CardStatus_v6 *p_card_status = malloc(sizeof(RIL_CardStatus_v6));
     p_card_status->card_state = card_state;
     p_card_status->universal_pin_state = RIL_PINSTATE_UNKNOWN;
     p_card_status->gsm_umts_subscription_app_index = RIL_CARD_MAX_APPS;
     p_card_status->cdma_subscription_app_index = RIL_CARD_MAX_APPS;
+    p_card_status->ims_subscription_app_index = RIL_CARD_MAX_APPS;
     p_card_status->num_applications = num_apps;
 
     // Initialize application status
@@ -2438,7 +2435,6 @@ static int getCardStatus(RIL_CardStatus **pp_card_status) {
         // Only support one app, gsm
         p_card_status->num_applications = 1;
         p_card_status->gsm_umts_subscription_app_index = 0;
-        p_card_status->cdma_subscription_app_index = 0;
 
         // Get the correct app status
         p_card_status->applications[0] = app_status_array[sim_status];
@@ -2451,7 +2447,7 @@ static int getCardStatus(RIL_CardStatus **pp_card_status) {
 /**
  * Free the card status returned by getCardStatus
  */
-static void freeCardStatus(RIL_CardStatus *p_card_status) {
+static void freeCardStatus(RIL_CardStatus_v6 *p_card_status) {
     free(p_card_status);
 }
 
