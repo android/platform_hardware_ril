@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * Copyright (c) 2010, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,6 +218,28 @@ typedef struct {
 } RIL_Dial;
 
 typedef struct {
+    char             *aidPtr;    /* null terminated string, e.g., from 0xA0, 0x00
+                                    0x41, 0x30*/
+    char             *pin;
+} RIL_SimPin;
+
+typedef struct {
+    char             *aidPtr;    /* null terminated string, e.g., from 0xA0, 0x00
+                                    0x41, 0x30*/
+    char             *puk;
+    char             *newPin;
+} RIL_SimPuk;
+
+typedef struct {
+    char             *aidPtr;    /* null terminated string, e.g., from 0xA0, 0x00
+                                    0x41, 0x30*/
+    char             *pin;
+    char             *newPin;
+} RIL_SimPinSet;
+
+typedef struct {
+    char *aidPtr;   /* null terminated string, e.g., from 0xA0, 0x00
+                       0x41, 0x30. null for card files (outside the ADF)*/
     int command;    /* one of the commands listed for TS 27.007 +CRSM*/
     int fileid;     /* EF id */
     char *path;     /* "pathid" from TS 27.007 +CRSM command.
@@ -416,7 +439,8 @@ typedef struct
   char             *aid_ptr;        /* null terminated string, e.g., from 0xA0, 0x00 -> 0x41,
                                        0x30, 0x30, 0x30 */
   char             *app_label_ptr;  /* null terminated string */
-  int              pin1_replaced;   /* applicable to USIM and CSIM */
+  int              pin1_replaced;   /* applicable to USIM and CSIM. When set to 0 - use pin1 to get
+                                       current pin state. Otherwise, use universal_pin_state from RIL_CardStatus */
   RIL_PinState     pin1;
   RIL_PinState     pin2;
 } RIL_AppStatus;
@@ -425,11 +449,20 @@ typedef struct
 {
   RIL_CardState card_state;
   RIL_PinState  universal_pin_state;             /* applicable to USIM and CSIM: RIL_PINSTATE_xxx */
-  int           gsm_umts_subscription_app_index; /* value < RIL_CARD_MAX_APPS */
-  int           cdma_subscription_app_index;     /* value < RIL_CARD_MAX_APPS */
+  int           num_current_3gpp_indexes;
+  int           subscription_3gpp_app_index[RIL_CARD_MAX_APPS]; /* value < RIL_CARD_MAX_APPS */
+  int           num_current_3gpp2_indexes;
+  int           subscription_3gpp2_app_index[RIL_CARD_MAX_APPS]; /* value < RIL_CARD_MAX_APPS */
   int           num_applications;                /* value <= RIL_CARD_MAX_APPS */
   RIL_AppStatus applications[RIL_CARD_MAX_APPS];
 } RIL_CardStatus;
+
+typedef struct
+{
+    char *aid_ptr;  /* null terminated string, e.g., from 0xA0, 0x00
+                       0x41, 0x30*/
+} RIL_RequestImsi;
+
 
 /* The result of a SIM refresh, returned in data[0] of RIL_UNSOL_SIM_REFRESH */
 typedef enum {
@@ -682,8 +715,7 @@ typedef struct {
  *
  * Supplies SIM PIN. Only called if RIL_CardStatus has RIL_APPSTATE_PIN state
  *
- * "data" is const char **
- * ((const char **)data)[0] is PIN value
+ * "data" is const RIL_SimPin*
  *
  * "response" is int *
  * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
@@ -704,9 +736,7 @@ typedef struct {
  *
  * Supplies SIM PUK and new PIN.
  *
- * "data" is const char **
- * ((const char **)data)[0] is PUK value
- * ((const char **)data)[1] is new PIN value
+ * "data" is const RIL_SimPuk*"
  *
  * "response" is int *
  * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
@@ -728,8 +758,7 @@ typedef struct {
  * Supplies SIM PIN2. Only called following operation where SIM_PIN2 was
  * returned as a a failure from a previous operation.
  *
- * "data" is const char **
- * ((const char **)data)[0] is PIN2 value
+ * "data" is const RIL_SimPin*
  *
  * "response" is int *
  * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
@@ -749,9 +778,7 @@ typedef struct {
  *
  * Supplies SIM PUK2 and new PIN2.
  *
- * "data" is const char **
- * ((const char **)data)[0] is PUK2 value
- * ((const char **)data)[1] is new PIN2 value
+ * "data" is const RIL_SimPuk*"
  *
  * "response" is int *
  * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
@@ -772,9 +799,7 @@ typedef struct {
  *
  * Supplies old SIM PIN and new PIN.
  *
- * "data" is const char **
- * ((const char **)data)[0] is old PIN value
- * ((const char **)data)[1] is new PIN value
+ * "data" is const RIL_SimPinSet*
  *
  * "response" is int *
  * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
@@ -797,9 +822,7 @@ typedef struct {
  *
  * Supplies old SIM PIN2 and new PIN2.
  *
- * "data" is const char **
- * ((const char **)data)[0] is old PIN2 value
- * ((const char **)data)[1] is new PIN2 value
+ * "data" is const RIL_SimPinSet*
  *
  * "response" is int *
  * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
@@ -882,7 +905,7 @@ typedef struct {
  *
  * Only valid when radio state is "RADIO_STATE_ON"
  *
- * "data" is NULL
+ * "data" is const RIL_RequestImsi *
  * "response" is a const char * containing the IMSI
  *
  * Valid errors:
@@ -1094,14 +1117,14 @@ typedef struct {
  *                              3GPP2 C.S0005-A v6.0. It is represented in
  *                              units of 0.25 seconds and ranges from -1296000
  *                              to 1296000, both values inclusive (corresponding
- *                              to a range of -90° to +90°).
+ *                              to a range of -90ï¿½ to +90ï¿½).
  * ((const char **)response)[6] is Base Station longitude if registered on a
  *                              CDMA system or NULL if not. Base Station
  *                              longitude is a decimal number as specified in
  *                              3GPP2 C.S0005-A v6.0. It is represented in
  *                              units of 0.25 seconds and ranges from -2592000
  *                              to 2592000, both values inclusive (corresponding
- *                              to a range of -180° to +180°).
+ *                              to a range of -180ï¿½ to +180ï¿½).
  * ((const char **)response)[7] is concurrent services support indicator if
  *                              registered on a CDMA system 0-1.
  *                                   0 - Concurrent services not supported,
@@ -1651,10 +1674,11 @@ typedef struct {
  * Query the status of a facility lock state
  *
  * "data" is const char **
- * ((const char **)data)[0] is the facility string code from TS 27.007 7.4
+ * ((const char **)data)[0] is the AID (applies only in case of FDN, or "" otherwise)
+ * ((const char **)data)[1] is the facility string code from TS 27.007 7.4
  *                      (eg "AO" for BAOC, "SC" for SIM lock)
- * ((const char **)data)[1] is the password, or "" if not required
- * ((const char **)data)[2] is the TS 27.007 service class bit vector of
+ * ((const char **)data)[2] is the password, or "" if not required
+ * ((const char **)data)[3] is the TS 27.007 service class bit vector of
  *                           services to query
  *
  * "response" is an int *
@@ -1678,11 +1702,12 @@ typedef struct {
  *
  * "data" is const char **
  *
- * ((const char **)data)[0] = facility string code from TS 27.007 7.4
+ * ((const char **)data)[0] is the AID (applies only in case of FDN, or "" otherwise)
+ * ((const char **)data)[1] = facility string code from TS 27.007 7.4
  * (eg "AO" for BAOC)
- * ((const char **)data)[1] = "0" for "unlock" and "1" for "lock"
- * ((const char **)data)[2] = password
- * ((const char **)data)[3] = string representation of decimal TS 27.007
+ * ((const char **)data)[2] = "0" for "unlock" and "1" for "lock"
+ * ((const char **)data)[3] = password
+ * ((const char **)data)[4] = string representation of decimal TS 27.007
  *                            service class bit vector. Eg, the string
  *                            "1" means "set this facility for voice services"
  *
@@ -3300,7 +3325,9 @@ typedef struct {
  *
  * "data" is an int *
  * ((int *)data)[0] is a RIL_SimRefreshResult.
- * ((int *)data)[1] is the EFID of the updated file if the result is
+ * ((int *)data)[1] is the AID if the result is
+ * SIM_FILE_UPDATE or NULL for any other result.
+ * ((int *)data)[2] is the EFID of the updated file if the result is
  * SIM_FILE_UPDATE or NULL for any other result.
  *
  * Note: If the SIM state changes as a result of the SIM refresh (eg,
