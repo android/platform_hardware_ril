@@ -200,6 +200,12 @@ static void dispatchSIM_IO (Parcel& p, RequestInfo *pRI);
 static void dispatchCallForward(Parcel& p, RequestInfo *pRI);
 static void dispatchRaw(Parcel& p, RequestInfo *pRI);
 static void dispatchSmsWrite (Parcel &p, RequestInfo *pRI);
+static void dispatchRequestImsi(Parcel &p, RequestInfo *pRI);
+static void dispatchSimPin(Parcel &p, RequestInfo *pRI);
+static void dispatchSimPuk(Parcel &p, RequestInfo *pRI);
+static void dispatchSimPinSet(Parcel &p, RequestInfo *pRI);
+
+
 
 static void dispatchCdmaSms(Parcel &p, RequestInfo *pRI);
 static void dispatchCdmaSmsAck(Parcel &p, RequestInfo *pRI);
@@ -661,6 +667,8 @@ invalid:
 /**
  * Callee expects const RIL_SIM_IO *
  * Payload is:
+ *   int32_t slot
+ *   String aidPtr
  *   int32_t command
  *   int32_t fileid
  *   String path
@@ -677,6 +685,11 @@ dispatchSIM_IO (Parcel &p, RequestInfo *pRI) {
     memset (&simIO, 0, sizeof(simIO));
 
     // note we only check status at the end
+
+    status = p.readInt32(&t);
+    simIO.slot = (int)t;
+
+    simIO.aidPtr = strdupReadString(p);
 
     status = p.readInt32(&t);
     simIO.command = (int)t;
@@ -699,7 +712,8 @@ dispatchSIM_IO (Parcel &p, RequestInfo *pRI) {
     simIO.pin2 = strdupReadString(p);
 
     startRequest;
-    appendPrintBuf("%scmd=0x%X,efid=0x%X,path=%s,%d,%d,%d,%s,pin2=%s", printBuf,
+    appendPrintBuf("%sslot=%d,aid=%s,cmd=0x%X,efid=0x%X,path=%s,%d,%d,%d,%s,pin2=%s",
+        printBuf, simIO.slot, simIO.aidPtr,
         simIO.command, simIO.fileid, (char*)simIO.path,
         simIO.p1, simIO.p2, simIO.p3,
         (char*)simIO.data,  (char*)simIO.pin2);
@@ -713,11 +727,13 @@ dispatchSIM_IO (Parcel &p, RequestInfo *pRI) {
        s_callbacks.onRequest(pRI->pCI->requestNumber, &simIO, sizeof(simIO), pRI);
 
 #ifdef MEMSET_FREED
+    memsetString (simIO.aidPtr);
     memsetString (simIO.path);
     memsetString (simIO.data);
     memsetString (simIO.pin2);
 #endif
 
+    free (simIO.aidPtr);
     free (simIO.path);
     free (simIO.data);
     free (simIO.pin2);
@@ -1178,6 +1194,238 @@ invalid:
     return;
 
 }
+
+/**
+* Callee expects const RIL_RequestImsi *
+* Payload is:
+*   int32_t slot
+*   String aidPtr
+*/
+static void
+dispatchRequestImsi(Parcel &p, RequestInfo *pRI) {
+    RIL_RequestImsi getImsi;
+    int32_t t;
+    status_t status;
+
+    memset (&getImsi, 0, sizeof(getImsi));
+
+    // note we only check status at the end
+
+    status = p.readInt32(&t);
+    getImsi.slot = (int)t;
+
+    getImsi.aid_ptr = strdupReadString(p);
+
+    startRequest;
+    appendPrintBuf("%sslot=%d,aid=%s",
+        printBuf, getImsi.slot, getImsi.aid_ptr);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &getImsi, sizeof(getImsi), pRI);
+
+#ifdef MEMSET_FREED
+    memsetString (getImsi.aid_ptr);
+#endif
+
+    free (getImsi.aid_ptr);
+
+#ifdef MEMSET_FREED
+    memset(&getImsi, 0, sizeof(getImsi));
+#endif
+
+    return;
+invalid:
+    free (getImsi.aid_ptr);
+    invalidCommandBlock(pRI);
+    return;
+}
+
+
+/**
+* Callee expects const RIL_SimPin *
+* Payload is:
+*   int32_t slot
+*   String aidPtr
+*   String Pin
+*/
+static void
+dispatchSimPin(Parcel &p, RequestInfo *pRI) {
+    RIL_SimPin simPin;
+    int32_t t;
+    status_t status;
+
+    memset (&simPin, 0, sizeof(simPin));
+
+    // note we only check status at the end
+
+    status = p.readInt32(&t);
+    simPin.slot = (int)t;
+
+    simPin.aidPtr = strdupReadString(p);
+    simPin.pin= strdupReadString(p);
+
+
+    startRequest;
+    appendPrintBuf("%sslot=%d,aid=%s,pin=****",
+        printBuf, simPin.slot, simPin.aidPtr);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &simPin, sizeof(simPin), pRI);
+
+#ifdef MEMSET_FREED
+    memsetString(simPin.aidPtr);
+    memsetString(simPin.pin);
+#endif
+
+    free(simPin.aidPtr);
+    free(simPin.pin);
+
+#ifdef MEMSET_FREED
+    memset(&simPin, 0, sizeof(simPin));
+#endif
+
+    return;
+invalid:
+    free(simPin.aidPtr);
+    free(simPin.pin);
+    invalidCommandBlock(pRI);
+    return;
+}
+
+
+/**
+* Callee expects const RIL_SimPuk *
+* Payload is:
+*   int32_t slot
+*   String aidPtr
+*   String puk
+*   String newPin
+*/
+static void
+dispatchSimPuk(Parcel &p, RequestInfo *pRI) {
+    RIL_SimPuk simPuk;
+    int32_t t;
+    status_t status;
+
+    memset (&simPuk, 0, sizeof(simPuk));
+
+    // note we only check status at the end
+
+    status = p.readInt32(&t);
+    simPuk.slot = (int)t;
+
+    simPuk.aidPtr = strdupReadString(p);
+    simPuk.puk= strdupReadString(p);
+    simPuk.newPin= strdupReadString(p);
+
+
+    startRequest;
+    appendPrintBuf("%sslot=%d,aid=%s,puk=****,new_pin=****",
+        printBuf, simPuk.slot, simPuk.aidPtr);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &simPuk, sizeof(simPuk), pRI);
+
+#ifdef MEMSET_FREED
+    memsetString(simPuk.aidPtr);
+    memsetString(simPuk.puk);
+    memsetString(simPuk.newPin);
+#endif
+
+    free(simPuk.aidPtr);
+    free(simPuk.puk);
+    free(simPuk.newPin);
+
+#ifdef MEMSET_FREED
+    memset(&simPuk, 0, sizeof(simPuk));
+#endif
+
+    return;
+invalid:
+    free(simPuk.aidPtr);
+    free(simPuk.puk);
+    free(simPuk.newPin);
+    invalidCommandBlock(pRI);
+    return;
+}
+
+
+/**
+* Callee expects const RIL_SimPinSet *
+* Payload is:
+*   int32_t slot
+*   String aidPtr
+*   String pin
+*   String newPin
+*/
+static void
+dispatchSimPinSet(Parcel &p, RequestInfo *pRI) {
+    RIL_SimPinSet simPinSet;
+    int32_t t;
+    status_t status;
+
+    memset (&simPinSet, 0, sizeof(simPinSet));
+
+    // note we only check status at the end
+
+    status = p.readInt32(&t);
+    simPinSet.slot = (int)t;
+
+    simPinSet.aidPtr = strdupReadString(p);
+    simPinSet.pin= strdupReadString(p);
+    simPinSet.newPin= strdupReadString(p);
+
+
+    startRequest;
+    appendPrintBuf("%sslot=%d,aid=%s,puk=****,new_pin=****",
+        printBuf, simPinSet.slot, simPinSet.aidPtr);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &simPinSet, sizeof(simPinSet), pRI);
+
+#ifdef MEMSET_FREED
+    memsetString(simPinSet.aidPtr);
+    memsetString(simPinSet.pin);
+    memsetString(simPinSet.newPin);
+#endif
+
+    free(simPinSet.aidPtr);
+    free(simPinSet.pin);
+    free(simPinSet.newPin);
+
+#ifdef MEMSET_FREED
+    memset(&simPinSet, 0, sizeof(simPinSet));
+#endif
+
+    return;
+invalid:
+    free(simPinSet.aidPtr);
+    free(simPinSet.pin);
+    free(simPinSet.newPin);
+    invalidCommandBlock(pRI);
+    return;
+}
+
 
 static int
 blockingWrite(int fd, const void *buffer, size_t len) {
@@ -1948,49 +2196,60 @@ static void rilEventAddWakeup(struct ril_event *ev) {
 }
 
 static int responseSimStatus(Parcel &p, void *response, size_t responselen) {
-    int i;
+    int i, j;
 
     if (response == NULL && responselen != 0) {
         LOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
     }
 
-    if (responselen % sizeof (RIL_CardStatus *) != 0) {
+    if (responselen % sizeof (RIL_CardList *) != 0) {
         LOGE("invalid response length %d expected multiple of %d\n",
-            (int)responselen, (int)sizeof (RIL_CardStatus *));
+            (int)responselen, (int)sizeof (RIL_CardList *));
         return RIL_ERRNO_INVALID_RESPONSE;
     }
 
-    RIL_CardStatus *p_cur = ((RIL_CardStatus *) response);
+    startResponse;
+    RIL_CardList *p_cl = ((RIL_CardList *) response);
+    p.writeInt32(p_cl->num_cards);
+
+    for (i = 0; i < p_cl->num_cards; i++) {
+        RIL_CardStatus *p_cur = &(p_cl->card[i]);
 
     p.writeInt32(p_cur->card_state);
     p.writeInt32(p_cur->universal_pin_state);
-    p.writeInt32(p_cur->gsm_umts_subscription_app_index);
-    p.writeInt32(p_cur->cdma_subscription_app_index);
+        p.writeInt32(p_cur->num_current_3gpp_indexes);
+        for (j = 0; j < p_cur->num_current_3gpp_indexes; j++) {
+            p.writeInt32(p_cur->subscription_3gpp_app_index[j]);
+        }
+        p.writeInt32(p_cur->num_current_3gpp2_indexes);
+        for (j = 0; j < p_cur->num_current_3gpp2_indexes; j++) {
+            p.writeInt32(p_cur->subscription_3gpp2_app_index[j]);
+        }
     p.writeInt32(p_cur->num_applications);
 
-    startResponse;
-    for (i = 0; i < p_cur->num_applications; i++) {
-        p.writeInt32(p_cur->applications[i].app_type);
-        p.writeInt32(p_cur->applications[i].app_state);
-        p.writeInt32(p_cur->applications[i].perso_substate);
-        writeStringToParcel(p, (const char*)(p_cur->applications[i].aid_ptr));
+        for (j = 0; j < p_cur->num_applications; j++) {
+            p.writeInt32(p_cur->applications[j].app_type);
+            p.writeInt32(p_cur->applications[j].app_state);
+            p.writeInt32(p_cur->applications[j].perso_substate);
+            writeStringToParcel(p, (const char*)(p_cur->applications[j].aid_ptr));
         writeStringToParcel(p, (const char*)
-                                      (p_cur->applications[i].app_label_ptr));
-        p.writeInt32(p_cur->applications[i].pin1_replaced);
-        p.writeInt32(p_cur->applications[i].pin1);
-        p.writeInt32(p_cur->applications[i].pin2);
+                                          (p_cur->applications[j].app_label_ptr));
+            p.writeInt32(p_cur->applications[j].pin1_replaced);
+            p.writeInt32(p_cur->applications[j].pin1);
+            p.writeInt32(p_cur->applications[j].pin2);
         appendPrintBuf("%s[app_type=%d,app_state=%d,perso_substate=%d,\
                 aid_ptr=%s,app_label_ptr=%s,pin1_replaced=%d,pin1=%d,pin2=%d],",
                 printBuf,
-                p_cur->applications[i].app_type,
-                p_cur->applications[i].app_state,
-                p_cur->applications[i].perso_substate,
-                p_cur->applications[i].aid_ptr,
-                p_cur->applications[i].app_label_ptr,
-                p_cur->applications[i].pin1_replaced,
-                p_cur->applications[i].pin1,
-                p_cur->applications[i].pin2);
+                    p_cur->applications[j].app_type,
+                    p_cur->applications[j].app_state,
+                    p_cur->applications[j].perso_substate,
+                    p_cur->applications[j].aid_ptr,
+                    p_cur->applications[j].app_label_ptr,
+                    p_cur->applications[j].pin1_replaced,
+                    p_cur->applications[j].pin1,
+                    p_cur->applications[j].pin2);
+        }
     }
     closeResponse;
 
