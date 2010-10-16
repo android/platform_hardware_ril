@@ -1623,6 +1623,7 @@ static void  requestSIM_IO(void *data, size_t datalen, RIL_Token t)
     p_args = (RIL_SIM_IO *)data;
 
     /* FIXME handle pin2 */
+    /* FIXME handle slot and aidPtr */
 
     if (p_args->data == NULL) {
         asprintf(&cmd, "AT+CRSM=%d,%d,%d,%d,%d",
@@ -1673,14 +1674,12 @@ static void  requestEnterSimPin(void*  data, size_t  datalen, RIL_Token  t)
     ATResponse   *p_response = NULL;
     int           err;
     char*         cmd = NULL;
-    const char**  strings = (const char**)data;;
+    RIL_SimPin*   sp = (RIL_SimPin *)data;
 
-    if ( datalen == sizeof(char*) ) {
-        asprintf(&cmd, "AT+CPIN=%s", strings[0]);
-    } else if ( datalen == 2*sizeof(char*) ) {
-        asprintf(&cmd, "AT+CPIN=%s,%s", strings[0], strings[1]);
-    } else
+    if (datalen < sizeof(RIL_SimPin)) {
         goto error;
+    }
+    asprintf(&cmd, "AT+CPIN=%s", sp->pin);
 
     err = at_send_command_singleline(cmd, "+CPIN:", &p_response);
     free(cmd);
@@ -1694,6 +1693,53 @@ error:
     at_response_free(p_response);
 }
 
+static void  requestEnterSimPuk(void*  data, size_t  datalen, RIL_Token  t)
+{
+    ATResponse   *p_response = NULL;
+    int           err;
+    char*         cmd = NULL;
+    RIL_SimPuk*   sp = (RIL_SimPuk *)data;
+
+    if (datalen < sizeof(RIL_SimPuk)) {
+        goto error;
+    }
+    asprintf(&cmd, "AT+CPIN=%s,%s", sp->puk,sp->newPin);
+
+    err = at_send_command_singleline(cmd, "+CPIN:", &p_response);
+    free(cmd);
+
+    if (err < 0 || p_response->success == 0) {
+error:
+        RIL_onRequestComplete(t, RIL_E_PASSWORD_INCORRECT, NULL, 0);
+    } else {
+        RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+    }
+    at_response_free(p_response);
+}
+
+static void  requestSimPinSet(void*  data, size_t  datalen, RIL_Token  t)
+{
+    ATResponse   *p_response = NULL;
+    int           err;
+    char*         cmd = NULL;
+    RIL_SimPinSet*   sps = (RIL_SimPinSet *)data;
+
+    if (datalen < sizeof(RIL_SimPinSet)) {
+        goto error;
+    }
+    asprintf(&cmd, "AT+CPIN=%s,%s", sps->pin, sps->newPin);
+
+    err = at_send_command_singleline(cmd, "+CPIN:", &p_response);
+    free(cmd);
+
+    if (err < 0 || p_response->success == 0) {
+error:
+        RIL_onRequestComplete(t, RIL_E_PASSWORD_INCORRECT, NULL, 0);
+    } else {
+        RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+    }
+    at_response_free(p_response);
+}
 
 static void  requestSendUSSD(void *data, size_t datalen, RIL_Token t)
 {
@@ -2054,12 +2100,18 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         }
 
         case RIL_REQUEST_ENTER_SIM_PIN:
-        case RIL_REQUEST_ENTER_SIM_PUK:
         case RIL_REQUEST_ENTER_SIM_PIN2:
+            requestEnterSimPin(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_ENTER_SIM_PUK:
         case RIL_REQUEST_ENTER_SIM_PUK2:
+            requestEnterSimPuk(data, datalen, t);
+            break;
+
         case RIL_REQUEST_CHANGE_SIM_PIN:
         case RIL_REQUEST_CHANGE_SIM_PIN2:
-            requestEnterSimPin(data, datalen, t);
+            requestSimPinSet(data, datalen, t);
             break;
 
         case RIL_REQUEST_VOICE_RADIO_TECH:
@@ -2219,11 +2271,6 @@ setRadioState(RIL_RadioState newState)
         RIL_onUnsolicitedResponse (RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED,
                                     NULL, 0);
 
-        /* FIXME onSimReady() and onRadioPowerOn() cannot be called
-         * from the AT reader thread
-         * Currently, this doesn't happen, but if that changes then these
-         * will need to be dispatched on the request thread
-         */
         if (sState == RADIO_STATE_ON) {
             onRadioPowerOn();
         }
@@ -2429,8 +2476,10 @@ static int getCardStatus(RIL_CardStatus **pp_card_status) {
     RIL_CardStatus *p_card_status = malloc(sizeof(RIL_CardStatus));
     p_card_status->card_state = card_state;
     p_card_status->universal_pin_state = RIL_PINSTATE_UNKNOWN;
-    p_card_status->gsm_umts_subscription_app_index = RIL_CARD_MAX_APPS;
-    p_card_status->cdma_subscription_app_index = RIL_CARD_MAX_APPS;
+    p_card_status->num_current_3gpp_indexes = 0;
+    p_card_status->subscription_3gpp_app_index[0] = RIL_CARD_MAX_APPS;
+    p_card_status->num_current_3gpp2_indexes= 0;
+    p_card_status->subscription_3gpp2_app_index[0] = RIL_CARD_MAX_APPS;
     p_card_status->num_applications = num_apps;
 
     // Initialize application status
@@ -2444,8 +2493,10 @@ static int getCardStatus(RIL_CardStatus **pp_card_status) {
     if (num_apps != 0) {
         // Only support one app, gsm
         p_card_status->num_applications = 1;
-        p_card_status->gsm_umts_subscription_app_index = 0;
-        p_card_status->cdma_subscription_app_index = 0;
+        p_card_status->num_current_3gpp_indexes = 1;
+        p_card_status->subscription_3gpp_app_index[0] = 0;
+        // TODO: Properly handle 3gpp2 apps
+        p_card_status->num_current_3gpp2_indexes = 0;
 
         // Get the correct app status
         p_card_status->applications[0] = app_status_array[sim_status];
