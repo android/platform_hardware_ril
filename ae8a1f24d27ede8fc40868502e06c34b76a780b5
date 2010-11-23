@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA9n///IU\u003d",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1002951
+      },
+      "writtenOn": "2010-11-23T17:09:50Z",
+      "side": 1,
+      "message": "what was the reasoning behind this one?",
+      "revId": "ae8a1f24d27ede8fc40868502e06c34b76a780b5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
