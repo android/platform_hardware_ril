@@ -185,6 +185,15 @@ typedef struct {
                        (as expected by TS 27.005) or NULL for default SMSC */
 } RIL_SMS_WriteArgs;
 
+/** Used by RIL_UNSOL_RESPONSE_NEW_ETWS_MESSAGE */
+typedef struct {
+    int type;       /* Indication type (0 for primary ETWS message, 1 for secondary) */
+    int size;       /* Size of the pdu */
+    char * pdu;     /* PDU of message */
+                    /* In case of primary ETWS notification this is a 88 byte */
+                    /* message sent to the MS by the BTS as coded in 3GPP 23.041 Section 9.4.1.1 */
+} RIL_Etws_Message;
+
 /** Used by RIL_REQUEST_DIAL */
 typedef struct {
     char * address;
@@ -3376,6 +3385,17 @@ typedef struct {
  * "data" is null
  */
 #define RIL_UNSOL_RESEND_INCALL_MUTE 1030
+
+/**
+ * RIL_UNSOL_RESPONSE_NEW_ETWS_MESSAGE
+ *
+ * Called when new Etws message is received
+ *
+ * "data" is a RIL_Etws_Message *
+ *
+ */
+#define RIL_UNSOL_RESPONSE_NEW_ETWS_MESSAGE 1031
+
 /***********************************************************************/
 
 
