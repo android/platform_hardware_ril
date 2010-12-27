@@ -82,6 +82,12 @@ typedef enum {
 } RIL_CallState;
 
 typedef enum {
+    ICON_DISPLAYED_SUCCESS,                /* Icon was displayed succesfully  */
+    ICON_DISPLAYED_FAILURE,                /* Icon could not be displayed  */
+    NO_ICON_RECEIVED                       /* Icon is not present    */
+} RIL_IconDisplayStatus;
+
+typedef enum {
     RADIO_STATE_OFF = 0,                   /* Radio explictly powered off (eg CFUN=0) */
     RADIO_STATE_UNAVAILABLE = 1,           /* Radio unavailable (eg, resetting or not booted) */
     RADIO_STATE_SIM_NOT_READY = 2,         /* Radio is on, but the SIM interface is not ready */
@@ -2962,6 +2968,24 @@ typedef struct {
  *
  */
 #define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
+
+/**
+ *  RIL_REQUEST_STK_SEND_ICON_DISPLAY_STATUS
+ *
+ *  Indicates the display status of the Icon sent through
+ *  RIL_UNSOL_STK_EVENT_NOTIFY.
+ *
+ *  "data" is RIL_IconDisplayStatus
+ *  "response" is NULL
+ *
+ *  Valid errors:
+ *   SUCCESS
+ *   RADIO_NOT_AVAILABLE
+ *   GENERIC_FAILURE
+ *
+ */
+#define RIL_REQUEST_STK_SEND_ICON_DISPLAY_STATUS  104
+
 
 /***********************************************************************/
 
