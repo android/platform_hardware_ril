@@ -96,6 +96,34 @@ typedef enum {
     RADIO_STATE_NV_READY = 9               /* Radio is on and the NV interface is available */
 } RIL_RadioState;
 
+typedef enum {
+    RADIO_TECH_3GPP = 1, /* 3GPP Technologies - GSM, WCDMA, LTE */
+    RADIO_TECH_3GPP2 = 2 /* 3GPP2 Technologies - CDMA, EVDO */
+} RIL_RadioTechnologyFamily;
+
+typedef enum {
+    RADIO_TECH_UNKNOWN = 0,
+    RADIO_TECH_GPRS = 1,
+    RADIO_TECH_EDGE = 2,
+    RADIO_TECH_UMTS = 3,
+    RADIO_TECH_IS95A = 4,
+    RADIO_TECH_IS95B = 5,
+    RADIO_TECH_1xRTT =  6,
+    RADIO_TECH_EVDO_0 = 7,
+    RADIO_TECH_EVDO_A = 8,
+    RADIO_TECH_HSDPA = 9,
+    RADIO_TECH_HSUPA = 10,
+    RADIO_TECH_HSPA = 11,
+    RADIO_TECH_EVDO_B = 12,
+    RADIO_TECH_EHRPD = 13,
+    RADIO_TECH_LTE = 14
+} RIL_RadioTechnology;
+
+typedef enum {
+    CDMA_SSRC_NV = 0,
+    CDMA_SSRC_RUIM = 1,
+} RIL_CdmaSubscriptionSource;
+
 /* User-to-User signaling Info activation types derived from 3GPP 23.087 v8.0 */
 typedef enum {
     RIL_UUS_TYPE1_IMPLICIT = 0,
@@ -2423,7 +2451,7 @@ typedef struct {
 #define RIL_REQUEST_SET_LOCATION_UPDATES 76
 
 /**
- * RIL_REQUEST_CDMA_SET_SUBSCRIPTION
+ * RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE
  *
  * Request to set the location where the CDMA subscription shall
  * be retrieved
@@ -2440,8 +2468,10 @@ typedef struct {
  *  GENERIC_FAILURE
  *  SIM_ABSENT
  *  SUBSCRIPTION_NOT_AVAILABLE
+ *
+ * See also: RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE
  */
-#define RIL_REQUEST_CDMA_SET_SUBSCRIPTION 77
+#define RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE 77
 
 /**
  * RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE
@@ -2963,6 +2993,45 @@ typedef struct {
  */
 #define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
 
+/**
+ * RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE
+ *
+ * Request to query the location where the CDMA subscription shall
+ * be retrieved
+ *
+ * "data" is NULL
+ *
+ * "response" is int *
+ * ((int *)data)[0] is == 0 from RUIM/SIM (default)
+ * ((int *)data)[0] is == 1 from NV
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ *
+ * See also: RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE
+ */
+#define RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE 104
+
+/**
+ * RIL_REQUEST_CDMA_PRL_VERSION
+ *
+ * Request the PRL (preferred roaming list) version.
+ *
+ * "response" is const char *
+ * (const char *)response is PRL version if PRL is loaded and NULL if not
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *
+ * See also: RIL_UNSOL_CDMA_PRL_CHANGED
+ */
+#define RIL_REQUEST_CDMA_PRL_VERSION 105
+
 /***********************************************************************/
 
 
@@ -3379,6 +3448,46 @@ typedef struct {
  * "data" is null
  */
 #define RIL_UNSOL_RESEND_INCALL_MUTE 1030
+
+/**
+ * RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED
+ *
+ * Called when CDMA subscription source changes.
+ *
+ * Callee will invoke the following request on the main thread:
+ *
+ * RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE
+ *
+ * "data" is NULL
+ */
+#define RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED 1031
+
+/**
+ * RIL_UNSOL_CDMA_PRL_CHANGED
+ *
+ * Called when PRL (preferred roaming list) changes.
+ *
+ * Callee will invoke the following request on the main thread:
+ *
+ * RIL_REQUEST_CDMA_PRL_VERSION
+ *
+ * "data" is NULL
+ */
+#define RIL_UNSOL_CDMA_PRL_CHANGED 1032
+
+/**
+ * RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE
+ *
+ * Called when Emergency Callback Mode Ends
+ *
+ * Indicates that the radio system selection module has
+ * proactively exited emergency callback mode.
+ *
+ * "data" is NULL
+ *
+ */
+#define RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE 1033
+
 /***********************************************************************/
 
 
