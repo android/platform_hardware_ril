@@ -366,6 +366,7 @@ typedef struct {
 } RIL_SuppSvcNotification;
 
 #define RIL_CARD_MAX_APPS     8
+#define RIL_MAX_CARDS         2
 
 typedef enum {
     RIL_CARDSTATE_ABSENT   = 0,
@@ -695,6 +696,24 @@ typedef struct {
   char numberOfInfoRecs;
   RIL_CDMA_InformationRecord infoRec[RIL_CDMA_MAX_NUMBER_OF_INFO_RECS];
 } RIL_CDMA_InformationRecords;
+
+typedef enum {
+  RIL_UICC_SUBSCRIPTION_ACTIVATE = 0,
+  RIL_UICC_SUBSCRIPTION_DEACTIVATE = 1
+} RIL_UiccSubActStatus;
+
+typedef enum {
+  RIL_SUBSCRIPTION_0 = 0,
+  RIL_SUBSCRIPTION_1 = 1
+} RIL_Subscription;
+
+typedef struct {
+  int   slot;                   /* 0, 1, ... etc. */
+  int   app_index;              /* array subscriptor from applications[RIL_CARD_MAX_APPS] in
+                                   RIL_REQUEST_GET_SIM_STATUS */
+  RIL_Subscription sub_num;     /* Indicates subscription 0 or subscription 1 */
+  RIL_UiccSubActStatus  act_status;
+} RIL_SelectUiccSub;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -3079,6 +3098,62 @@ typedef struct {
  */
 #define RIL_REQUEST_VOICE_RADIO_TECH 106
 
+/**
+ * RIL_REQUEST_SET_UICC_SUBSCRIPTION_SOURCE
+ *
+ * Selects/deselects a particular application/subscription to use on a particular SIM card
+ * "data" is const  RIL_SelectUiccSub*
+ *
+ * "response" is NULL
+ *
+ *  Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ *  SUBSCRIPTION_NOT_SUPPORTED
+ *
+ */
+# define RIL_REQUEST_SET_UICC_SUBSCRIPTION_SOURCE  107
+
+/**
+ *  RIL_REQUEST_SET_DATA_SUBSCRIPTION_SOURCE
+ *
+ *  Selects a subscription for data call setup
+ * "data" is NULL
+ *
+ * "response" is NULL
+ *
+ *  Valid errors:
+ *
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ *
+ */
+#define RIL_REQUEST_SET_DATA_SUBSCRIPTION_SOURCE  108
+
+/**
+ *  RIL_REQUEST_SET_SUBSCRIPTION_MODE
+ *
+ *  Sets the SUBSCRIPTION_MODE to DualStandBy/SingleStandBy
+ * "data" is const int *
+ * ((const int *)data) [0]    1 indicates SingleStandBy Mode
+                              2 indicates DualStandBy Mode
+ *
+ * "response" is NULL
+ *
+ *  Valid errors:
+ *
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ *
+ */
+#define RIL_REQUEST_SET_SUBSCRIPTION_MODE 109
+
 /***********************************************************************/
 
 
@@ -3545,6 +3620,17 @@ typedef struct {
  *
  */
 #define RIL_UNSOL_VOICE_RADIO_TECH_CHANGED 1034
+
+/**
+ * RIL_UNSOL_SUBSCRIPTION_READY
+ *
+ * Called when subscription is ready at RIL
+ *
+ * "data" is NULL
+ *
+ */
+#define RIL_UNSOL_SUBSCRIPTION_READY 1035
+
 
 /***********************************************************************/
 
