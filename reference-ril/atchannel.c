@@ -51,6 +51,7 @@
 #define HANDSHAKE_RETRY_COUNT 8
 #define HANDSHAKE_TIMEOUT_MSEC 250
 
+extern char * ril_inst_id;
 static pthread_t s_tid_reader;
 static int s_fd = -1;    /* fd of the AT channel */
 static ATUnsolHandler s_unsolHandler;
@@ -63,6 +64,8 @@ static char *s_ATBufferCur = s_ATBuffer;
 static int s_ackPowerIoctl; /* true if TTY has android byte-count
                                 handshake for low power*/
 static int s_readCount = 0;
+
+static int s_ok2go = 1;
 
 #if AT_DEBUG
 void  AT_DUMP(const char*  prefix, const char*  buff, int  len)
@@ -78,8 +81,8 @@ void  AT_DUMP(const char*  prefix, const char*  buff, int  len)
  * these are protected by s_commandmutex
  */
 
-static pthread_mutex_t s_commandmutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t s_commandcond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t s_commandmutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t s_commandcond = PTHREAD_COND_INITIALIZER;
 
 static ATCommandType s_type;
 static const char *s_responsePrefix = NULL;
@@ -800,6 +803,7 @@ static int at_send_command_full (const char *command, ATCommandType type,
     int err;
 
     if (0 != pthread_equal(s_tid_reader, pthread_self())) {
+        LOGE("reader thread!!");
         /* cannot be called from reader thread */
         return AT_ERROR_INVALID_THREAD;
     }
@@ -1016,3 +1020,8 @@ AT_CME_Error at_get_cme_error(const ATResponse *p_response)
     return (AT_CME_Error) ret;
 }
 
+void at_update_channel(int sFD)
+{
+    LOGD("at_update_channel s_fd=%d, sFD=%d",s_fd, sFD);
+    s_fd = sFD;
+}

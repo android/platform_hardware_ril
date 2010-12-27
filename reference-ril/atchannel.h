@@ -107,6 +107,8 @@ int at_send_command_sms (const char *command, const char *pdu,
                             const char *responsePrefix,
                             ATResponse **pp_outResponse);
 
+void at_update_channel(int sFD);
+
 void at_response_free(ATResponse *p_response);
 
 typedef enum {

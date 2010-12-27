@@ -146,6 +146,8 @@ static int getCardStatus(RIL_CardStatus **pp_card_status);
 static void freeCardStatus(RIL_CardStatus *p_card_status);
 static void onDataCallListChanged(void *param);
 
+extern pthread_mutex_t s_commandmutex;
+extern pthread_cond_t s_commandcond;
 extern const char * requestToString(int request);
 
 /*** Static Variables ***/
@@ -174,11 +176,13 @@ static pthread_cond_t s_state_cond = PTHREAD_COND_INITIALIZER;
 static int s_port = -1;
 static const char * s_device_path = NULL;
 static int          s_device_socket = 0;
+char * ril_inst_id = "rild1";
 
 /* trigger change to this with s_state_cond */
 static int s_closed = 0;
 
 static int sFD;     /* file desc of AT channel */
+static int sOldFD =-1;     /* file desc of AT channel for prev. service provider*/
 static char sATBuffer[MAX_AT_RESPONSE+1];
 static char *sATBufferCur = NULL;
 
@@ -671,6 +675,112 @@ static void requestGetCurrentCalls(void *data, size_t datalen, RIL_Token t)
 error:
     RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
     at_response_free(p_response);
+}
+
+static void setUiccSubscriptionSource(int request, void *data, size_t datalen, RIL_Token t)
+{
+
+    RIL_SelectUiccSub *uiccSubscrInfo;
+    uiccSubscrInfo = (RIL_SelectUiccSub *)data;
+    int fd =-1;
+
+    RIL_SelectUiccSub *subData = (RIL_SelectUiccSub*) data;
+
+    if(subData->act_status == 1)
+    {
+        LOGD("Android fwk deactivate the sub, NOP");
+        RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+        return;
+    }
+
+    if(subData->slot == 0) {
+        if(strcmp(ril_inst_id, "rild1") == 0)
+        {
+            LOGD("slotId=0, GSM1 already connected");
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            return;
+        } else {
+            LOGD("slotId=0, need to select GSM1 service");
+            ril_inst_id =  "rild1";
+        }
+    } else {
+        if (strcmp(ril_inst_id, "rild2") == 0)
+        {
+            LOGD("slotId=1, GSM2 already connected");
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            return;
+        } else {
+            LOGD("slotId=1, need to select GSM2 service");
+            ril_inst_id =  "rild2";
+        }
+    }
+    LOGD("Connecting sFD=%d to other service", sFD);
+
+    if(sOldFD == -1) {
+        LOGD("Trying to lock s_commandmutex");
+        pthread_mutex_lock(&s_commandmutex);
+        LOGD("locked s_commandmutex");
+
+        sOldFD = sFD;
+        sFD = -1;
+        /* Qemu-specific control socket */
+        LOGD("\n Opening qemud socket");
+        fd = socket_local_client( "qemud",
+                ANDROID_SOCKET_NAMESPACE_RESERVED,
+                SOCK_STREAM );
+        LOGD("\n QEMUD fd=%d", fd);
+
+        if (fd >= 0 ) {
+            char  answer[2];
+            char  *service = "gsm1";
+            if(0==strcmp(ril_inst_id, "rild1")) {
+                service = "gsm1";
+                LOGD("Connecting to GSM1 service");
+            } else if (0==strcmp(ril_inst_id, "rild2")) {
+                service = "gsm2";
+                LOGD("Connecting to GSM2 service");
+            } else {
+                service = "gsm";
+            }
+            (write(fd, service, 4) == 4)?LOGD("\nwritten %s",service):LOGE("\nWriting %s failed", service);
+            (read(fd, answer, 2) == 2)?LOGD("\nread ok"):LOGE("\nread failed");
+            (memcmp(answer, "OK", 2) ==0)?LOGD("\nDone"):LOGE("\nNOT done");
+            if ( memcmp(answer, "OK", 2) != 0) {
+                LOGE("\n %s attempt failed.",ril_inst_id );
+                close(fd);
+                fd = -1;
+            }
+            sFD = fd;
+            at_update_channel(sFD);
+        }
+        pthread_mutex_unlock(&s_commandmutex);
+        LOGD("unlocked s_commandmutex");
+
+    } else {
+        int temp = sFD;
+        LOGD("Simply swaping the connections.");
+
+        sFD = sOldFD;
+        sOldFD = sFD;
+    }
+
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+}
+
+static void setSubscriptionMode(int request, void *data, size_t datalen, RIL_Token t)
+{
+    LOGD("setSubscriptionMode()");
+    // TODO: DSDS: Need to implement this.
+    // workarround: send success for now.
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+}
+
+static void setDataSubscriptionSource(int request, void *data, size_t datalen, RIL_Token t)
+{
+    LOGD("setDataSubscriptionSource()") ;
+    // TODO: DSDS: Need to implement this.
+    // workarround: send success for now.
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
 }
 
 static void requestDial(void *data, size_t datalen, RIL_Token t)
@@ -2090,6 +2200,16 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             requestGetPreferredNetworkType(request, data, datalen, t);
             break;
 
+       case RIL_REQUEST_SET_UICC_SUBSCRIPTION_SOURCE:
+            setUiccSubscriptionSource(request, data, datalen, t);
+            break;
+        case RIL_REQUEST_SET_DATA_SUBSCRIPTION_SOURCE:
+            setDataSubscriptionSource(request, data, datalen, t);
+            break;
+        case RIL_REQUEST_SET_SUBSCRIPTION_MODE:
+            setSubscriptionMode(request, data, datalen, t);
+            break;
+
         /* CDMA Specific Requests */
         case RIL_REQUEST_CDMA_PRL_VERSION:
         {
@@ -2189,6 +2309,18 @@ static const char * getVersion(void)
 }
 
 static void
+setCurrentModemType(int modemType)
+{
+    LOGD("setCurrentModemType(%d)", modemType);
+    int old = TECH(sMdmInfo);
+    TECH(sMdmInfo) = modemType;
+
+    if (techFamilyFromModemType(old) != techFamilyFromModemType(modemType)) {
+        RIL_onUnsolicitedResponse(RIL_UNSOL_VOICE_RADIO_TECH_CHANGED, NULL, 0);
+    }
+}
+
+static void
 setRadioTechnology(ModemInfo *mdm, int newtech)
 {
     LOGD("setRadioTechnology(%d)", newtech);
@@ -2237,6 +2369,11 @@ setRadioState(RIL_RadioState newState)
         RIL_onUnsolicitedResponse (RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED,
                                     NULL, 0);
 
+        /* FIXME onSimReady() and onRadioPowerOn() cannot be called
+         * from the AT reader thread
+         * Currently, this doesn't happen, but if that changes then these
+         * will need to be dispatched on the request thread
+         */
         if (sState == RADIO_STATE_ON) {
             onRadioPowerOn();
         }
@@ -3009,16 +3146,32 @@ mainLoop(void *param)
             } else if (s_device_socket) {
                 if (!strcmp(s_device_path, "/dev/socket/qemud")) {
                     /* Qemu-specific control socket */
+                    LOGD("\n Opening qemud socket");
                     fd = socket_local_client( "qemud",
                                               ANDROID_SOCKET_NAMESPACE_RESERVED,
                                               SOCK_STREAM );
+                    LOGD("\n QEMUD fd=%d", fd);
+
                     if (fd >= 0 ) {
                         char  answer[2];
-
-                        if ( write(fd, "gsm", 3) != 3 ||
-                             read(fd, answer, 2) != 2 ||
-                             memcmp(answer, "OK", 2) != 0)
+                        char  *service = "gsm1";
+                        if(0==strcmp(ril_inst_id, "rild1")) {
+                              service = "gsm1";
+                              LOGD("Connecting to GSM1 service");
+                        }
+                        else if(0==strcmp(ril_inst_id, "rild2")) {
+                              service = "gsm2";
+                              LOGD("Connecting to GSM2 service");
+                        }
+                        else {
+                              service = "gsm";
+                        }
+                        (write(fd, service, 4) == 4)?LOGD("\nwritten %s",service):LOGE("\nWriting %s failed", service);
+                        (read(fd, answer, 2) == 2)?LOGD("\nread ok"):LOGE("\nread failed");
+                        (memcmp(answer, "OK", 2) ==0)?LOGD("\nDone"):LOGE("\nNOT done");
+                        if ( memcmp(answer, "OK", 2) != 0)
                         {
+                            LOGE("\n %s attempt failed.",ril_inst_id );
                             close(fd);
                             fd = -1;
                         }
@@ -3074,11 +3227,17 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
     int ret;
     int fd = -1;
     int opt;
+    int j=0;
     pthread_attr_t attr;
 
     s_rilenv = env;
 
-    while ( -1 != (opt = getopt(argc, argv, "p:d:s:"))) {
+    LOGD("%s: argc=%d",__FUNCTION__, argc);
+
+    for(j =0;j<argc;j++)
+    LOGD("\nrilinit[%d]=%s",j,argv[j]);
+
+    while ( -1 != (opt = getopt(argc, argv, "p:d:s:m:"))) {
         switch (opt) {
             case 'p':
                 s_port = atoi(optarg);
@@ -3097,7 +3256,12 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
             case 's':
                 s_device_path   = optarg;
                 s_device_socket = 1;
-                LOGI("Opening socket %s\n", s_device_path);
+                LOGD("Opening socket %s\n", s_device_path);
+            break;
+
+            case 'm':
+                ril_inst_id = optarg;
+                LOGD("ReferRil is using mode %s\n",ril_inst_id );
             break;
 
             default:

@@ -1,7 +1,6 @@
 /* //device/libs/telephony/ril_commands.h
 **
 ** Copyright 2006, The Android Open Source Project
-** Copyright (c) 2010, Code Aurora Forum. All rights reserved.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -122,3 +121,6 @@
     {RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE, dispatchVoid, responseInts},
     {RIL_REQUEST_CDMA_PRL_VERSION, dispatchVoid, responseString},
     {RIL_REQUEST_VOICE_RADIO_TECH, dispatchVoid, responseInts},
+    {RIL_REQUEST_SET_UICC_SUBSCRIPTION_SOURCE, dispatchUiccSubscripton, responseVoid},
+    {RIL_REQUEST_SET_DATA_SUBSCRIPTION_SOURCE, dispatchVoid, responseVoid},
+    {RIL_REQUEST_SET_SUBSCRIPTION_MODE, dispatchInts, responseVoid},

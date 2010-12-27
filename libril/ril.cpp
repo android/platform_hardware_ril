@@ -213,6 +213,7 @@ static void dispatchCdmaSmsAck(Parcel &p, RequestInfo *pRI);
 static void dispatchGsmBrSmsCnf(Parcel &p, RequestInfo *pRI);
 static void dispatchCdmaBrSmsCnf(Parcel &p, RequestInfo *pRI);
 static void dispatchRilCdmaSmsWriteArgs(Parcel &p, RequestInfo *pRI);
+static void dispatchUiccSubscripton(Parcel &p, RequestInfo *pRI);
 static int responseInts(Parcel &p, void *response, size_t responselen);
 static int responseStrings(Parcel &p, void *response, size_t responselen);
 static int responseString(Parcel &p, void *response, size_t responselen);
@@ -258,6 +259,29 @@ static UnsolResponseInfo s_unsolResponses[] = {
 #include "ril_unsol_commands.h"
 };
 
+static char * RIL_getRilSocketName() {
+
+    FILE *fp = NULL;
+    char filename[16+4] = "/data/radio/pid_";
+    sprintf(filename, "/data/radio/pid_%d", getpid());
+
+    fp = fopen(filename, "r");
+    static char rild[6] = "rild1";
+    int pid =0;
+
+    if (fp != NULL) {
+        while (!feof(fp)) {
+            fscanf(fp,"PID_%d=%s\n",&pid, rild );
+            LOGD("libril cntx PID=%d found PID_%d=%s",getpid(), pid, rild);
+            if (getpid() == pid) {
+                return rild;
+            }
+        }
+        fclose(fp);
+    }
+    return rild;
+
+}
 
 static char *
 strdupReadString(Parcel &p) {
@@ -1402,6 +1426,48 @@ invalid:
     free(simPinSet.aidPtr);
     free(simPinSet.pin);
     free(simPinSet.newPin);
+    invalidCommandBlock(pRI);
+    return;
+}
+
+static void dispatchUiccSubscripton(Parcel &p, RequestInfo *pRI) {
+    RIL_SelectUiccSub uicc_sub;
+    status_t status;
+    int32_t  t;
+    memset(&uicc_sub, 0, sizeof(uicc_sub));
+
+    status = p.readInt32(&t);
+    uicc_sub.slot = (int) t;
+
+    status = p.readInt32(&t);
+    uicc_sub.app_index = (int) t;
+
+    status = p.readInt32(&t);
+    uicc_sub.sub_num = (RIL_Subscription) t;
+
+    status = p.readInt32(&t);
+    uicc_sub.act_status = (RIL_UiccSubActStatus) t;
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    startRequest;
+    appendPrintBuf("slot=%d, app_index=%d, act_status = %d",
+            uicc_sub.slot, uicc_sub.app_index, uicc_sub.act_status);
+    LOGD("dispatchUiccSubscripton, slot = %d, app_index = %d, act_status = %d",
+            uicc_sub.slot, uicc_sub.app_index, uicc_sub.act_status);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &uicc_sub, sizeof(uicc_sub), pRI);
+
+#ifdef MEMSET_FREED
+    memset(&uicc_sub, 0, sizeof(uicc_sub));
+#endif
+    return;
+
+invalid:
     invalidCommandBlock(pRI);
     return;
 }
@@ -2718,6 +2784,9 @@ eventLoop(void *param) {
     s_fdWakeupRead = filedes[0];
     s_fdWakeupWrite = filedes[1];
 
+    LOGD("[FD]: pipe read:%d",s_fdWakeupRead );
+    LOGD("[FD]: pipe write:%d",s_fdWakeupWrite );
+
     fcntl(s_fdWakeupRead, F_SETFL, O_NONBLOCK);
 
     ril_event_set (&s_wakeupfd_event, s_fdWakeupRead, true,
@@ -2819,9 +2888,9 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
     s_fdListen = ret;
 
 #else
-    s_fdListen = android_get_control_socket(SOCKET_NAME_RIL);
+    s_fdListen = android_get_control_socket(RIL_getRilSocketName());
     if (s_fdListen < 0) {
-        LOGE("Failed to get socket '" SOCKET_NAME_RIL "'");
+        LOGE("Failed to get socket %s",RIL_getRilSocketName());
         exit(-1);
     }
 
@@ -3301,10 +3370,12 @@ requestToString(int request) {
         case RIL_REQUEST_CDMA_PRL_VERSION: return "CDMA_PRL_VERSION";
         case RIL_REQUEST_DELETE_SMS_ON_SIM: return "DELETE_SMS_ON_SIM";
         case RIL_REQUEST_GSM_SMS_BROADCAST_ACTIVATION: return "GSM_SMS_BROADCAST_ACTIVATION";
-        case RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING: return "REPORT_STK_SERVICE_IS_RUNNING";
         case RIL_REQUEST_SET_SUPP_SVC_NOTIFICATION: return "SET_SUPP_SVC_NOTIFICATION";
         case RIL_REQUEST_VOICE_RADIO_TECH: return "VOICE_RADIO_TECH";
         case RIL_REQUEST_WRITE_SMS_TO_SIM: return "WRITE_SMS_TO_SIM";
+        case RIL_REQUEST_SET_UICC_SUBSCRIPTION_SOURCE: return "SET_UICC_SUBSCRIPTION_SOURCE";
+        case RIL_REQUEST_SET_DATA_SUBSCRIPTION_SOURCE: return "SET_DATA_SUBSCRIPTION_SOURCE";
+        case RIL_REQUEST_SET_SUBSCRIPTION_MODE: return "REQUEST_SET_SUBSCRIPTION_MODE";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_NETWORK_STATE_CHANGED: return "UNSOL_RESPONSE_NETWORK_STATE_CHANGED";
@@ -3339,6 +3410,7 @@ requestToString(int request) {
         case RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED: return "UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED";
         case RIL_UNSOL_VOICE_RADIO_TECH_CHANGED: return "RIL_UNSOL_VOICE_RADIO_TECH_CHANGED";
         case RIL_UNSOL_SUPP_SVC_NOTIFICATION: return "UNSOL_SUPP_SVC_NOTIFICATION";
+        case RIL_UNSOL_SUBSCRIPTION_READY: return "UNSOL_SUBSCRIPTION_READY";
         default: return "<unknown request>";
     }
 }

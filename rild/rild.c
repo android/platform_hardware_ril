@@ -38,6 +38,8 @@
 #define LIB_ARGS_PROPERTY   "rild.libargs"
 #define MAX_LIB_ARGS        16
 
+static char* s_socket_name_ril ="rild1";
+
 static void usage(const char *argv0)
 {
     fprintf(stderr, "Usage: %s -l <ril impl library> [-- <args for impl library>]\n", argv0);
@@ -63,6 +65,51 @@ static struct RIL_Env s_rilEnv = {
 };
 
 extern void RIL_startEventLoop();
+
+char * RIL_getRilSocketName() {
+
+    FILE *fp =NULL;
+    char filename[16+4] = "/data/radio/pid_";
+
+    sprintf(filename, "/data/radio/pid_%d", getpid());
+
+    fp = fopen(filename, "r");
+    static char rild[6] = "rild1";
+    int pid =0;
+
+    LOGE("%s: enter", __FUNCTION__);
+
+    if(fp != NULL) {
+        while(!feof(fp)) {
+            fscanf(fp,"PID_%d=%s\n",&pid, rild );
+            LOGE("rild cntx PID=%d found PID_%d=%s",getpid(), pid, rild);
+            if(getpid() == pid) {
+                return rild;
+            }
+        }
+        fclose(fp);
+    }
+    return rild;
+
+}
+
+void RIL_setRilSocketName(char * s) {
+    FILE *fp= NULL;
+
+    char filename[16+4] = "/data/radio/pid_";
+    sprintf(filename, "/data/radio/pid_%d", getpid());
+
+    LOGE("%s: enter", __FUNCTION__);
+    fp = fopen(filename, "w");
+    if(fp != NULL) {
+        fprintf(fp,"PID_%d=%s\n",getpid(),s);
+        LOGE("written:PID_%d=%s",getpid(),s  );
+        fclose(fp);
+    }
+
+}
+
+
 
 static int make_argv(char * args, char ** argv)
 {
@@ -100,13 +147,20 @@ int main(int argc, char **argv)
 {
     const char * rilLibPath = NULL;
     char **rilArgv;
+    static char * s_argv[MAX_LIB_ARGS];
     void *dlHandle;
     const RIL_RadioFunctions *(*rilInit)(const struct RIL_Env *, int, char **);
     const RIL_RadioFunctions *funcs;
     char libPath[PROPERTY_VALUE_MAX];
     unsigned char hasLibArgs = 0;
+    char *modem;
+    int j=0;
 
     int i;
+    LOGE("**RIL Daemon Started**");
+    LOGE("**RILd param count=%d**", argc);
+
+    s_argv[0] = argv[0];
 
     for (i = 1; i < argc ;) {
         if (0 == strcmp(argv[i], "-l") && (argc - i > 1)) {
@@ -116,9 +170,20 @@ int main(int argc, char **argv)
             i++;
             hasLibArgs = 1;
             break;
+        } else if (0 == strcmp(argv[i], "-m") &&  (argc - i > 1)) {
+            modem = argv[i+1];
+            if(0 == strcmp(modem,"modem1")) {
+                RIL_setRilSocketName("rild1");
+                i+=2;
+            } else if (0 == strcmp(modem,"modem2")) {
+                RIL_setRilSocketName("rild2");
+                i+=2;
+            }
+
         } else {
             usage(argv[0]);
         }
+        s_argv[i] = argv[i];
     }
 
     if (rilLibPath == NULL) {
@@ -225,7 +290,9 @@ int main(int argc, char **argv)
         } while (0);
 
         if (done) {
-            argv = arg_overrides;
+            s_argv[1] = arg_overrides[1];
+            s_argv[2] = arg_overrides[2];
+
             argc = 3;
             i    = 1;
             hasLibArgs = 1;
@@ -233,6 +300,9 @@ int main(int argc, char **argv)
 
             LOGD("overriding with %s %s", arg_overrides[1], arg_overrides[2]);
         }
+        s_argv[argc++] = "-m";
+        s_argv[argc++] = RIL_getRilSocketName();
+
     }
 OpenLib:
 #endif
@@ -255,7 +325,7 @@ OpenLib:
     }
 
     if (hasLibArgs) {
-        rilArgv = argv + i - 1;
+        rilArgv = s_argv + i - 1;
         argc = argc -i + 1;
     } else {
         static char * newArgv[MAX_LIB_ARGS];
@@ -266,7 +336,7 @@ OpenLib:
     }
 
     // Make sure there's a reasonable argv[0]
-    rilArgv[0] = argv[0];
+    rilArgv[0] = "dummy";
 
     funcs = rilInit(&s_rilEnv, argc, rilArgv);
 

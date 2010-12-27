@@ -142,7 +142,7 @@ RIL_Errno RspGetSimStatus(
     RIL_CardStatus cardStatus;
     cardStatus.card_state = RIL_CardState(r.card_state());
     cardStatus.universal_pin_state = RIL_PinState(r.universal_pin_state());
-    cardStatus.gsm_umts_subscription_app_index = r.gsm_umts_subscription_app_index();
+    cardStatus.subscription_3gpp_app_index[0] = r.gsm_umts_subscription_app_index();
     cardStatus.num_applications = r.num_applications();
     for (int i = 0; i < cardStatus.num_applications; i++) {
        cardStatus.applications[i].app_type = RIL_AppType(r.applications(i).app_type());
