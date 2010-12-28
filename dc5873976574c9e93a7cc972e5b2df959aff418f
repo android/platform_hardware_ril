@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3///Ek\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 3070,
+      "author": {
+        "id": 1000660
+      },
+      "writtenOn": "2010-12-28T23:22:35Z",
+      "side": 1,
+      "message": "This is a duplicate case statement that conflicts with the one 5 lines above.",
+      "revId": "dc5873976574c9e93a7cc972e5b2df959aff418f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
