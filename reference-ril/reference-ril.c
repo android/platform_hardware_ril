@@ -1087,6 +1087,8 @@ static void requestSMSAcknowledge(void *data, size_t datalen, RIL_Token t)
     }
 
     RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+
+    return;
 error:
     RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
 
