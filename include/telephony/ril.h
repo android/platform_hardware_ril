@@ -634,6 +634,12 @@ typedef struct {
   RIL_CDMA_InformationRecord infoRec[RIL_CDMA_MAX_NUMBER_OF_INFO_RECS];
 } RIL_CDMA_InformationRecords;
 
+/* Data Call Profile: Simple IP User Profile Parameters*/
+typedef struct {
+  int  profileId;
+  int  priority;       /* priority. [0..255], 0 - highest */
+} RIL_DataCallProfileInfo;
+
 /**
  * RIL_REQUEST_GET_SIM_STATUS
  *
@@ -2962,6 +2968,29 @@ typedef struct {
  *
  */
 #define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
+
+/**
+ * RIL_REQUEST_GET_DATA_CALL_PROFILE
+ *
+ * Get the Data Call Profile for a particular app type
+ *
+ * "data" is const int*
+ * (const int*)data[0] - App type. Value is specified the RUIM spec C.S0023-D
+ *
+ *
+ * "response" is a const char * containing the count and the array of profiles
+ * ((const int *)response)[0] Number RIL_DataCallProfileInfo structs(count)
+ * ((const char *)response)[1] is the buffer that contains 'count' number of
+ *                              RIL_DataCallProfileInfo structs.
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ *  RIL_E_DATA_CALL_PROFILE_ERROR
+ *  RIL_E_DATA_CALL_PROFILE_NOT_AVAILABLE
+ *
+ */
+#define RIL_REQUEST_GET_DATA_CALL_PROFILE 104
 
 /***********************************************************************/
 
