@@ -1,6 +1,7 @@
 /* //device/libs/telephony/ril_commands.h
 **
 ** Copyright 2006, The Android Open Source Project
+** Copyright (c) 2010, Code Aurora Forum. All rights reserved.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -16,16 +17,16 @@
 */
     {0, NULL, NULL},                   //none
     {RIL_REQUEST_GET_SIM_STATUS, dispatchVoid, responseSimStatus},
-    {RIL_REQUEST_ENTER_SIM_PIN, dispatchStrings, responseInts},
-    {RIL_REQUEST_ENTER_SIM_PUK, dispatchStrings, responseInts},
-    {RIL_REQUEST_ENTER_SIM_PIN2, dispatchStrings, responseInts},
-    {RIL_REQUEST_ENTER_SIM_PUK2, dispatchStrings, responseInts},
-    {RIL_REQUEST_CHANGE_SIM_PIN, dispatchStrings, responseInts},
-    {RIL_REQUEST_CHANGE_SIM_PIN2, dispatchStrings, responseInts},
+    {RIL_REQUEST_ENTER_SIM_PIN, dispatchSimPin, responseInts},
+    {RIL_REQUEST_ENTER_SIM_PUK, dispatchSimPuk, responseInts},
+    {RIL_REQUEST_ENTER_SIM_PIN2, dispatchSimPin, responseInts},
+    {RIL_REQUEST_ENTER_SIM_PUK2, dispatchSimPuk, responseInts},
+    {RIL_REQUEST_CHANGE_SIM_PIN, dispatchSimPinSet, responseInts},
+    {RIL_REQUEST_CHANGE_SIM_PIN2, dispatchSimPinSet, responseInts},
     {RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION, dispatchStrings, responseInts},
     {RIL_REQUEST_GET_CURRENT_CALLS, dispatchVoid, responseCallList},
     {RIL_REQUEST_DIAL, dispatchDial, responseVoid},
-    {RIL_REQUEST_GET_IMSI, dispatchVoid, responseString},
+    {RIL_REQUEST_GET_IMSI, dispatchRequestImsi, responseString},
     {RIL_REQUEST_HANGUP, dispatchInts, responseVoid},
     {RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND, dispatchVoid, responseVoid},
     {RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND, dispatchVoid, responseVoid},
@@ -91,7 +92,7 @@
     {RIL_REQUEST_GET_PREFERRED_NETWORK_TYPE, dispatchVoid, responseInts},
     {RIL_REQUEST_GET_NEIGHBORING_CELL_IDS, dispatchVoid, responseCellList},
     {RIL_REQUEST_SET_LOCATION_UPDATES, dispatchInts, responseVoid},
-    {RIL_REQUEST_CDMA_SET_SUBSCRIPTION, dispatchInts, responseVoid},
+    {RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE, dispatchInts, responseVoid},
     {RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE, dispatchInts, responseVoid},
     {RIL_REQUEST_CDMA_QUERY_ROAMING_PREFERENCE, dispatchVoid, responseInts},
     {RIL_REQUEST_SET_TTY_MODE, dispatchInts, responseVoid},
@@ -117,4 +118,7 @@
     {RIL_REQUEST_GET_SMSC_ADDRESS, dispatchVoid, responseString},
     {RIL_REQUEST_SET_SMSC_ADDRESS, dispatchString, responseVoid},
     {RIL_REQUEST_REPORT_SMS_MEMORY_STATUS, dispatchInts, responseVoid},
-    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, responseVoid}
+    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, responseVoid},
+    {RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE, dispatchVoid, responseInts},
+    {RIL_REQUEST_CDMA_PRL_VERSION, dispatchVoid, responseString},
+    {RIL_REQUEST_VOICE_RADIO_TECH, dispatchVoid, responseInts},
