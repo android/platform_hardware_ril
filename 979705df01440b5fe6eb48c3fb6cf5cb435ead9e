@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//+Eg\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2982,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-05T23:45:11Z",
+      "side": 1,
+      "message": "Do you need the count. Can we not find this out from the size of the message?",
+      "revId": "979705df01440b5fe6eb48c3fb6cf5cb435ead9e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
