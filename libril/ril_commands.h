@@ -91,7 +91,7 @@
     {RIL_REQUEST_GET_PREFERRED_NETWORK_TYPE, dispatchVoid, responseInts},
     {RIL_REQUEST_GET_NEIGHBORING_CELL_IDS, dispatchVoid, responseCellList},
     {RIL_REQUEST_SET_LOCATION_UPDATES, dispatchInts, responseVoid},
-    {RIL_REQUEST_CDMA_SET_SUBSCRIPTION, dispatchInts, responseVoid},
+    {RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE, dispatchInts, responseVoid},
     {RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE, dispatchInts, responseVoid},
     {RIL_REQUEST_CDMA_QUERY_ROAMING_PREFERENCE, dispatchVoid, responseInts},
     {RIL_REQUEST_SET_TTY_MODE, dispatchInts, responseVoid},
@@ -117,4 +117,5 @@
     {RIL_REQUEST_GET_SMSC_ADDRESS, dispatchVoid, responseString},
     {RIL_REQUEST_SET_SMSC_ADDRESS, dispatchString, responseVoid},
     {RIL_REQUEST_REPORT_SMS_MEMORY_STATUS, dispatchInts, responseVoid},
-    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, responseVoid}
+    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, responseVoid},
+    {RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE, dispatchVoid, responseInts},
