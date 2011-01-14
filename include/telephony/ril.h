@@ -40,7 +40,8 @@
 extern "C" {
 #endif
 
-#define RIL_VERSION 3
+#define RIL_VERSION 5     /* Current version */
+#define RIL_VERSION_MIN 2 /* Minimum RIL_VERSION supported */
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
@@ -95,6 +96,24 @@ typedef enum {
     RADIO_STATE_NV_NOT_READY = 8,          /* Radio is on, but the NV interface is not available */
     RADIO_STATE_NV_READY = 9               /* Radio is on and the NV interface is available */
 } RIL_RadioState;
+
+typedef enum {
+    RADIO_TECH_UNKNOWN = 0,
+    RADIO_TECH_GPRS = 1,
+    RADIO_TECH_EDGE = 2,
+    RADIO_TECH_UMTS = 3,
+    RADIO_TECH_IS95A = 4,
+    RADIO_TECH_IS95B = 5,
+    RADIO_TECH_1xRTT =  6,
+    RADIO_TECH_EVDO_0 = 7,
+    RADIO_TECH_EVDO_A = 8,
+    RADIO_TECH_HSDPA = 9,
+    RADIO_TECH_HSUPA = 10,
+    RADIO_TECH_HSPA = 11,
+    RADIO_TECH_EVDO_B = 12,
+    RADIO_TECH_EHRPD = 13,
+    RADIO_TECH_LTE = 14
+} RIL_RadioTechnology;
 
 /* User-to-User signaling Info activation types derived from 3GPP 23.087 v8.0 */
 typedef enum {
@@ -154,13 +173,38 @@ typedef struct {
     RIL_UUS_Info *  uusInfo;    /* NULL or Pointer to User-User Signaling Information */
 } RIL_Call;
 
+/* Deprecated, use RIL_Data_Call_Response_v5 */
 typedef struct {
-    int             cid;        /* Context ID */
+    int             cid;        /* Context ID, uniquely identifies this call */
     int             active;     /* 0=inactive, 1=active/physical link down, 2=active/physical link up */
-    char *          type;       /* X.25, IP, IPV6, etc. */
-    char *          apn;
-    char *          address;
-} RIL_Data_Call_Response;
+    char *          type;       /* One of the PDP_type values in TS 27.007 section 10.1.1.
+                                   For example, "IP", "IPV6", "IPV4V6", or "PPP". */
+    char *          apn;        /* ignored */
+    char *          address;    /* A space-delimited list of addresses, e.g., "192.0.1.3" or
+                                   "192.0.1.11 2001:db8::1". */
+} RIL_Data_Call_Response_v3;
+
+/*
+ * Returned by RIL_REQUEST_SETUP_DATA_CALL, RIL_REQUEST_DATA_CALL_LIST
+ * and RIL_UNSOL_DATA_CALL_LIST_CHANGED, on error status != 0.
+ */
+typedef struct {
+    int             status;     /* A RIL_DataCallFailCause, 0 which is PDP_FAIL_NONE if no error */
+    int             cid;        /* Context ID, uniquely identifies this call */
+    int             active;     /* 0=inactive, 1=active/physical link down, 2=active/physical link up */
+    char *          type;       /* One of the PDP_type values in TS 27.007 section 10.1.1.
+                                   For example, "IP", "IPV6", "IPV4V6", or "PPP". If status is
+                                   PDP_FAIL_ONLY_SINGLE_BEARER_ALLOWED this is the type supported
+                                   such as "IP" or "IPV6" */
+    char *          ifname;     /* The network interface name */
+    char *          addresses;  /* A space-delimited list of addresses,
+                                   e.g., "192.0.1.3" or "192.0.1.11 2001:db8::1".
+                                   May not be empty, typically 1 IPv4 or 1 IPv6 or
+                                   one of each. */
+    char *          dnses;      /* A space-delimited list of DNS server addresses,
+                                   e.g., "192.0.1.3" or "192.0.1.11 2001:db8::1".
+                                   May be empty. */
+} RIL_Data_Call_Response_v5;
 
 typedef struct {
     int messageRef;   /* TP-Message-Reference for GSM,
@@ -283,6 +327,14 @@ typedef enum {
 
 /* See RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE */
 typedef enum {
+    PDP_FAIL_NONE = 0, /* No error, connection ok */
+
+    /* an integer cause code defined in TS 24.008
+       section 6.1.3.1.3 or TS 24.301 Release 8+ Annex B.
+       If the implementation does not have access to the exact cause codes,
+       then it should return one of the following values,
+       as the UI layer needs to distinguish these
+       cases for error notification and potential retries. */
     PDP_FAIL_OPERATOR_BARRED = 0x08,               /* no retry */
     PDP_FAIL_INSUFFICIENT_RESOURCES = 0x1A,
     PDP_FAIL_MISSING_UKNOWN_APN = 0x1B,            /* no retry */
@@ -293,13 +345,28 @@ typedef enum {
     PDP_FAIL_SERVICE_OPTION_NOT_SUPPORTED = 0x20,  /* no retry */
     PDP_FAIL_SERVICE_OPTION_NOT_SUBSCRIBED = 0x21, /* no retry */
     PDP_FAIL_SERVICE_OPTION_OUT_OF_ORDER = 0x22,
-    PDP_FAIL_NSAPI_IN_USE      = 0x23,             /* no retry */
+    PDP_FAIL_NSAPI_IN_USE = 0x23,                  /* no retry */
+    PDP_FAIL_ONLY_IPV4_ALLOWED = 0x32,             /* no retry */
+    PDP_FAIL_ONLY_IPV6_ALLOWED = 0x33,             /* no retry */
+    PDP_FAIL_ONLY_SINGLE_BEARER_ALLOWED = 0x34,
     PDP_FAIL_PROTOCOL_ERRORS   = 0x6F,             /* no retry */
-    PDP_FAIL_ERROR_UNSPECIFIED = 0xffff,  /* This and all other cases: retry silently */
+
     /* Not mentioned in the specification */
     PDP_FAIL_REGISTRATION_FAIL = -1,
     PDP_FAIL_GPRS_REGISTRATION_FAIL = -2,
-} RIL_LastDataCallActivateFailCause;
+
+   /* reasons for data call drop - network/modem disconnect */
+    PDP_FAIL_SIGNAL_LOST = -3,            /* should  retry */
+    PDP_FAIL_PREF_RADIO_TECH_CHANGED = -4,/* preferred technology has changed, should retry
+                                             with parameters appropriate for new technology */
+    PDP_FAIL_RADIO_POWER_OFF = -5,        /* data call was disconnected because radio was resetting,
+                                             powered off - no retry */
+    PDP_FAIL_TETHERED_CALL_ACTIVE = -6,   /* data call was disconnected by modem because tethered
+                                             mode was up on same APN/data profile - no retry until
+                                             tethered call is off */
+
+    PDP_FAIL_ERROR_UNSPECIFIED = 0xffff,  /* retry silently */
+} RIL_DataCallFailCause;
 
 /* See RIL_REQUEST_SETUP_DATA_CALL */
 typedef enum {
@@ -869,6 +936,9 @@ typedef struct {
  *
  * Hang up a specific line (like AT+CHLD=1x)
  *
+ * After this HANGUP request returns, RIL should show the connection is NOT
+ * active anymore in next RIL_REQUEST_GET_CURRENT_CALLS query.
+ *
  * "data" is an int *
  * (int *)data)[0] contains Connection index (value of 'x' in CHLD above)
  *
@@ -887,6 +957,9 @@ typedef struct {
  *
  * Hang up waiting or held (like AT+CHLD=0)
  *
+ * After this HANGUP request returns, RIL should show the connection is NOT
+ * active anymore in next RIL_REQUEST_GET_CURRENT_CALLS query.
+ *
  * "data" is NULL
  * "response" is NULL
  *
@@ -902,6 +975,9 @@ typedef struct {
  * RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND
  *
  * Hang up waiting or held (like AT+CHLD=1)
+ *
+ * After this HANGUP request returns, RIL should show the connection is NOT
+ * active anymore in next RIL_REQUEST_GET_CURRENT_CALLS query.
  *
  * "data" is NULL
  * "response" is NULL
@@ -1054,12 +1130,8 @@ typedef struct {
  *                                            in 16 bits
  *                                    In UMTS, CID is UMTS Cell Identity
  *                                             (see TS 25.331) in 28 bits
- * ((const char **)response)[3] indicates the available radio technology 0-7,
- *                                  0 - Unknown, 1 - GPRS, 2 - EDGE, 3 - UMTS,
- *                                  4 - IS95A, 5 - IS95B, 6 - 1xRTT,
- *                                  7 - EvDo Rev. 0, 8 - EvDo Rev. A,
- *                                  9 - HSDPA, 10 - HSUPA, 11 - HSPA,
- *                                  12 - EVDO Rev B
+ * ((const char **)response)[3] indicates the available voice radio technology,
+ *                              valid values as defined by RIL_RadioTechnology.
  * ((const char **)response)[4] is Base Station ID if registered on a CDMA
  *                              system or NULL if not.  Base Station ID in
  *                              decimal format
@@ -1069,14 +1141,14 @@ typedef struct {
  *                              3GPP2 C.S0005-A v6.0. It is represented in
  *                              units of 0.25 seconds and ranges from -1296000
  *                              to 1296000, both values inclusive (corresponding
- *                              to a range of -90° to +90°).
+ *                              to a range of -90 to +90 degrees).
  * ((const char **)response)[6] is Base Station longitude if registered on a
  *                              CDMA system or NULL if not. Base Station
  *                              longitude is a decimal number as specified in
  *                              3GPP2 C.S0005-A v6.0. It is represented in
  *                              units of 0.25 seconds and ranges from -2592000
  *                              to 2592000, both values inclusive (corresponding
- *                              to a range of -180° to +180°).
+ *                              to a range of -180 to +180 degrees).
  * ((const char **)response)[7] is concurrent services support indicator if
  *                              registered on a CDMA system 0-1.
  *                                   0 - Concurrent services not supported,
@@ -1138,14 +1210,8 @@ typedef struct {
  * ((const char **)response)[0] is registration state 0-5 from TS 27.007 10.1.20 AT+CGREG
  * ((const char **)response)[1] is LAC if registered or NULL if not
  * ((const char **)response)[2] is CID if registered or NULL if not
- * ((const char **)response)[3] indicates the available radio technology, where:
- *      0 == unknown
- *      1 == GPRS only
- *      2 == EDGE
- *      3 == UMTS
- *      9 == HSDPA
- *      10 == HSUPA
- *      11 == HSPA
+ * ((const char **)response)[3] indicates the available data radio technology,
+ *                              valid values as defined by RIL_RadioTechnology.
  *
  * LAC and CID are in hexadecimal format.
  * valid LAC are 0x0000 - 0xffff
@@ -1293,10 +1359,20 @@ typedef struct {
  *
  * Setup a packet data connection
  *
+ * The RIL is expected to:
+ *  - Create one data call context.
+ *  - Create and configure a dedicated interface for the context
+ *  - The interface must be point to point.
+ *  - The interface is configured with one or more addresses and
+ *    is capable of sending and receiving packets. The prefix length
+ *    of the addresses must be /32 for IPv4 and /128 for IPv6.
+ *  - Must NOT change the linux routing table.
+ *  - Support up to RIL_REQUEST_GPRS_REGISTRATION_STATE response[5]
+ *    number of simultaneous data call contexts.
+ *
  * "data" is a const char **
  * ((const char **)data)[0] indicates whether to setup connection on radio technology CDMA
  *                              or GSM/UMTS, 0-1. 0 - CDMA, 1-GSM/UMTS
- *
  * ((const char **)data)[1] is a RIL_DataProfile (support is optional)
  * ((const char **)data)[2] is the APN to connect to if radio technology is GSM/UMTS. This APN will
  *                          override the one in the profile. NULL indicates no APN overrride.
@@ -1307,27 +1383,26 @@ typedef struct {
  *                          1 => PAP may be performed; CHAP is never performed.
  *                          2 => CHAP may be performed; PAP is never performed.
  *                          3 => PAP / CHAP may be performed - baseband dependent.
+ * ((const char **)data)[6] is the PDP type to request if the radio technology is GSM/UMTS.
+ *                          Must be one of the PDP_type values in TS 27.007 section 10.1.1.
+ *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
  *
- * "response" is a char **
- * ((char **)response)[0] indicating PDP CID, which is generated by RIL. This Connection ID is
- *                          used in GSM/UMTS and CDMA
- * ((char **)response)[1] indicating the network interface name for GSM/UMTS or CDMA
- * ((char **)response)[2] indicating the IP address for this interface for GSM/UMTS
- *                          and NULL for CDMA
+ * "response" is a RIL_Data_Call_Response_v5
  *
  * FIXME may need way to configure QoS settings
  *
- * replaces  RIL_REQUEST_SETUP_DEFAULT_PDP
- *
  * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  SUCCESS should be returned on both success and failure of setup with
+ *  the RIL_Data_Call_Response_v5.status containing the actual status.
+ *  For all other errors the RIL_Data_Call_Resonse_v5 is ignored.
+ *
+ *  Other errors could include:
+ *    RADIO_NOT_AVAILABLE, GENERIC_FAILURE, OP_NOT_ALLOWED_BEFORE_REG_TO_NW,
+ *    OP_NOT_ALLOWED_DURING_VOICE_CALL and REQUEST_NOT_SUPPORTED.
  *
  * See also: RIL_REQUEST_DEACTIVATE_DATA_CALL
  */
 #define RIL_REQUEST_SETUP_DATA_CALL 27
-
 
 
 /**
@@ -1608,10 +1683,12 @@ typedef struct {
  * RIL_REQUEST_DEACTIVATE_DATA_CALL
  *
  * Deactivate packet data connection
- * replaces RIL_REQUEST_DEACTIVATE_DEFAULT_PDP
  *
  * "data" is const char **
  * ((char**)data)[0] indicating CID
+ * ((char**)data)[1] indicating Disconnect Reason
+ *                   0 => No specific reason specified
+ *                   1 => Radio shutdown requested
  *
  * "response" is NULL
  *
@@ -1954,7 +2031,7 @@ typedef struct {
  *
  * If the implementation does not have access to the exact cause codes,
  * then it should return one of the values listed in
- * RIL_LastDataCallActivateFailCause, as the UI layer needs to distinguish these
+ * RIL_DataCallFailCause, as the UI layer needs to distinguish these
  * cases for error notification
  * and potential retries.
  *
@@ -1964,7 +2041,7 @@ typedef struct {
  *  GENERIC_FAILURE
  *
  * See also: RIL_REQUEST_LAST_CALL_FAIL_CAUSE
- *
+ * TODO: Deprecate when v5 is completed.
  */
 
 #define RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE 56
@@ -1978,7 +2055,7 @@ typedef struct {
  * replaces RIL_REQUEST_PDP_CONTEXT_LIST
  *
  * "data" is NULL
- * "response" is an array of RIL_Data_Call_Response
+ * "response" is an array of RIL_Data_Call_Response_v5
  *
  * Valid errors:
  *  SUCCESS
@@ -3129,7 +3206,7 @@ typedef struct {
  * has been activated or deactivated
  * replaces RIL_UNSOL_PDP_CONTEXT_LIST_CHANGED
  *
- * "data" is an array of RIL_Data_Call_Response identical to that
+ * "data" is an array of RIL_Data_Call_Response_v5 identical to that
  * returned by RIL_REQUEST_DATA_CALL_LIST
  *
  * See also: RIL_REQUEST_DATA_CALL_LIST
