@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//8UI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-17T21:47:24Z",
+      "side": 1,
+      "message": "Do we need GSM here?",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//8UE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-17T21:47:24Z",
+      "side": 1,
+      "message": "It will be nice to have gateway here as well. Currently DHCP returns dns addresses and gateway and DHCP is triggered by RIL. Currently ril just sets a property for gateway and another for dns addresses and JAVA space reads the property to know these values. If you are hoping that the dns addresses will be returned by ril after SETUP_DATA_CALL, it seems logical to have the gateway also returned by this message.",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//8UA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1134,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-17T21:47:24Z",
+      "side": 1,
+      "message": "GSM is not covered by the enum. Do we need to add one for GSM as well?",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//8T8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1204,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-17T21:47:24Z",
+      "side": 1,
+      "message": "Can we change the name to DATA_REGISTRATION_STATE?",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//8To\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1365,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-17T21:47:24Z",
+      "side": 1,
+      "message": "What does this mean? point to point? If the interface returned is a IP network interface, the subnet defines the accessible IP addresses. Need not necessarily be Point-to-Point, right?",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//8T0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-17T21:47:24Z",
+      "side": 1,
+      "message": "This field has not been added to RIL_REQUEST_GPRS_REGISTRATION_STATE yet. Also ril/modem may not know how many simultaneous contexts it can support before hand.",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
