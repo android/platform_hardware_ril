@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//8Ls\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2011-01-18T20:51:05Z",
+      "side": 1,
+      "message": "Wink, addDefaultRoute() function in networkstatetracker is already making use of the gateway to setup default routes. It gets this from dataconnection.java when data call setup is complete.\n\n//DataConnection,.java\n                    gatewayAddress \u003d SystemProperties.get(prefix + \"gw\");\n                    dnsServers[0] \u003d SystemProperties.get(prefix + \"dns1\");\n                    dnsServers[1] \u003d SystemProperties.get(prefix + \"dns2\");\n\nIf we do not add gatewayAddress then that need to be obtained using properties again - which may not be what we want. \n\nyes, ipaddress/gateway might need to be coupled if that is the case.",
+      "parentUuid": "AAAA+3//8SE\u003d",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//8UA\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
