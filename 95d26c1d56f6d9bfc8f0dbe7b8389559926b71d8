@@ -162,6 +162,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//8IE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2011-01-18T22:18:30Z",
+      "side": 1,
+      "message": "Wink, gateway is not required. interface based routing should work in all cdma/gsm/wcdma/lte case. Its all essentially PPP. I like removing this, as it will clean up a bit in the higher layers. I dont see any issues so far.",
+      "parentUuid": "AAAA+3//8LI\u003d",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//8UA\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
