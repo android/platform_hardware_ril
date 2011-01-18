@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//8LY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2011-01-18T21:05:03Z",
+      "side": 1,
+      "message": "Actually, on second thought, you might be right. We may be able to get rid of the gateway from here. Let me double check.",
+      "parentUuid": "AAAA+3//8Ls\u003d",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//8UA\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
