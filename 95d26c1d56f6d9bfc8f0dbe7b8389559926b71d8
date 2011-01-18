@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//8NA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-18T21:57:49Z",
+      "side": 1,
+      "message": "I noticed that. But we never really need to know whether it was GSM or WCDMA for Voice earlier. For voice Android telephony only needs to know if it is 3GPP or 3GPP2. That is true even now.\n\nThis RIL_RadioTechnology filed in the response to the RIL_REQUEST_REGISTRATION_STATE message used to indicate data radio tech earlier. If we want to use it to indicate voice radio tech, then we probably need to introduce a tech family (3GPP/3GPP2) enum and use that or add GSM to this list for completion.",
+      "parentUuid": "AAAA+3//8R8\u003d",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//8UE\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
