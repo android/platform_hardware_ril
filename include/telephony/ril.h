@@ -1188,13 +1188,15 @@ typedef struct {
  *
  * Toggle radio on and off (for "airplane" mode)
  * "data" is int *
- * ((int *)data)[0] is > 0 for "Radio On"
- * ((int *)data)[0] is == 0 for "Radio Off"
+ * ((int *)data)[0] is == 0 for "Radio Off or Airplane Mode"
+ * ((int *)data)[0] is == 1 for "Radio On"
+ * ((int *)data)[0] is == 2 for "Phone Power Off"
  *
  * "response" is NULL
  *
- * Turn radio on if "on" > 0
- * Turn radio off if "on" == 0
+ * Turn radio off or airplane mode if "on" == 0
+ * Turn radio on if "on" == 1
+ * Turn Phone power off if "on" == 2
  *
  * Valid errors:
  *  SUCCESS
