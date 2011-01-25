@@ -55,6 +55,23 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//7qE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1005485
+      },
+      "writtenOn": "2011-01-25T11:07:04Z",
+      "side": 1,
+      "message": "For IPv6 is this supposed to be a Link-Local or public address?\n\nWhen 3GPP packet data connections are setup with IPv6, a Link-Local address is received en the control plane (or rather an Interface-ID). This Link-Local address is supposed to be used as local address during IPv6 Stateless Address Autoconfiguration (SAA) Procedure where the public prefix is received and one or more public IPv6 addresses are assigned.\n\nSee \"IP address allocation\" in 3GPP TS 24.301 and \"IPv6 Stateless Address Autoconfiguration\" in 3GPP TS 29.061. \n\nIf the RIL needs to return the public address, then it needs to delay this response until the network interface has finished the SAA Procedure...",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//8UE\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -285,6 +302,23 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//7qI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1368,
+      "author": {
+        "id": 1005485
+      },
+      "writtenOn": "2011-01-25T11:07:04Z",
+      "side": 1,
+      "message": "I guess you mean /64 for IPv6? Even Point-to-point links normally have /64 addresses in IPv6. This is also the case for but LinkLocal and public addresses received on 3GPP packet data connections.",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//8T0\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -314,6 +348,23 @@
       "side": 1,
       "message": "It will be coming before we\u0027re done. I\u0027d split some original work and this is the first piece so the comment is \"forward\" compatibile.",
       "parentUuid": "AAAA+3//8T0\u003d",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//7pw\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1405,
+      "author": {
+        "id": 1005485
+      },
+      "writtenOn": "2011-01-25T11:07:04Z",
+      "side": 1,
+      "message": "In general, how is RIL_REQUEST_SETUP_DATA_CALL supposed to work for the LTE (actually any 3GPP R8 network) default bearer procedure?\n\nThe default bearer is always established during the attach procedure (see 3GPP TS 24.301 \"Attach procedure\"). This means that there will probably exist a packet data connection before the first RIL_REQUEST_SETUP_DATA_CALL is issued.\n\nHow shall the RIL notify that a default bearer has been setup?\nHow shall the default bearer be associated with an APN configuration in Android?\nShall Android influence the setup parameters (APN, PDP type, etc) for the default bearer? If yes, then these needs to be configured before attach.",
       "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
