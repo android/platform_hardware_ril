@@ -368,6 +368,24 @@
       "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//7eg\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1405,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-01-26T23:11:19Z",
+      "side": 1,
+      "message": "One way to handle it is by having a configuration in the modem which will be used for default bearer. When the Apps processor does a SETUP_DATA_CALL, if the (APN, PDP type, etc) information matches the one that is already established the modem can return the parameters associated with that call. Otherwise, it will establish a new PDP connection.",
+      "parentUuid": "AAAA+3//7pw\u003d",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
