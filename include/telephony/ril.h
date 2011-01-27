@@ -328,7 +328,8 @@ typedef struct {
 typedef enum {
     RIL_CARDSTATE_ABSENT   = 0,
     RIL_CARDSTATE_PRESENT  = 1,
-    RIL_CARDSTATE_ERROR    = 2
+    RIL_CARDSTATE_ERROR    = 2,
+    RIL_CARDSTATE_INVALID  = 3
 } RIL_CardState;
 
 typedef enum {
