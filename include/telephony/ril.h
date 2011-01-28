@@ -96,6 +96,21 @@ typedef enum {
     RADIO_STATE_NV_READY = 9               /* Radio is on and the NV interface is available */
 } RIL_RadioState;
 
+typedef enum {
+    PREF_NET_TYPE_GSM_WCDMA                = 0, /* GSM/WCDMA (WCDMA preferred) */
+    PREF_NET_TYPE_GSM_ONLY                 = 1, /* GSM only */
+    PREF_NET_TYPE_WCDMA                    = 2, /* WCDMA  */
+    PREF_NET_TYPE_GSM_WCDMA_AUTO           = 3, /* GSM/WCDMA (auto mode, according to PRL) */
+    PREF_NET_TYPE_CDMA_EVDO_AUTO           = 4, /* CDMA and EvDo (auto mode, according to PRL) */
+    PREF_NET_TYPE_CDMA_ONLY                = 5, /* CDMA only */
+    PREF_NET_TYPE_EVDO_ONLY                = 6, /* EvDo only */
+    PREF_NET_TYPE_GSM_WCDMA_CDMA_EVDO_AUTO = 7, /* GSM/WCDMA, CDMA, and EvDo (auto mode, according to PRL) */
+    PREF_NET_TYPE_LTE_CDMA_EVDO            = 8, /* LTE, CDMA and EvDo */
+    PREF_NET_TYPE_LTE_GSM_WCDMA            = 9, /* LTE, GSM/WCDMA */
+    PREF_NET_TYPE_LTE_CMDA_EVDO_GSM_WCDMA  = 10, /* LTE, CDMA, EvDo, GSM/WCDMA */
+    PREF_NET_TYPE_LTE_ONLY                 = 11  /* LTE only */
+} RIL_PreferredNetworkType;
+
 /* User-to-User signaling Info activation types derived from 3GPP 23.087 v8.0 */
 typedef enum {
     RIL_UUS_TYPE1_IMPLICIT = 0,
@@ -513,11 +528,21 @@ typedef struct {
     int signalNoiseRatio; /* Valid values are 0-8.  8 is the highest signal to noise ratio. */
 } RIL_EVDO_SignalStrength;
 
+typedef struct {
+    int signalStrength;  /* Valid values are (0-31, 99) as defined in TS 27.007 8.5 */
+    int rsrp;            /* The current Reference Signal Receive Power in dBm.
+                          * Range: -44 to -140 dBm
+                          */
+    int rsrq;            /* The current Reference Signal Receive Quality in dB.
+                          * Range: -20 to-3 dB.
+                          */
+} RIL_LTE_SignalStrength;
 
 typedef struct {
     RIL_GW_SignalStrength   GW_SignalStrength;
     RIL_CDMA_SignalStrength CDMA_SignalStrength;
     RIL_EVDO_SignalStrength EVDO_SignalStrength;
+    RIL_LTE_SignalStrength  LTE_SignalStrength;
 } RIL_SignalStrength;
 
 /* Names of the CDMA info records (C.S0005 section 3.7.5) */
@@ -2334,16 +2359,7 @@ typedef struct {
  * Requests to set the preferred network type for searching and registering
  * (CS/PS domain, RAT, and operation mode)
  *
- * "data" is int *
- *
- * ((int *)data)[0] is == 0 for GSM/WCDMA (WCDMA preferred)
- * ((int *)data)[0] is == 1 for GSM only
- * ((int *)data)[0] is == 2 for WCDMA only
- * ((int *)data)[0] is == 3 for GSM/WCDMA (auto mode, according to PRL)
- * ((int *)data)[0] is == 4 for CDMA and EvDo (auto mode, according to PRL)
- * ((int *)data)[0] is == 5 for CDMA only
- * ((int *)data)[0] is == 6 for EvDo only
- * ((int *)data)[0] is == 7 for GSM/WCDMA, CDMA, and EvDo (auto mode, according to PRL)
+ * "data" is int * which is RIL_PreferredNetworkType
  *
  * "response" is NULL
  *
@@ -2364,14 +2380,7 @@ typedef struct {
  * "data" is NULL
  *
  * "response" is int *
- * ((int *)response)[0] is == 0 for GSM/WCDMA (WCDMA preferred)
- * ((int *)response)[0] is == 1 for GSM only
- * ((int *)response)[0] is == 2 for WCDMA only
- * ((int *)response)[0] is == 3 for GSM/WCDMA (auto mode, according to PRL)
- * ((int *)response)[0] is == 4 for CDMA and EvDo (auto mode, according to PRL)
- * ((int *)response)[0] is == 5 for CDMA only
- * ((int *)response)[0] is == 6 for EvDo only
- * ((int *)response)[0] is == 7 for GSM/WCDMA, CDMA, and EvDo (auto mode, according to PRL)
+ * ((int *)reponse)[0] is == RIL_PreferredNetworkType
  *
  * Valid errors:
  *  SUCCESS
