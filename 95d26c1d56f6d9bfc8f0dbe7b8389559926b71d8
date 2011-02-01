@@ -386,6 +386,24 @@
       "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//6s4\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1405,
+      "author": {
+        "id": 1005485
+      },
+      "writtenOn": "2011-02-01T16:43:29Z",
+      "side": 1,
+      "message": "Yes, I agree. It would be possible to match the PDN parameters in the vendor RIL and/or modem.\n\nBut perhaps there are some advantages of doing this \"matching\" in the Android framework. The Android framework has more knowledge than the RIL/modem of what kind of data call is being setup and can potentially do a more \"smart matching\".\n\nIt could also be that a default bearer is active notification from the RIL could be used as an input to switching between WLAN and Mobile networks.",
+      "parentUuid": "AAAA+3//7eg\u003d",
+      "revId": "95d26c1d56f6d9bfc8f0dbe7b8389559926b71d8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
