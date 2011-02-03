@@ -1425,6 +1425,7 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
 
         case RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC:
             at_send_command("AT+COPS=0", NULL);
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
             break;
 
         case RIL_REQUEST_DATA_CALL_LIST:
