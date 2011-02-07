@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5so\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-07T20:14:31Z",
+      "side": 1,
+      "message": "Historically the ril.cpp presented to the FW only the latest version, but things are so different here I decided to have the FW handle the differences. Thus the version is going up to the framework for SETUP_DATA_COMMAND. I\u0027ve uploaded other files which should answer specific questions.\n\nNote; I\u0027ve not yet added support for the new \"_v5\" structures here, in ril.h, to ril.cpp or reference-ril.cpp. But will be doing that this week, I hope.",
+      "parentUuid": "AAAA+3//5uA\u003d",
+      "revId": "d4e487eb7e9283262281c772effd8f7aeca96ab0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5tQ\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2011-02-07T19:07:50Z",
       "side": 1,
       "message": "Can we add AID to other SIM messages to handle multiple applications on the UICC card?",
+      "revId": "d4e487eb7e9283262281c772effd8f7aeca96ab0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5ss\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3400,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-07T20:14:31Z",
+      "side": 1,
+      "message": "Update with suggestions so they can be discussed.",
+      "parentUuid": "AAAA+3//5tQ\u003d",
       "revId": "d4e487eb7e9283262281c772effd8f7aeca96ab0",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
