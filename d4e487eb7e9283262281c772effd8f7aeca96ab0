@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//5uA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-07T19:07:50Z",
+      "side": 1,
+      "message": "How will frameworks handle ril\u0027s that support version 2 or 3. Will rild, convert the messages to version 5? Or do you think telephony would also know which ril version it is talking to and decode the message appropriately?",
+      "revId": "d4e487eb7e9283262281c772effd8f7aeca96ab0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5tQ\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3400,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-07T19:07:50Z",
+      "side": 1,
+      "message": "Can we add AID to other SIM messages to handle multiple applications on the UICC card?",
+      "revId": "d4e487eb7e9283262281c772effd8f7aeca96ab0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
