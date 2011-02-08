@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//5kc\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "typedef struct {\n    char             *aidPtr;    /* null terminated string, e.g., from 0xA0, 0x00\n                                    0x41, 0x30*/\n    char             *pin;\n} RIL_SimPin;\n\ntypedef struct {\n    char             *aidPtr;    /* null terminated string, e.g., from 0xA0, 0x00\n                                    0x41, 0x30*/\n    char             *puk;\n    char             *newPin;\n} RIL_SimPuk;\n\ntypedef struct {\n    char             *aidPtr;    /* null terminated string, e.g., from 0xA0, 0x00\n                                    0x41, 0x30*/\n    char             *pin;\n    char             *newPin;\n} RIL_SimPinSet;",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5kY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "char *aidPtr;   /* null terminated string, e.g., from 0xA0, 0x00\n                       0x41, 0x30. null for card files (outside the ADF)*/",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5kU\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "typedef struct\n{\n    char *aid_ptr;  /* null terminated string, e.g., from 0xA0, 0x00\n                       0x41, 0x30*/\n} RIL_RequestImsi;",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5kM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* \"data\" is const RIL_SimPin*",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5kQ\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* \"data\" is const RIL_SimPuk*\"",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5kI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* \"data\" is const RIL_SimPin*",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5kE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* \"data\" is const RIL_SimPuk*\"",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5kA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 880,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* \"data\" is const RIL_SimPinSet*",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5j8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 905,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* \"data\" is const RIL_SimPinSet*",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5j4\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 990,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* \"data\" is const RIL_RequestImsi *",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5j0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1813,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* ((const char **)data)[0] is the AID (applies only in case of FDN, or \"\" otherwise)\n * ((const char **)data)[1] is the facility string code from TS 27.007 7.4\n *                      (eg \"AO\" for BAOC, \"SC\" for SIM lock)\n * ((const char **)data)[2] is the password, or \"\" if not required\n * ((const char **)data)[3] is the TS 27.007 service class bit vector of\n *                           services to query",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5jg\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1840,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-08T21:06:11Z",
+      "side": 1,
+      "message": "* ((const char **)data)[0] \u003d AID (applies only in case of FDN, or \"\" otherwise)\n * ((const char **)data)[1] \u003d facility string code from TS 27.007 7.4\n * (eg \"AO\" for BAOC)\n * ((const char **)data)[2] \u003d \"0\" for \"unlock\" and \"1\" for \"lock\"\n * ((const char **)data)[3] \u003d password\n * ((const char **)data)[4] \u003d string representation of decimal TS 27.007\n *                            service class bit vector. Eg, the string\n *                            \"1\" means \"set this facility for voice services\"",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
