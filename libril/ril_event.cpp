@@ -319,6 +319,7 @@ void ril_event_del(struct ril_event * ev)
     MUTEX_ACQUIRE();
 
     if (ev->index < 0 || ev->index >= MAX_FD_EVENTS) {
+        MUTEX_RELEASE();
         return;
     }
 
