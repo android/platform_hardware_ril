@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA+3//5Yc\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Will EHRPD be added to this list?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5YY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Is this comment only for a successful data call? Wouldnt it be empty on data call fail?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5YU\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "How about other parameters like gw address? Should this be added here as well?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5kc\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -36,6 +87,57 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5YE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Should \"Data\" be changed to \"PS\" (Packet Switch)?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5YA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Should this be - no retry - because modem/framework does not know when UE will  be back in service. Once Framework sees UE back in service it can setup new call anyways?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5X8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 493,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Update comment to include ISIM as well",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5kU\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -47,6 +149,40 @@
       "writtenOn": "2011-02-08T21:06:11Z",
       "side": 1,
       "message": "typedef struct\n{\n    char *aid_ptr;  /* null terminated string, e.g., from 0xA0, 0x00\n                       0x41, 0x30*/\n} RIL_RequestImsi;",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5Xc\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Verizon\u0027s requirements are to use CQI\n\ntypedef struct {\n    int signalStrength; /* Valid values are (0-31, 99) as defined in TS 27.007 8.5 */\n    int rsrp; /* The current Reference Signal Receive Power in dBm\n               * multipled by -1. Range: 44 to 140 dBm */\n    int cqi; /* Valid values are (0-15, 99) 99 value indicates modem is in idle mode */\n} RIL_LTE_SignalStrength;",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5X4\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Should there be a request for pin operations on UPIN? seems to be missing.\n\nAlso, is there a need for AID For this and other SIM PIN or PIN type operations?",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -166,6 +302,74 @@
       "writtenOn": "2011-02-08T21:06:11Z",
       "side": 1,
       "message": "* \"data\" is const RIL_RequestImsi *",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5X0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "In general, should VOICE be replaced with CS(Circuit switch)? Since voice calls  are also possible on IMS or VoIP?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5Xw\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1477,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Add LTE in comments",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5Xs\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1489,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Add LTE in comments",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5Xo\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1794,
+      "author": {
+        "id": 1004214
+      },
+      "writtenOn": "2011-02-09T21:16:27Z",
+      "side": 1,
+      "message": "Is this cause sent while entering into Airplane Mode or Powering down the phone or both? We also have use cases where there is an IMS registration failure -- here per VZW requirements we are not to register on that PLMN again until T3402 Timer expires.",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
