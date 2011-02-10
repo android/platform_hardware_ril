@@ -369,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5MY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-10T18:40:11Z",
+      "side": 1,
+      "message": "Comment from our UIM expert:\nRIL knows if UPIN is used or not, so when Android does ENTER_SIM_PIN, we internally map it into verify pin for UPIN. So, we don\u0027t think there is a need for a new request. UPIN is rarely used on the market (personally, I haven\u0027t seen any card with UPIN, other than in lab!). Moreover Android does not have a full support for UPIN (possibility to replace PIN with UPIN) so it seems that current request is enough.",
+      "parentUuid": "AAAA+3//5QM\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5kM\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
