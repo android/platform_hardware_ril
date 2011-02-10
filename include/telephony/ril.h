@@ -3274,7 +3274,8 @@ typedef struct {
  * Called when new Broadcast SMS is received
  *
  * "data" can be one of the following:
- * If received from GSM network, "data" is const char of 88 bytes
+ * If received from GSM network, "data" is either const char of 56 bytes
+ * as coded in 3GPP 23.041 Section 9.4.1.3 or const char of 88 bytes
  * which indicates each page of a CBS Message sent to the MS by the
  * BTS as coded in 3GPP 23.041 Section 9.4.1.2.
  * If received from UMTS network, "data" is const char of 90 up to 1252
