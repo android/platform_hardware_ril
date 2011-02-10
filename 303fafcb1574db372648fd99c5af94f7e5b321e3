@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5P8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "Do we really need to enumerate so many options, what about LTE_AUTO and LTE_ONLY and drop the other LTE variants?",
+      "parentUuid": "AAAA+3//5Yc\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5YY\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5Qk\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "Yes this and the other fields would likely be empty or ignored most of the time. I could envision where fields might have valid contents on errors as mentioned for type above.",
+      "parentUuid": "AAAA+3//5YY\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5YU\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2011-02-09T21:16:27Z",
       "side": 1,
       "message": "How about other parameters like gw address? Should this be added here as well?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5Qg\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "At this time we don\u0027t believe the gateway is needed as the connections are point to point. We are having a conference call with Lorenzo and it necessary it could be added.",
+      "parentUuid": "AAAA+3//5YU\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -104,6 +158,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5Qc\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "I\u0027d like to be as generic as possible and Data is more generic to me.",
+      "parentUuid": "AAAA+3//5YE\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5YA\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -121,6 +193,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5QY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "AAAA+3//5YA\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5X8\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -132,6 +222,24 @@
       "writtenOn": "2011-02-09T21:16:27Z",
       "side": 1,
       "message": "Update comment to include ISIM as well",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5QU\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 493,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "AAAA+3//5X8\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -172,6 +280,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5QQ\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "Will it be acceptable to include both rsrq and cqi?\n\nI see in 27.007 8.5 there is also bit error rate (ber), are there any other important values?\n\nWhat document defines rsrp \u0026 cqi?",
+      "parentUuid": "AAAA+3//5Xc\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5X4\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -183,6 +309,24 @@
       "writtenOn": "2011-02-09T21:16:27Z",
       "side": 1,
       "message": "Should there be a request for pin operations on UPIN? seems to be missing.\n\nAlso, is there a need for AID For this and other SIM PIN or PIN type operations?",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5QM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "I believe Alex\u0027s comments are covering the need for the AID.\n\nAlex or other experts, opinion on UPIN operations?",
+      "parentUuid": "AAAA+3//5X4\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -325,6 +469,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5QI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "Possibly, but I think VOICE is clear enough, but if others want CS or some other term, fine with me.",
+      "parentUuid": "AAAA+3//5X0\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5Xw\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -336,6 +498,24 @@
       "writtenOn": "2011-02-09T21:16:27Z",
       "side": 1,
       "message": "Add LTE in comments",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5P4\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1477,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "Maybe we deprecate data[0] and add data[7] which could be a \"properties\" string for specifying things like bandwidth, QOS and preferred network. The properties could be simple space separated entities or name value pairs or ...\n\nSuggestions or other ideas?",
+      "parentUuid": "AAAA+3//5Xw\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -359,6 +539,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5QE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1489,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "Will reword probably \"is the connection type to request and must be ....\".",
+      "parentUuid": "AAAA+3//5Xs\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5Xo\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -370,6 +568,24 @@
       "writtenOn": "2011-02-09T21:16:27Z",
       "side": 1,
       "message": "Is this cause sent while entering into Airplane Mode or Powering down the phone or both? We also have use cases where there is an IMS registration failure -- here per VZW requirements we are not to register on that PLMN again until T3402 Timer expires.",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5QA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1794,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-10T05:40:40Z",
+      "side": 1,
+      "message": "Either to keep it simple.\n\nAs for IMS registration failure I would assume the ril should be hiding as many of these operator specific requirements as possible from the FW hence I don\u0027t see the need for additional specificity. But if others feel differently please speak up.",
+      "parentUuid": "AAAA+3//5Xo\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
