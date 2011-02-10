@@ -37,6 +37,42 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5PU\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-10T08:49:00Z",
+      "side": 1,
+      "message": "LTE_AUTO may not work if the modem supports all technologies and you want to specify that you dont want UMTS and GSM.",
+      "parentUuid": "AAAA+3//5P8\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5PY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-10T08:49:00Z",
+      "side": 1,
+      "message": "EHRPD is basically EVDO on the radio interface layer and a different backbone. If modem supports EHRPD, when a mode that includes EVDO is chosen, modem and the network will  automatically negotiate EVDO/EHRPD. Do you see any value in explicitly adding EHRPD as a user configurable setting. If you want to turn off EHRPD, can it be done directly in the modem using an NV item?",
+      "parentUuid": "AAAA+3//5Yc\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5YY\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
