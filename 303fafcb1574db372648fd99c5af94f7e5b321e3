@@ -247,6 +247,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5Nk\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2011-02-11T19:18:20Z",
+      "side": 1,
+      "message": "yes. Retry not needed here.",
+      "parentUuid": "AAAA+3//5QY\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5X8\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -570,6 +588,42 @@
       "side": 1,
       "message": "Maybe we deprecate data[0] and add data[7] which could be a \"properties\" string for specifying things like bandwidth, QOS and preferred network. The properties could be simple space separated entities or name value pairs or ...\n\nSuggestions or other ideas?",
       "parentUuid": "AAAA+3//5Xw\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5FU\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1477,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2011-02-11T19:18:20Z",
+      "side": 1,
+      "message": "I suggest making this generic and putting in the RIL_RadioTechnology parameter as the first argument here. This will help avoid race conditions like below.\n\n1. modem camped on LTE. \n2. data registration message received by android with LTE.\n3. modem camped on 1x or something else..\n4. SETUP_DATA_CALL is issued with LTE parameters (android didnt yet get 3)\n5. SETUP_DATA_CALL can be failed here with because tech field mismatches..\n6. data registration message received by android with 1x \n7, SETUP_DATA_CALL is issued with 1x parameters.\n8. SETUP_DATA_CALL successful.",
+      "parentUuid": "AAAA+3//5Xw\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5Fw\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1477,
+      "author": {
+        "id": 1004120
+      },
+      "writtenOn": "2011-02-11T19:18:20Z",
+      "side": 1,
+      "message": "Having a generic name/value pair based message passing mechanism sounds good for QOS/bandwidth reqs later. May be we can add a generic parameter for this..and design the specifics of this later?",
+      "parentUuid": "AAAA+3//5P4\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
