@@ -352,6 +352,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//4+Y\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-12T01:45:16Z",
+      "side": 1,
+      "message": "The earlier verizon spec did mention that we need to use CQI. But the newer spec DEVICE REQUIREMENTS LTE DATA DEVICES, VERSION 11.0 seems to suggest that we need to use \"LTE reference signal signal-to-noise ratio (RS_SNR)\"",
+      "parentUuid": "AAAA+3//5QQ\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5X4\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
