@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//5EM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-12T02:19:43Z",
+      "side": 1,
+      "message": "So I\u0027m deleting the the question.",
+      "parentUuid": "AAAA+3//5PY\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//5YY\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "At this time we don\u0027t believe the gateway is needed as the connections are point to point. We are having a conference call with Lorenzo and it necessary it could be added.",
       "parentUuid": "AAAA+3//5YU\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5EI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-12T02:19:43Z",
+      "side": 1,
+      "message": "Adding gateways.",
+      "parentUuid": "AAAA+3//5Qg\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -642,6 +678,24 @@
       "side": 1,
       "message": "Having a generic name/value pair based message passing mechanism sounds good for QOS/bandwidth reqs later. May be we can add a generic parameter for this..and design the specifics of this later?",
       "parentUuid": "AAAA+3//5P4\u003d",
+      "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//5Do\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1477,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-12T02:19:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAA+3//5FU\u003d",
       "revId": "303fafcb1574db372648fd99c5af94f7e5b321e3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
