@@ -69,6 +69,24 @@
       "revId": "17983d4c9e34ffce3c8168043b970a1a06723341",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//418\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-14T23:00:57Z",
+      "side": 1,
+      "message": "Document that describes what to use for signal strength on LTE for verizon is \"DEVICE REQUIREMENTS LTE DATA DEVICES VERSION 11.0\"\n\nRSRP, RSRQ and RS_SNR should be described in TS 36.214 Physical Layer Section 5.1.3 or TS 36.331 RRC",
+      "parentUuid": "AAAA+3//42k\u003d",
+      "revId": "17983d4c9e34ffce3c8168043b970a1a06723341",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
