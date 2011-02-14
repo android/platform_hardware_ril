@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//43o\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-14T20:19:35Z",
+      "side": 1,
+      "message": "I thought we decided that we dont need gateways",
+      "revId": "17983d4c9e34ffce3c8168043b970a1a06723341",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//43c\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-02-14T20:19:35Z",
+      "side": 1,
+      "message": "May have to add RS_SNR as per latest Verizon spec.",
+      "revId": "17983d4c9e34ffce3c8168043b970a1a06723341",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
