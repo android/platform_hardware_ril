@@ -16,6 +16,24 @@
       "revId": "8793230e7d1f484a4a70afac31acb0e6ab29dc65",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//4TQ\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 639,
+      "author": {
+        "id": 1005304
+      },
+      "writtenOn": "2011-02-18T02:14:18Z",
+      "side": 1,
+      "message": "The 3GPP2 standard for RUIM cards specifies multiple user profiles for requesting for different services (like MMS, LBS etc) and each of these have a set of parameters associated with them. The profile ID is a number that uniquely identifies this profile. \n\nThe framework will request for all the profiles for a particular service type (e.g. MMS, LBS etc) and the profile ID\u0027S returned by the modem/UIM-cards has to be saved. When the particular service is requested the profile is chosen from the saved list (arbitrated using priorities if there are multiple profiles).",
+      "parentUuid": "AAAA+3//4V8\u003d",
+      "revId": "8793230e7d1f484a4a70afac31acb0e6ab29dc65",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
