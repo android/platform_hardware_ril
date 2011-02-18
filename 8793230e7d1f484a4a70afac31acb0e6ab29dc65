@@ -34,6 +34,24 @@
       "revId": "8793230e7d1f484a4a70afac31acb0e6ab29dc65",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//4Sk\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 639,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-18T05:16:51Z",
+      "side": 1,
+      "message": "Whats the advantage of exposing these profile ids/priority pairs to the framework, why not just pass the \"particular service type\" (as an \"apn\" maybe) and have the \"vendor ril\" do the mapping to the profile id?",
+      "parentUuid": "AAAA+3//4TQ\u003d",
+      "revId": "8793230e7d1f484a4a70afac31acb0e6ab29dc65",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
