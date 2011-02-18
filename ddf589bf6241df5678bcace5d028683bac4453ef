@@ -16,6 +16,40 @@
       "revId": "ddf589bf6241df5678bcace5d028683bac4453ef",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//4RI\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1002951
+      },
+      "writtenOn": "2011-02-18T07:57:49Z",
+      "side": 1,
+      "message": "How would you return the exact cause code? There are many more cause codes defined but typically filtered out at the modem layer even though the application layer needs to know about them on several markets.",
+      "revId": "ddf589bf6241df5678bcace5d028683bac4453ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//4Q8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 657,
+      "author": {
+        "id": 1002951
+      },
+      "writtenOn": "2011-02-18T07:57:49Z",
+      "side": 1,
+      "message": "Could we add the RSCP and Ec/No for UMTS also?",
+      "revId": "ddf589bf6241df5678bcace5d028683bac4453ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
