@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//4SE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-18T07:44:46Z",
+      "side": 1,
+      "message": "Talked with Lorenzo and he pointed out that if gateways are provided than each of the addresses must have a netmask. I will add to the documentation that the netmask will be defined by using \"address/prefix\" notation. For example \"192.0.1.3/24\" or \"2001:db8::1/64\".",
+      "revId": "ddf589bf6241df5678bcace5d028683bac4453ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
