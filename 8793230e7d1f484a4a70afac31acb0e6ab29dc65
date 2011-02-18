@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//4V8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 639,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-18T00:28:58Z",
+      "side": 1,
+      "message": "Where are these profile ID\u0027s defined, how is the framework supposed to select from them?",
+      "revId": "8793230e7d1f484a4a70afac31acb0e6ab29dc65",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
