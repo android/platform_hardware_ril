@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//4Hw\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1002951
+      },
+      "writtenOn": "2011-02-21T07:20:25Z",
+      "side": 1,
+      "message": "It is not only the issue of retry or not, it is also important to be able to have detailed and exact error messages in the UI. For some it is not enough with a generic barred error code.",
+      "parentUuid": "AAAA+3//4OY\u003d",
+      "revId": "ddf589bf6241df5678bcace5d028683bac4453ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//4Q8\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 5
