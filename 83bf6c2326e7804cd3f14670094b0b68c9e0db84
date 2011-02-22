@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//37g\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-22T22:58:09Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "AAAA+3//38k\u003d",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//38w\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2011-02-22T19:22:38Z",
       "side": 1,
       "message": "It might be good to specify that AID is required only for FDN case",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//37I\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1831,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-22T22:58:09Z",
+      "side": 1,
+      "message": "OK, Is this correct:\n\n   This is only applicable in the case of Fixed Dialing Numbers (FDN) requests.",
+      "parentUuid": "AAAA+3//38w\u003d",
       "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//37E\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1861,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-22T22:58:09Z",
+      "side": 1,
+      "message": "OK using wording as above.",
+      "parentUuid": "AAAA+3//38s\u003d",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//384\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 7
@@ -64,6 +118,24 @@
       "writtenOn": "2011-02-22T19:21:33Z",
       "side": 1,
       "message": "In case of FILE_UPDATE, we need to pass both the EFID and the AID... otherwise Android does not know in which application the file was refreshed.",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//37A\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 3419,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-22T22:58:09Z",
+      "side": 1,
+      "message": "If we send both are they mutually exclusive or could both need refreshing?",
+      "parentUuid": "AAAA+3//384\u003d",
       "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//354\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2065,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-22T22:58:09Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "AAAA+3//38Q\u003d",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//38E\u003d",
         "filename": "libril/ril.cpp",
         "patchSetId": 7
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA+3//350\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2078,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-22T22:58:09Z",
+      "side": 1,
+      "message": "Fixing, txs",
+      "parentUuid": "AAAA+3//38E\u003d",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//38M\u003d",
         "filename": "libril/ril.cpp",
         "patchSetId": 7
@@ -115,6 +223,24 @@
       "writtenOn": "2011-02-22T19:39:17Z",
       "side": 1,
       "message": "If it is v5 structure - then num_applications will have different offset.",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//35w\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2079,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-02-22T22:58:09Z",
+      "side": 1,
+      "message": "Yes again, will fix.",
+      "parentUuid": "AAAA+3//38M\u003d",
       "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
