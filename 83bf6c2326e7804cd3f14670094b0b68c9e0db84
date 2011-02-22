@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA+3//38w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1831,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-22T19:22:38Z",
+      "side": 1,
+      "message": "It might be good to specify that AID is required only for FDN case",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//38s\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1861,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-22T19:22:38Z",
+      "side": 1,
+      "message": "It might be good to specify that AID is required only for FDN case",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//384\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 7
