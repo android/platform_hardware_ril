@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA+3//38k\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-22T19:39:17Z",
+      "side": 1,
+      "message": "Shouldn\u0027t it be v6 now?",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA+3//38w\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 7
@@ -47,6 +64,57 @@
       "writtenOn": "2011-02-22T19:21:33Z",
       "side": 1,
       "message": "In case of FILE_UPDATE, we need to pass both the EFID and the AID... otherwise Android does not know in which application the file was refreshed.",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//38Q\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2065,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-22T19:39:17Z",
+      "side": 1,
+      "message": "This could be v5 structure, right?",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//38E\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2078,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-22T19:39:17Z",
+      "side": 1,
+      "message": "You write cdma_subscription_app_index twice. (the other one is on line 2070)",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//38M\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2079,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-22T19:39:17Z",
+      "side": 1,
+      "message": "If it is v5 structure - then num_applications will have different offset.",
       "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
