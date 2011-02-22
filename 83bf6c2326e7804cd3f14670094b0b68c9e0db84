@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA+3//384\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 3419,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-02-22T19:21:33Z",
+      "side": 1,
+      "message": "In case of FILE_UPDATE, we need to pass both the EFID and the AID... otherwise Android does not know in which application the file was refreshed.",
+      "revId": "83bf6c2326e7804cd3f14670094b0b68c9e0db84",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
