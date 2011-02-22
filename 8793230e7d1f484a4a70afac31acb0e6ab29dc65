@@ -52,6 +52,24 @@
       "revId": "8793230e7d1f484a4a70afac31acb0e6ab29dc65",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA+3//394\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 639,
+      "author": {
+        "id": 1005304
+      },
+      "writtenOn": "2011-02-22T18:58:34Z",
+      "side": 1,
+      "message": "The OMH standard (docs at: http://www.cdg.org/devices/omh/resources/documents.asp) specifies many features/functionalities. The support of these features in the frameworks would help in providing this feature to various devices and modem implementations. OMH Testing would be limited to a one time frameworks level testing and only the RIL API testing would have to be performed for various underlying modem/RIL implementations. This would reduce the time/effort for feature testing for various OEMs/vendors.\n\nOne of these features is \u0027multiple user profile arbitration\u0027 where the priority for each of the profiles will be used to select the right profile (for data calls). The parameter details of the profiles will be in the RUIM card and stays within the modem space but for arbitration logic, only a unique value (of a \"apn\" or a ID) and its priority needs to be exposed. The ID was chosen to make it a simple \u0027int\u0027 as a key to the list of profiles that may be present in the card.",
+      "parentUuid": "AAAA+3//4Sk\u003d",
+      "revId": "8793230e7d1f484a4a70afac31acb0e6ab29dc65",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
