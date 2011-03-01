@@ -4,10 +4,6 @@
 
 LOCAL_PATH:= $(call my-dir)
 
-ifeq ($(TARGET_ARCH),arm)
-
-# Mock-ril only buid for debug variants
-ifneq ($(filter userdebug eng tests, $(TARGET_BUILD_VARIANT)),)
 
 include $(CLEAR_VARS)
 
@@ -24,6 +20,11 @@ gen_src_cpp=$(src_generated)/cpp
 gen_src_java=$(src_generated)/java
 gen_src_py=$(src_generated)/python
 gen_src_desc=$(src_generated)/desc
+
+ifeq ($(TARGET_ARCH),arm)
+
+# Mock-ril only builds for debug variants
+ifneq ($(filter userdebug eng tests, $(TARGET_BUILD_VARIANT)),)
 
 LOCAL_SRC_FILES:= \
     $(src_cpp)/ctrl_server.cpp \
@@ -89,7 +90,8 @@ LOCAL_MODULE := librilproto-java
 
 LOCAL_STATIC_JAVA_LIBRARIES := libprotobuf-java-2.3.0-micro
 
-LOCAL_SRC_FILES := $(call all-java-files-under, $(src_java) $(gen_src_java))
+LOCAL_SRC_FILES := $(call all-java-files-under, $(src_java))
+LOCAL_SRC_FILES += $(call all-java-files-under, $(gen_src_java))
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
 # =======================================================
