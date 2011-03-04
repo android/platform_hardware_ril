@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/H///YY\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 2088,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-03-04T21:46:58Z",
+      "side": 1,
+      "message": "Why are we checking if responselen is a sizeof a pointer? Doesn\u0027t responselen instead tells us size of the structure the pointer points to?\nRIL_SIM_IO also returns pointer to a structure but it checks for structure size there instead of pointer size.",
+      "revId": "b6b4f0fee7cb532eaae8e2553d5922121c7d98b2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
