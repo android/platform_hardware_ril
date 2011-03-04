@@ -16,6 +16,24 @@
       "revId": "b6b4f0fee7cb532eaae8e2553d5922121c7d98b2",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/H///W8\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 2088,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-03-04T23:11:34Z",
+      "side": 1,
+      "message": "Because thats what was being used before. I just changed it to assume there was one pointer. Its not a very good convention but didn\u0027t feel a big need to change it.",
+      "parentUuid": "AAAA/H///YY\u003d",
+      "revId": "b6b4f0fee7cb532eaae8e2553d5922121c7d98b2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
