@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA/H///EQ\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-03-08T18:27:11Z",
+      "side": 1,
+      "message": "We also need to pass AID to know which specific file got updated. (see my comment on line 3423)",
+      "revId": "b6b4f0fee7cb532eaae8e2553d5922121c7d98b2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/H///EM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-03-08T18:27:11Z",
+      "side": 1,
+      "message": "data[1] is int *.",
+      "revId": "b6b4f0fee7cb532eaae8e2553d5922121c7d98b2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/H///EU\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 3423,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2011-03-08T18:27:11Z",
+      "side": 1,
+      "message": "Sorry, but I don\u0027t really understand your previous comment (regarding mutual exclusion). My understanding is that a set of aid and ef_id point to specific file on the card. (just file is not enough since there are some files that are present in multiple aids but have different content)\nAnother problem here is that we can\u0027t pass aid as int *. AID is a string.",
+      "revId": "b6b4f0fee7cb532eaae8e2553d5922121c7d98b2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/H///YY\u003d",
         "filename": "libril/ril.cpp",
         "patchSetId": 8
