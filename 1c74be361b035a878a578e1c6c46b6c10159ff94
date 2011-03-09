@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/H//++o\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 3423,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-03-09T16:53:03Z",
+      "side": 1,
+      "message": "Alex,\n\nTo have this method mix int\u0027s and stings we may want to change this to use a struct, but in any case we need to be backwards compatible.\n\nCould you make a concrete proposal by uploading a patch set?",
+      "revId": "1c74be361b035a878a578e1c6c46b6c10159ff94",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
