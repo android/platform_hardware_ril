@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/H//+s0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 1278,
+      "author": {
+        "id": 1004920
+      },
+      "writtenOn": "2011-03-11T01:22:41Z",
+      "side": 1,
+      "message": "Some of these registration failed causes are mapped twice. \nAlso there might be more denied reasons beyond these. \nThis might cause confusion. \nCan we just remove all these call denied reasons \nand have the comment to refer to spec\n3GPP TS 24.008 10.5.3.6 and Annex G.?",
+      "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
