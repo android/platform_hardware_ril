@@ -16,6 +16,24 @@
       "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/H//+sY\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 1278,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-03-11T01:41:44Z",
+      "side": 1,
+      "message": "Sounds like a good suggestion to me, I assume we\u0027d do the same thing for RIL_REQUEST_DATA_REGISTRATION below.\n\nOther opinions?",
+      "parentUuid": "AAAA/H//+s0\u003d",
+      "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
