@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA/X///Mc\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-03-21T18:53:42Z",
+      "side": 1,
+      "message": "Can someone provide a document reference for these values?",
+      "parentUuid": "AAAA/X///NA\u003d",
+      "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/X///M8\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2011-03-21T18:36:22Z",
       "side": 1,
       "message": "Valid range recommendation -20dB to + 30dB. Invalid value 255",
+      "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/X///M0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-03-21T18:53:42Z",
+      "side": 1,
+      "message": "Document reference?\n\nAlso it would be nice if we could use one value that might in INVALID for all of the fields, how about INT_MAX aka 0x7FFFFFFF?",
+      "parentUuid": "AAAA/X///M8\u003d",
       "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
