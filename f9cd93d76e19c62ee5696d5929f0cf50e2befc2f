@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAA/X///NA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1004677
+      },
+      "writtenOn": "2011-03-21T18:36:22Z",
+      "side": 1,
+      "message": "Defining an invalid value will let telephony know that rsrp is not valid and rsrp should be ignored for signal strength determination",
+      "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/X///M8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 1004677
+      },
+      "writtenOn": "2011-03-21T18:36:22Z",
+      "side": 1,
+      "message": "Valid range recommendation -20dB to + 30dB. Invalid value 255",
+      "revId": "f9cd93d76e19c62ee5696d5929f0cf50e2befc2f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/H//+s0\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 11
