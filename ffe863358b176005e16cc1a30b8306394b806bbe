@@ -87,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA/n///6s\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-04-04T22:29:45Z",
+      "side": 1,
+      "message": "The RIL interface is common to pre-release 8 and 3gpp2 as well. I believe EVDO supports requesting QoS during call setup. Id prefer that we leave it in there for now",
+      "parentUuid": "AAAA/n///+0\u003d",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/n///+w\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
