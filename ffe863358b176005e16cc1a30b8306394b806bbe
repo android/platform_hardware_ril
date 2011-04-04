@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/n////I\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-04T13:35:29Z",
+      "side": 1,
+      "message": "Do you expect IPv6 link-local or public IP addresses here? If you specify what you expect, you implicitly also give direction on where the IPv6 auto-configuration must be managed: in the telephony framework, or by the RILd or modem.",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n////M\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-04T13:35:29Z",
+      "side": 1,
+      "message": "Shouldn’t this be /64 for IPv6?  Point-to-point links normally have /64 addresses in IPv6. This is also the case for LinkLocal and public address received on 3GPP packet data connections. (This issue was raised for the v1 patch by Harald Johansen STE).",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///+8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-04T13:35:29Z",
+      "side": 1,
+      "message": "For IMS the IMS Application needs to know the SIP Signaling Proxy. This must be read from the dynamic data in the PDN Connection, and should be added in order to support IMS.\nThe pcscf addresses should be a list of IPv4/IPv6 addresses or domain names.",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///+4\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1525,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-04T13:35:29Z",
+      "side": 1,
+      "message": "In future support for IMS Emergency Call is needed. If RIL_REQUEST_SETUP_DATA_CALL is to be used to setup the IMS Emergency Bearer, a flag is needed to indicate this.\nHowever a separate Request function might be a better solution in this case.",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///+0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-04T13:35:29Z",
+      "side": 1,
+      "message": "I think this FIXME can be removed. In 3GPP Release 8 configuring QoS from the UE is no longer supported, the network will initiate setup of dedicated bearers.\nHowever reading the QoS setting is needed for the IMS Preconditions.",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///+w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 3354,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-04T13:35:29Z",
+      "side": 1,
+      "message": "In LTE the combined attach and activation procedure will initiate an Initial Default PDN Connection. Should this Unsolicited Response be used to report the initial PDN Connection to the telephony framework?",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}

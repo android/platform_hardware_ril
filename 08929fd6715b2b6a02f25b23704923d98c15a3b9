@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/n////A\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-04T13:35:29Z",
+      "side": 0,
+      "message": "I not sure removing the APN is a good idea, in LTE Networks the APN name may prove useful.\n\nThere is a conceptual change in LTE, where the combined attach\nand activation procedure always will result in an active PDN Connection. Normally the ME will use an empty APN name in the combined procedure and allow the network to select the APN.\n\nThe RIL can deal with this initial PDN connection in a number of ways, ranging from ignoring it completely\nto fully incorporate the concept of this automatic initial PDN Connection.\n\nI opt for reporting this initial PDN Connection to framework using\nRIL_UNSOL_DATA_CALL_LIST_CHANGED and let the telephony framework decide how to use it. IMHO the telephony\nframework is the right place to decide how to use the initial PDN. This is where information about APN names, connection states, roaming etc\nis available.\n\nThe telephony framework could use the APN name reported in\nRIL_Data_Call_Response to decide how to use this automatically activated PDN Connection. The APN name is needed to recognize the initial PDN Connection.\nThe APN name should be checked with well known names and matched to the ApnList.",
+      "revId": "08929fd6715b2b6a02f25b23704923d98c15a3b9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
