@@ -37,6 +37,8 @@
 
 #include "ril.h"
 #include "hardware/qemu_pipe.h"
+#include <cutils/properties.h>
+
 
 #define LOG_TAG "RIL"
 #include <utils/Log.h>
@@ -2908,6 +2910,111 @@ static void onUnsolicited (const char *s, const char *sms_pdu)
 #ifdef WORKAROUND_FAKE_CGEV
         RIL_requestTimedCallback (onDataCallListChanged, NULL, NULL); //TODO use new function
 #endif /* WORKAROUND_FAKE_CGEV */
+    } else if(strStartsWith(s,"+STK:")) {
+
+        int nSTKCmd = 0;
+        char *response = NULL;
+        char *str;
+        int nEvent = RIL_UNSOL_STK_PROACTIVE_COMMAND;
+        line = strdup(s);
+        err = at_tok_start(&line);
+        if (err < 0) {
+            ALOGE("Error ::: bailing out %d\n ", err);
+        }
+
+        int err = at_tok_nextint(&line, &nSTKCmd);
+        //err = at_tok_nextstr(&line, &str);
+        if (err < 0) {
+            ALOGE("Error :: bailing out %d\n ", err);
+        }
+        ALOGE("STK Command %d \n", nSTKCmd);
+        /*
+         * TBD: To make the case labels more meaningful and more orderly,
+         * instead of plain numbers.
+         * Reference TS for following payloads : 3GPP TS 31.124 v9.2.0
+        */
+        switch (nSTKCmd) {
+            case 0:
+                // SETUP MENU
+                response = strdup("D03B810301258082028182850C546F6F6C6B6974204D656E758F07014974656D20318F07024974656D20328F07034974656D20338F07044974656D2034");
+                break;
+            case 1:
+                // IDLE MODE TEXT 1.1.1
+                response = strdup("D01A8103012800820281828D0F0449646C65204D6F64652054657874");
+                break;
+            case 2:
+                // DISPLAY TEXT 1.4.1
+                response = strdup("D01A8103012180820281028D0F04546F6F6C6B697420546573742031");
+                break;
+            case 3:
+                // DISPLAY TEXT SEQ 1.2
+                response = strdup("D01A8103012180820281028D0F04546F6F6C6B697420546573742031");
+                break;
+            case 4:
+                // DISPLAY TEXT SEQ 1.3
+                response = strdup("D01A8103012181820281028D0F04546F6F6C6B697420546573742032");
+                break;
+            case 5:
+                // SEND DTMF
+                response = strdup("D01C810301140082028183850953656E642044544D46AC02C1F29E020101");
+                nEvent = RIL_UNSOL_STK_EVENT_NOTIFY;
+                break;
+            case 6:
+                // GETINKEY 7.1.1
+                response = strdup("D0158103012280820281828D0A04456E74657220222B22");
+                break;
+            case 7:
+                // DISPLAY TEXT 7.1.1
+                response = strdup("D01C8103012180820281028D110448656C7020696E666F726D6174696F6E");
+                break;
+            case 8:
+                //GETINKEY 7.1.2
+                response = strdup("D0158103012280820281828D0A04456E74657220222B22");
+                break;
+            case 9:
+                //27.22.4.22.2 SET UP IDLE MODE TEXT SEQ 2.4
+                response = strdup("D00F8103012800820281828D009E020101");
+                break;
+            case 10:
+                //Remove Idle screen 1.3
+                response = strdup("D00B8103012800820281828D00");
+                break;
+            case 11:
+                //SET UP IDLE MODE TEXT 2.1.1
+                response = strdup("D0198103012800820281828D0A0449646C6520746578749E020001");
+                break;
+            case 12:
+                //SET UP IDLE MODE TEXT 2.2.1A
+                response = strdup("D0198103012800820281828D0A0449646C6520746578749E020101");
+                break;
+            case 13:
+                // 27.22.4.26.2 LAUNCH BROWSER SEQ 2.3
+                response = strdup("D00B8103011500820281823100");
+                break;
+            case 14:
+                // PROVILE LOCAL INFO: Qualifier is LANG SETTING
+                response = strdup("D009810301260482028182");
+                break;
+            case 15:
+                //LAUNCH BROWSER 1.2.1
+                response = strdup("D01F8103011500820281823112687474703A2F2F7878782E7979792E7A7A7A0500");
+                break;
+            case 100:
+                // SESSION END
+                RIL_onUnsolicitedResponse (RIL_UNSOL_STK_SESSION_END,
+                                       NULL, 0);
+                break;
+            default:
+                ALOGE("Error: Wrong STK CMD option %d\n ", err);
+                break;
+        }
+        if(NULL != response) {
+            RIL_onUnsolicitedResponse (nEvent, //RIL_UNSOL_STK_PROACTIVE_COMMAND,
+                                       response, strlen(response));
+        } else {
+            ALOGE("Error: Something wrong with response string...");
+        }
+        free(line);
     } else if (strStartsWith(s,"+CREG:")
                 || strStartsWith(s,"+CGREG:")
     ) {
