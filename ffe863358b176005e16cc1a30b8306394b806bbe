@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA/n///5o\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-04T23:44:34Z",
+      "side": 1,
+      "message": "On first blush this feels like a something that the SIP \"application\" should handle and not something generic to a connection. Reading this, http://en.wikipedia.org/wiki/IP_Multimedia_Subsystem, I also see that there are \"I-CSCF\" and \"S-CSCF\". Would these be needed as well, or maybe I\u0027ve got the wrong \"P-CSCF\"?",
+      "parentUuid": "AAAA/n///+8\u003d",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/n///+4\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -64,6 +82,24 @@
       "writtenOn": "2011-04-04T13:35:29Z",
       "side": 1,
       "message": "In future support for IMS Emergency Call is needed. If RIL_REQUEST_SETUP_DATA_CALL is to be used to setup the IMS Emergency Bearer, a flag is needed to indicate this.\nHowever a separate Request function might be a better solution in this case.",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///50\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1525,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-04T23:44:34Z",
+      "side": 1,
+      "message": "Can this be handled by as a \"connection property\"?",
+      "parentUuid": "AAAA/n///+4\u003d",
       "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -105,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA/n///5w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-04T23:44:34Z",
+      "side": 1,
+      "message": "Will leave in the FIXME, I\u0027m hoping QoS can be handled as a \"connection property\".",
+      "parentUuid": "AAAA/n///6s\u003d",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/n///+w\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -116,6 +170,24 @@
       "writtenOn": "2011-04-04T13:35:29Z",
       "side": 1,
       "message": "In LTE the combined attach and activation procedure will initiate an Initial Default PDN Connection. Should this Unsolicited Response be used to report the initial PDN Connection to the telephony framework?",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///5s\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 3354,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-04T23:44:34Z",
+      "side": 1,
+      "message": "Yes, \"or a new context has been activated\".",
+      "parentUuid": "AAAA/n///+w\u003d",
       "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
