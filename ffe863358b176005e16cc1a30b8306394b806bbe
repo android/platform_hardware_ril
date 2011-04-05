@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA/n///3Q\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1006116
+      },
+      "writtenOn": "2011-04-05T06:03:58Z",
+      "side": 1,
+      "message": "You have the right P-CSCF definition. The client should only need to know the P-CSCF address since that is the proxy used for all SIP signalling towards the IMS network.\n\nThe way that this ties into the data connection is that the P-CSCF address should be determined as early as when establishing an EPS bearer for SIP signaling. See 3GPP TS 24.229, annex L.2.2.1 (method II for P-CSCF discovery, as specified in GSMA PRD IR.92, section 4.4).",
+      "parentUuid": "AAAA/n///5o\u003d",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/n///+4\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
