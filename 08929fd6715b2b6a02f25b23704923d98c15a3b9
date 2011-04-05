@@ -16,6 +16,24 @@
       "revId": "08929fd6715b2b6a02f25b23704923d98c15a3b9",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///48\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-05T00:05:34Z",
+      "side": 0,
+      "message": "At this time the framework defines the APN and passes it to the ril and we do not want the lower levels to do  the selection. Thus there is no need to pass it back and I wanted to be sure it was clear that it couldn\u0027t be modified, so I removed it. But I can be convinced to change.\n\nWhat do other thinks?",
+      "parentUuid": "AAAA/n////A\u003d",
+      "revId": "08929fd6715b2b6a02f25b23704923d98c15a3b9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
