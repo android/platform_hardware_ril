@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/n///uk\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2982,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-05T22:45:31Z",
+      "side": 1,
+      "message": "Should the parameter possibly be \"max\" power allowed rather than just on/off?",
+      "revId": "ff205eb2cd4866298d0bad8f3238bcf02a449df2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
