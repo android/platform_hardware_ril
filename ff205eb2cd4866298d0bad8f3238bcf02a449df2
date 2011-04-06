@@ -16,6 +16,24 @@
       "revId": "ff205eb2cd4866298d0bad8f3238bcf02a449df2",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///p0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2982,
+      "author": {
+        "id": 1005066
+      },
+      "writtenOn": "2011-04-06T18:04:00Z",
+      "side": 1,
+      "message": "Wink, Android wouldn\u0027t know what is the maximum power allowed. So we just tell modem that hotspot is turned on and off and then it is up to the modem to set the max transmit power accordingly.",
+      "parentUuid": "AAAA/n///uk\u003d",
+      "revId": "ff205eb2cd4866298d0bad8f3238bcf02a449df2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
