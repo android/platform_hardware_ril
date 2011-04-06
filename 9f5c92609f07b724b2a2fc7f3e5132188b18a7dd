@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/n///rk\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 2011,
+      "author": {
+        "id": 1006075
+      },
+      "writtenOn": "2011-04-06T07:48:42Z",
+      "side": 1,
+      "message": "Function call \nsendSimStatusAppInfo(p, p_cur-\u003enum_applications, p_cur-\u003eapplications); \nappears on both line 2011 and line 2021 and could perhaps be placed on line 2023 only instead?",
+      "revId": "9f5c92609f07b724b2a2fc7f3e5132188b18a7dd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///rg\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 2569,
+      "author": {
+        "id": 1006075
+      },
+      "writtenOn": "2011-04-06T07:48:42Z",
+      "side": 1,
+      "message": "Isn\u0027t LOGE an error log? Should that particular LOGE be changed to\nsomething else like for example LOGI?",
+      "revId": "9f5c92609f07b724b2a2fc7f3e5132188b18a7dd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
