@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/n///qk\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1006075
+      },
+      "writtenOn": "2011-04-07T07:49:42Z",
+      "side": 1,
+      "message": "fclose(fp); missing here?",
+      "revId": "a67015363e208ccfadc78e971231013d831d0110",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n///kc\u003d",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1006075
+      },
+      "writtenOn": "2011-04-07T07:49:42Z",
+      "side": 1,
+      "message": "fclose(fp);?",
+      "revId": "a67015363e208ccfadc78e971231013d831d0110",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
