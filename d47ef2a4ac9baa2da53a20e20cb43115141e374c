@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/n//+t0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 2983,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-04-12T23:08:53Z",
+      "side": 1,
+      "message": "Please change the text to \"reduce transmit power as per FCC regulations for wifi hotspot\".",
+      "revId": "d47ef2a4ac9baa2da53a20e20cb43115141e374c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
