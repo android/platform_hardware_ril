@@ -34,6 +34,24 @@
       "revId": "08929fd6715b2b6a02f25b23704923d98c15a3b9",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n//+pU\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-13T14:04:34Z",
+      "side": 0,
+      "message": "Some operators may require an empty APN name to be used in the Initial PDN Connection, (established as part of Network Registration). In this case the network will chose an APN name for you. In this scenario we should probably read the APN name from modem and report the APN name back to the telephony framework...",
+      "parentUuid": "AAAA/n///48\u003d",
+      "revId": "08929fd6715b2b6a02f25b23704923d98c15a3b9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }

@@ -124,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "AAAA/n//+oo\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1525,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-13T14:04:34Z",
+      "side": 1,
+      "message": "Yes, I suppose this should be possible.",
+      "parentUuid": "AAAA/n///50\u003d",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAA/n///+0\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -171,6 +189,24 @@
       "side": 1,
       "message": "Will leave in the FIXME, I\u0027m hoping QoS can be handled as a \"connection property\".",
       "parentUuid": "AAAA/n///6s\u003d",
+      "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n//+ok\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 1006086
+      },
+      "writtenOn": "2011-04-13T14:04:34Z",
+      "side": 1,
+      "message": "I have added a proposal for how to report QoS for LTE on page 16 in https://docs.google.com/viewer?a\u003dv\u0026pid\u003dexplorer\u0026chrome\u003dtrue\u0026srcid\u003d0B6TxXYDwShpjNDdhMzI5YzctNDhhMC00NGQ0LWE4MzgtYTUzZjMzODk3YzNi\u0026hl\u003den",
+      "parentUuid": "AAAA/n///5w\u003d",
       "revId": "ffe863358b176005e16cc1a30b8306394b806bbe",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
