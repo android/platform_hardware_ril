@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/n//+Ok\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 644,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-04-18T20:43:27Z",
+      "side": 1,
+      "message": "Any reason to have removed some of the additional clarifications we made (I see them in patch 12) for these fields ?",
+      "revId": "1fa242c6b8441212429a919da766e622555a3a50",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/n//+Os\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 3647,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-04-18T20:43:27Z",
+      "side": 1,
+      "message": "Probably wanted to say \"Called when ril connects\" ?\n\nWe know the RIL version when it invokes RIL_Register. Can the version change after that? Am trying to understand what RIL connects means here.",
+      "revId": "1fa242c6b8441212429a919da766e622555a3a50",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
