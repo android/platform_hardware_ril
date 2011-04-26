@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAA/3///4Q\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 2978,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-26T18:44:22Z",
+      "side": 1,
+      "message": "Should we extend this comment for when the FW is going to be calling this?\n\nWhat changes are needed on the Wifi/Tethering to support this?\n\nIs the FW change necessary to support this large, can it be posted?",
+      "revId": "eec1321a6bcbcc570dfacbcf4afac55f87d00a5e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAA/3///4U\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 2982,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-04-26T18:44:22Z",
+      "side": 1,
+      "message": "Can we site the regulation or something.",
+      "revId": "eec1321a6bcbcc570dfacbcf4afac55f87d00a5e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
