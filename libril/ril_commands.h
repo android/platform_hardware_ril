@@ -117,4 +117,8 @@
     {RIL_REQUEST_GET_SMSC_ADDRESS, dispatchVoid, responseString},
     {RIL_REQUEST_SET_SMSC_ADDRESS, dispatchString, responseVoid},
     {RIL_REQUEST_REPORT_SMS_MEMORY_STATUS, dispatchInts, responseVoid},
-    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, responseVoid}
+    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, responseVoid},
+    {RIL_REQUEST_SIM_TRANSMIT_BASIC, dispatchSIM_IO, responseSIM_IO},
+    {RIL_REQUEST_SIM_OPEN_CHANNEL, dispatchString, responseInts},
+    {RIL_REQUEST_SIM_CLOSE_CHANNEL, dispatchInts, responseVoid},
+    {RIL_REQUEST_SIM_TRANSMIT_CHANNEL, dispatchSIM_IO, responseSIM_IO}
