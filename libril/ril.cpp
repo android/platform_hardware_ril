@@ -198,6 +198,7 @@ static void dispatchStrings (Parcel& p, RequestInfo *pRI);
 static void dispatchInts (Parcel& p, RequestInfo *pRI);
 static void dispatchDial (Parcel& p, RequestInfo *pRI);
 static void dispatchSIM_IO (Parcel& p, RequestInfo *pRI);
+static void dispatchSIM_APDU (Parcel& p, RequestInfo *pRI);
 static void dispatchCallForward(Parcel& p, RequestInfo *pRI);
 static void dispatchRaw(Parcel& p, RequestInfo *pRI);
 static void dispatchSmsWrite (Parcel &p, RequestInfo *pRI);
@@ -724,6 +725,75 @@ dispatchSIM_IO (Parcel &p, RequestInfo *pRI) {
 
 #ifdef MEMSET_FREED
     memset(&simIO, 0, sizeof(simIO));
+#endif
+
+    return;
+invalid:
+    invalidCommandBlock(pRI);
+    return;
+}
+
+/**
+ * Callee expects const RIL_SIM_APDU *
+ * Payload is:
+ *   int32_t cla
+ *   int32_t command
+ *   int32_t sessionid
+ *   int32_t p1, p2, p3
+ *   String data
+ */
+static void
+dispatchSIM_APDU (Parcel &p, RequestInfo *pRI) {
+    RIL_SIM_APDU simAPDU;
+    int32_t t;
+    status_t status;
+
+    memset (&simAPDU, 0, sizeof(simAPDU));
+
+    // note we only check status at the end
+
+    status = p.readInt32(&t);
+    simAPDU.cla = (int)t;
+
+    status = p.readInt32(&t);
+    simAPDU.command = (int)t;
+
+    status = p.readInt32(&t);
+    simAPDU.sessionid = (int)t;
+
+    status = p.readInt32(&t);
+    simAPDU.p1 = (int)t;
+
+    status = p.readInt32(&t);
+    simAPDU.p2 = (int)t;
+
+    status = p.readInt32(&t);
+    simAPDU.p3 = (int)t;
+
+    simAPDU.data = strdupReadString(p);
+
+    startRequest;
+    appendPrintBuf("%scmd=0x%X,sessionid=0x%X,%d,%d,%d,%s", printBuf,
+        simAPDU.command, simAPDU.sessionid,
+        simAPDU.p1, simAPDU.p2, simAPDU.p3,
+        (char*)simAPDU.data);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &simAPDU, sizeof(simAPDU), pRI);
+
+#ifdef MEMSET_FREED
+    memsetString (simAPDU.data);
+#endif
+
+    free (simAPDU.data);
+
+#ifdef MEMSET_FREED
+    memset(&simAPDU, 0, sizeof(simAPDU));
 #endif
 
     return;
@@ -2991,6 +3061,10 @@ requestToString(int request) {
         case RIL_REQUEST_SEND_SMS_EXPECT_MORE: return "SEND_SMS_EXPECT_MORE";
         case RIL_REQUEST_SETUP_DATA_CALL: return "SETUP_DATA_CALL";
         case RIL_REQUEST_SIM_IO: return "SIM_IO";
+        case RIL_REQUEST_SIM_TRANSMIT_BASIC: return "SIM_TRANSMIT_BASIC";
+        case RIL_REQUEST_SIM_OPEN_CHANNEL: return "SIM_OPEN_CHANNEL";
+        case RIL_REQUEST_SIM_CLOSE_CHANNEL: return "SIM_CLOSE_CHANNEL";
+        case RIL_REQUEST_SIM_TRANSMIT_CHANNEL: return "SIM_TRANSMIT_CHANNEL";
         case RIL_REQUEST_SEND_USSD: return "SEND_USSD";
         case RIL_REQUEST_CANCEL_USSD: return "CANCEL_USSD";
         case RIL_REQUEST_GET_CLIR: return "GET_CLIR";

@@ -68,8 +68,10 @@ typedef enum {
                                                    location */
     RIL_E_MODE_NOT_SUPPORTED = 13,              /* HW does not support preferred network type */
     RIL_E_FDN_CHECK_FAILURE = 14,               /* command failed because recipient is not on FDN list */
-    RIL_E_ILLEGAL_SIM_OR_ME = 15                /* network selection failed due to
+    RIL_E_ILLEGAL_SIM_OR_ME = 15,               /* network selection failed due to
                                                    illegal SIM or ME */
+    RIL_E_MISSING_RESOURCE = 16,                /* no logical channel is available */
+    RIL_E_NO_SUCH_ELEMENT = 17                  /* application not found */
 } RIL_Errno;
 
 typedef enum {
@@ -210,6 +212,16 @@ typedef struct {
     char *data;     /* May be NULL*/
     char *pin2;     /* May be NULL*/
 } RIL_SIM_IO;
+
+typedef struct {
+    int cla;
+    int command;    /* any command for +CSIM, and +CGLA */
+    int sessionid;  /* session id of logical channel */
+    int p1;
+    int p2;
+    int p3;
+    char *data;     /* May be NULL*/
+} RIL_SIM_APDU;
 
 typedef struct {
     int sw1;
@@ -1365,6 +1377,102 @@ typedef struct {
  *  SIM_PUK2
  */
 #define RIL_REQUEST_SIM_IO 28
+
+/**
+ * RIL_REQUEST_SIM_TRANSMIT_BASIC
+ *
+ * Exchange APDU with UICC on the basic channel
+ * This command reflects the TS 27.007 "generic SIM access"
+ * operation (+CSIM).
+ * The modem must ensure proper function of GSM/CDMA, and filter
+ * commands appropriate.
+ *
+ * "data" is a const RIL_SIM_APDU *
+ * If member "p3" of RIL_SIM_APDU is negative a 4 byte APDU shall be sent.
+ *
+ * "response" is a const RIL_SIM_IO_Response *
+ *
+ * Arguments and responses that are unused for certain
+ * values of "command" should be ignored or set to NULL
+ *
+ * Valid responses:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SIM_TRANSMIT_BASIC 104
+
+/**
+ * RIL_REQUEST_SIM_OPEN_CHANNEL
+ *
+ * Open a new logical channel and select the given application
+ * This command reflects the TS 27.007 "open logical channel" operation
+ * (+CCHO).
+ *
+ * "data" is a const char * containing the AID of the application
+ *
+ * "response" is a int *
+ * ((int *)response)[0] contains the session id of the logical channel
+ * The value zero indicates an invalid session id 
+ *
+ * Arguments and responses that are unused for certain
+ * values of "command" should be ignored or set to NULL
+ *
+ * The differentiation of the error code in MISSING_RESOURCE,
+ * NO_SUCH_ELEMENT, and GENERIC_FAILURE is needed to ensure proper function
+ * of access control by higher level software. MISSING_RESOURCE means no
+ * logical channel is available. NO_SUCH_ELEMENT means application with
+ * given AID not found.
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ *  MISSING_RESOURCE
+ *  NO_SUCH_ELEMENT
+ */
+#define RIL_REQUEST_SIM_OPEN_CHANNEL 105
+
+/**
+ * RIL_REQUEST_SIM_CLOSE_CHANNEL
+ *
+ * Closes a logical channel
+ * This command reflects the TS 27.007 "close logical channel" operation
+ * (+CCHC).
+ *
+ * "data" is a const int *
+ * ((const int *)data)[0] is the session id of the logical channel
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SIM_CLOSE_CHANNEL 106
+
+/**
+ * RIL_REQUEST_SIM_TRANSMIT_CHANNEL
+ *
+ * Exchange APDU with UICC on a logical channel
+ * This command reflects the TS 27.007 "generic logical channel access"
+ * operation (+CGLA).
+ *
+ * "data" is a const RIL_SIM_APDU *
+ * If member "p3" of RIL_SIM_APDU is negative a 4 byte APDU shall be sent.
+ *
+ * "response" is a const RIL_SIM_IO_Response *
+ *
+ * Arguments and responses that are unused for certain
+ * values of "command" should be ignored or set to NULL
+ *
+ * Valid responses:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SIM_TRANSMIT_CHANNEL 107
 
 /**
  * RIL_REQUEST_SEND_USSD
