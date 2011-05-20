@@ -1,0 +1,9 @@
+Change-Id: Icf952151b01964b3e2ed3a112802855df1088513
+Code-Review+2: John Huang <jsh@android.com>
+Verified+1: John Huang <jsh@android.com>
+Code-Review+1: Team Android CDMA <oss.android_cdma@teleca.com>
+Submitted-by: John Huang <jsh@android.com>
+Submitted-at: Wed, 18 Feb 2009 18:21:19 -0700
+Reviewed-on: https://review.source.android.com/8659
+Project: platform/hardware/ril
+Branch: refs/heads/cdma-import

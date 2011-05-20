@@ -1,0 +1,7 @@
+Change-Id: I956db6dda9800bd074191b650e40f04e6115654b
+Code-Review+1: Stefan Schülein <Stefan.Schuelein@teleca.com>
+Code-Review+2: John Huang <jsh@android.com>
+Verified+1: John Huang <jsh@android.com>
+Reviewed-on: https://review.source.android.com/4603
+Project: platform/hardware/ril
+Branch: refs/heads/cdma-import

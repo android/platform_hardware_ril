@@ -1,0 +1,9 @@
+Change-Id: I67121e09d894c2f971bb01451371c0fb9d00adcc
+Code-Review+2: Jaikumar Ganesh <jaikumarg@android.com>
+Verified+1: Jean-Baptiste Queru <jbq@google.com>
+Code-Review+1: Francois Mazard <f-mazard@ti.com>
+Submitted-by: Jean-Baptiste Queru <jbq@google.com>
+Submitted-at: Fri, 21 Aug 2009 13:40:15 -0700
+Reviewed-on: https://review.source.android.com/11146
+Project: platform/hardware/ril
+Branch: refs/heads/master
