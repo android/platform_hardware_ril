@@ -32,6 +32,7 @@
 #define ANDROID_RIL_H 1
 
 #include <stdlib.h>
+#include <telephony/ril_qos.h>
 #ifndef FEATURE_UNIT_TEST
 #include <sys/time.h>
 #endif /* !FEATURE_UNIT_TEST */
@@ -2972,6 +2973,138 @@ typedef struct {
  */
 #define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
 
+/**
+ * RIL_REQUEST_SETUP_QOS
+ *
+ * The QoS Parameters contain the following:
+ * - Call ID
+ * - QoS Specs (There can be multiple QoS Specs with a mimimum of ONE)
+ *
+ * A QoS Spec is a pair of QoS Flow spec and QoS Filter Spec.  QoS Flow/Filter
+ * spec is a comma seperated list of key value pairs of the form 'KEY=VALUE'
+ * where the 'KEY' is from the enum RIL_QosSpecKeys and the 'VALUE' is the
+ * numerical value. Each QoS Spec is identified by a unique index.
+ *
+ *
+ * For example, the following set of strings is one QoS Spec, first string has
+ * Flow/Filter spec for TX and second for RX.
+ *
+ * "RIL_QOS_SPEC_INDEX=0,RIL_QOS_FLOW_DIRECTION=0,\
+ *              RIL_QOS_FLOW_DATA_RATE_MIN=64000,\
+ *              RIL_QOS_FILTER_TCP_SOURCE_PORT=4000"
+ * "RIL_QOS_SPEC_INDEX=0,RIL_QOS_FLOW_DIRECTION=1,\
+ *              RIL_QOS_FLOW_DATA_RATE_MIN=64000,\
+ *              RIL_QOS_FILTER_TCP_SOURCE_PORT=4000"
+ *
+ * A QoS spec must have at least ONE pair of flow/filter spec (either RX or
+ * TX). There can be any combination of (the optional) flow and filter
+ * parameters included in the QoS spec.
+ *
+ *
+ * "data" is the Call ID followed by an array of QoS Specs
+ * ((char **)data)[0] - Call ID
+ * ((char **)data)[1] - Flow/Filter Spec (for TX or RX)
+ * ((char **)data)[2] - Flow/Filter Spec (optional: for the other direction)
+ *
+ * "response" is a char ** representing a return code followed by a QoS ID.
+ *
+ * ((char **)response)[0] - return code. 0 - success, non-0 - failure
+ * ((char **)response)[1] - QoS ID
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SETUP_QOS 104
+
+/**
+ * RIL_REQUEST_RELEASE_QOS
+ *
+ * Request to release the QoS for a particular call
+ * "data" is char **
+ * ((char **)data)[0] is QoS ID
+ *
+ * "response" is char ** representing a return code
+ * ((char **)response)[0] - return code. 0 - success, non-0 - failure
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_RELEASE_QOS 105
+
+/**
+ * RIL_REQUEST_GET_QOS_STATUS
+ *
+ * Request to get the QoS status and its parameters for a given QoS ID
+ *
+ * "data" is char *
+ * ((char *)data) - QoS ID
+ *
+ * "response" is an const char ** representing a return code followed by an
+ * array of Flow/Filter Specs
+ * ((char **)response)[0] - return code. 0 - success, non-0 - failure
+ * ((char **)response)[1] - Value from RIL_QosStatus
+ * ((char **)response)[2] - Flow/Filter Spec   (may be followed by more specs)
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_GET_QOS_STATUS 106
+
+/**
+ * RIL_REQUEST_MODIFY_QOS
+ *
+ * Request to modify QoS for a particular call by specifying the QoS
+ * parameters. The QoS parameters are similar to RIL_REQUEST_SETUP_QOS and
+ * specifies QoS Flow/Filter Spec's with updated values
+ *
+ * "data" is char **
+ * ((char **)data)[0] - QoS ID
+ * ((char **)data)[1] - Modified Flow/Filter Spec   (For TX or RX. Mandatory.)
+ * ((char **)data)[2] - Modified Flow/Filter Spec   (For the other direction. Optional)
+ *
+ * "response" is char ** representing a return code
+ * ((char **)response)[0] - return code. 0 - success, non-0 - failure
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_MODIFY_QOS 107
+
+/**
+ * RIL_REQUEST_SUSPEND_QOS
+ *
+ * Request to suspend the QoS for a particular call. All the traffic will be
+ * sent using the default/best effort QoS link.
+ * "data" is char **
+ * ((char **)data[0] is QoS ID
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SUSPEND_QOS 108
+
+/**
+ * RIL_REQUEST_RESUME_QOS
+ *
+ * Request to resume the QoS for a particular call.
+ * "data" is char **
+ * ((char **)data)[0] is QoS ID
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_RESUME_QOS 109
+
 /***********************************************************************/
 
 
@@ -3392,6 +3525,19 @@ typedef struct {
  * "data" is null
  */
 #define RIL_UNSOL_RESEND_INCALL_MUTE 1030
+
+/**
+ * RIL_UNSOL_QOS_STATE_CHANGED_IND
+ *
+ * Indication for any change in the QoS state of a particular QoS flow
+ *
+ * "data" is an char **
+ * ((char **)data)[0] - QoS ID
+ * ((char **)data)[1] - Status from RIL_QosIndStates
+ *
+ */
+#define RIL_UNSOL_QOS_STATE_CHANGED_IND 1031
+
 /***********************************************************************/
 
 
