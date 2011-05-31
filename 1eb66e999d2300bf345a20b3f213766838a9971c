@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAABB3///+E\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1006024
+      },
+      "writtenOn": "2011-05-31T21:32:56Z",
+      "side": 1,
+      "message": "Reference: 3GPP TS 36.133 9.1.4",
+      "revId": "1eb66e999d2300bf345a20b3f213766838a9971c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABB3///+A\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 1006024
+      },
+      "writtenOn": "2011-05-31T21:32:56Z",
+      "side": 1,
+      "message": "Reference: 3GPP TS 36.133 9.1.7",
+      "revId": "1eb66e999d2300bf345a20b3f213766838a9971c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABB3///9w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 1006024
+      },
+      "writtenOn": "2011-05-31T21:32:56Z",
+      "side": 1,
+      "message": "/* The current Reference Signal Signal-to-Noise Ratio */",
+      "revId": "1eb66e999d2300bf345a20b3f213766838a9971c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABB3///98\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 1006024
+      },
+      "writtenOn": "2011-05-31T21:32:56Z",
+      "side": 1,
+      "message": "/* The current Channel Quality Indicator. Range: 0 to 15. Reference: 3GPP TS 36.101 9.2, 9.3, A.4 */",
+      "revId": "1eb66e999d2300bf345a20b3f213766838a9971c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
