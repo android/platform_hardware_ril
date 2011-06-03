@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "AAABB3///kE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 1006024
+      },
+      "writtenOn": "2011-06-03T21:49:36Z",
+      "side": 1,
+      "message": "Reference: 3GPP TS 36.101 8.1.1",
+      "revId": "73c25fb0461a8dda903378c7ab080fa707c59841",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAABB3///9Q\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 16
@@ -47,6 +64,24 @@
       "writtenOn": "2011-05-31T22:45:59Z",
       "side": 1,
       "message": "/* The current Channel Quality Indicator. \n * Range: 0 to 15\n * INT_MAX : 0x7FFFFFFF denotes invalid value\n * Reference: 3GPP TS 36.101 9.2, 9.3, A.4 */",
+      "revId": "73c25fb0461a8dda903378c7ab080fa707c59841",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABB3///kA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 1006024
+      },
+      "writtenOn": "2011-06-03T21:49:36Z",
+      "side": 1,
+      "message": "Please use this reference instead:\nReference: 3GPP TS 36.213 7.2.3",
+      "parentUuid": "AAABB3///9Q\u003d",
       "revId": "73c25fb0461a8dda903378c7ab080fa707c59841",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
