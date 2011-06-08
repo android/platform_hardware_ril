@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAABCH///60\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1935,
+      "author": {
+        "id": 1004125
+      },
+      "writtenOn": "2011-06-08T07:16:44Z",
+      "side": 1,
+      "message": "Why not use the 3GPP STK/SAT AT command format. Proactive command: +CUSATP: \u003cproactive_command\u003e",
+      "revId": "44bb8c758e52d8a73866eed205070ee0d86483bd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
