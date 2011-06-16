@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAABDH///2k\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-06-16T23:14:53Z",
+      "side": 1,
+      "message": "This would break backward compatibility. Can you use fileid where you need cla?\n\nOtherwise, you will have to increment the RIL_VERSION I think",
+      "revId": "347878c117ba2c957a93cc0418fc9dc001ea5b8f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABDH///2o\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1383,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2011-06-16T23:14:53Z",
+      "side": 1,
+      "message": "How is this command different from the RIL_REQUEST_SIM_IO command? Could you also add some documentation on where and how this command will be used?",
+      "revId": "347878c117ba2c957a93cc0418fc9dc001ea5b8f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
