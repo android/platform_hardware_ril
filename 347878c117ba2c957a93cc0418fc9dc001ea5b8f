@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAABDX///9Q\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1002811
+      },
+      "writtenOn": "2011-06-17T10:49:26Z",
+      "side": 1,
+      "message": "fileid already is used for the session id of the logical channel. For RIL_REQUEST_SIM_TRANSMIT_BASIC and RIL_REQUEST_SIM_TRANSMIT_CHANNEL we don\u0027t need path, but then we have to map an int to char*.",
+      "parentUuid": "AAABDH///2k\u003d",
+      "revId": "347878c117ba2c957a93cc0418fc9dc001ea5b8f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAABDH///2o\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
