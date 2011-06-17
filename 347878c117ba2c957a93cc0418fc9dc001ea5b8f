@@ -33,6 +33,24 @@
       "revId": "347878c117ba2c957a93cc0418fc9dc001ea5b8f",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABDX///9w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1383,
+      "author": {
+        "id": 1002811
+      },
+      "writtenOn": "2011-06-17T10:27:43Z",
+      "side": 1,
+      "message": "RIL_REQUEST_SIM_IO reflects AT+CRSM as defined in 3GPP TS 27.007. RIL_REQUEST_SIM_TRANSMIT_BASIC reflects AT+CSIM, RIL_REQUEST_SIM_OPEN_CHANNEL reflects AT+CCHO, RIL_REQUEST_SIM_CLOSE_CHANNEL reflects AT+CCHC, and RIL_REQUEST_SIM_TRANSMIT_CHANNEL reflects AT+CGLA. All of these AT commands are defined in 3GPP TS 27.007, and allow access to the UICC from outside of the modem with different limitations. The four new commands are needed by the SIMalliance Open Mobile API (please see http://review.source.android.com/#change,23176). The SIMalliance Open Mobile API enables application programmers the use of a secure element (e.g. the UICC, but also others) to implement apps like a wallet for example.",
+      "parentUuid": "AAABDH///2o\u003d",
+      "revId": "347878c117ba2c957a93cc0418fc9dc001ea5b8f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
