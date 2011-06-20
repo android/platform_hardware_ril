@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "AAABDX///vE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1002811
+      },
+      "writtenOn": "2011-06-20T08:53:52Z",
+      "side": 1,
+      "message": "We would prefer to increment the RIL_VERSION, because this would reflect the added functionality, and the support for the added functionality could be easily checked. Do you agree?",
+      "parentUuid": "AAABDX///48\u003d",
+      "revId": "347878c117ba2c957a93cc0418fc9dc001ea5b8f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAABDH///2o\u003d",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
