@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAABEX///IM\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-07-01T05:36:41Z",
+      "side": 1,
+      "message": "We won\u0027t be able to bump the version number so we\u0027ll need to do the change differently. Probably create RIL_SIM_IO_v7 with the new fields and used only by the new commands.",
+      "revId": "3006949bea2d407db19d4d13dbd7b0a535bed29c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABEX///II\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-07-01T05:36:41Z",
+      "side": 1,
+      "message": "As mentioned above create a new structure with this field and leave RIL_SIM_IO unchanged.",
+      "revId": "3006949bea2d407db19d4d13dbd7b0a535bed29c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABEX///IE\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1412,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-07-01T05:36:41Z",
+      "side": 1,
+      "message": "remove white space.",
+      "revId": "3006949bea2d407db19d4d13dbd7b0a535bed29c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAABEX///IA\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2011-07-01T05:36:41Z",
+      "side": 1,
+      "message": "Create dispatchSIM_IO_v7 or some other technique to allow backwards compatibility.",
+      "revId": "3006949bea2d407db19d4d13dbd7b0a535bed29c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
