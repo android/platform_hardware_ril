@@ -1,6 +1,7 @@
 /* //device/system/reference-ril/reference-ril.c
 **
 ** Copyright 2006, The Android Open Source Project
+** Copyright (c) 2012, The Linux Foundation. All rights reserved.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -210,6 +211,14 @@ static char *sATBufferCur = NULL;
 static const struct timeval TIMEVAL_SIMPOLL = {1,0};
 static const struct timeval TIMEVAL_CALLSTATEPOLL = {0,500000};
 static const struct timeval TIMEVAL_0 = {0,0};
+
+static int s_ims_registered  = 0;        // 0==unregistered
+static int s_ims_services    = 1;        // & 0x1 == sms over ims supported
+static int s_ims_format    = 1;          // FORMAT_3GPP(1) vs FORMAT_3GPP2(2);
+static int s_ims_cause_retry = 0;        // 1==causes sms over ims to temp fail
+static int s_ims_cause_perm_failure = 0; // 1==causes sms over ims to permanent fail
+static int s_ims_gsm_retry   = 0;        // 1==causes sms over gsm to temp fail
+static int s_ims_gsm_fail    = 0;        // 1==causes sms over gsm to permanent fail
 
 #ifdef WORKAROUND_ERRONEOUS_ANSWER
 // Max number of times we'll try to repoll when we think
@@ -1499,12 +1508,14 @@ static void requestCdmaSendSMS(void *data, size_t datalen, RIL_Token t)
     // But it is not implemented yet.
 
     memset(&response, 0, sizeof(response));
+    response.messageRef = 1;
     RIL_onRequestComplete(t, RIL_E_SUCCESS, &response, sizeof(response));
     return;
 
 error:
     // Cdma Send SMS will always cause send retry error.
-    RIL_onRequestComplete(t, RIL_E_SMS_SEND_FAIL_RETRY, NULL, 0);
+    response.messageRef = -1;
+    RIL_onRequestComplete(t, RIL_E_SMS_SEND_FAIL_RETRY, &response, sizeof(response));
 }
 
 static void requestSendSMS(void *data, size_t datalen, RIL_Token t)
@@ -1516,6 +1527,12 @@ static void requestSendSMS(void *data, size_t datalen, RIL_Token t)
     char *cmd1, *cmd2;
     RIL_SMS_Response response;
     ATResponse *p_response = NULL;
+
+    memset(&response, 0, sizeof(response));
+    ALOGD("requestSendSMS datalen =%d", datalen);
+
+    if (s_ims_gsm_fail != 0) goto error;
+    if (s_ims_gsm_retry != 0) goto error2;
 
     smsc = ((const char **)data)[0];
     pdu = ((const char **)data)[1];
@@ -1534,17 +1551,68 @@ static void requestSendSMS(void *data, size_t datalen, RIL_Token t)
 
     if (err != 0 || p_response->success == 0) goto error;
 
-    memset(&response, 0, sizeof(response));
-
     /* FIXME fill in messageRef and ackPDU */
-
+    response.messageRef = 1;
     RIL_onRequestComplete(t, RIL_E_SUCCESS, &response, sizeof(response));
     at_response_free(p_response);
 
     return;
 error:
-    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+    response.messageRef = -2;
+    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, &response, sizeof(response));
     at_response_free(p_response);
+    return;
+error2:
+    // send retry error.
+    response.messageRef = -1;
+    RIL_onRequestComplete(t, RIL_E_SMS_SEND_FAIL_RETRY, &response, sizeof(response));
+    at_response_free(p_response);
+    return;
+}
+
+static void requestImsSendSMS(void *data, size_t datalen, RIL_Token t)
+{
+    RIL_IMS_SMS_Message *p_args;
+    RIL_SMS_Response response;
+
+    memset(&response, 0, sizeof(response));
+
+    ALOGD("requestImsSendSMS: datalen=%d, "
+        "registered=%d, service=%d, format=%d, ims_perm_fail=%d, "
+        "ims_retry=%d, gsm_fail=%d, gsm_retry=%d",
+        datalen, s_ims_registered, s_ims_services, s_ims_format,
+        s_ims_cause_perm_failure, s_ims_cause_retry, s_ims_gsm_fail,
+        s_ims_gsm_retry);
+
+    // figure out if this is gsm/cdma format
+    // then route it to requestSendSMS vs requestCdmaSendSMS respectively
+    p_args = (RIL_IMS_SMS_Message *)data;
+
+    if (0 != s_ims_cause_perm_failure ) goto error;
+
+    // want to fail over ims and this is first request over ims
+    if (0 != s_ims_cause_retry && 0 == p_args->retry) goto error2;
+
+    if (RADIO_TECH_3GPP == p_args->tech) {
+        return requestSendSMS(p_args->message.gsmMessage,
+                datalen - sizeof(RIL_RadioTechnologyFamily),
+                t);
+    } else if (RADIO_TECH_3GPP2 == p_args->tech) {
+        return requestCdmaSendSMS(p_args->message.cdmaMessage,
+                datalen - sizeof(RIL_RadioTechnologyFamily),
+                t);
+    } else {
+        ALOGE("requestImsSendSMS invalid format value =%d", p_args->tech);
+    }
+
+error:
+    response.messageRef = -2;
+    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, &response, sizeof(response));
+    return;
+
+error2:
+    response.messageRef = -1;
+    RIL_onRequestComplete(t, RIL_E_SMS_SEND_FAIL_RETRY, &response, sizeof(response));
 }
 
 static void requestSetupDataCall(void *data, size_t datalen, RIL_Token t)
@@ -2051,6 +2119,9 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         case RIL_REQUEST_CDMA_SEND_SMS:
             requestCdmaSendSMS(data, datalen, t);
             break;
+        case RIL_REQUEST_IMS_SEND_SMS:
+            requestImsSendSMS(data, datalen, t);
+            break;
         case RIL_REQUEST_SETUP_DATA_CALL:
             requestSetupDataCall(data, datalen, t);
             break;
@@ -2167,6 +2238,28 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         case RIL_REQUEST_CHANGE_SIM_PIN2:
             requestEnterSimPin(data, datalen, t);
             break;
+
+       case RIL_REQUEST_IMS_REGISTRATION_STATE:
+        {
+            int reply[2];
+            //0==unregistered, 1==registered
+            reply[0] = s_ims_registered;
+
+            //to be used when changed to include service supporated info
+            //reply[1] = s_ims_services;
+
+            // FORMAT_3GPP(1) vs FORMAT_3GPP2(2);
+            reply[1] = s_ims_format;
+
+            ALOGD("IMS_REGISTRATION=%d, format=%d ",
+                    reply[0], reply[1]);
+            if (reply[1] != -1) {
+                RIL_onRequestComplete(t, RIL_E_SUCCESS, reply, sizeof(reply));
+            } else {
+                RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+            }
+            break;
+        }
 
         case RIL_REQUEST_VOICE_RADIO_TECH:
             {
@@ -2925,6 +3018,18 @@ static void waitForClose()
     }
 
     pthread_mutex_unlock(&s_state_mutex);
+}
+
+static void sendUnsolImsNetworkStateChanged()
+{
+#if 0  // to be used when unsol is changed to return data.
+    int reply[2];
+    reply[0] = s_ims_registered;
+    reply[1] = s_ims_services;
+    reply[1] = s_ims_format;
+#endif
+    RIL_onUnsolicitedResponse(RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED,
+            NULL, 0);
 }
 
 /**
