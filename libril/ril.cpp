@@ -233,6 +233,7 @@ static int responseCallRing(Parcel &p, void *response, size_t responselen);
 static int responseCdmaSignalInfoRecord(Parcel &p,void *response, size_t responselen);
 static int responseCdmaCallWaiting(Parcel &p,void *response, size_t responselen);
 static int responseSimRefresh(Parcel &p, void *response, size_t responselen);
+static int responseGetDataCallProfile(Parcel &p, void *response, size_t responselen);
 
 static int decodeVoiceRadioTechnology (RIL_RadioState radioState);
 static int decodeCdmaSubscriptionSource (RIL_RadioState radioState);
@@ -2349,6 +2350,42 @@ static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
+/* response is the count and the list of RIL_DataCallProfileInfo */
+static int responseGetDataCallProfile(Parcel &p, void *response, size_t responselen) {
+    int num = 0;
+
+    ALOGD("[OMH>]> %d", responselen);
+
+    if (response == NULL && responselen != 0) {
+        ALOGE("invalid response: NULL");
+        return RIL_ERRNO_INVALID_RESPONSE;
+    }
+
+    ALOGD("[OMH>]> processing response");
+
+    /* number of profile info's */
+    num = *((int *) response);
+    if (num > (responselen / sizeof(RIL_DataCallProfileInfo))) {
+        num = responselen / sizeof(RIL_DataCallProfileInfo);
+    }
+    p.writeInt32(num);
+
+    RIL_DataCallProfileInfo *p_cur = ((RIL_DataCallProfileInfo *) ((int *)response + 1));
+
+    startResponse;
+    for (int i = 0 ; i < num ; i++) {
+        p.writeInt32(p_cur->profileId);
+        p.writeInt32(p_cur->priority);
+        appendPrintBuf("%s[profileId=%d,priority=%d],", printBuf,
+            p_cur->profileId, p_cur->priority);
+        p_cur++;
+    }
+    removeLastChar;
+    closeResponse;
+
+    return 0;
+}
+
 /**
  * A write on the wakeup fd is done just to pop us out of select()
  * We empty the buffer here and then ril_event will reset the timers on the
@@ -3445,6 +3482,7 @@ requestToString(int request) {
         case RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU: return "RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU";
         case RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS: return "RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS";
         case RIL_REQUEST_VOICE_RADIO_TECH: return "VOICE_RADIO_TECH";
+        case RIL_REQUEST_GET_DATA_CALL_PROFILE: return "GET_DATA_CALL_PROFILE";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED: return "UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED";
