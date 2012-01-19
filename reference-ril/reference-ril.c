@@ -1,6 +1,6 @@
 /* //device/system/reference-ril/reference-ril.c
 **
-** Copyright 2006, The Android Open Source Project
+** Copyright 2006,2013 The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -199,6 +199,7 @@ static pthread_cond_t s_state_cond = PTHREAD_COND_INITIALIZER;
 static int s_port = -1;
 static const char * s_device_path = NULL;
 static int          s_device_socket = 0;
+const char * ril_inst_id = NULL;
 
 /* trigger change to this with s_state_cond */
 static int s_closed = 0;
@@ -3139,7 +3140,13 @@ mainLoop(void *param)
                      * now another "legacy" way of communicating with the
                      * emulator), we will try to connecto to gsm service via
                      * qemu pipe. */
-                    fd = qemu_pipe_open("qemud:gsm");
+                    char qemuPipe[MAX_QEMU_PIPE_NAME_LENGTH] = "qemud:gsm";
+                    if (strncmp(ril_inst_id, "0", MAX_CLIENT_ID_LENGTH)) {
+                        strncat(qemuPipe, ril_inst_id ,MAX_QEMU_PIPE_NAME_LENGTH);
+                    }
+                    RLOGD("qemu pipe name : %s\n", qemuPipe);
+                    fd = qemu_pipe_open(qemuPipe);
+
                     if (fd < 0) {
                         /* Qemu-specific control socket */
                         fd = socket_local_client( "qemud",
@@ -3212,7 +3219,7 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
 
     s_rilenv = env;
 
-    while ( -1 != (opt = getopt(argc, argv, "p:d:s:"))) {
+    while ( -1 != (opt = getopt(argc, argv, "p:d:s:c:"))) {
         switch (opt) {
             case 'p':
                 s_port = atoi(optarg);
@@ -3232,6 +3239,11 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
                 s_device_path   = optarg;
                 s_device_socket = 1;
                 RLOGI("Opening socket %s\n", s_device_path);
+            break;
+
+            case 'c':
+                ril_inst_id = optarg;
+                RLOGI("ReferRil is using instance %s ", ril_inst_id);
             break;
 
             default:
