@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <telephony/ril_cdma_sms.h>
+#include <telephony/ril_msim.h>
 #ifndef FEATURE_UNIT_TEST
 #include <sys/time.h>
 #endif /* !FEATURE_UNIT_TEST */
@@ -33,6 +34,12 @@ extern "C" {
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
+
+#define MAX_RILDS 3
+#define MAX_SOCKET_NAME_LENGTH 6
+#define MAX_CLIENT_ID_LENGTH 2
+#define MAX_DEBUG_SOCKET_NAME_LENGTH 12
+#define MAX_QEMU_PIPE_NAME_LENGTH  11
 
 typedef void * RIL_Token;
 
@@ -3663,6 +3670,24 @@ typedef struct {
  */
 #define RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL 117
 
+
+/**
+ * RIL_REQUEST_SET_UICC_SUBSCRIPTION
+ *
+ * Selection/de-selection of a subscription from a SIM card
+ * "data" is const  RIL_SelectUiccSub*
+
+ *
+ * "response" is NULL
+ *
+ *  Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_SUPPORTED
+ *
+ */
+#define RIL_REQUEST_SET_UICC_SUBSCRIPTION  118
 
 /***********************************************************************/
 
