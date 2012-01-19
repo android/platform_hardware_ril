@@ -1,5 +1,7 @@
 /* //device/libs/telephony/ril_commands.h
 **
+** Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+** Not a Contribution
 ** Copyright 2006, The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
@@ -132,3 +134,5 @@
     {RIL_REQUEST_SIM_OPEN_CHANNEL, dispatchString, responseInts},
     {RIL_REQUEST_SIM_CLOSE_CHANNEL, dispatchInts, responseVoid},
     {RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL, dispatchSIM_APDU, responseSIM_IO},
+    {RIL_REQUEST_SET_UICC_SUBSCRIPTION, dispatchUiccSubscripton, responseVoid},
+    {RIL_REQUEST_SET_DATA_SUBSCRIPTION, dispatchVoid, responseVoid},
