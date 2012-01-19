@@ -108,9 +108,14 @@ int main(int argc, char **argv)
     unsigned char hasLibArgs = 0;
 
     int i;
+    int k;
+    static char clientId[2] = {'0'};
+    LOGE("**RIL Daemon Started**");
+    LOGE("**RILd param count=%d**", argc);
 
     umask(S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
     for (i = 1; i < argc ;) {
+        LOGE("argv[%d]=%s",i, argv[i]);
         if (0 == strcmp(argv[i], "-l") && (argc - i > 1)) {
             rilLibPath = argv[i + 1];
             i += 2;
@@ -118,12 +123,23 @@ int main(int argc, char **argv)
             i++;
             hasLibArgs = 1;
             break;
+        } else if (0 == strcmp(argv[i], "-c") &&  (argc - i > 1)) {
+            strncpy(clientId, argv[i+1], strlen(clientId));
+            i += 2;
+            LOGE("clientId %s ", clientId);
         } else {
             usage(argv[0]);
         }
     }
 
+    if(0 == strcmp(clientId, "0")) {
+        RIL_setRilSocketName("rild");
+    } else if (0 == strcmp(clientId, "1")) {
+        RIL_setRilSocketName("rild1");
+    }
+
     if (rilLibPath == NULL) {
+        ALOGE("rilLibPath--  : %s ", rilLibPath);
         if ( 0 == property_get(LIB_PATH_PROPERTY, libPath, NULL)) {
             // No lib sepcified on the command line, and nothing set in props.
             // Assume "no-ril" case.
@@ -131,12 +147,13 @@ int main(int argc, char **argv)
         } else {
             rilLibPath = libPath;
         }
+        ALOGE("rilLibPath--  : %s ", rilLibPath);
     }
 
     /* special override when in the emulator */
 #if 1
     {
-        static char*  arg_overrides[3];
+        static char*  arg_overrides[5];
         static char   arg_device[32];
         int           done = 0;
 
@@ -155,7 +172,7 @@ int main(int argc, char **argv)
         do {
             len = read(fd,buffer,sizeof(buffer)); }
         while (len == -1 && errno == EINTR);
-
+        ALOGE("buffere is : %s",buffer);
         if (len < 0) {
             ALOGD("could not read /proc/cmdline:%s", strerror(errno));
             close(fd);
@@ -170,13 +187,14 @@ int main(int argc, char **argv)
             */
             int  tries = 5;
 #define  QEMUD_SOCKET_NAME    "qemud"
-
+            ALOGE("qemud");
             while (1) {
                 int  fd;
 
                 sleep(1);
 
                 fd = qemu_pipe_open("qemud:gsm");
+                ALOGE("fd : %d", fd);
                 if (fd < 0) {
                     fd = socket_local_client(
                                 QEMUD_SOCKET_NAME,
@@ -190,6 +208,7 @@ int main(int argc, char **argv)
 
                     arg_overrides[1] = "-s";
                     arg_overrides[2] = arg_device;
+                    ALOGE("arg_overrides[1] : %s arg_overrides[2]: %s ",arg_overrides[1], arg_overrides[2]);
                     done = 1;
                     break;
                 }
@@ -211,6 +230,7 @@ int main(int argc, char **argv)
 #define  KERNEL_OPTION  "android.ril="
 #define  DEV_PREFIX     "/dev/"
 
+            ALOGE("/dev/");
             p = strstr( buffer, KERNEL_OPTION );
             if (p == NULL)
                 break;
@@ -224,6 +244,7 @@ int main(int argc, char **argv)
             arg_device[sizeof(arg_device)-1] = 0;
             arg_overrides[1] = "-d";
             arg_overrides[2] = arg_device;
+            ALOGE("arg_overrides[1] : %s arg_overrides[2]: %s ",arg_overrides[1], arg_overrides[2]);
             done = 1;
 
         } while (0);
@@ -234,9 +255,12 @@ int main(int argc, char **argv)
             i    = 1;
             hasLibArgs = 1;
             rilLibPath = REFERENCE_RIL_PATH;
+            argv[argc++] = "-c";
+            argv[argc++] = clientId;
 
             ALOGD("overriding with %s %s", arg_overrides[1], arg_overrides[2]);
         }
+
     }
 OpenLib:
 #endif
@@ -259,14 +283,20 @@ OpenLib:
     }
 
     if (hasLibArgs) {
+        ALOGE("hasLibArgs");
         rilArgv = argv + i - 1;
         argc = argc -i + 1;
+        ALOGE("argc : %d ",argc);
+        for (k=0 ;k<argc; k++) {
+           ALOGE("rilArgv[%d] = %s ",k,rilArgv[k]);
+        }
     } else {
         static char * newArgv[MAX_LIB_ARGS];
         static char args[PROPERTY_VALUE_MAX];
         rilArgv = newArgv;
         property_get(LIB_ARGS_PROPERTY, args, "");
         argc = make_argv(args, rilArgv);
+        ALOGE("argc : %d", argc);
     }
 
     // Make sure there's a reasonable argv[0]

@@ -51,6 +51,7 @@
 #define HANDSHAKE_RETRY_COUNT 8
 #define HANDSHAKE_TIMEOUT_MSEC 250
 
+extern int ril_inst_id;
 static pthread_t s_tid_reader;
 static int s_fd = -1;    /* fd of the AT channel */
 static ATUnsolHandler s_unsolHandler;
@@ -78,8 +79,8 @@ void  AT_DUMP(const char*  prefix, const char*  buff, int  len)
  * these are protected by s_commandmutex
  */
 
-static pthread_mutex_t s_commandmutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t s_commandcond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t s_commandmutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t s_commandcond = PTHREAD_COND_INITIALIZER;
 
 static ATCommandType s_type;
 static const char *s_responsePrefix = NULL;
@@ -510,6 +511,7 @@ static int writeline (const char *s)
         } while (written < 0 && errno == EINTR);
 
         if (written < 0) {
+            LOGE("[%d:%d] write error1",ril_inst_id ,s_fd);
             return AT_ERROR_GENERIC;
         }
 
@@ -523,6 +525,7 @@ static int writeline (const char *s)
     } while ((written < 0 && errno == EINTR) || (written == 0));
 
     if (written < 0) {
+        LOGE("[%d:%d] write error2",ril_inst_id ,s_fd);
         return AT_ERROR_GENERIC;
     }
 
@@ -1016,3 +1019,8 @@ AT_CME_Error at_get_cme_error(const ATResponse *p_response)
     return (AT_CME_Error) ret;
 }
 
+void at_update_channel(int sFD)
+{
+    LOGE("at_update_channel s_fd=%d, sFD=%d",s_fd, sFD);
+    s_fd = sFD;
+}
