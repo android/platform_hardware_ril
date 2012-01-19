@@ -79,6 +79,8 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status);
 static void freeCardStatus(RIL_CardStatus_v6 *p_card_status);
 static void onDataCallListChanged(void *param);
 
+extern pthread_mutex_t s_commandmutex;
+extern pthread_cond_t s_commandcond;
 extern const char * requestToString(int request);
 
 /*** Static Variables ***/
@@ -107,11 +109,13 @@ static pthread_cond_t s_state_cond = PTHREAD_COND_INITIALIZER;
 static int s_port = -1;
 static const char * s_device_path = NULL;
 static int          s_device_socket = 0;
+int ril_inst_id = 0;
 
 /* trigger change to this with s_state_cond */
 static int s_closed = 0;
 
-static int sFD;     /* file desc of AT channel */
+static int sFD =-1;     /* file desc of AT channel for current service provider */
+static int sOldFD =-1;  /* file desc of AT channel for prev. service provider*/
 static char sATBuffer[MAX_AT_RESPONSE+1];
 static char *sATBufferCur = NULL;
 
@@ -1166,6 +1170,13 @@ static void  requestSIM_IO(void *data, size_t datalen, RIL_Token t)
 
     p_args = (RIL_SIM_IO_v6 *)data;
 
+    LOGD("requestSIM_IO: RILD=%d instance.", ril_inst_id);
+    if (!((0 == ril_inst_id) || (1 == ril_inst_id)))
+    {
+        LOGE("Not allowed on this RILD=%d instance.", ril_inst_id);
+        goto error;
+    }
+
     /* FIXME handle pin2 */
 
     if (p_args->data == NULL) {
@@ -2063,6 +2074,7 @@ mainLoop(void *param)
     int ret;
 
     AT_DUMP("== ", "entering mainLoop()", -1 );
+    LOGD("\nril_inst_id=%d", ril_inst_id);
     at_set_on_reader_closed(onATReaderClosed);
     at_set_on_timeout(onATTimeout);
 
@@ -2077,19 +2089,35 @@ mainLoop(void *param)
                      * now another "legacy" way of communicating with the
                      * emulator), we will try to connecto to gsm service via
                      * qemu pipe. */
-                    fd = qemu_pipe_open("qemud:gsm");
+                    if (0 == ril_inst_id) {
+                        LOGE("instance 0 ril_inst_id : ", ril_inst_id);
+                        fd = qemu_pipe_open("qemud:gsm");
+                    } else if (1 == ril_inst_id) {
+                        LOGE("instance 1 ril_inst_id : ", ril_inst_id);
+                        fd = qemu_pipe_open("qemud:gsm1");
+                    }
                     if (fd < 0) {
+                        LOGE("pipe failed");
                         /* Qemu-specific control socket */
                         fd = socket_local_client( "qemud",
                                                   ANDROID_SOCKET_NAMESPACE_RESERVED,
                                                   SOCK_STREAM );
                         if (fd >= 0 ) {
+                            LOGE("qemud success");
                             char  answer[2];
-
-                            if ( write(fd, "gsm", 3) != 3 ||
+                            char  *service = "gsm";
+                            if (0 == ril_inst_id) {
+                                service = "gsm";
+                                LOGE("Connecting to GSM service");
+                            } else if (1 == ril_inst_id) {
+                                service = "gsm1";
+                                LOGE("Connecting to GSM1 service");
+                            }
+                            if ( write(fd, service, 3) != 3 ||
                                  read(fd, answer, 2) != 2 ||
                                  memcmp(answer, "OK", 2) != 0)
                             {
+                                LOGE("success");
                                 close(fd);
                                 fd = -1;
                             }
@@ -2150,7 +2178,7 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
 
     s_rilenv = env;
 
-    while ( -1 != (opt = getopt(argc, argv, "p:d:s:"))) {
+    while ( -1 != (opt = getopt(argc, argv, "p:d:s:c:"))) {
         switch (opt) {
             case 'p':
                 s_port = atoi(optarg);
@@ -2170,6 +2198,11 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
                 s_device_path   = optarg;
                 s_device_socket = 1;
                 ALOGI("Opening socket %s\n", s_device_path);
+            break;
+
+            case 'c':
+                ril_inst_id = atoi(optarg);
+                ALOGI("ReferRil is using instance %d ", ril_inst_id);
             break;
 
             default:
