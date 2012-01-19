@@ -45,6 +45,8 @@ static void usage(const char *argv0)
     exit(-1);
 }
 
+extern char rild[MAX_SOCKET_NAME_LENGTH];
+
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
 
 extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
@@ -108,6 +110,9 @@ int main(int argc, char **argv)
     unsigned char hasLibArgs = 0;
 
     int i;
+    const char *clientId = NULL;
+    ALOGE("**RIL Daemon Started**");
+    ALOGE("**RILd param count=%d**", argc);
 
     umask(S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
     for (i = 1; i < argc ;) {
@@ -118,10 +123,22 @@ int main(int argc, char **argv)
             i++;
             hasLibArgs = 1;
             break;
+        } else if (0 == strcmp(argv[i], "-c") &&  (argc - i > 1)) {
+            clientId = argv[i+1];
+            i += 2;
         } else {
             usage(argv[0]);
         }
     }
+
+    if (clientId == NULL) {
+        clientId = "0";
+    } else if (atoi(clientId) >= MAX_RILDS) {
+        ALOGE("Max Number of rild's supported is: %d", MAX_RILDS);
+        exit(0);
+    }
+
+    RIL_setRilSocketName(strncat(rild, clientId, MAX_SOCKET_NAME_LENGTH));
 
     if (rilLibPath == NULL) {
         if ( 0 == property_get(LIB_PATH_PROPERTY, libPath, NULL)) {
@@ -136,7 +153,7 @@ int main(int argc, char **argv)
     /* special override when in the emulator */
 #if 1
     {
-        static char*  arg_overrides[3];
+        static char*  arg_overrides[5];
         static char   arg_device[32];
         int           done = 0;
 
@@ -234,6 +251,8 @@ int main(int argc, char **argv)
             i    = 1;
             hasLibArgs = 1;
             rilLibPath = REFERENCE_RIL_PATH;
+            argv[argc++] = "-c";
+            argv[argc++] = clientId;
 
             ALOGD("overriding with %s %s", arg_overrides[1], arg_overrides[2]);
         }
