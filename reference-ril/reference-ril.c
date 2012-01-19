@@ -199,6 +199,7 @@ static pthread_cond_t s_state_cond = PTHREAD_COND_INITIALIZER;
 static int s_port = -1;
 static const char * s_device_path = NULL;
 static int          s_device_socket = 0;
+const char * ril_inst_id = NULL;
 
 /* trigger change to this with s_state_cond */
 static int s_closed = 0;
@@ -759,6 +760,25 @@ static void requestGetCurrentCalls(void *data, size_t datalen, RIL_Token t)
 error:
     RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
     at_response_free(p_response);
+}
+
+static void setUiccSubscription(int request, void *data, size_t datalen, RIL_Token t)
+{
+    RIL_SelectUiccSub *uiccSubscrInfo;
+    uiccSubscrInfo = (RIL_SelectUiccSub *)data;
+    int response = 0;
+
+    RLOGD("setUiccSubscription() RILD=%s instance.", ril_inst_id);
+    // TODO: DSDS: Need to implement this.
+    // workaround: send success for now.
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+
+    if (uiccSubscrInfo->act_status == RIL_UICC_SUBSCRIPTION_ACTIVATE) {
+        RLOGD("setUiccSubscription() : Activate Request: sending SUBSCRIPTION_STATUS_CHANGED");
+        response = 1; // ACTIVATED
+    } else {
+        RLOGD("setUiccSubscriptionSource() : Deactivate Request");
+    }
 }
 
 static void requestDial(void *data, size_t datalen, RIL_Token t)
@@ -2284,6 +2304,10 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             requestSetCellInfoListRate(data, datalen, t);
             break;
 
+        case RIL_REQUEST_SET_UICC_SUBSCRIPTION:
+            setUiccSubscription(request, data, datalen, t);
+            break;
+
         /* CDMA Specific Requests */
         case RIL_REQUEST_BASEBAND_VERSION:
             if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
@@ -3245,7 +3269,13 @@ mainLoop(void *param)
                      * now another "legacy" way of communicating with the
                      * emulator), we will try to connecto to gsm service via
                      * qemu pipe. */
-                    fd = qemu_pipe_open("qemud:gsm");
+                    char qemuPipe[MAX_QEMU_PIPE_NAME_LENGTH] = "qemud:gsm";
+                    if (strncmp(ril_inst_id, "0", MAX_CLIENT_ID_LENGTH)) {
+                        strncat(qemuPipe, ril_inst_id ,MAX_QEMU_PIPE_NAME_LENGTH);
+                    }
+                    RLOGD("qemu pipe name : %s\n", qemuPipe);
+                    fd = qemu_pipe_open(qemuPipe);
+
                     if (fd < 0) {
                         /* Qemu-specific control socket */
                         fd = socket_local_client( "qemud",
@@ -3318,7 +3348,7 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
 
     s_rilenv = env;
 
-    while ( -1 != (opt = getopt(argc, argv, "p:d:s:"))) {
+    while ( -1 != (opt = getopt(argc, argv, "p:d:s:c:"))) {
         switch (opt) {
             case 'p':
                 s_port = atoi(optarg);
@@ -3338,6 +3368,11 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
                 s_device_path   = optarg;
                 s_device_socket = 1;
                 RLOGI("Opening socket %s\n", s_device_path);
+            break;
+
+            case 'c':
+                ril_inst_id = optarg;
+                RLOGI("ReferRil is using instance %s ", ril_inst_id);
             break;
 
             default:
