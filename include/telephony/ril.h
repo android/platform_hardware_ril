@@ -529,6 +529,11 @@ typedef struct
   RIL_AppStatus applications[RIL_CARD_MAX_APPS];
 } RIL_CardStatus_v6;
 
+typedef struct {
+    RIL_PersoSubstate depersonalizationType;
+    char             *depersonalizationCode;
+} RIL_Depersonalization;
+
 /* The result of a SIM refresh, returned in data[0] of RIL_UNSOL_SIM_REFRESH */
 typedef enum {
     /* A file on SIM has been updated.  data[1] contains the EFID. */
@@ -950,9 +955,11 @@ typedef struct {
 #define RIL_REQUEST_CHANGE_SIM_PIN2 7
 
 /**
- * RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION
+ * RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION DEPRECATED
  *
  * Requests that network personlization be deactivated
+ *
+ * The request is deprecated, use RIL_ENTER_DEPERSONALIZATION_CODE
  *
  * "data" is const char **
  * ((const char **)(data))[0]] is network depersonlization code
@@ -3268,6 +3275,27 @@ typedef struct {
  */
 #define RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS 107
 
+
+/**
+ * RIL_REQUEST_ENTER_DEPERSONALIZATION_CODE
+ *
+ * Requests personlization be deactivated
+ *
+ * "data" is const RIL_Depersonalization*
+ *
+ * "response" is int *
+ * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
+ *
+ * Valid errors:
+ *
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  PASSWORD_INCORRECT
+ *     (code is invalid)
+ */
+
+#define RIL_REQUEST_ENTER_DEPERSONALIZATION_CODE 108
 
 /***********************************************************************/
 
