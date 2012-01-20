@@ -1547,6 +1547,12 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             requestEnterSimPin(data, datalen, t);
             break;
 
+        case RIL_REQUEST_ENTER_DEPERSONALIZATION_CODE: {
+            int remainingAttempts = 3;
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, &remainingAttempts, sizeof(int));
+            break;
+        }
+
         default:
             RIL_onRequestComplete(t, RIL_E_REQUEST_NOT_SUPPORTED, NULL, 0);
             break;
