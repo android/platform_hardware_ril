@@ -114,8 +114,6 @@ const char * ril_inst_id = NULL;
 /* trigger change to this with s_state_cond */
 static int s_closed = 0;
 
-static int sFD =-1;     /* file desc of AT channel for current service provider */
-static int sOldFD =-1;  /* file desc of AT channel for prev. service provider*/
 static char sATBuffer[MAX_AT_RESPONSE+1];
 static char *sATBufferCur = NULL;
 
@@ -655,6 +653,36 @@ error:
     at_response_free(p_response);
 }
 
+static void setUiccSubscription(int request, void *data, size_t datalen, RIL_Token t)
+{
+    RIL_SelectUiccSub *uiccSubscrInfo;
+    uiccSubscrInfo = (RIL_SelectUiccSub *)data;
+    int response = 0;
+
+    ALOGD("setUiccSubscription() RILD=%s instance.", ril_inst_id);
+    // TODO: DSDS: Need to implement this.
+    // workarround: send success for now.
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+
+    if (uiccSubscrInfo->act_status == RIL_UICC_SUBSCRIPTION_ACTIVATE) {
+        ALOGD("setUiccSubscription() : Activate Request: sending SUBSCRIPTION_STATUS_CHANGED");
+        response = 1; // ACTIVATED
+        RIL_onUnsolicitedResponse (
+            RIL_UNSOL_UICC_SUBSCRIPTION_STATUS_CHANGED,
+            &response, sizeof(response));
+    } else {
+        ALOGD("setUiccSubscriptionSource() : Deactivate Request");
+    }
+}
+
+static void setDataSubscription(int request, void *data, size_t datalen, RIL_Token t)
+{
+    ALOGD("setDataSubscriptionSource()") ;
+    // TODO: DSDS: Need to implement this.
+    // workarround: send success for now.
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+}
+
 static void requestDial(void *data, size_t datalen, RIL_Token t)
 {
     RIL_Dial *p_dial;
@@ -1170,7 +1198,7 @@ static void  requestSIM_IO(void *data, size_t datalen, RIL_Token t)
 
     p_args = (RIL_SIM_IO_v6 *)data;
 
-    LOGD("requestSIM_IO: RILD=%s instance.", ril_inst_id);
+    ALOGD("requestSIM_IO: RILD=%s instance.", ril_inst_id);
 
     /* FIXME handle pin2 */
 
@@ -1551,6 +1579,14 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         case RIL_REQUEST_CHANGE_SIM_PIN:
         case RIL_REQUEST_CHANGE_SIM_PIN2:
             requestEnterSimPin(data, datalen, t);
+            break;
+
+       case RIL_REQUEST_SET_UICC_SUBSCRIPTION:
+            setUiccSubscription(request, data, datalen, t);
+            break;
+
+        case RIL_REQUEST_SET_DATA_SUBSCRIPTION:
+            setDataSubscription(request, data, datalen, t);
             break;
 
         default:

@@ -1018,9 +1018,3 @@ AT_CME_Error at_get_cme_error(const ATResponse *p_response)
 
     return (AT_CME_Error) ret;
 }
-
-void at_update_channel(int sFD)
-{
-    ALOGD("at_update_channel s_fd=%d, sFD=%d",s_fd, sFD);
-    s_fd = sFD;
-}
