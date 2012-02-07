@@ -1,6 +1,6 @@
 /* //device/libs/telephony/ril_commands.h
 **
-** Copyright 2006, The Android Open Source Project
+** Copyright 2006, 2012 The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -122,3 +122,5 @@
     {RIL_REQUEST_ISIM_AUTHENTICATION, dispatchString, responseString},
     {RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU, dispatchStrings, responseVoid},
     {RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS, dispatchString, responseSIM_IO},
+    {RIL_REQUEST_SET_UICC_SUBSCRIPTION, dispatchUiccSubscripton, responseVoid},
+    {RIL_REQUEST_SET_DATA_SUBSCRIPTION, dispatchVoid, responseVoid},
