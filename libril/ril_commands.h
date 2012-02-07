@@ -1,6 +1,6 @@
 /* //device/libs/telephony/ril_commands.h
 **
-** Copyright 2006, The Android Open Source Project
+** Copyright 2006, 2013 The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -125,3 +125,5 @@
     {RIL_REQUEST_VOICE_RADIO_TECH, dispatchVoiceRadioTech, responseInts},
     {RIL_REQUEST_GET_CELL_INFO_LIST, dispatchVoid, responseCellInfoList},
     {RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE, dispatchInts, responseVoid},
+    {RIL_REQUEST_SET_UICC_SUBSCRIPTION, dispatchUiccSubscripton, responseVoid},
+    {RIL_REQUEST_SET_DATA_SUBSCRIPTION, dispatchVoid, responseVoid},

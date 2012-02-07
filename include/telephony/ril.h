@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <telephony/ril_msim.h>
 #ifndef FEATURE_UNIT_TEST
 #include <sys/time.h>
 #endif /* !FEATURE_UNIT_TEST */
@@ -61,8 +62,9 @@ typedef enum {
                                                    location */
     RIL_E_MODE_NOT_SUPPORTED = 13,              /* HW does not support preferred network type */
     RIL_E_FDN_CHECK_FAILURE = 14,               /* command failed because recipient is not on FDN list */
-    RIL_E_ILLEGAL_SIM_OR_ME = 15                /* network selection failed due to
+    RIL_E_ILLEGAL_SIM_OR_ME = 15,               /* network selection failed due to
                                                    illegal SIM or ME */
+    RIL_E_SUBSCRIPTION_NOT_SUPPORTED = 26       /* Subscription not supported by RIL */
 } RIL_Errno;
 
 typedef enum {
@@ -3488,6 +3490,42 @@ typedef struct {
  */
 #define RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE 110
 
+/**
+ * RIL_REQUEST_SET_UICC_SUBSCRIPTION
+ *
+ * Selects/de-selects a particular application/subscription to use on a particular SIM card
+ * "data" is const  RIL_SelectUiccSub*
+ *
+ * "response" is NULL
+ *
+ *  Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ *  SUBSCRIPTION_NOT_SUPPORTED
+ *
+ */
+#define RIL_REQUEST_SET_UICC_SUBSCRIPTION  111
+
+/**
+ *  RIL_REQUEST_SET_DATA_SUBSCRIPTION
+ *
+ *  Selects a subscription for data call setup
+ * "data" is NULL
+ *
+ * "response" is NULL
+ *
+ *  Valid errors:
+ *
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ *
+ */
+#define RIL_REQUEST_SET_DATA_SUBSCRIPTION  112
+
 /***********************************************************************/
 
 
@@ -3978,6 +4016,20 @@ typedef struct {
  */
 #define RIL_UNSOL_CELL_INFO_LIST 1036
 
+/**
+ * RIL_UNSOL_UICC_SUBSCRIPTION_STATUS_CHANGED
+ *
+ * Called when there is a change in subscription status.
+ * This event will be sent in the following scenarios
+ *  - subscription readiness at modem, which was selected by telephony layer
+ *  - when subscription is deactivated by modem due to UICC card removal
+ *
+ * "data" is const int *
+ * ((const int *)data)[0] == 0 for Subscription Deactivated
+ * ((const int *)data)[0] == 1 for Subscription Activated
+ *
+ */
+#define RIL_UNSOL_UICC_SUBSCRIPTION_STATUS_CHANGED 1037
 /***********************************************************************/
 
 
