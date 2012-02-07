@@ -655,6 +655,106 @@ error:
     at_response_free(p_response);
 }
 
+static void setUiccSubscription(int request, void *data, size_t datalen, RIL_Token t)
+{
+
+    RIL_SelectUiccSub *uiccSubscrInfo;
+    uiccSubscrInfo = (RIL_SelectUiccSub *)data;
+    int fd =-1;
+
+    LOGD("setUiccSubscriptionSource()");
+
+    RIL_SelectUiccSub *subData = (RIL_SelectUiccSub*) data;
+
+    if(subData->act_status == 1)
+    {
+        LOGD("Android fwk deactivate the sub, NOP");
+        RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+        return;
+    }
+
+    if(subData->slot == 0) {
+        if(0 == ril_inst_id)
+        {
+            LOGD("slotId=0, GSM already connected");
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            return;
+        } else {
+            LOGD("slotId=0, need to select GSM service");
+            ril_inst_id =  0;
+        }
+    } else {
+        if (1 == ril_inst_id)
+        {
+            LOGD("slotId=1, GSM1 already connected");
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            return;
+        } else {
+            LOGD("slotId=1, need to select GSM1 service");
+            ril_inst_id =  1;
+        }
+    }
+    LOGD("Connecting sFD=%d to other service", sFD);
+
+    if(sOldFD == -1) {
+        LOGD("Trying to lock s_commandmutex");
+        pthread_mutex_lock(&s_commandmutex);
+        LOGD("locked s_commandmutex");
+
+        sOldFD = sFD;
+        sFD = -1;
+        /* Qemu-specific control socket */
+        LOGD("\n Opening qemud socket");
+        fd = socket_local_client( "qemud",
+                ANDROID_SOCKET_NAMESPACE_RESERVED,
+                SOCK_STREAM );
+        LOGD("\n QEMUD fd=%d", fd);
+
+        if (fd >= 0 ) {
+            char  answer[2];
+            char  *service = "gsm";
+            if(0 == ril_inst_id) {
+                service = "gsm";
+                LOGD("Connecting to GSM service");
+            } else if (1 == ril_inst_id) {
+                service = "gsm1";
+                LOGD("Connecting to GSM1 service");
+            } else {
+                service = "gsm";
+            }
+            (write(fd, service, 4) == 4)?LOGD("\nwritten %s",service):LOGE("\nWriting %s failed", service);
+            (read(fd, answer, 2) == 2)?LOGD("\nread ok"):LOGE("\nread failed");
+            (memcmp(answer, "OK", 2) ==0)?LOGD("\nDone"):LOGE("\nNOT done");
+            if ( memcmp(answer, "OK", 2) != 0) {
+                LOGE("\n %d attempt failed.",ril_inst_id );
+                close(fd);
+                fd = -1;
+            }
+            sFD = fd;
+            at_update_channel(sFD);
+        }
+        pthread_mutex_unlock(&s_commandmutex);
+        LOGD("unlocked s_commandmutex");
+
+    } else {
+        int temp = sFD;
+        LOGD("Simply swaping the connections.");
+
+        sFD = sOldFD;
+        sOldFD = sFD;
+    }
+
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+}
+
+static void setDataSubscription(int request, void *data, size_t datalen, RIL_Token t)
+{
+    LOGD("setDataSubscriptionSource()") ;
+    // TODO: DSDS: Need to implement this.
+    // workarround: send success for now.
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+}
+
 static void requestDial(void *data, size_t datalen, RIL_Token t)
 {
     RIL_Dial *p_dial;
@@ -1556,6 +1656,14 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         case RIL_REQUEST_CHANGE_SIM_PIN:
         case RIL_REQUEST_CHANGE_SIM_PIN2:
             requestEnterSimPin(data, datalen, t);
+            break;
+
+       case RIL_REQUEST_SET_UICC_SUBSCRIPTION:
+            setUiccSubscription(request, data, datalen, t);
+            break;
+
+        case RIL_REQUEST_SET_DATA_SUBSCRIPTION:
+            setDataSubscription(request, data, datalen, t);
             break;
 
         default:
