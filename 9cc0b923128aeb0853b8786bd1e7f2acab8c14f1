@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAADUn////w\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 3866,
+      "author": {
+        "id": 1000660
+      },
+      "writtenOn": "2012-02-28T21:22:47Z",
+      "side": 1,
+      "message": "FWIW, we already have a 1035 in Google\u0027s internal source tree, so this should be bumped up accordingly.",
+      "revId": "9cc0b923128aeb0853b8786bd1e7f2acab8c14f1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAADUn////o\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 2066,
+      "author": {
+        "id": 1000660
+      },
+      "writtenOn": "2012-02-28T21:22:47Z",
+      "side": 1,
+      "message": "Please use the new logging function ALOGE (here and in all other instances)",
+      "revId": "9cc0b923128aeb0853b8786bd1e7f2acab8c14f1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAADUn////k\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 2094,
+      "author": {
+        "id": 1000660
+      },
+      "writtenOn": "2012-02-28T21:22:47Z",
+      "side": 1,
+      "message": "Please use ALOGD instead of LOGD (here and in all other instances). We\u0027ve switched to the A versions to avoid naming conflicts.",
+      "revId": "9cc0b923128aeb0853b8786bd1e7f2acab8c14f1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
