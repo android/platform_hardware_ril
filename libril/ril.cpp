@@ -533,7 +533,12 @@ dispatchSmsWrite (Parcel &p, RequestInfo *pRI) {
 
     args.pdu = strdupReadString(p);
 
-    if (status != NO_ERROR || args.pdu == NULL) {
+    if (status != NO_ERROR ) {
+        ALOGE("dispatchSmsWrite: status= %d, args.status= %d", status, args.status);
+        goto invalid;
+    }
+    if( NULL == args.pdu ) {
+        ALOGE("dispatchSmsWrite: args.pdu is NULL");
         goto invalid;
     }
 
@@ -560,6 +565,7 @@ dispatchSmsWrite (Parcel &p, RequestInfo *pRI) {
     return;
 invalid:
     invalidCommandBlock(pRI);
+    RIL_onRequestComplete(pRI, RIL_E_GENERIC_FAILURE, NULL, 0);
     return;
 }
 
