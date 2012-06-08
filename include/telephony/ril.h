@@ -251,6 +251,28 @@ typedef struct {
                        (as expected by TS 27.005) or NULL for default SMSC */
 } RIL_SMS_WriteArgs;
 
+/** Used by RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS */
+typedef struct {
+    int type;       /* Notification type: */
+                    /* 0x00 - ETWS Primary */
+                    /* 0x01 - ETWS Secondary GSM */
+                    /* 0x02 - ETWS Secondary UMTS */
+                    /* 0x03 - GSM CB */
+                    /* 0x04 - UMTS CB */
+    int size;       /* Size of the pdu */
+    char * pdu;     /* PDU of message */
+                    /* "pdu" can be one of the following:
+                     * If primary ETWS notification, "pdu" is const char of 56 bytes
+                     * which indicates each page of a CBS Message sent to the MS by the
+                     * BTS as coded in 3GPP 23.041 Section 9.4.1.3.2.
+                     * If received from GSM network, "pdu" is const char of 88 bytes
+                     * which indicates each page of a CBS Message sent to the MS by the
+                     * BTS as coded in 3GPP 23.041 Section 9.4.1.2.
+                     * If received from UMTS network, "data" is const char of 90 up to 1252
+                     * bytes which contain between 1 and 15 CBS Message pages sent as one
+                     * packet to the MS by the BTS as coded in 3GPP 23.041 Section 9.4.2.2. */
+} RIL_Bc_Message;
+
 /** Used by RIL_REQUEST_DIAL */
 typedef struct {
     char * address;
@@ -3578,13 +3600,7 @@ typedef struct {
  *
  * Called when new Broadcast SMS is received
  *
- * "data" can be one of the following:
- * If received from GSM network, "data" is const char of 88 bytes
- * which indicates each page of a CBS Message sent to the MS by the
- * BTS as coded in 3GPP 23.041 Section 9.4.1.2.
- * If received from UMTS network, "data" is const char of 90 up to 1252
- * bytes which contain between 1 and 15 CBS Message pages sent as one
- * packet to the MS by the BTS as coded in 3GPP 23.041 Section 9.4.2.2.
+ * "data" is const RIL_Bc_Message *
  *
  */
 #define RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS 1021
