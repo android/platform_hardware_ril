@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAGuH////8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 3866,
+      "author": {
+        "id": 1004300
+      },
+      "writtenOn": "2012-06-19T06:08:17Z",
+      "side": 1,
+      "message": "If we leave 1035 and use 1036 then in hardware/ril/libril/ril_unsol_commands.h we need to have a null entry for 35 th entry.",
+      "parentUuid": "AAADUn////w\u003d",
+      "revId": "9cc0b923128aeb0853b8786bd1e7f2acab8c14f1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAADUn////o\u003d",
         "filename": "libril/ril.cpp",
         "patchSetId": 6
