@@ -99,7 +99,8 @@ typedef enum {
     RADIO_TECH_EVDO_B = 12,
     RADIO_TECH_EHRPD = 13,
     RADIO_TECH_LTE = 14,
-    RADIO_TECH_HSPAP = 15 // HSPA+
+    RADIO_TECH_HSPAP = 15, // HSPA+
+    RADIO_TECH_TD_SCDMA = 16
 } RIL_RadioTechnology;
 
 // Do we want to split Data from Voice and the use
@@ -662,6 +663,13 @@ typedef struct {
                           * Reference: 3GPP TS 36.101 9.2, 9.3, A.4 */
 } RIL_LTE_SignalStrength;
 
+typedef struct {
+    int rscp;    /* The Received Signal Code Power in dBm multipled by -1.
+                  * Range : 25 to 116
+                  * INT_MAX: 0x7FFFFFFF denotes invalid value.
+                  * Reference: 3GPP TS 25.123, section 9.1.1.1 */
+} RIL_TD_SCDMA_SignalStrength;
+
 /* Deprecated, use RIL_SignalStrength_v6 */
 typedef struct {
     RIL_GW_SignalStrength   GW_SignalStrength;
@@ -670,10 +678,11 @@ typedef struct {
 } RIL_SignalStrength_v5;
 
 typedef struct {
-    RIL_GW_SignalStrength   GW_SignalStrength;
-    RIL_CDMA_SignalStrength CDMA_SignalStrength;
-    RIL_EVDO_SignalStrength EVDO_SignalStrength;
-    RIL_LTE_SignalStrength  LTE_SignalStrength;
+    RIL_GW_SignalStrength       GW_SignalStrength;
+    RIL_CDMA_SignalStrength     CDMA_SignalStrength;
+    RIL_EVDO_SignalStrength     EVDO_SignalStrength;
+    RIL_LTE_SignalStrength      LTE_SignalStrength;
+    RIL_TD_SCDMA_SignalStrength TD_SCDMA_SignalStrength;
 } RIL_SignalStrength_v6;
 
 /* Names of the CDMA info records (C.S0005 section 3.7.5) */
@@ -1980,7 +1989,9 @@ typedef struct {
  *
  * Manually select a specified network.
  *
- * "data" is const char * specifying MCCMNC of network to select (eg "310170")
+ * "data" is a const char **
+ * ((const char **)data)[0] specifying MCCMNC of network to select (eg "310170")
+ * ((const char **)data)[1] specifying radio techonology
  * "response" is NULL
  *
  * This request must not respond until the new operator is selected
@@ -1997,6 +2008,7 @@ typedef struct {
  *       Returns GENERIC_FAILURE for all other causes that might be
  *       fixed by retries.
  *
+ * See also: RIL_REQUEST_QUERY_AVAILABLE_NETWORKS
  */
 #define RIL_REQUEST_SET_NETWORK_SELECTION_MANUAL 47
 
@@ -2006,7 +2018,7 @@ typedef struct {
  * Scans for available networks
  *
  * "data" is NULL
- * "response" is const char ** that should be an array of n*4 strings, where
+ * "response" is const char ** that should be an array of n*5 strings, where
  *    n is the number of available networks
  * For each available network:
  *
@@ -2018,6 +2030,15 @@ typedef struct {
  *           "available"
  *           "current"
  *           "forbidden"
+ * ((const char **) response)[n+4] is a string value of radio technology:
+ * as per 3GPP TS 27.007, section 7.3
+ *           "GPRS only"
+ *           "EDGE"
+ *           "UMTS"
+ *           "HSDPA"
+ *           "HSUPA"
+ *           "HSPA"
+ *           "LTE"
  *
  * This request must not respond until the new operator is selected
  * and registered
