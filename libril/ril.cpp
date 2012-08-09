@@ -1995,6 +1995,15 @@ static int responseRilSignalStrength(Parcel &p,
         p.writeInt32(p_cur->EVDO_SignalStrength.signalNoiseRatio);
         if (responselen >= sizeof (RIL_SignalStrength_v6)) {
             p.writeInt32(p_cur->LTE_SignalStrength.signalStrength);
+
+            /*
+             * ril version <=6 receives negative values for rsrp
+             * workaround for backward compatibility
+             */
+            p_cur->LTE_SignalStrength.rsrp =
+                    ((s_callbacks.version <= 6) && (p_cur->LTE_SignalStrength.rsrp < 0 )) ?
+                        -(p_cur->LTE_SignalStrength.rsrp) : p_cur->LTE_SignalStrength.rsrp;
+
             p.writeInt32(p_cur->LTE_SignalStrength.rsrp);
             p.writeInt32(p_cur->LTE_SignalStrength.rsrq);
             p.writeInt32(p_cur->LTE_SignalStrength.rssnr);
