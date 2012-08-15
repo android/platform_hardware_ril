@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAIbH///v0\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2012-08-15T16:32:28Z",
+      "side": 1,
+      "message": "Can you also add reference to the spec for encoding in case of etws secondary?",
+      "revId": "b3b4e53f4f2eb2ff442dadf1d489a38a6e4364e5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAIbH///wA\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2012-08-15T16:32:28Z",
+      "side": 1,
+      "message": "At this point it doesn\u0027t matter where it was received from since there is \"type\" field now. I think we should change comment.",
+      "revId": "b3b4e53f4f2eb2ff442dadf1d489a38a6e4364e5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAIbH///v4\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1003902
+      },
+      "writtenOn": "2012-08-15T16:32:28Z",
+      "side": 1,
+      "message": "Same as above. Change comment to state that we rely on type field and not on where message was received from.",
+      "revId": "b3b4e53f4f2eb2ff442dadf1d489a38a6e4364e5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
