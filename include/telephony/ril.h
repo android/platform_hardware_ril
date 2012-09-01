@@ -1403,20 +1403,22 @@ typedef struct {
 /**
  * RIL_REQUEST_RADIO_POWER
  *
- * Toggle radio on and off (for "airplane" mode)
- * If the radio is is turned off/on the radio modem subsystem
+ * Toggle radio on and off or sets it in low-power mode a.k.a "airplane" mode
+ * If the radio is turned off/on the radio modem subsystem
  * is expected return to an initialized state. For instance,
  * any voice and data calls will be terminated and all associated
  * lists emptied.
  *
  * "data" is int *
- * ((int *)data)[0] is > 0 for "Radio On"
- * ((int *)data)[0] is == 0 for "Radio Off"
+ * ((int *)data)[0] is == 0 for "Radio Off or Airplane Mode"
+ * ((int *)data)[0] is == 1 for "Radio On"
+ * ((int *)data)[0] is == 2 for "Modem or Radio Power Off"
  *
  * "response" is NULL
  *
- * Turn radio on if "on" > 0
- * Turn radio off if "on" == 0
+ * Turn radio off or airplane mode if "on" == 0
+ * Turn radio on if "on" == 1
+ * Shutdown modem or radio if it is in airplane mode == 2
  *
  * Valid errors:
  *  SUCCESS
