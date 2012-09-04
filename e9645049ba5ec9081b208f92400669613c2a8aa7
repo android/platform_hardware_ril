@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAI6X//7PI\u003d",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2710,
+      "author": {
+        "id": 1000660
+      },
+      "writtenOn": "2012-09-04T18:02:29Z",
+      "side": 1,
+      "message": "100 columns",
+      "revId": "e9645049ba5ec9081b208f92400669613c2a8aa7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
