@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAI63//7b8\u003d",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1406,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2012-09-04T19:40:26Z",
+      "side": 1,
+      "message": "These comments are confusing, can we just state that is now got 3 states, 0 \u003d\u003d Radio off, 1 \u003d\u003d Radio on, 2 \u003d\u003d low power?",
+      "revId": "fe182e9963a1911ca703f1b751c0d8feecb64680",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
