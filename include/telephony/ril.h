@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-#define RIL_VERSION 7     /* Current version */
+#define RIL_VERSION 8     /* Current version */
 #define RIL_VERSION_MIN 6 /* Minimum RIL_VERSION supported */
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
@@ -253,6 +253,33 @@ typedef struct {
     char * smsc;    /* SMSC address in GSM BCD format prefixed by a length byte
                        (as expected by TS 27.005) or NULL for default SMSC */
 } RIL_SMS_WriteArgs;
+
+typedef enum {
+    BC_MESSAGE_TYPE_ETWS_PRIMARY = 0,           /* 0 - ETWS Primary */
+    BC_MESSAGE_TYPE_ETWS_SECONDARY_GSM = 1,     /* 1 - ETWS Secondary GSM */
+    BC_MESSAGE_TYPE_ETWS_SECONDARY_UMTS = 2,    /* 2 - ETWS Secondary UMTS */
+    BC_MESSAGE_TYPE_GSM = 3,                    /* 3 - GSM CB */
+    BC_MESSAGE_TYPE_UMTS = 4                    /* 4 - UMTS CB */
+} RIL_BcMessageType;
+
+/** Used by RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS */
+typedef struct {
+    RIL_BcMessageType type;
+    int pdu_len;    /* length of PDU */
+    unsigned char * pdu;     /* PDU of message */
+                    /* "pdu" can be one of the following:
+                     * If primary ETWS notification, "pdu" is const char of 56 bytes
+                     * which indicates each page of a CBS Message sent to the MS by the
+                     * BTS as coded in 3GPP 23.041 Section 9.4.1.3.2.
+                     * If type is ETWS Secondary GSM or GSM CB
+                     * "pdu" is const char of 88 bytes
+                     * which indicates each page of a CBS Message sent to the MS by the
+                     * BTS as coded in 3GPP 23.041 Section 9.4.1.2.
+                     * If type is ETWS Secondary UMTS or UMTS CB,
+                     * "pdu" is const char of 90 up to 1252
+                     * bytes which contain between 1 and 15 CBS Message pages sent as one
+                     * packet to the MS by the BTS as coded in 3GPP 23.041 Section 9.4.2.2. */
+} RIL_Bc_Message;
 
 /** Used by RIL_REQUEST_DIAL */
 typedef struct {
@@ -3617,13 +3644,7 @@ typedef struct {
  *
  * Called when new Broadcast SMS is received
  *
- * "data" can be one of the following:
- * If received from GSM network, "data" is const char of 88 bytes
- * which indicates each page of a CBS Message sent to the MS by the
- * BTS as coded in 3GPP 23.041 Section 9.4.1.2.
- * If received from UMTS network, "data" is const char of 90 up to 1252
- * bytes which contain between 1 and 15 CBS Message pages sent as one
- * packet to the MS by the BTS as coded in 3GPP 23.041 Section 9.4.2.2.
+ * "data" is const RIL_Bc_Message *
  *
  */
 #define RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS 1021
