@@ -221,6 +221,7 @@ static int responseCallForwards(Parcel &p, void *response, size_t responselen);
 static int responseDataCallList(Parcel &p, void *response, size_t responselen);
 static int responseSetupDataCall(Parcel &p, void *response, size_t responselen);
 static int responseRaw(Parcel &p, void *response, size_t responselen);
+static int responseBroadcastSms(Parcel &p, void *response, size_t responselen);
 static int responseSsn(Parcel &p, void *response, size_t responselen);
 static int responseSimStatus(Parcel &p, void *response, size_t responselen);
 static int responseGsmBrSmsCnf(Parcel &p, void *response, size_t responselen);
@@ -1683,6 +1684,79 @@ static int responseRaw(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
+static int
+responseBroadcastSms(Parcel &p, void *response, size_t responselen) {
+    RIL_Bc_Message message;
+
+    ALOGD("Inside responseBroadcastSms: responselen = %d", responselen);
+
+    if (response == NULL && responselen != 0) {
+        ALOGE("invalid response: NULL with responselen != 0");
+        return RIL_ERRNO_INVALID_RESPONSE;
+    }
+
+    if (s_callbacks.version >= 8) {
+        ALOGD("s_callbacks.version %d >= 8", s_callbacks.version);
+        if (responselen < sizeof(RIL_Bc_Message)) {
+            ALOGE("invalid response length was %d expected > %d",
+                    (int) responselen, (int) sizeof(RIL_Bc_Message));
+            return RIL_ERRNO_INVALID_RESPONSE;
+        }
+        RIL_Bc_Message *p_cur = (RIL_Bc_Message *) response;
+        message.type = p_cur->type;
+        message.pdu_len = p_cur->pdu_len;
+        message.pdu = p_cur->pdu;
+    } else {
+        ALOGD("s_callbacks.version %d < 8", s_callbacks.version);
+        if (response == NULL) {
+            p.writeInt32(-1); //-1 for unknown type
+            // The java code reads -1 size as null byte array
+            p.writeInt32(-1);
+            return 0;
+        }
+        // guess type based on pdu_len
+        if (responselen <= 56) {
+            message.type = BC_MESSAGE_TYPE_ETWS_PRIMARY;
+        } else if (responselen <= 88) {
+            // can be etws secondary gsm also, but parsing is same as bc gsm
+            message.type = BC_MESSAGE_TYPE_GSM;
+        } else {
+            // can be etws secondary umts also, but parsing is same as bc umts
+            message.type = BC_MESSAGE_TYPE_UMTS;
+        }
+        message.pdu_len = responselen;
+        message.pdu = (unsigned char*) response;
+    }
+
+    p.writeInt32(message.type);
+    p.writeInt32(message.pdu_len);
+    p.write(message.pdu, message.pdu_len);
+
+    // print pdu contents:
+    startResponse;
+    appendPrintBuf("%stype=%d, pdu_len=%d,",printBuf, message.type, message.pdu_len);
+    if (1) { // print in decimal
+        appendPrintBuf("%s\n Pdu DEC:", printBuf);
+        for (int i = 0, k=1; i < message.pdu_len; i += 8, k++) {
+            appendPrintBuf("%s\n%d:  ", printBuf, k);
+            for (int j = i; j < i + 8 && j < message.pdu_len; j++) {
+                appendPrintBuf("%s%d, ", printBuf, message.pdu[j]);
+            }
+        }
+    }
+    if (1) { // print in Hex
+        appendPrintBuf("%s\n Pdu HEX:", printBuf);
+        for (int i = 0, k=1; i < message.pdu_len; i += 8, k++) {
+            appendPrintBuf("%s\n%d:  ", printBuf, k);
+            for (int j = i; j < i + 8 && j < message.pdu_len; j++) {
+                appendPrintBuf("%s%.2x, ", printBuf, message.pdu[j]);
+            }
+        }
+    }
+    closeResponse;
+
+    return 0;
+}
 
 static int responseSIM_IO(Parcel &p, void *response, size_t responselen) {
     if (response == NULL) {
@@ -2136,7 +2210,7 @@ static int responseSimRefresh(Parcel &p, void *response, size_t responselen) {
     }
 
     startResponse;
-    if (s_callbacks.version == 7) {
+    if (s_callbacks.version >= 7) {
         RIL_SimRefreshResponse_v7 *p_cur = ((RIL_SimRefreshResponse_v7 *) response);
         p.writeInt32(p_cur->result);
         p.writeInt32(p_cur->ef_id);
