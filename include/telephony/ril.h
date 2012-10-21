@@ -28,6 +28,7 @@ extern "C" {
 
 #define RIL_VERSION 7     /* Current version */
 #define RIL_VERSION_MIN 6 /* Minimum RIL_VERSION supported */
+#define RIL_QCOM_VERSION 3 /* Qualcomm internal RIL version */
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
@@ -102,7 +103,8 @@ typedef enum {
     RADIO_TECH_EHRPD = 13,
     RADIO_TECH_LTE = 14,
     RADIO_TECH_HSPAP = 15, // HSPA+
-    RADIO_TECH_GSM = 16 // Only supports voice
+    RADIO_TECH_GSM = 16, // Only supports voice
+    RADIO_TECH_TD_SCDMA = 17
 } RIL_RadioTechnology;
 
 // Do we want to split Data from Voice and the use
@@ -681,6 +683,13 @@ typedef struct {
                           * Reference: 3GPP TS 36.101 9.2, 9.3, A.4 */
 } RIL_LTE_SignalStrength;
 
+typedef struct {
+    int rscp;    /* The Received Signal Code Power in dBm multipled by -1.
+                  * Range : 25 to 120
+                  * INT_MAX: 0x7FFFFFFF denotes invalid value.
+                  * Reference: 3GPP TS 25.123, section 9.1.1.1 */
+} RIL_TD_SCDMA_SignalStrength;
+
 /* Deprecated, use RIL_SignalStrength_v6 */
 typedef struct {
     RIL_GW_SignalStrength   GW_SignalStrength;
@@ -694,6 +703,14 @@ typedef struct {
     RIL_EVDO_SignalStrength EVDO_SignalStrength;
     RIL_LTE_SignalStrength  LTE_SignalStrength;
 } RIL_SignalStrength_v6;
+
+typedef struct {
+    RIL_GW_SignalStrength       GW_SignalStrength;
+    RIL_CDMA_SignalStrength     CDMA_SignalStrength;
+    RIL_EVDO_SignalStrength     EVDO_SignalStrength;
+    RIL_LTE_SignalStrength      LTE_SignalStrength;
+    RIL_TD_SCDMA_SignalStrength TD_SCDMA_SignalStrength;
+} RIL_SignalStrength_v7;
 
 /* Names of the CDMA info records (C.S0005 section 3.7.5) */
 typedef enum {
