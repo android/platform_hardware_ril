@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAK2X///vo\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1318,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2012-10-25T20:58:28Z",
+      "side": 1,
+      "message": "According to this, http://linux.die.net/man/3/write, EAGAIN cannot occur on a blocking write to a file descriptor. I maybe missing something, have you seen this occur or do you have some other reason to believe its necessary?",
+      "revId": "42a461178a4710374ff3e85ee7ede56a0f0e9cb6",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
