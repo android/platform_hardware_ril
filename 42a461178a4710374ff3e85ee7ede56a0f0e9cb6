@@ -16,6 +16,24 @@
       "revId": "42a461178a4710374ff3e85ee7ede56a0f0e9cb6",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAALwn///74\u003d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1318,
+      "author": {
+        "id": 1004300
+      },
+      "writtenOn": "2012-11-23T06:00:22Z",
+      "side": 1,
+      "message": "We have seen this error during our testing. EAGAIN is returned.",
+      "parentUuid": "AAAK2X///vo\u003d",
+      "revId": "42a461178a4710374ff3e85ee7ede56a0f0e9cb6",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
