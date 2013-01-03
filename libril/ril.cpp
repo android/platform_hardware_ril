@@ -233,6 +233,8 @@ static int responseCallRing(Parcel &p, void *response, size_t responselen);
 static int responseCdmaSignalInfoRecord(Parcel &p,void *response, size_t responselen);
 static int responseCdmaCallWaiting(Parcel &p,void *response, size_t responselen);
 static int responseSimRefresh(Parcel &p, void *response, size_t responselen);
+static int responseGetDataRrcState(Parcel &p, void *response, size_t responselen);
+static int responseDataRrcStateChanged(Parcel &p, void *response, size_t responselen);
 
 static int decodeVoiceRadioTechnology (RIL_RadioState radioState);
 static int decodeCdmaSubscriptionSource (RIL_RadioState radioState);
@@ -2349,6 +2351,53 @@ static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
+static void marshallDataRrcState(Parcel &p, RIL_RrcState *pRrcState, int num)
+{
+    for (int i = 0; i < num; i++) {
+        p.writeInt64(pRrcState->time);
+        p.writeInt32(pRrcState->state);
+        appendPrintBuf("%s[time=%d,state=%d],", printBuf,
+            pRrcState->time,
+            pRrcState->state);
+    }
+}
+
+static int responseGetDataRrcState(Parcel &p, void *response, size_t responselen)
+{
+    int num = responselen / sizeof(RIL_RrcState);
+    if ((responselen % sizeof(RIL_RrcState) != 0) || (num != 1)) {
+        RLOGE("invalid response length %d expected multiple of %d",
+                (int)responselen, (int)sizeof(RIL_RrcState));
+        return RIL_ERRNO_INVALID_RESPONSE;
+    }
+
+    startResponse;
+    marshallDataRrcState(p, (RIL_RrcState *)response, 1);
+    removeLastChar;
+    closeResponse;
+
+    return 0;
+}
+
+static int responseDataRrcStateChanged(Parcel &p, void *response, size_t responselen)
+{
+    if (responselen % sizeof(RIL_RrcState) != 0) {
+        RLOGE("invalid response length %d expected multiple of %d",
+                (int)responselen, (int)sizeof(RIL_RrcState));
+        return RIL_ERRNO_INVALID_RESPONSE;
+    }
+
+    int num = responselen / sizeof(RIL_RrcState);
+    p.writeInt32(num);
+
+    startResponse;
+    marshallDataRrcState(p, (RIL_RrcState *)response, num);
+    removeLastChar;
+    closeResponse;
+
+    return 0;
+}
+
 /**
  * A write on the wakeup fd is done just to pop us out of select()
  * We empty the buffer here and then ril_event will reset the timers on the
@@ -3445,6 +3494,8 @@ requestToString(int request) {
         case RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU: return "RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU";
         case RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS: return "RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS";
         case RIL_REQUEST_VOICE_RADIO_TECH: return "VOICE_RADIO_TECH";
+        case RIL_REQUEST_GET_DATA_RRC_STATE: return "GET_DATA_RRC_STATE";
+        case RIL_REQUEST_SET_DATA_RRC_RATE: return "SET_DATA_RRC_RATE";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED: return "UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED";
@@ -3480,6 +3531,7 @@ requestToString(int request) {
         case RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE: return "UNSOL_EXIT_EMERGENCY_CALLBACK_MODE";
         case RIL_UNSOL_RIL_CONNECTED: return "UNSOL_RIL_CONNECTED";
         case RIL_UNSOL_VOICE_RADIO_TECH_CHANGED: return "UNSOL_VOICE_RADIO_TECH_CHANGED";
+        case RIL_UNSOL_DATA_RRC_STATE_CHANGED: return "UNSOL_DATA_RRC_STATE_CHANGED";
         default: return "<unknown request>";
     }
 }
