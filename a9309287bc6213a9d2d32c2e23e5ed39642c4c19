@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "Now5uk70",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 3876,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2013-01-03T23:54:03Z",
+      "side": 1,
+      "message": "Unless modem supports this minimum time configuration, it will be difficult to reduce the chattiness across the modem-apps interface.\n\nIf modem doesn\u0027t support this interface what is the behavior on the framework. Should we add some API to first find out if modem exposes RRC states and allows for configuring the minimum time.",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
