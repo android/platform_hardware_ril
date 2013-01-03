@@ -810,6 +810,45 @@ typedef struct {
 } RIL_CDMA_InformationRecords;
 
 /**
+ * Radio Resource Control states
+ */
+typedef enum {
+    RIL_RRC_STATE_UNKNOWN           = 0,    // Unknown state
+
+    // GSM states
+    RIL_RRC_STATE_GSM_CELL_IDLE     = 1,    // Idle (lowest power)
+    RIL_RRC_STATE_GSM_CELL_URA_PCH  = 2,    // URA Paging Channel (more power then idle)
+    RIL_RRC_STATE_GSM_CELL_PCH      = 3,    // Paging Channel (more power yet)
+    RIL_RRC_STATE_GSM_CELL_FACH     = 4,    // Forward Access Channel (even more power)
+    RIL_RRC_STATE_GSM_CELL_DCH      = 5,    // Dedicated Channel (full power)
+
+    // CDMA states
+    // Question are these valid for all of the Cdma modes
+    // (IS95A, IS95B, 1xRTT, EVDO_0, EVDO_A, EVDO_B)?
+    RIL_RRC_STATE_CDMA_IDLE         = 21,   // Idle (lowest power)
+    RIL_RRC_STATE_CDMA_DORMANT      = 22,   // Dormant state (intermediate power) state
+    RIL_RRC_STATE_CDMA_CONNECTED    = 23,   // Connected state (full power)
+
+    // LTE states
+    RIL_RRC_STATE_LTE_IDLE_DRX      = 41,   // Idle (15mW)
+    RIL_RRC_STATE_LTE_CONN_SHORT_DRX= 42,   // Connected Short DRX state (1000mW)
+    RIL_RRC_STATE_LTE_CONN_LONG_DRX = 43,   // Connected Long DRX state (1000mW)
+    RIL_RRC_STATE_LTE_CONN_CONT_RECP= 44,   // Connected Continuous reception (1000..3500mW)
+
+    // WiMax States
+    RIL_RRC_STATE_WIMAX_IDLE        = 61,   // Idle
+    RIL_RRC_STATE_WIMAX_CONNECTED   = 62,   // Connected
+} RIL_RrcStates;
+
+/**
+ * Radio Resource Control State
+ */
+typedef struct {
+    long                        time;       // Time in nanos as returned by elapsedRealtimeNano
+    RIL_RrcStates               state;      // The current state
+} RIL_RrcState;
+
+/**
  * RIL_REQUEST_GET_SIM_STATUS
  *
  * Requests status of the SIM interface and the SIM card
@@ -3313,6 +3352,38 @@ typedef struct {
  */
 #define RIL_REQUEST_VOICE_RADIO_TECH 108
 
+/**
+ * RIL_REQUEST_GET_DATA_RRC_STATE
+ *
+ * Requests the Data Radio Resource Control State
+ *
+ * "data" is NULL
+ *
+ * "response" is const RIL_RrcState
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_GET_DATA_RRC_STATE 109
+
+/**
+ * RIL_REQUEST_SET_DATA_RRC_RATE
+ *
+ * This is the number minimum milliseconds between successive
+ * RIL_UNSOL_DATA_RRC_STATE messages and defines the highest rate
+ * at which RIL_UNSOL_DATA_RRC_STATE's will be sent. A value of
+ * 0 means send as fast as possible.
+ *
+ * "data" The number of milliseconds as an int
+ *
+ * "response" is null
+ *
+ * Valid errors:
+ *  SUCCESS must not fail
+ */
+#define RIL_REQUEST_SET_DATA_RRC_RATE 110
 
 /***********************************************************************/
 
@@ -3792,6 +3863,17 @@ typedef struct {
  */
 #define RIL_UNSOL_VOICE_RADIO_TECH_CHANGED 1035
 
+/**
+ * RIL_UNSOL_DATA_RRC_STATE_CHANGED
+ *
+ * Sent when the DATA_RRC_STATE changes but the time
+ * between these messages must not be less than the
+ * value set by RIL_REQUEST_SET_DATA_RRC_RATE.
+ *
+ * "data" is an array of the last set of RIL_RrcState
+ *
+ */
+#define RIL_UNSOL_DATA_RRC_STATE_CHANGED 1036
 
 /***********************************************************************/
 
