@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "NpLgUiUs",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-01-04T01:17:41Z",
+      "side": 1,
+      "message": "It might delay it might not it will depend on what we learn.",
+      "parentUuid": "No25OPzg",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "No064GxU",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2013-01-04T00:09:14Z",
       "side": 1,
       "message": "This is very similar to the active field in DATA_CALL_LIST. On the framework side, why can\u0027t we just use the same field for all power optimization?",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "NpHg0wdw",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 830,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-01-04T01:17:41Z",
+      "side": 1,
+      "message": "Because this will give us more data and more control over the rate. Note this is for data collecting at the moment.",
+      "parentUuid": "No064GxU",
       "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "NpPhcUX0",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 3873,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-01-04T01:17:41Z",
+      "side": 1,
+      "message": "We want to match up \"all\" of the changes to activity that\u0027s happened in the past. Maybe the \"rate\" should include a \"max count\" too?",
+      "parentUuid": "No659J9s",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "Now5uk70",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2013-01-03T23:54:03Z",
       "side": 1,
       "message": "Unless modem supports this minimum time configuration, it will be difficult to reduce the chattiness across the modem-apps interface.\n\nIf modem doesn\u0027t support this interface what is the behavior on the framework. Should we add some API to first find out if modem exposes RRC states and allows for configuring the minimum time.",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "NpLh9ads",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 3876,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-01-04T01:17:41Z",
+      "side": 1,
+      "message": "I\u0027d rather not make it optional and I believe it shouldn\u0027t be to hard to map the current information to this new format and control the rate. (Another approach might be to \"deprecate\" Ril_UNSOL_VOICE_NETWORK_STATE_CHANGED and have this command include this RRC information as well as the RIL_REQUEST_OPERATOR, RIL_REQUEST_VOICE_REGISTRATION_STATE and RIL_REQUEST_DATA_REGISTRATION_STATE there by streamlining network change information and also being able to control the rate. What do you think of that?)",
+      "parentUuid": "Now5uk70",
       "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
