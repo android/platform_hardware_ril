@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "No25OPzg",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2013-01-04T00:09:14Z",
+      "side": 1,
+      "message": "How will the framework code differentiate between URA_PCH, PCH and FACH?\n\nI can understand that DCH means apps can send data. But if modem RRC state is in one of the other states, does android delay the sending of data? If so, for how much time? And how does Android know which data can be delayed? What if we have time critical data",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "No064GxU",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 830,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2013-01-04T00:09:14Z",
+      "side": 1,
+      "message": "This is very similar to the active field in DATA_CALL_LIST. On the framework side, why can\u0027t we just use the same field for all power optimization?",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "Now5uk70",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
