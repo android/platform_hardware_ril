@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "No659J9s",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 3873,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2013-01-04T00:46:29Z",
+      "side": 1,
+      "message": "Why do we need array? Latest and greatest is all that you probably need.",
+      "revId": "a9309287bc6213a9d2d32c2e23e5ed39642c4c19",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "Now5uk70",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
