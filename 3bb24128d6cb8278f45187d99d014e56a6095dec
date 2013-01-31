@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "PDk0k7GM",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-01-31T22:00:06Z",
+      "side": 1,
+      "message": "This represents one cell, I would expect to in the array that more than one RIL_CellInfo would have registered set.",
+      "parentUuid": "PDto8M8E",
+      "revId": "3bb24128d6cb8278f45187d99d014e56a6095dec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "PDtoK8yg",
         "filename": "librilutils/librilutils.c",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "PDu3c2EM",
+        "filename": "librilutils/librilutils.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-01-31T22:00:06Z",
+      "side": 1,
+      "message": "The intent is for vendor provided ril\u0027s to link to this library and if and when rild/libril wants to use it to will link to it. I don\u0027t see a problem.",
+      "parentUuid": "PDtoK8yg",
+      "revId": "3bb24128d6cb8278f45187d99d014e56a6095dec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "PDnp3X4I",
         "filename": "reference-ril/reference-ril.c",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2013-01-31T15:15:47Z",
       "side": 1,
       "message": "What is the -10 representing here? Is it just to provide an older time stamp for debugging purposes?",
+      "revId": "3bb24128d6cb8278f45187d99d014e56a6095dec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "PDu2uGKA",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1845,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-01-31T22:00:06Z",
+      "side": 1,
+      "message": "yes just for debugging and eventually this will return several and each will have a faked different time.",
+      "parentUuid": "PDnp3X4I",
       "revId": "3bb24128d6cb8278f45187d99d014e56a6095dec",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
