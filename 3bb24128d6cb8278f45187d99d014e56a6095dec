@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "PDto8M8E",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2013-01-31T15:15:47Z",
+      "side": 1,
+      "message": "What would the behavior be if more than one cell are registered?",
+      "revId": "3bb24128d6cb8278f45187d99d014e56a6095dec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "PDtoK8yg",
+        "filename": "librilutils/librilutils.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2013-01-31T15:15:47Z",
+      "side": 1,
+      "message": "Why should this file be in a separate library?\nShould rild itself have need to use the functions here, it\u0027ll have to link to the library. Will not that make it accessible to ril implementations anyway? Or is this expected to be used outside of the context of rild?",
+      "revId": "3bb24128d6cb8278f45187d99d014e56a6095dec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "PDnp3X4I",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1845,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2013-01-31T15:15:47Z",
+      "side": 1,
+      "message": "What is the -10 representing here? Is it just to provide an older time stamp for debugging purposes?",
+      "revId": "3bb24128d6cb8278f45187d99d014e56a6095dec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
