@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "P41YWBF4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 1012283
+      },
+      "writtenOn": "2013-02-20T16:57:49Z",
+      "side": 1,
+      "message": "Is \"registered\" the same as \"serving cell\" and \"not registered\" the same as \"neighboring cell\"?",
+      "revId": "f6dce96f13484ef9b02b98cb1783f281e6e3fe96",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
