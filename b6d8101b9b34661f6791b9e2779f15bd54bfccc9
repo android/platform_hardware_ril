@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "QEdHdRAE",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3342,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-02-21T22:26:05Z",
+      "side": 1,
+      "message": "I\u0027m considering only having this and the RIL_UNSOL_DC_RT_INFO_CHANGED return only return the latest value rather than an array. This should make the implementation simpler, anyone against this idea?",
+      "revId": "b6d8101b9b34661f6791b9e2779f15bd54bfccc9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
