@@ -16,6 +16,24 @@
       "revId": "b6d8101b9b34661f6791b9e2779f15bd54bfccc9",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "QJ3sb34A",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3342,
+      "author": {
+        "id": 1000161
+      },
+      "writtenOn": "2013-02-22T07:01:51Z",
+      "side": 1,
+      "message": "It indeed makes the implementation simpler.",
+      "parentUuid": "QEdHdRAE",
+      "revId": "b6d8101b9b34661f6791b9e2779f15bd54bfccc9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
