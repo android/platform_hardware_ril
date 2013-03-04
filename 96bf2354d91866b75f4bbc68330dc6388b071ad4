@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "QqdlN00s",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 821,
+      "author": {
+        "id": 1020090
+      },
+      "writtenOn": "2013-03-04T05:53:11Z",
+      "side": 1,
+      "message": "Is there any idea how to use this information in framework to reduce power conusmption? Is there any other commit which uses this information?",
+      "revId": "96bf2354d91866b75f4bbc68330dc6388b071ad4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
