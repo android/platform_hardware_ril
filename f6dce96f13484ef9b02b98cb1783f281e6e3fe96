@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "RG2dlsvY",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-03-07T05:05:25Z",
+      "side": 1,
+      "message": "Because some nincompoop used that name in a file named qcrili.h and it causes a compile error, maybe you can fix that :)",
+      "parentUuid": "REPLV6Ak",
+      "revId": "f6dce96f13484ef9b02b98cb1783f281e6e3fe96",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "P41YWBF4",
         "filename": "include/telephony/ril.h",
         "patchSetId": 4
