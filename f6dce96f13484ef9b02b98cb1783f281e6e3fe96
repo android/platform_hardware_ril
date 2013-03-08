@@ -90,6 +90,23 @@
     },
     {
       "key": {
+        "uuid": "RT3P2QI0",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 3433,
+      "author": {
+        "id": 1020361
+      },
+      "writtenOn": "2013-03-08T15:20:36Z",
+      "side": 1,
+      "message": "Since RIL_UNSOL_CELL_INFO_LIST will include signal strength information for every neighboring cell it is expected to change very frequently.\n\nIs there a risk that the information will change too frequently if the minimum time is set to 0 (default)?\n\nPerhaps it would be a good idea to specify how much change in signal strength is needed before sending a new event, or specifying only to send an event when a new neighboring cell shows up/disappears, or when the cell registration changes.\n\nEvery event will potentially cause the cpu to wake up and data to be sent from the receiving application. This will cause increased power consumption.",
+      "revId": "f6dce96f13484ef9b02b98cb1783f281e6e3fe96",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "RRKHmuKQ",
         "filename": "include/telephony/ril.h",
         "patchSetId": 4
