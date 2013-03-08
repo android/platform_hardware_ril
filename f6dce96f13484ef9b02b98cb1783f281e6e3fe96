@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "RREHW1Lo",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2013-03-08T02:07:06Z",
+      "side": 1,
+      "message": "Sure, let\u0027s fix it.",
+      "parentUuid": "RG2dlsvY",
+      "revId": "f6dce96f13484ef9b02b98cb1783f281e6e3fe96",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "P41YWBF4",
         "filename": "include/telephony/ril.h",
         "patchSetId": 4
@@ -66,6 +84,23 @@
       "side": 1,
       "message": "Yes.",
       "parentUuid": "P41YWBF4",
+      "revId": "f6dce96f13484ef9b02b98cb1783f281e6e3fe96",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "RRKHmuKQ",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 3434,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2013-03-08T02:07:06Z",
+      "side": 1,
+      "message": "I think it would be better to set the default to INT_MAX as a way to preserve backwards compatibility.\nDoing it so would require an explicit request to enable this feature. Older frameworks wouldn\u0027t send it, and wouldn\u0027t need to cope with unsols they won\u0027t process",
       "revId": "f6dce96f13484ef9b02b98cb1783f281e6e3fe96",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
