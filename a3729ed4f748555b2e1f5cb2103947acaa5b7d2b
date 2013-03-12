@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "RgIg0uwk",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-03-12T16:24:12Z",
+      "side": 1,
+      "message": "remove",
+      "revId": "a3729ed4f748555b2e1f5cb2103947acaa5b7d2b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "RgCg7b-c",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1699,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-03-12T16:24:12Z",
+      "side": 1,
+      "message": "remove",
+      "revId": "a3729ed4f748555b2e1f5cb2103947acaa5b7d2b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "RgAgpy6k",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1710,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-03-12T16:24:12Z",
+      "side": 1,
+      "message": "remove",
+      "revId": "a3729ed4f748555b2e1f5cb2103947acaa5b7d2b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
