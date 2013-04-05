@@ -16,6 +16,7 @@
 */
 
 #include <telephony/ril_cdma_sms.h>
+#include <telephony/librilutils.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -222,6 +223,12 @@ static int s_repollCallsCount = 0;
 // Should we expect a call to be answered in the next CLCC?
 static int s_expectAnswer = 0;
 #endif /* WORKAROUND_ERRONEOUS_ANSWER */
+
+static int s_cell_info_rate_ms = INT_MAX;
+static int s_mcc = 0;
+static int s_mnc = 0;
+static int s_lac = 0;
+static int s_cid = 0;
 
 static void pollSIMState (void *param);
 static void setRadioState(RIL_RadioState newState);
@@ -1261,6 +1268,8 @@ static int parseRegistrationState(char *str, int *type, int *items, int **respon
         default:
             goto error;
     }
+    s_lac = resp[1];
+    s_cid = resp[2];
     if (response)
         *response = resp;
     if (items)
@@ -1443,6 +1452,12 @@ static void requestOperator(void *data, size_t datalen, RIL_Token t)
 
         err = at_tok_nextstr(&line, &(response[i]));
         if (err < 0) goto error;
+        // Simple assumption that mcc and mnc are 3 digits each
+        if (strlen(response[i]) == 6) {
+            if (sscanf(response[i], "%3d%3d", &s_mcc, &s_mnc) != 2) {
+                RLOGE("requestOperator expected mccmnc to be 6 decimal digits");
+            }
+        }
     }
 
     if (i != 3) {
@@ -1815,6 +1830,47 @@ static int techFromModemType(int mdmtype)
     return ret;
 }
 
+static void requestGetCellInfoList(void *data, size_t datalen, RIL_Token t)
+{
+    uint64_t curTime = ril_nano_time();
+    RIL_CellInfo ci[1] =
+    {
+        { // ci[0]
+            1, // cellInfoType
+            1, // registered
+            curTime - 1000, // Fake some time in the past
+            { // union CellInfo
+                {  // RIL_CellInfoGsm gsm
+                    {  // gsm.cellIdneityGsm
+                        s_mcc, // mcc
+                        s_mnc, // mnc
+                        s_lac, // lac
+                        s_cid, // cid
+                        0  // psc
+                    },
+                    {  // gsm.signalStrengthGsm
+                        10, // signalStrength
+                        0  // bitErrorRate
+                    }
+                }
+            }
+        }
+    };
+
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, ci, sizeof(ci));
+}
+
+
+static void requestSetCellInfoListRate(void *data, size_t datalen, RIL_Token t)
+{
+    // For now we'll save the rate but no RIL_UNSOL_CELL_INFO_LIST messages
+    // will be sent.
+    assert (datalen == sizeof(int));
+    s_cell_info_rate_ms = ((int *)data)[0];
+
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+}
+
 /*** Callback methods from the RIL library to us ***/
 
 /**
@@ -2177,6 +2233,14 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
                 requestExitEmergencyMode(data, datalen, t);
                 break;
             } // Fall-through if tech is not cdma
+
+        case RIL_REQUEST_GET_CELL_INFO_LIST:
+            requestGetCellInfoList(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE:
+            requestSetCellInfoListRate(data, datalen, t);
+            break;
 
         default:
             RLOGD("Request not supported. Tech: %d",TECH(sMdmInfo));
