@@ -12,7 +12,7 @@ LOCAL_SRC_FILES:= \
     at_tok.c
 
 LOCAL_SHARED_LIBRARIES := \
-    libcutils libutils libril
+    libcutils libutils libril librilutils
 
 # for asprinf
 LOCAL_CFLAGS := -D_GNU_SOURCE
