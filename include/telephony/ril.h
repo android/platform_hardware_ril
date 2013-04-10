@@ -2678,6 +2678,11 @@ typedef struct {
  *
  * "data" is int *
  * ((int *)data)[0] is == RIL_CdmaSubscriptionSource
+ * ((int *)data)[1] is == Service Programming Code
+ *                        SPC(Service Programming Code) is a decimal number as specified
+ *                        in 3GPP2 C.S0016-C v2.0 Table 3.3.6-1
+ *                        Default - 0
+ *                        Active  - 1 through 999,999
  *
  * "response" is NULL
  *
