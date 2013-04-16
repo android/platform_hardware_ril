@@ -3313,6 +3313,20 @@ typedef struct {
  */
 #define RIL_REQUEST_VOICE_RADIO_TECH 108
 
+/**
+ * RIL_REQUEST_SET_LTE_ATTACH_PROFILE
+ *
+ * Set an apn to attach profile on LTE network
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  GENERIC_FAILURE
+ *  SUBSCRIPTION_NOT_AVAILABLE
+ */
+#define RIL_REQUEST_SET_LTE_ATTACH_PROFILE 109
+
 
 /***********************************************************************/
 
@@ -3860,6 +3874,15 @@ typedef struct {
     RIL_Cancel onCancel;
     RIL_GetVersion getVersion;
 } RIL_RadioFunctions;
+
+typedef struct {
+    int apnlen;
+    char apn[128];
+    int protocol;
+    int authtype;
+    char username[128];
+    char password[128];
+} RIL_LteAttachProfile;
 
 #ifdef RIL_SHLIB
 struct RIL_Env {

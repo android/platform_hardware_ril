@@ -203,6 +203,7 @@ static void dispatchRaw(Parcel& p, RequestInfo *pRI);
 static void dispatchSmsWrite (Parcel &p, RequestInfo *pRI);
 static void dispatchDataCall (Parcel& p, RequestInfo *pRI);
 static void dispatchVoiceRadioTech (Parcel& p, RequestInfo *pRI);
+static void dispatchSetLteAttachProfile (Parcel& p, RequestInfo *pRI);
 static void dispatchCdmaSubscriptionSource (Parcel& p, RequestInfo *pRI);
 
 static void dispatchCdmaSms(Parcel &p, RequestInfo *pRI);
@@ -1301,6 +1302,73 @@ static void dispatchCdmaSubscriptionSource(Parcel& p, RequestInfo *pRI) {
         RIL_onRequestComplete(pRI, RIL_E_GENERIC_FAILURE, NULL, 0);
     else
         RIL_onRequestComplete(pRI, RIL_E_SUCCESS, &cdmaSubscriptionSource, sizeof(int));
+}
+
+static void dispatchSetLteAttachProfile(Parcel &p, RequestInfo *pRI)
+{
+    RIL_LteAttachProfile pf;
+    int32_t  t;
+    status_t status;
+    char *string_data = NULL;
+
+    memset(&pf, 0, sizeof(pf));
+
+    status = p.readInt32(&t);
+    pf.apnlen = (int) t;
+
+    string_data = strdupReadString(p);
+    if (NULL != string_data && strlen(string_data) > 0) {
+        int nLen = 0;
+        nLen = MIN(strlen(string_data), 100);
+        memcpy((void*)&pf.apn[0], string_data,nLen);
+    }
+    free(string_data);
+    string_data = NULL;
+
+    status = p.readInt32(&t);
+    pf.protocol = (int) t;
+
+    status = p.readInt32(&t);
+    pf.authtype = (int) t;
+
+    string_data = strdupReadString(p);
+    if (NULL != string_data && strlen(string_data) > 0) {
+        int nLen = 0;
+        nLen = MIN(strlen(string_data), 100);
+        memcpy((void*)&pf.username[0], string_data,nLen);
+    }
+    free(string_data);
+    string_data = NULL;
+
+    string_data = strdupReadString(p);
+    if (NULL != string_data && strlen(string_data) > 0) {
+        int nLen = 0;
+        nLen = MIN(strlen(string_data), 100);
+        memcpy((void*)&pf.password[0], string_data,nLen);
+    }
+    free(string_data);
+    string_data = NULL;
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    startRequest;
+    appendPrintBuf("%sapnlen=%d, apn=%s, protocol=%d, auth_type=%d, username=%s, password=%s",
+            printBuf, pf.apnlen, pf.apn, pf.protocol, pf.auth_type, pf.username, pf.password);
+    closeRequest;
+
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &pf, sizeof(pf),pRI);
+
+#ifdef MEMSET_FREED
+    memset(&pf, 0, sizeof(pf));
+#endif
+    return;
+invalid:
+    invalidCommandBlock(pRI);
+    return;
 }
 
 static int
@@ -3445,6 +3513,7 @@ requestToString(int request) {
         case RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU: return "RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU";
         case RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS: return "RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS";
         case RIL_REQUEST_VOICE_RADIO_TECH: return "VOICE_RADIO_TECH";
+        case RIL_REQUEST_SET_LTE_ATTACH_PROFILE: return "RIL_REQUEST_SET_LTE_ATTACH_PROFILE";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED: return "UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED";
