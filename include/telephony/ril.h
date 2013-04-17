@@ -637,6 +637,10 @@ typedef struct {
     int bitErrorRate;    /* bit error rate (0-7, 99) as defined in TS 27.007 8.5 */
 } RIL_GW_SignalStrength;
 
+typedef struct {
+    int signalStrength;  /* Valid values are (0-31, 99) as defined in TS 27.007 8.5 */
+    int bitErrorRate;    /* bit error rate (0-7, 99) as defined in TS 27.007 8.5 */
+} RIL_SignalStrengthWcdma;
 
 typedef struct {
     int dbm;  /* Valid values are positive integers.  This value is the actual RSSI value
@@ -731,37 +735,44 @@ typedef struct {
 
 /** RIL_CellIdentityGsm */
 typedef struct {
-    int mcc;    /* 3-digit Mobile Country Code, 0..999 */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999 */
-    int lac;    /* 16-bit Location Area Code, 0..65535 */
-    int cid;    /* 16-bit GSM Cell Identity described in TS 27.007, 0..65535
-                 * 28-bit UMTS Cell Identity described in TS 25.331, 0..268435455 */
-    int psc;    /* 9-bit UMTS Primary Scrambling Code described in TS 25.331, 0..511 */
+    int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown */
+    int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
+    int cid;    /* 16-bit GSM Cell Identity described in TS 27.007, 0..65535, INT_MAX if unknown  */
 } RIL_CellIdentityGsm;
+
+/** RIL_CellIdentityWcdma */
+typedef struct {
+    int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
+    int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
+    int cid;    /* 28-bit UMTS Cell Identity described in TS 25.331, 0..268435455, INT_MAX if unknown  */
+    int psc;    /* 9-bit UMTS Primary Scrambling Code described in TS 25.331, 0..511, INT_MAX if unknown */
+} RIL_CellIdentityWcdma;
 
 /** RIL_CellIdentityCdma */
 typedef struct {
-    int networkId;      /* Network Id 0..65535 */
-    int systemId;       /* CDMA System Id 0..32767 */
-    int basestationId;  /* Base Station Id 0..65535 */
+    int networkId;      /* Network Id 0..65535, INT_MAX if unknown */
+    int systemId;       /* CDMA System Id 0..32767, INT_MAX if unknown  */
+    int basestationId;  /* Base Station Id 0..65535, INT_MAX if unknown  */
     int longitude;      /* Longitude is a decimal number as specified in 3GPP2 C.S0005-A v6.0.
                          * It is represented in units of 0.25 seconds and ranges from -2592000
                          * to 2592000, both values inclusive (corresponding to a range of -180
-                         * to +180 degrees). */
+                         * to +180 degrees). INT_MAX if unknown */
 
     int latitude;       /* Latitude is a decimal number as specified in 3GPP2 C.S0005-A v6.0.
                          * It is represented in units of 0.25 seconds and ranges from -1296000
                          * to 1296000, both values inclusive (corresponding to a range of -90
-                         * to +90 degrees). */
+                         * to +90 degrees). INT_MAX if unknown */
 } RIL_CellIdentityCdma;
 
 /** RIL_CellIdentityLte */
 typedef struct {
-    int mcc;    /* 3-digit Mobile Country Code, 0..999 */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999 */
-    int ci;     /* 28-bit Cell Identity described in TS ??? */
-    int pci;    /* physical cell id 0..503 */
-    int tac;    /* 16-bit tracking area code */
+    int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
+    int ci;     /* 28-bit Cell Identity described in TS ???, INT_MAX if unknown */
+    int pci;    /* physical cell id 0..503, INT_MAX if unknown  */
+    int tac;    /* 16-bit tracking area code, INT_MAX if unknown  */
 } RIL_CellIdentityLte;
 
 /** RIL_CellInfoGsm */
@@ -769,6 +780,12 @@ typedef struct {
   RIL_CellIdentityGsm   cellIdentityGsm;
   RIL_GW_SignalStrength signalStrengthGsm;
 } RIL_CellInfoGsm;
+
+/** RIL_CellInfoWcdma */
+typedef struct {
+  RIL_CellIdentityWcdma cellIdentityWcdma;
+  RIL_SignalStrengthWcdma signalStrengthWcdma;
+} RIL_CellInfoWcdma;
 
 /** RIL_CellInfoCdma */
 typedef struct {
@@ -788,6 +805,7 @@ typedef enum {
   RIL_CELL_INFO_TYPE_GSM    = 1,
   RIL_CELL_INFO_TYPE_CDMA   = 2,
   RIL_CELL_INFO_TYPE_LTE    = 3,
+  RIL_CELL_INFO_TYPE_WCDMA  = 4,
 } RIL_CellInfoType;
 
 // Must be the same as CellInfo.TIMESTAMP_TYPE_XXX
@@ -808,6 +826,7 @@ typedef struct {
     RIL_CellInfoGsm     gsm;
     RIL_CellInfoCdma    cdma;
     RIL_CellInfoLte     lte;
+    RIL_CellInfoWcdma   wcdma;
   } CellInfo;
 } RIL_CellInfo;
 
@@ -3447,7 +3466,7 @@ typedef struct {
  * RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE
  *
  * Sets the minimum time between when RIL_UNSOL_CELL_INFO_LIST should be invoked.
- * The default, 0, means invoke RIL_UNSOL_CELL_INFO_LIST when any of the reported
+ * A value of 0, means invoke RIL_UNSOL_CELL_INFO_LIST when any of the reported
  * information changes. Setting the value to INT_MAX(0x7fffffff) means never issue
  * a RIL_UNSOL_CELL_INFO_LIST.
  *
