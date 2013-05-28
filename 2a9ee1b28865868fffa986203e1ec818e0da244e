@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "VA3MYyIY",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1000161
+      },
+      "writtenOn": "2013-05-28T13:21:45Z",
+      "side": 1,
+      "message": "I would propose to add the EARFCN and BW this could be used by coexistence components. in order to exclude some frequency bands to WiFi or BT subsystem.\nThese fields could be defaulted to 0 when the modem does not provide this information.",
+      "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
