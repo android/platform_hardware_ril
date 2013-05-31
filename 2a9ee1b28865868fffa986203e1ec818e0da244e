@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9d89cd3c_8d54a10a",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1012468
+      },
+      "writtenOn": "2013-05-31T08:13:47Z",
+      "side": 1,
+      "message": "Since the contents are the same as in RIL_GW_SignalStrength, we could as well typedef  RIL_GW_SignalStrength to RIL_SignalStrengthWcdma",
+      "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "VA3MYyIY",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
