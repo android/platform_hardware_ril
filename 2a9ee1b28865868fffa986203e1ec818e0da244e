@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1d879d2a_499e215c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-05-31T21:50:49Z",
+      "side": 1,
+      "message": "Yes but this doesn\u0027t cost anything and makes it clearer, IMHO.",
+      "parentUuid": "9d89cd3c_8d54a10a",
+      "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "VA3MYyIY",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2013-05-28T13:21:45Z",
       "side": 1,
       "message": "I would propose to add the EARFCN and BW this could be used by coexistence components. in order to exclude some frequency bands to WiFi or BT subsystem.\nThese fields could be defaulted to 0 when the modem does not provide this information.",
+      "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d879d2a_69a3e59c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-05-31T21:50:49Z",
+      "side": 1,
+      "message": "Maybe, the other option might be to include that information in the RealTimeInfo, just a thought?",
+      "parentUuid": "VA3MYyIY",
       "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
