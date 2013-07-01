@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a2cb179_f25bb537",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-07-01T18:34:28Z",
+      "side": 1,
+      "message": "Lets add:\n\n  PREF_NET_TYPE_AUTO \u003d 13; /* Radio is to choose the preferred mode */",
+      "revId": "0e09487471b09e45b5fc1b1588a600f35157079a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
