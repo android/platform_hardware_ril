@@ -26,8 +26,8 @@
 extern "C" {
 #endif
 
-#define RIL_VERSION 7     /* Current version */
-#define RIL_VERSION_MIN 6 /* Minimum RIL_VERSION supported */
+#define RIL_VERSION 9     /* Current version */
+#define RIL_VERSION_MIN 9 /* Minimum RIL_VERSION supported */
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
@@ -55,8 +55,9 @@ typedef enum {
                                                    location */
     RIL_E_MODE_NOT_SUPPORTED = 13,              /* HW does not support preferred network type */
     RIL_E_FDN_CHECK_FAILURE = 14,               /* command failed because recipient is not on FDN list */
-    RIL_E_ILLEGAL_SIM_OR_ME = 15                /* network selection failed due to
+    RIL_E_ILLEGAL_SIM_OR_ME = 15,                /* network selection failed due to
                                                    illegal SIM or ME */
+    RIL_E_INVALID_CARD = 16                     /* Invalid card for this socket */
 } RIL_Errno;
 
 typedef enum {
@@ -242,19 +243,6 @@ typedef struct {
                          -1 if unknown or not applicable*/
 } RIL_SMS_Response;
 
-/** Used by RIL_REQUEST_WRITE_SMS_TO_SIM */
-typedef struct {
-    int status;     /* Status of message.  See TS 27.005 3.1, "<stat>": */
-                    /*      0 = "REC UNREAD"    */
-                    /*      1 = "REC READ"      */
-                    /*      2 = "STO UNSENT"    */
-                    /*      3 = "STO SENT"      */
-    char * pdu;     /* PDU of message to write, as an ASCII hex string less the SMSC address,
-                       the TP-layer length is "strlen(pdu)/2". */
-    char * smsc;    /* SMSC address in GSM BCD format prefixed by a length byte
-                       (as expected by TS 27.005) or NULL for default SMSC */
-} RIL_SMS_WriteArgs;
-
 /** Used by RIL_REQUEST_DIAL */
 typedef struct {
     char * address;
@@ -266,41 +254,6 @@ typedef struct {
              */
     RIL_UUS_Info *  uusInfo;    /* NULL or Pointer to User-User Signaling Information */
 } RIL_Dial;
-
-typedef struct {
-    int command;    /* one of the commands listed for TS 27.007 +CRSM*/
-    int fileid;     /* EF id */
-    char *path;     /* "pathid" from TS 27.007 +CRSM command.
-                       Path is in hex asciii format eg "7f205f70"
-                       Path must always be provided.
-                     */
-    int p1;
-    int p2;
-    int p3;
-    char *data;     /* May be NULL*/
-    char *pin2;     /* May be NULL*/
-} RIL_SIM_IO_v5;
-
-typedef struct {
-    int command;    /* one of the commands listed for TS 27.007 +CRSM*/
-    int fileid;     /* EF id */
-    char *path;     /* "pathid" from TS 27.007 +CRSM command.
-                       Path is in hex asciii format eg "7f205f70"
-                       Path must always be provided.
-                     */
-    int p1;
-    int p2;
-    int p3;
-    char *data;     /* May be NULL*/
-    char *pin2;     /* May be NULL*/
-    char *aidPtr;   /* AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value. */
-} RIL_SIM_IO_v6;
-
-typedef struct {
-    int sw1;
-    int sw2;
-    char *simResponse;  /* In hex string format ([a-fA-F0-9]*). */
-} RIL_SIM_IO_Response;
 
 /* See also com.android.internal.telephony.gsm.CallForwardInfo */
 
@@ -430,134 +383,6 @@ typedef struct {
     char *  number;             /* "number" from 27.007 7.17
                                    (MT only, may be NULL). */
 } RIL_SuppSvcNotification;
-
-#define RIL_CARD_MAX_APPS     8
-
-typedef enum {
-    RIL_CARDSTATE_ABSENT   = 0,
-    RIL_CARDSTATE_PRESENT  = 1,
-    RIL_CARDSTATE_ERROR    = 2
-} RIL_CardState;
-
-typedef enum {
-    RIL_PERSOSUBSTATE_UNKNOWN                   = 0, /* initial state */
-    RIL_PERSOSUBSTATE_IN_PROGRESS               = 1, /* in between each lock transition */
-    RIL_PERSOSUBSTATE_READY                     = 2, /* when either SIM or RUIM Perso is finished
-                                                        since each app can only have 1 active perso
-                                                        involved */
-    RIL_PERSOSUBSTATE_SIM_NETWORK               = 3,
-    RIL_PERSOSUBSTATE_SIM_NETWORK_SUBSET        = 4,
-    RIL_PERSOSUBSTATE_SIM_CORPORATE             = 5,
-    RIL_PERSOSUBSTATE_SIM_SERVICE_PROVIDER      = 6,
-    RIL_PERSOSUBSTATE_SIM_SIM                   = 7,
-    RIL_PERSOSUBSTATE_SIM_NETWORK_PUK           = 8, /* The corresponding perso lock is blocked */
-    RIL_PERSOSUBSTATE_SIM_NETWORK_SUBSET_PUK    = 9,
-    RIL_PERSOSUBSTATE_SIM_CORPORATE_PUK         = 10,
-    RIL_PERSOSUBSTATE_SIM_SERVICE_PROVIDER_PUK  = 11,
-    RIL_PERSOSUBSTATE_SIM_SIM_PUK               = 12,
-    RIL_PERSOSUBSTATE_RUIM_NETWORK1             = 13,
-    RIL_PERSOSUBSTATE_RUIM_NETWORK2             = 14,
-    RIL_PERSOSUBSTATE_RUIM_HRPD                 = 15,
-    RIL_PERSOSUBSTATE_RUIM_CORPORATE            = 16,
-    RIL_PERSOSUBSTATE_RUIM_SERVICE_PROVIDER     = 17,
-    RIL_PERSOSUBSTATE_RUIM_RUIM                 = 18,
-    RIL_PERSOSUBSTATE_RUIM_NETWORK1_PUK         = 19, /* The corresponding perso lock is blocked */
-    RIL_PERSOSUBSTATE_RUIM_NETWORK2_PUK         = 20,
-    RIL_PERSOSUBSTATE_RUIM_HRPD_PUK             = 21,
-    RIL_PERSOSUBSTATE_RUIM_CORPORATE_PUK        = 22,
-    RIL_PERSOSUBSTATE_RUIM_SERVICE_PROVIDER_PUK = 23,
-    RIL_PERSOSUBSTATE_RUIM_RUIM_PUK             = 24
-} RIL_PersoSubstate;
-
-typedef enum {
-    RIL_APPSTATE_UNKNOWN               = 0,
-    RIL_APPSTATE_DETECTED              = 1,
-    RIL_APPSTATE_PIN                   = 2, /* If PIN1 or UPin is required */
-    RIL_APPSTATE_PUK                   = 3, /* If PUK1 or Puk for UPin is required */
-    RIL_APPSTATE_SUBSCRIPTION_PERSO    = 4, /* perso_substate should be look at
-                                               when app_state is assigned to this value */
-    RIL_APPSTATE_READY                 = 5
-} RIL_AppState;
-
-typedef enum {
-    RIL_PINSTATE_UNKNOWN              = 0,
-    RIL_PINSTATE_ENABLED_NOT_VERIFIED = 1,
-    RIL_PINSTATE_ENABLED_VERIFIED     = 2,
-    RIL_PINSTATE_DISABLED             = 3,
-    RIL_PINSTATE_ENABLED_BLOCKED      = 4,
-    RIL_PINSTATE_ENABLED_PERM_BLOCKED = 5
-} RIL_PinState;
-
-typedef enum {
-  RIL_APPTYPE_UNKNOWN = 0,
-  RIL_APPTYPE_SIM     = 1,
-  RIL_APPTYPE_USIM    = 2,
-  RIL_APPTYPE_RUIM    = 3,
-  RIL_APPTYPE_CSIM    = 4,
-  RIL_APPTYPE_ISIM    = 5
-} RIL_AppType;
-
-typedef struct
-{
-  RIL_AppType      app_type;
-  RIL_AppState     app_state;
-  RIL_PersoSubstate perso_substate; /* applicable only if app_state ==
-                                       RIL_APPSTATE_SUBSCRIPTION_PERSO */
-  char             *aid_ptr;        /* null terminated string, e.g., from 0xA0, 0x00 -> 0x41,
-                                       0x30, 0x30, 0x30 */
-  char             *app_label_ptr;  /* null terminated string */
-  int              pin1_replaced;   /* applicable to USIM, CSIM & ISIM */
-  RIL_PinState     pin1;
-  RIL_PinState     pin2;
-} RIL_AppStatus;
-
-/* Deprecated, use RIL_CardStatus_v6 */
-typedef struct
-{
-  RIL_CardState card_state;
-  RIL_PinState  universal_pin_state;             /* applicable to USIM and CSIM: RIL_PINSTATE_xxx */
-  int           gsm_umts_subscription_app_index; /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           cdma_subscription_app_index;     /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           num_applications;                /* value <= RIL_CARD_MAX_APPS */
-  RIL_AppStatus applications[RIL_CARD_MAX_APPS];
-} RIL_CardStatus_v5;
-
-typedef struct
-{
-  RIL_CardState card_state;
-  RIL_PinState  universal_pin_state;             /* applicable to USIM and CSIM: RIL_PINSTATE_xxx */
-  int           gsm_umts_subscription_app_index; /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           cdma_subscription_app_index;     /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           ims_subscription_app_index;      /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           num_applications;                /* value <= RIL_CARD_MAX_APPS */
-  RIL_AppStatus applications[RIL_CARD_MAX_APPS];
-} RIL_CardStatus_v6;
-
-/** The result of a SIM refresh, returned in data[0] of RIL_UNSOL_SIM_REFRESH
- *      or as part of RIL_SimRefreshResponse_v7
- */
-typedef enum {
-    /* A file on SIM has been updated.  data[1] contains the EFID. */
-    SIM_FILE_UPDATE = 0,
-    /* SIM initialized.  All files should be re-read. */
-    SIM_INIT = 1,
-    /* SIM reset.  SIM power required, SIM may be locked and all files should be re-read. */
-    SIM_RESET = 2
-} RIL_SimRefreshResult;
-
-typedef struct {
-    RIL_SimRefreshResult result;
-    int                  ef_id; /* is the EFID of the updated file if the result is */
-                                /* SIM_FILE_UPDATE or 0 for any other result. */
-    char *               aid;   /* is AID(application ID) of the card application */
-                                /* See ETSI 102.221 8.1 and 101.220 4 */
-                                /*     For SIM_FILE_UPDATE result it can be set to AID of */
-                                /*         application in which updated EF resides or it can be */
-                                /*         NULL if EF is outside of an application. */
-                                /*     For SIM_INIT result this field is set to AID of */
-                                /*         application that caused REFRESH */
-                                /*     For SIM_RESET result it is NULL. */
-} RIL_SimRefreshResponse_v7;
 
 /* Deprecated, use RIL_CDMA_CallWaiting_v6 */
 typedef struct {
@@ -811,185 +636,19 @@ typedef struct {
 } RIL_CDMA_InformationRecords;
 
 /**
- * RIL_REQUEST_GET_SIM_STATUS
+ * RIL_REQUEST_ASSIGN_ICCID
  *
- * Requests status of the SIM interface and the SIM card
+ * Sets the expected ICCID that this socket is always going to refer to.
+ * First call that must be made on a new socket.
  *
- * "data" is NULL
- *
- * "response" is const RIL_CardStatus_v6 *
- *
- * Valid errors:
- *  Must never fail
- */
-#define RIL_REQUEST_GET_SIM_STATUS 1
-
-/**
- * RIL_REQUEST_ENTER_SIM_PIN
- *
- * Supplies SIM PIN. Only called if RIL_CardStatus has RIL_APPSTATE_PIN state
- *
- * "data" is const char **
- * ((const char **)data)[0] is PIN value
- * ((const char **)data)[1] is AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value.
- *
- * "response" is int *
- * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
- *
- * Valid errors:
- *
- * SUCCESS
- * RADIO_NOT_AVAILABLE (radio resetting)
- * GENERIC_FAILURE
- * PASSWORD_INCORRECT
- */
-
-#define RIL_REQUEST_ENTER_SIM_PIN 2
-
-
-/**
- * RIL_REQUEST_ENTER_SIM_PUK
- *
- * Supplies SIM PUK and new PIN.
- *
- * "data" is const char **
- * ((const char **)data)[0] is PUK value
- * ((const char **)data)[1] is new PIN value
- * ((const char **)data)[2] is AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value.
- *
- * "response" is int *
- * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
+ * "data" is char* containing IccID
  *
  * Valid errors:
  *
  *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- *  PASSWORD_INCORRECT
- *     (PUK is invalid)
+ *  INVALID_CARD
  */
-
-#define RIL_REQUEST_ENTER_SIM_PUK 3
-
-/**
- * RIL_REQUEST_ENTER_SIM_PIN2
- *
- * Supplies SIM PIN2. Only called following operation where SIM_PIN2 was
- * returned as a a failure from a previous operation.
- *
- * "data" is const char **
- * ((const char **)data)[0] is PIN2 value
- * ((const char **)data)[1] is AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value.
- *
- * "response" is int *
- * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
- *
- * Valid errors:
- *
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- *  PASSWORD_INCORRECT
- */
-
-#define RIL_REQUEST_ENTER_SIM_PIN2 4
-
-/**
- * RIL_REQUEST_ENTER_SIM_PUK2
- *
- * Supplies SIM PUK2 and new PIN2.
- *
- * "data" is const char **
- * ((const char **)data)[0] is PUK2 value
- * ((const char **)data)[1] is new PIN2 value
- * ((const char **)data)[2] is AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value.
- *
- * "response" is int *
- * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
- *
- * Valid errors:
- *
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- *  PASSWORD_INCORRECT
- *     (PUK2 is invalid)
- */
-
-#define RIL_REQUEST_ENTER_SIM_PUK2 5
-
-/**
- * RIL_REQUEST_CHANGE_SIM_PIN
- *
- * Supplies old SIM PIN and new PIN.
- *
- * "data" is const char **
- * ((const char **)data)[0] is old PIN value
- * ((const char **)data)[1] is new PIN value
- * ((const char **)data)[2] is AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value.
- *
- * "response" is int *
- * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
- *
- * Valid errors:
- *
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- *  PASSWORD_INCORRECT
- *     (old PIN is invalid)
- *
- */
-
-#define RIL_REQUEST_CHANGE_SIM_PIN 6
-
-
-/**
- * RIL_REQUEST_CHANGE_SIM_PIN2
- *
- * Supplies old SIM PIN2 and new PIN2.
- *
- * "data" is const char **
- * ((const char **)data)[0] is old PIN2 value
- * ((const char **)data)[1] is new PIN2 value
- * ((const char **)data)[2] is AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value.
- *
- * "response" is int *
- * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
- *
- * Valid errors:
- *
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- *  PASSWORD_INCORRECT
- *     (old PIN2 is invalid)
- *
- */
-
-#define RIL_REQUEST_CHANGE_SIM_PIN2 7
-
-/**
- * RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION
- *
- * Requests that network personlization be deactivated
- *
- * "data" is const char **
- * ((const char **)(data))[0]] is network depersonlization code
- *
- * "response" is int *
- * ((int *)response)[0] is the number of retries remaining, or -1 if unknown
- *
- * Valid errors:
- *
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- *  PASSWORD_INCORRECT
- *     (code is invalid)
- */
-
-#define RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION 8
+#define RIL_REQUEST_ASSIGN_ICCID 1
 
 /**
  * RIL_REQUEST_GET_CURRENT_CALLS
@@ -1027,25 +686,6 @@ typedef struct {
  *  GENERIC_FAILURE
  */
 #define RIL_REQUEST_DIAL 10
-
-/**
- * RIL_REQUEST_GET_IMSI
- *
- * Get the SIM IMSI
- *
- * Only valid when radio state is "RADIO_STATE_ON"
- *
- * "data" is const char **
- * ((const char **)data)[0] is AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value.
- * "response" is a const char * containing the IMSI
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- */
-
-#define RIL_REQUEST_GET_IMSI 11
 
 /**
  * RIL_REQUEST_HANGUP
@@ -1576,34 +1216,6 @@ typedef struct {
  */
 #define RIL_REQUEST_SETUP_DATA_CALL 27
 
-
-/**
- * RIL_REQUEST_SIM_IO
- *
- * Request SIM I/O operation.
- * This is similar to the TS 27.007 "restricted SIM" operation
- * where it assumes all of the EF selection will be done by the
- * callee.
- *
- * "data" is a const RIL_SIM_IO_v6 *
- * Please note that RIL_SIM_IO has a "PIN2" field which may be NULL,
- * or may specify a PIN2 for operations that require a PIN2 (eg
- * updating FDN records)
- *
- * "response" is a const RIL_SIM_IO_Response *
- *
- * Arguments and responses that are unused for certain
- * values of "command" should be ignored or set to NULL
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- *  SIM_PIN2
- *  SIM_PUK2
- */
-#define RIL_REQUEST_SIM_IO 28
-
 /**
  * RIL_REQUEST_SEND_USSD
  *
@@ -1791,45 +1403,6 @@ typedef struct {
  *  GENERIC_FAILURE
  */
 #define RIL_REQUEST_SMS_ACKNOWLEDGE  37
-
-/**
- * RIL_REQUEST_GET_IMEI - DEPRECATED
- *
- * Get the device IMEI, including check digit
- *
- * The request is DEPRECATED, use RIL_REQUEST_DEVICE_IDENTITY
- * Valid when RadioState is not RADIO_STATE_UNAVAILABLE
- *
- * "data" is NULL
- * "response" is a const char * containing the IMEI
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- */
-
-#define RIL_REQUEST_GET_IMEI 38
-
-/**
- * RIL_REQUEST_GET_IMEISV - DEPRECATED
- *
- * Get the device IMEISV, which should be two decimal digits
- *
- * The request is DEPRECATED, use RIL_REQUEST_DEVICE_IDENTITY
- * Valid when RadioState is not RADIO_STATE_UNAVAILABLE
- *
- * "data" is NULL
- * "response" is a const char * containing the IMEISV
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
- */
-
-#define RIL_REQUEST_GET_IMEISV 39
-
 
 /**
  * RIL_REQUEST_ANSWER
@@ -2374,40 +1947,6 @@ typedef struct {
 #define RIL_REQUEST_SET_SUPP_SVC_NOTIFICATION 62
 
 /**
- * RIL_REQUEST_WRITE_SMS_TO_SIM
- *
- * Stores a SMS message to SIM memory.
- *
- * "data" is RIL_SMS_WriteArgs *
- *
- * "response" is int *
- * ((const int *)response)[0] is the record index where the message is stored.
- *
- * Valid errors:
- *  SUCCESS
- *  GENERIC_FAILURE
- *
- */
-#define RIL_REQUEST_WRITE_SMS_TO_SIM 63
-
-/**
- * RIL_REQUEST_DELETE_SMS_ON_SIM
- *
- * Deletes a SMS message from SIM memory.
- *
- * "data" is int  *
- * ((int *)data)[0] is the record index of the message to delete.
- *
- * "response" is NULL
- *
- * Valid errors:
- *  SUCCESS
- *  GENERIC_FAILURE
- *
- */
-#define RIL_REQUEST_DELETE_SMS_ON_SIM 64
-
-/**
  * RIL_REQUEST_SET_BAND_MODE
  *
  * Assign a specified band for RF configuration.
@@ -2483,84 +2022,9 @@ typedef struct {
 #define RIL_REQUEST_QUERY_AVAILABLE_BAND_MODE 66
 
 /**
- * RIL_REQUEST_STK_GET_PROFILE
- *
- * Requests the profile of SIM tool kit.
- * The profile indicates the SAT/USAT features supported by ME.
- * The SAT/USAT features refer to 3GPP TS 11.14 and 3GPP TS 31.111
- *
- * "data" is NULL
- *
- * "response" is a const char * containing SAT/USAT profile
- * in hexadecimal format string starting with first byte of terminal profile
- *
- * Valid errors:
- *  RIL_E_SUCCESS
- *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
- */
-#define RIL_REQUEST_STK_GET_PROFILE 67
-
-/**
- * RIL_REQUEST_STK_SET_PROFILE
- *
- * Download the STK terminal profile as part of SIM initialization
- * procedure
- *
- * "data" is a const char * containing SAT/USAT profile
- * in hexadecimal format string starting with first byte of terminal profile
- *
- * "response" is NULL
- *
- * Valid errors:
- *  RIL_E_SUCCESS
- *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
- */
-#define RIL_REQUEST_STK_SET_PROFILE 68
-
-/**
- * RIL_REQUEST_STK_SEND_ENVELOPE_COMMAND
- *
- * Requests to send a SAT/USAT envelope command to SIM.
- * The SAT/USAT envelope command refers to 3GPP TS 11.14 and 3GPP TS 31.111
- *
- * "data" is a const char * containing SAT/USAT command
- * in hexadecimal format string starting with command tag
- *
- * "response" is a const char * containing SAT/USAT response
- * in hexadecimal format string starting with first byte of response
- * (May be NULL)
- *
- * Valid errors:
- *  RIL_E_SUCCESS
- *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
- */
-#define RIL_REQUEST_STK_SEND_ENVELOPE_COMMAND 69
-
-/**
- * RIL_REQUEST_STK_SEND_TERMINAL_RESPONSE
- *
- * Requests to send a terminal response to SIM for a received
- * proactive command
- *
- * "data" is a const char * containing SAT/USAT response
- * in hexadecimal format string starting with first byte of response data
- *
- * "response" is NULL
- *
- * Valid errors:
- *  RIL_E_SUCCESS
- *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
- */
-#define RIL_REQUEST_STK_SEND_TERMINAL_RESPONSE 70
-
-/**
  * RIL_REQUEST_STK_HANDLE_CALL_SETUP_REQUESTED_FROM_SIM
  *
- * When STK application gets RIL_UNSOL_STK_CALL_SETUP, the call actually has
+ * When STK application gets SIL_UNSOL_STK_CALL_SETUP, the call actually has
  * been initialized by ME already. (We could see the call has been in the 'call
  * list') So, STK application needs to accept/reject the call according as user
  * operations.
@@ -3097,34 +2561,6 @@ typedef struct {
 #define RIL_REQUEST_CDMA_DELETE_SMS_ON_RUIM 97
 
 /**
- * RIL_REQUEST_DEVICE_IDENTITY
- *
- * Request the device ESN / MEID / IMEI / IMEISV.
- *
- * The request is always allowed and contains GSM and CDMA device identity;
- * it substitutes the deprecated requests RIL_REQUEST_GET_IMEI and
- * RIL_REQUEST_GET_IMEISV.
- *
- * If a NULL value is returned for any of the device id, it means that error
- * accessing the device.
- *
- * When CDMA subscription is changed the ESN/MEID may change.  The application
- * layer should re-issue the request to update the device identity in this case.
- *
- * "response" is const char **
- * ((const char **)response)[0] is IMEI if GSM subscription is available
- * ((const char **)response)[1] is IMEISV if GSM subscription is available
- * ((const char **)response)[2] is ESN if CDMA subscription is available
- * ((const char **)response)[3] is MEID if CDMA subscription is available
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- */
-#define RIL_REQUEST_DEVICE_IDENTITY 98
-
-/**
  * RIL_REQUEST_EXIT_EMERGENCY_CALLBACK_MODE
  *
  * Request the radio's system selection module to exit emergency
@@ -3197,23 +2633,6 @@ typedef struct {
 #define RIL_REQUEST_REPORT_SMS_MEMORY_STATUS 102
 
 /**
- * RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING
- *
- * Indicates that the StkSerivce is running and is
- * ready to receive RIL_UNSOL_STK_XXXXX commands.
- *
- * "data" is NULL
- * "response" is NULL
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- *
- */
-#define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
-
-/**
  * RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE
  *
  * Request to query the location where the CDMA subscription shall
@@ -3235,22 +2654,6 @@ typedef struct {
 #define RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE 104
 
 /**
- * RIL_REQUEST_ISIM_AUTHENTICATION
- *
- * Request the ISIM application on the UICC to perform AKA
- * challenge/response algorithm for IMS authentication
- *
- * "data" is a const char * containing the challenge string in Base64 format
- * "response" is a const char * containing the response in Base64 format
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- */
-#define RIL_REQUEST_ISIM_AUTHENTICATION 105
-
-/**
  * RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU
  *
  * Acknowledge successful or failed receipt of SMS previously indicated
@@ -3270,32 +2673,6 @@ typedef struct {
  *  GENERIC_FAILURE
  */
 #define RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU 106
-
-/**
- * RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS
- *
- * Requests to send a SAT/USAT envelope command to SIM.
- * The SAT/USAT envelope command refers to 3GPP TS 11.14 and 3GPP TS 31.111.
- *
- * This request has one difference from RIL_REQUEST_STK_SEND_ENVELOPE_COMMAND:
- * the SW1 and SW2 status bytes from the UICC response are returned along with
- * the response data, using the same structure as RIL_REQUEST_SIM_IO.
- *
- * The RIL implementation shall perform the normal processing of a '91XX'
- * response in SW1/SW2 to retrieve the pending proactive command and send it
- * as an unsolicited response, as RIL_REQUEST_STK_SEND_ENVELOPE_COMMAND does.
- *
- * "data" is a const char * containing the SAT/USAT command
- * in hexadecimal format starting with command tag
- *
- * "response" is a const RIL_SIM_IO_Response *
- *
- * Valid errors:
- *  RIL_E_SUCCESS
- *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
- */
-#define RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS 107
 
 /**
  * RIL_REQUEST_VOICE_RADIO_TECH
@@ -3409,18 +2786,6 @@ typedef struct {
 #define RIL_UNSOL_RESPONSE_NEW_SMS_STATUS_REPORT 1004
 
 /**
- * RIL_UNSOL_RESPONSE_NEW_SMS_ON_SIM
- *
- * Called when new SMS has been stored on SIM card
- *
- * "data" is const int *
- * ((const int *)data)[0] contains the slot index on the SIM that contains
- * the new message
- */
-
-#define RIL_UNSOL_RESPONSE_NEW_SMS_ON_SIM 1005
-
-/**
  * RIL_UNSOL_ON_USSD
  *
  * Called when a new USSD message is received.
@@ -3499,84 +2864,6 @@ typedef struct {
 #define RIL_UNSOL_SUPP_SVC_NOTIFICATION 1011
 
 /**
- * RIL_UNSOL_STK_SESSION_END
- *
- * Indicate when STK session is terminated by SIM.
- *
- * "data" is NULL
- */
-#define RIL_UNSOL_STK_SESSION_END 1012
-
-/**
- * RIL_UNSOL_STK_PROACTIVE_COMMAND
- *
- * Indicate when SIM issue a STK proactive command to applications
- *
- * "data" is a const char * containing SAT/USAT proactive command
- * in hexadecimal format string starting with command tag
- *
- */
-#define RIL_UNSOL_STK_PROACTIVE_COMMAND 1013
-
-/**
- * RIL_UNSOL_STK_EVENT_NOTIFY
- *
- * Indicate when SIM notifies applcations some event happens.
- * Generally, application does not need to have any feedback to
- * SIM but shall be able to indicate appropriate messages to users.
- *
- * "data" is a const char * containing SAT/USAT commands or responses
- * sent by ME to SIM or commands handled by ME, in hexadecimal format string
- * starting with first byte of response data or command tag
- *
- */
-#define RIL_UNSOL_STK_EVENT_NOTIFY 1014
-
-/**
- * RIL_UNSOL_STK_CALL_SETUP
- *
- * Indicate when SIM wants application to setup a voice call.
- *
- * "data" is const int *
- * ((const int *)data)[0] contains timeout value (in milliseconds)
- */
-#define RIL_UNSOL_STK_CALL_SETUP 1015
-
-/**
- * RIL_UNSOL_SIM_SMS_STORAGE_FULL
- *
- * Indicates that SMS storage on the SIM is full.  Sent when the network
- * attempts to deliver a new SMS message.  Messages cannot be saved on the
- * SIM until space is freed.  In particular, incoming Class 2 messages
- * cannot be stored.
- *
- * "data" is null
- *
- */
-#define RIL_UNSOL_SIM_SMS_STORAGE_FULL 1016
-
-/**
- * RIL_UNSOL_SIM_REFRESH
- *
- * Indicates that file(s) on the SIM have been updated, or the SIM
- * has been reinitialized.
- *
- * In the case where RIL is version 6 or older:
- * "data" is an int *
- * ((int *)data)[0] is a RIL_SimRefreshResult.
- * ((int *)data)[1] is the EFID of the updated file if the result is
- * SIM_FILE_UPDATE or NULL for any other result.
- *
- * In the case where RIL is version 7:
- * "data" is a RIL_SimRefreshResponse_v7 *
- *
- * Note: If the SIM state changes as a result of the SIM refresh (eg,
- * SIM_READY -> SIM_LOCKED_OR_ABSENT), RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
- * should be sent.
- */
-#define RIL_UNSOL_SIM_REFRESH 1017
-
-/**
  * RIL_UNSOL_CALL_RING
  *
  * Ring indication for an incoming call (eg, RING or CRING event).
@@ -3594,17 +2881,6 @@ typedef struct {
  * "data" is const RIL_CDMA_SignalInfoRecord * if CDMA
  */
 #define RIL_UNSOL_CALL_RING 1018
-
-/**
- * RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
- *
- * Indicates that SIM state changes.
- *
- * Callee will invoke RIL_REQUEST_GET_SIM_STATUS on main thread
-
- * "data" is null
- */
-#define RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED 1019
 
 /**
  * RIL_UNSOL_RESPONSE_CDMA_NEW_SMS
