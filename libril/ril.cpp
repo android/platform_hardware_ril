@@ -2763,7 +2763,7 @@ static void debugCallback (int fd, short flags, void *param) {
             issueLocalRequest(RIL_REQUEST_RESET_RADIO, NULL, 0);
             break;
         case 1:
-            RLOGI ("Connection on debug port: issuing radio power off.");
+            RLOGI ("Connection on debug port: issuing radio power (airplane_mode).");
             data = 0;
             issueLocalRequest(RIL_REQUEST_RADIO_POWER, &data, sizeof(int));
             // Close the socket

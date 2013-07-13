@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#define RIL_VERSION 8     /* Current version */
+#define RIL_VERSION 9     /* Current version */
 #define RIL_VERSION_MIN 6 /* Minimum RIL_VERSION supported */
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
@@ -1548,20 +1548,26 @@ typedef struct {
 /**
  * RIL_REQUEST_RADIO_POWER
  *
- * Toggle radio on and off (for "airplane" mode)
- * If the radio is is turned off/on the radio modem subsystem
- * is expected return to an initialized state. For instance,
+ * Set radio power to one of the following states:
+ *     on - powered completely ON
+ *     "airplane mode" - Low power mode with RF turned off
+ *     device shutdown - Device is shutting down. All further commands are ignored
+ *                       and RADIO_NOT_AVAILABLE must be returned.
+ * If the radio transitions from airplane mode to on, the radio modem subsystem
+ * is expected to return to an initialized state. For instance,
  * any voice and data calls will be terminated and all associated
  * lists emptied.
  *
  * "data" is int *
- * ((int *)data)[0] is > 0 for "Radio On"
- * ((int *)data)[0] is == 0 for "Radio Off"
+ * ((int *)data)[0] is > 0 for "Radio On". Turn the Radio On.
+ * ((int *)data)[0] is == 0 for "Enable Airplane mode". Set the radio/modem in
+ *                               low power mode and turn off RF.
+ * ((int *)data)[0] is == -1 for "Device is shutting down". Shutdown radio and SIMs.
+ *                           SUCCESS result should be returned within 1 second. Not
+ *                           returning or delaying too long will not stop the device
+ *                           shutdown process, but may delay it unnecessarily.
  *
  * "response" is NULL
- *
- * Turn radio on if "on" > 0
- * Turn radio off if "on" == 0
  *
  * Valid errors:
  *  SUCCESS
@@ -1993,7 +1999,7 @@ typedef struct {
  * data call list if SUCCESS is returned. Any other return
  * values should also try to remove the call from the list,
  * but that may not be possible. In any event a
- * RIL_REQUEST_RADIO_POWER off/on must clear the list. An
+ * RIL_REQUEST_RADIO_POWER "airplane mode"/on must clear the list. An
  * RIL_UNSOL_DATA_CALL_LIST_CHANGED is not expected to be
  * issued because of an RIL_REQUEST_DEACTIVATE_DATA_CALL.
  *
@@ -2373,7 +2379,7 @@ typedef struct {
  * Returns the data call list. An entry is added when a
  * RIL_REQUEST_SETUP_DATA_CALL is issued and removed on a
  * RIL_REQUEST_DEACTIVATE_DATA_CALL. The list is emptied
- * when RIL_REQUEST_RADIO_POWER off/on is issued.
+ * when RIL_REQUEST_RADIO_POWER "airplane mode"/on is issued.
  *
  * "data" is NULL
  * "response" is an array of RIL_Data_Call_Response_v6
