@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "53ecab79_04181837",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 2019,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2013-07-16T23:25:26Z",
+      "side": 1,
+      "message": "Rather than memset to 0, just set the INVALID value explicitly.",
+      "revId": "5da06732461d7901659482735831c70bf2050ed0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "53ecab79_e4141405",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 2023,
+      "author": {
+        "id": 1003413
+      },
+      "writtenOn": "2013-07-16T23:25:26Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5da06732461d7901659482735831c70bf2050ed0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
