@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "f342ff7b_5ea6b5a8",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 706,
+      "author": {
+        "id": 1012468
+      },
+      "writtenOn": "2013-07-19T08:48:17Z",
+      "side": 1,
+      "message": "Is the CQI reporting for wideband CQI?",
+      "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "VA3MYyIY",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -66,6 +83,23 @@
       "side": 1,
       "message": "Maybe, the other option might be to include that information in the RealTimeInfo, just a thought?",
       "parentUuid": "VA3MYyIY",
+      "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f342ff7b_beaa5969",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 3471,
+      "author": {
+        "id": 1012468
+      },
+      "writtenOn": "2013-07-19T08:48:17Z",
+      "side": 1,
+      "message": "For a value 0\nInstantaneous CQI report can be misleading, because it changes every TTI (1ms):\nCQI could be 15 (high quality) for 10 TTIs in a row and then can be invalid if no data for few TTIs.\nIf Application is keep querying at instances where CQI was invalid, it may give incorrect picture.\nCQI distribution report over a defined period could make more sense.\n\nOr set a min value for this reporting, so that such error/invalid reporting can be prevented.\n\nThere could be other delays also by the time the value reaches RIL.",
       "revId": "2a9ee1b28865868fffa986203e1ec818e0da244e",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
