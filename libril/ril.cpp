@@ -2932,6 +2932,12 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
     int ret;
     int flags;
 
+    if (s_registerCalled > 0) {
+        RLOGE("RIL_register has been called more than once. "
+                "Subsequent call ignored");
+        return;
+    }
+
     if (callbacks == NULL) {
         RLOGE("RIL_register: RIL_RadioFunctions * null");
         return;
@@ -2947,12 +2953,6 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
         return;
     }
     RLOGE("RIL_register: RIL version %d", callbacks->version);
-
-    if (s_registerCalled > 0) {
-        RLOGE("RIL_register has been called more than once. "
-                "Subsequent call ignored");
-        return;
-    }
 
     memcpy(&s_callbacks, callbacks, sizeof (RIL_RadioFunctions));
 
