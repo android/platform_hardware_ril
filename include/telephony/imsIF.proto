@@ -1,0 +1,794 @@
+/*
+ * Copyright (c) 2013, The Linux Foundation. All rights reserved.
+ * Not a Contribution.
+ *
+ * Copyright (C) 2006 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* IMS interface to Modem */
+
+package ims;
+option java_package = "org.codeaurora.ims";
+option java_outer_classname = "ImsQmiIF";
+
+/*
+IMS QMI byte stream will have the following contents
+byte[0] Length of MsgTag
+byte[1.. Length of MsgTag] MsgTag 11bytes
+byte[Length of MsgTag+1 ..Length of Message] Message
+*/
+
+message MsgTag {
+    required fixed32 token = 1; /*generated dynamically */
+    required MsgType type = 2;
+    required MsgId id = 3;
+    required Error error = 4;
+}
+
+enum MsgType {
+        UNKNOWN = 0;
+        REQUEST = 1;
+        RESPONSE = 2;
+        UNSOL_RESPONSE = 3;
+    }
+
+enum MsgId {
+    UNKNOWN_REQ = 0;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_IMS_REGISTRATION_STATE, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_IMS_REGISTRATION_STATE, Error:Valid errors
+     *          Message: message Registration
+     *
+     * Description:Request current IMS registration state
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+    REQUEST_IMS_REGISTRATION_STATE = 1;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_DIAL, Error:E_UNUSED ,
+     *          Message: message Dial
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_DIAL, Error:Valid errors
+     *          Message: is NULL
+     *
+     * Description: Initiate voice call
+     *
+     * This method is never used for supplementary service codes
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  GENERIC_FAILURE
+     */
+
+    REQUEST_DIAL = 2;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_ANSWER, Error:E_UNUSED ,
+     *          Message: Calltype
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_ANSWER, Error:Valid errors
+     *          Message: message NULL
+     *
+     * Description:
+     *  Answer incoming call
+     *
+     *  Will not be called for WAITING calls.
+     *  REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE will be used in this case
+     *  instead
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_ANSWER = 3;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_HANGUP, Error:E_UNUSED ,
+     *          Message: Hangup
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_HANGUP, Error:Valid errors
+     *          Message: message NULL
+     *
+     * Description:
+     *  Hang up a specific connection
+     *
+     *  After this HANGUP request returns, connection will NOT
+     *  be active anymore in next REQUEST_GET_CURRENT_CALLS query.
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_HANGUP = 4;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_LAST_CALL_FAIL_CAUSE, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_LAST_CALL_FAIL_CAUSE, Error:Valid errors
+     *          Message: message CallFailCauseResponse
+     *
+     * Description:
+     *  Requests the failure cause code for the most recently terminated call
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_LAST_CALL_FAIL_CAUSE = 5;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_GET_CURRENT_CALLS, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_GET_CURRENT_CALLS, Error:Valid errors
+     *          Message: CallList or null
+     *          null means no active calls in CallList
+
+     * Description:
+     *  Requests current call list
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_HANGUP_WAITING_OR_BACKGROUND, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_HANGUP_WAITING_OR_BACKGROUND, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * Hang up waiting or held
+     *
+     * After this HANGUP request returns, the connection is NOT
+     * active anymore in next REQUEST_GET_CURRENT_CALLS query.
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+    REQUEST_HANGUP_WAITING_OR_BACKGROUND = 7;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * Hang up foreground call and resume background call
+     *
+     * After this HANGUP request returns, the connection is NOT
+     * active anymore in next REQUEST_GET_CURRENT_CALLS query and the background holding call
+     * is changed to foreground active call
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+    REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND = 8;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE, Error:E_UNUSED ,
+     *          Message: Calltype or null
+     *          Calltype is specified while answering incoming call
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * For switching calls. Also used for answering waiting call with user specified calltype
+     *
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE = 9;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_CONFERENCE, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_CONFERENCE, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * For merging foreground and background call
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_CONFERENCE = 10;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_EXIT_EMERGENCY_CALLBACK_MODE, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_EXIT_EMERGENCY_CALLBACK_MODE, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * Request to exit from emergency call back mode
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+    REQUEST_EXIT_EMERGENCY_CALLBACK_MODE =11;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_DTMF, Error:E_UNUSED ,
+     *          Message: Dtmf
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_DTMF, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * Request to send a dtmf tone. If a tone is currently playing
+     * it should cancel the previous tone and play the new tone
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+    REQUEST_DTMF = 13;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_DTMF_START, Error:E_UNUSED ,
+     *          Message: Dtmf
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_DTMF_START, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * Request to send a dtmf tone. If a tone is currently playing
+     * it should cancel the previous tone and play the new tone
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+    REQUEST_DTMF_START = 14;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_DTMF_STOP, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_DTMF_STOP, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * Stop playing a currently playing tone.
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+    REQUEST_DTMF_STOP = 15;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_QUERY_CALL_CLIP, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_QUERY_CALL_CLIP, Error:Valid errors
+     *          Message: ClipProvisionStatus
+     *
+     * Description:
+     * Queries the status of the CLIP supplementary service for MMI code "*#30#"
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_QUERY_CLIP = 16;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_GET_CLIR, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_GET_CLIR, Error:Valid errors
+     *          Message: Clir
+     *
+     * Description:
+     * Gets current CLIR status
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_GET_CLIR = 17;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_SET_CLIR, Error:E_UNUSED ,
+     *          Message: Clir
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_SET_CLIR, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     * Sets CLIR
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E-GENERIC_FAILURE
+     */
+
+    REQUEST_SET_CLIR = 18;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_QUERY_CALL_FORWARD_STATUS, Error:E_UNUSED ,
+     *          Message: CallForwardInfoList
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_QUERY_CALL_FORWARD_STATUS, Error:Valid errors
+     *          Message: CallForwardInfoList or null , one for
+     *          each distinct registered phone number.
+     *
+     * Description:
+     *
+     * Requests the call forward settings
+
+     * For example, if data is forwarded to +18005551212 and voice is forwarded
+     * to +18005559999, then two separate CallForwardInfo should be returned
+     *
+     * If, however, both data and voice are forwarded to +18005551212, then
+     * a single CallForwardInfo can be returned with the service class
+     * set to "data + voice = 3")
+     *
+     * Valid errors:
+     *  SUCCESS
+     *  RADIO_NOT_AVAILABLE
+     *  GENERIC_FAILURE
+     */
+    REQUEST_QUERY_CALL_FORWARD_STATUS = 19;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_SET_CALL_FORWARD_STATUS, Error:E_UNUSED ,
+     *          Message: CallForwardInfoList
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_SET_CALL_FORWARD_STATUS, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+     *
+     * Configure call forward rule
+     *
+     * Valid errors:
+     *  SUCCESS
+     *  RADIO_NOT_AVAILABLE
+     *  GENERIC_FAILURE
+     */
+    REQUEST_SET_CALL_FORWARD_STATUS = 20;
+
+    /**
+     * REQUEST_QUERY_CALL_WAITING
+     * MsgType: REQUEST
+     *
+     * Query current call waiting state
+     *
+     * "data" must be a "message ServiceClass"
+     *
+     * "response" is a "message CallWaitingInfo"
+     *
+     * Valid errors:
+     *  SUCCESS
+     *  RADIO_NOT_AVAILABLE
+     *  GENERIC_FAILURE
+     */
+    REQUEST_QUERY_CALL_WAITING = 21;
+
+    /**
+     * REQUEST_SET_CALL_WAITING
+     * MsgType: REQUEST
+     *
+     * Configure current call waiting state
+     *
+     * "data" is "message CallWaitingInfo"
+     * "response" is Null
+     *
+     * Valid errors:
+     *  SUCCESS
+     *  RADIO_NOT_AVAILABLE
+     *  GENERIC_FAILURE
+     */
+    REQUEST_SET_CALL_WAITING = 22;
+
+    /**
+     * MsgType: REQUEST ,MsgId: REQUEST_SET_SUPP_SVC_NOTIFICATION, Error:E_UNUSED ,
+     *          Message: SuppSvcNotification
+     *
+     * MsgType: RESPONSE, MsgId: REQUEST_SET_SUPP_SVC_NOTIFICATION, Error:Valid errors
+     *          Message: NULL
+     *
+     * Description:
+
+     * Enables/disables supplementary service related notifications
+     * from the network.
+     *
+     * Notifications are reported via UNSOL_SUPP_SVC_NOTIFICATION.
+     *
+     * Valid errors:
+     *  E_SUCCESS
+     *  E_RADIO_NOT_AVAILABLE
+     *  E_GENERIC_FAILURE
+    */
+    REQUEST_SET_SUPP_SVC_NOTIFICATION = 23;
+
+
+    /**
+     * Value to indicate start of message id values for unsolicited response
+     * If new request-response messages are added , it should be done before this
+     * If new unsol response messages are added , it should be done after this
+     */
+    UNSOL_RSP_BASE = 200;
+
+    /**
+     * MsgType: UNSOL_RESPONSE ,MsgId: UNSOL_RESPONSE_CALL_STATE_CHANGED, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * Description:
+
+     * Notifies call state change. This should be followed by polling
+     * using GET_CURRENT_CALLS to get the change
+     *
+    */
+
+    UNSOL_RESPONSE_CALL_STATE_CHANGED = 201;
+
+    /**
+     * MsgType: UNSOL_RESPONSE ,MsgId: UNSOL_CALL_RING, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * Description:
+     * Notifies new incoming call ring
+    */
+    UNSOL_CALL_RING = 202;
+
+    /**
+     * MsgType: UNSOL_RESPONSE ,MsgId: UNSOL_RINGBACK_TONE, Error:E_UNUSED ,
+     *          Message: RingBackTone
+     *
+     * Description:
+     * Indicates that network doesn't have in-band information,  need to
+     * play out-band tone
+    */
+    UNSOL_RINGBACK_TONE = 203;
+
+    /**
+     * MsgType: UNSOL_RESPONSE ,MsgId: UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED, Error:E_UNUSED ,
+     *          Message: Registration
+     *
+     * Description:
+     * Indicates that ims network state has changed to the reported state
+    */
+    UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED = 204;
+
+    /**
+     * MsgType: UNSOL_RESPONSE ,MsgId: UNSOL_ENTER_EMERGENCY_CALLBACK_MODE, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * Description:
+     * request to enter emergency call back mode
+    */
+    UNSOL_ENTER_EMERGENCY_CALLBACK_MODE = 205;
+
+    /**
+     * MsgType: UNSOL_RESPONSE ,MsgId: UNSOL_EXIT_EMERGENCY_CALLBACK_MODE, Error:E_UNUSED ,
+     *          Message: NULL
+     *
+     * Description:
+     * request to exit emergency call back mode
+    */
+    UNSOL_EXIT_EMERGENCY_CALLBACK_MODE = 206;
+
+    /**
+     * MsgType: UNSOL_RESPONSE ,MsgId: UNSOL_SUPP_SVC_NOTIFICATION, Error:E_UNUSED ,
+     *          Message: SuppSvcNotification
+     *
+     * Description:
+     * Reports supplementary service related notification from the network.
+    */
+    UNSOL_SUPP_SVC_NOTIFICATION = 207;
+
+    }
+
+    enum Error{
+    E_SUCCESS = 0;
+    E_RADIO_NOT_AVAILABLE = 1;     /* If radio did not start or is resetting */
+    E_GENERIC_FAILURE = 2;
+    E_REQUEST_NOT_SUPPORTED = 6;
+    E_CANCELLED = 7;
+    E_UNUSED = 16;
+
+    E_INVALID_PARAMETER = 27;               /* Invalid parameter given in a
+                                                   REQUEST_MODIFY_CALL_INITIATE */
+    E_REJECTED_BY_REMOTE = 28;              /* Remote end rejected a change started by
+                                                   REQUEST_MODIFY_CALL_INITIATE */
+    E_IMS_DEREGISTERED = 29;
+    }
+
+
+enum CallState{
+    CALL_ACTIVE = 0;
+    CALL_HOLDING = 1;
+    CALL_DIALING = 2;    /* MO call only */
+    CALL_ALERTING = 3;   /* MO call only */
+    CALL_INCOMING = 4;   /* MT call only */
+    CALL_WAITING = 5;     /* MT call only */
+}
+
+enum RadioState{
+    RADIO_STATE_OFF = 0;                   /* Radio explictly powered off (eg CFUN=0) */
+    RADIO_STATE_UNAVAILABLE = 1;           /* Radio unavailable (eg, resetting or not booted) */
+    RADIO_STATE_ON = 10;                    /* Radio is on */
+}
+
+enum CallFailCause {
+    CALL_FAIL_UNOBTAINABLE_NUMBER = 1;
+    CALL_FAIL_NORMAL = 16;
+    CALL_FAIL_BUSY = 17;
+    CALL_FAIL_CONGESTION = 34;
+    CALL_FAIL_CALL_BARRED = 240;
+
+    CALL_FAIL_NETWORK_UNAVAILABLE = 1010; /* PS network is unavailable
+                                       * Remote party is temporarily camped on
+                                       * non PS network.
+                                       * Originating / remote party lost PS
+                                       * coverage during the call
+                                       * UI prompts user to retry call on CS*/
+
+    CALL_FAIL_FEATURE_UNAVAILABLE = 1011; /* User has not subscribed for this
+                                       * service. UI prompts user to retry call
+                                       * on CS*/
+
+    CALL_FAIL_SIP_Error = 1012; /* Sip timeout or dialog not present Error during
+                                      * call upgrade/downgrade
+                                      * SIP Error code 481/408
+                                      * sent by IMS stack. UI does not take
+                                      * any action on this Error code.*/
+    CALL_FAIL_MISC = 1013;/* Error code to represent Miscellaneous call failure cases*/
+    CALL_FAIL_ERROR_UNSPECIFIED = 0xffff;
+}
+
+
+message CallList {
+    message Call {
+        optional CallState  state = 1;
+        optional fixed32    index = 2;              /* Connection Index for use with, eg, AT+CHLD */
+        optional fixed32    toa = 3;                /* type of address, eg 145 = intl */
+        optional bool       isMpty = 4;             /* nonzero if is mpty call */
+        optional bool       isMT = 5;               /* nonzero if call is mobile terminated */
+        optional fixed32    als = 6;                /* ALS line indicator if available
+                                                     (0 = line 1) */
+        optional bool       isVoice = 7;            /* nonzero if this is is a voice call */
+        optional bool       isVoicePrivacy = 8;     /* nonzero if CDMA voice privacy mode is active */
+        optional string     number = 9;             /* Remote party number */
+        optional fixed32    numberPresentation = 10;/* 0=Allowed, 1=Restricted, 2=Not Specified/Unknown 3=Payphone */
+        optional string     name =11;               /* Remote party name */
+        optional fixed32    namePresentation = 12;  /* 0=Allowed, 1=Restricted, 2=Not Specified/Unknown 3=Payphone */
+        optional CallDetails  callDetails = 13;     /* current call detail */
+    }
+    repeated Call callAttributes = 2 ;
+}
+
+message Dial {
+    optional string address = 1;
+    optional fixed32 clir = 2;
+            /* (same as 'n' paremeter in TS 27.007 7.7 "+CLIR"
+             * clir == 0 on "use subscription default value"
+             * clir == 1 on "CLIR invocation" (restrict CLI presentation)
+             * clir == 2 on "CLIR suppression" (allow CLI presentation)
+             */
+    optional CallDetails  callDetails = 3; /* current call detail */
+    optional IpPresentation presentation = 4; /* IP Presentation detail */
+    optional bool isConferenceUri = 5; /* set to true only if initiating conference uri,
+                                        * field not set for other dial requests */
+}
+
+message Hangup {
+    optional fixed32 conn_index  = 1; /* Valid if multiparty is false else -1  */
+    optional bool multi_party    = 2; /* Is Hangup for a multiparty call */
+    optional string  conn_uri    = 3; /* Valid if multiparty is true, else null */
+    optional fixed32 conf_id     = 4; /* Conference ID if more than 1 conference call */
+}
+
+message Clir {
+    optional fixed32 param_m = 1;
+    optional fixed32 param_n = 2;
+}
+
+message Answer {
+    optional CallType call_type = 1;
+    optional IpPresentation presentation = 4; /* IP Presentation detail */
+}
+
+message SwitchWaitingOrHoldingAndActive {
+    optional CallType call_type = 1;
+}
+
+message Dtmf {
+    optional string dtmf = 1;
+}
+
+message RingBackTone {
+    enum ToneFlag {
+        STOP = 0;
+        START = 1;
+    }
+    optional ToneFlag flag = 1;
+}
+
+message LastFailCause{
+    optional CallFailCause cause = 1;
+}
+
+enum ClipStatus {
+    NOT_PROVISIONED = 0;
+    PROVISIONED = 1;
+    STATUS_UNKNOWN = 2;
+}
+
+message ClipProvisionStatus{
+    optional ClipStatus clip_status = 1;
+}
+
+message CallWaitingInfo{
+    optional StatusType service_status = 1;
+    optional ServiceClass       service_class  = 2; /*  TS 27.007 service class to query */
+}
+
+message CallForwardInfoList{
+    message CallForwardInfo{
+        optional fixed32 status = 1;/*
+                                     * For RIL_REQUEST_QUERY_CALL_FORWARD_STATUS
+                                     * status 1 = active, 0 = not active
+                                     *
+                                     * For RIL_REQUEST_SET_CALL_FORWARD:
+                                     * status is:
+                                     * 0 = disable
+                                     * 1 = enable
+                                     * 2 = interrogate
+                                     * 3 = registeration
+                                     * 4 = erasure
+                                     */
+        optional fixed32 reason = 2;      /* from TS 27.007 7.11 "reason" */
+        optional fixed32 service_class = 3;/* From 27.007 +CCFC/+CLCK "class"
+                                             See table for Android mapping from
+                                             MMI service code
+                                             0 means user doesn't input class */
+        optional fixed32 toa = 4;         /* "type" from TS 27.007 7.11 */
+        optional string  number = 5;      /* "number" from TS 27.007 7.11. May be NULL */
+        optional fixed32 time_seconds = 6; /* for CF no reply only */
+    }
+    repeated CallForwardInfo info = 2;
+}
+
+message SuppSvcNotification{
+    optional NotificationType notificationType = 1;
+                                           /*
+                                            * 0 = MO intermediate result code
+                                            * 1 = MT unsolicited result code
+                                            */
+    optional fixed32 code = 2;
+    optional fixed32 index = 3;            /* CUG index - not used currently */
+    optional fixed32 type = 4;             /* "type" (MT only).- not used currently */
+    optional string  number = 5;           /* "number"
+                                              (MT only, may be NULL). - not used currently*/
+}
+
+enum NotificationType {
+    MO = 0;
+    MT = 1;
+}
+
+enum CallType{
+    CALL_TYPE_VOICE = 0;       /* Voice only call */
+    CALL_TYPE_VT_TX = 1;       /* PS Video telephony call: one way TX video,
+                                * two way audio */
+    CALL_TYPE_VT_RX = 2;       /* Video telephony call: one way RX video,
+                                * two way audio */
+    CALL_TYPE_VT = 3;          /* Video telephony call: two way video,
+                                * two way audio */
+    CALL_TYPE_VT_NODIR = 4;    /* Video telephony call: no direction
+                                * two way audio
+                                * intermediate state in a video call till
+                                * video link is setup */
+    CALL_TYPE_UNKNOWN = 5;      /* default value used locally for intitialization */
+}
+
+enum CallDomain{
+    CALL_DOMAIN_UNKNOWN = 0;   /* Unknown domain. Sent by RIL when modem
+                                    * has not yet selected a
+                                    * domain for a call */
+    CALL_DOMAIN_CS = 1;        /* Circuit switched domain */
+    CALL_DOMAIN_PS = 2;        /* Packet switched domain */
+    CALL_DOMAIN_AUTOMATIC = 3; /* Automatic domain. Sent by Android to
+                                    * indicate that the domain
+                                    * for a new call should be selected by modem */
+    CALL_DOMAIN_NOT_SET = 4;   /* default value used locally for intitialization */
+}
+
+enum StatusType {
+    STATUS_DISABLED = 0;
+    STATUS_PARTIALLY_ENABLED = 1;
+    STATUS_ENABLED = 2;
+}
+
+message CallDetails {
+    optional CallType   callType = 1;   /* Initial call type to use */
+    optional CallDomain callDomain = 2; /* Call domain to place the call on.
+                                 * Modem is expected to respect
+                                 * the selected call domain.
+                                 * When domain is AUTOMATIC, modem will
+                                 * select the best available domain */
+    repeated string extras = 3 ; /* A list of additional call attributes,
+                                 * each char * being a key-value pair.
+                                 * The format should be
+                                 * <param-name>=<value>
+                                   e.g.codec=AMR */
+}
+
+message Registration {
+    enum RegState{
+        REGISTER = 1;
+        UNREGISTER = 2;
+    }
+    optional RegState state = 1;
+}
+
+message ServiceClass{
+    optional fixed32 service_Class = 1;  /*  TS 27.007 service class to query */
+}
+
+message CallFailCauseResponse{
+    optional CallFailCause failcause = 1;
+    optional bytes errorinfo = 2; /* placeholder to send additional error codes
+                                    that are not covered in CallFailCause enum*/
+}
