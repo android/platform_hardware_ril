@@ -68,6 +68,8 @@
 #define MDM_EVDO        0x08
 #define MDM_LTE         0x10
 
+int wait_for_debugger = false;
+
 typedef struct {
     int supportedTechs; // Bitmask of supported Modem Technology bits
     int currentTech;    // Technology the modem is currently using (in the format used by modem)
@@ -1838,6 +1840,7 @@ static void requestGetCellInfoList(void *data, size_t datalen, RIL_Token t)
         { // ci[0]
             1, // cellInfoType
             1, // registered
+            2, // timestamp_type
             curTime - 1000, // Fake some time in the past
             { // union CellInfo
                 {  // RIL_CellInfoGsm gsm
@@ -3253,6 +3256,10 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
     pthread_attr_init (&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     ret = pthread_create(&s_tid_mainloop, &attr, mainLoop, NULL);
+
+    while (wait_for_debugger) {
+        usleep(10000);
+    }
 
     return &s_callbacks;
 }
