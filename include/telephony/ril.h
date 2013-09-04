@@ -1407,7 +1407,7 @@ typedef struct {
  * ((const char **)response)[8] is System ID if registered on a CDMA system or
  *                              NULL if not. Valid System ID are 0 - 32767
  * ((const char **)response)[9] is Network ID if registered on a CDMA system or
- *                              NULL if not. Valid System ID are 0 - 65535
+ *                              NULL if not. Valid Network ID are 0 - 65535
  * ((const char **)response)[10] is the TSB-58 Roaming Indicator if registered
  *                               on a CDMA or EVDO system or NULL if not. Valid values
  *                               are 0-255.
