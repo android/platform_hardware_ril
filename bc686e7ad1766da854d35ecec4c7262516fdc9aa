@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "32649599_ee9ebb5c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-09-04T22:12:41Z",
+      "side": 1,
+      "message": "Lets make a new command(s) that take an array of RIL_RadioTechnology for preferred network types where which is an order list of preferred values.\n\nAlso, we may want a new command to return the \"supported\" RIL_RadioTechnology lists.",
+      "revId": "bc686e7ad1766da854d35ecec4c7262516fdc9aa",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
