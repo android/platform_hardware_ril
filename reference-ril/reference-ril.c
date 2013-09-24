@@ -2114,6 +2114,7 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             break;
         }
         case RIL_REQUEST_SEND_SMS:
+        case RIL_REQUEST_SEND_SMS_EXPECT_MORE:
             requestSendSMS(data, datalen, t);
             break;
         case RIL_REQUEST_CDMA_SEND_SMS:
