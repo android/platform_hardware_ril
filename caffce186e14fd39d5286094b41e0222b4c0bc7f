@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3e88e4e1_c0ac73cc",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 4127,
+      "author": {
+        "id": 1003966
+      },
+      "writtenOn": "2013-10-14T20:38:40Z",
+      "side": 1,
+      "message": "I\u0027m not familiar with this code at all, so apologies in advance. The docs for this function clearly say that the data is owned by the caller, and should not be modified. So isn\u0027t \"const\" more appropriate here, and we should fix the definition in ril.cpp?",
+      "revId": "caffce186e14fd39d5286094b41e0222b4c0bc7f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
