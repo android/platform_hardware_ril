@@ -16,6 +16,24 @@
       "revId": "caffce186e14fd39d5286094b41e0222b4c0bc7f",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e8de0f2_86dd2ecf",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 4127,
+      "author": {
+        "id": 1022430
+      },
+      "writtenOn": "2013-10-14T22:24:33Z",
+      "side": 1,
+      "message": "data is currently treated as a parameter of type void* by the compiler, and may also be undefined.",
+      "parentUuid": "3e88e4e1_c0ac73cc",
+      "revId": "caffce186e14fd39d5286094b41e0222b4c0bc7f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
