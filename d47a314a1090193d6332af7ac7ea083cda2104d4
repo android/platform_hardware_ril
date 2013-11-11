@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5e075952_13438e2e",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1021368
+      },
+      "writtenOn": "2013-11-11T08:42:48Z",
+      "side": 1,
+      "message": "we can avoid new function altogether and use existing dispatchstrings() method.",
+      "revId": "d47a314a1090193d6332af7ac7ea083cda2104d4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
