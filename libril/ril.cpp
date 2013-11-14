@@ -115,6 +115,16 @@ namespace android {
 #endif
 
 enum WakeType {DONT_WAKE, WAKE_PARTIAL};
+/**
+Structure : Sim Identifier Type
+**/
+typedef enum
+{
+	SIM_SINGLE,                         ///< single SIM case
+	SIM_DUAL_FIRST,                     ///< the first SIM
+	SIM_DUAL_SECOND,                    ///< the second SIM
+	SIM_ALL = 0xFF                      ///< for all the SIMs
+} SimNumber_t;
 
 typedef struct {
     int requestNumber;
@@ -130,6 +140,7 @@ typedef struct {
 
 typedef struct RequestInfo {
     int32_t token;      //this is not RIL_Token
+    SimNumber_t SimId;  //this is SIM ID
     CommandInfo *pCI;
     struct RequestInfo *p_next;
     char cancelled;
@@ -191,6 +202,12 @@ static size_t s_lastNITZTimeDataSize;
     static char printBuf[PRINTBUF_SIZE];
 #endif
 
+#define SOCKET_NAME_RIL1 "rild1"
+static int s_fdListenEx = -1;
+static int s_fdCommandEx = -1;
+static struct ril_event s_listen_eventEx;
+static struct ril_event s_commands_eventEx;
+
 /*******************************************************************/
 
 static void dispatchVoid (Parcel& p, RequestInfo *pRI);
@@ -241,9 +258,15 @@ static int responseCdmaCallWaiting(Parcel &p,void *response, size_t responselen)
 static int responseSimRefresh(Parcel &p, void *response, size_t responselen);
 static int responseCellInfoList(Parcel &p, void *response, size_t responselen);
 
+#ifdef VIDEO_TELEPHONY_ENABLE
+static void dispatchDialVT (Parcel& p, RequestInfo *pRI);
+static void dispatchVTInts (Parcel &p, RequestInfo *pRI);
+static void dispatchVTVoid (Parcel& p, RequestInfo *pRI);
+#endif //VIDEO_TELEPHONY_ENABLE
+
 static int decodeVoiceRadioTechnology (RIL_RadioState radioState);
 static int decodeCdmaSubscriptionSource (RIL_RadioState radioState);
-static RIL_RadioState processRadioState(RIL_RadioState newRadioState);
+static RIL_RadioState processRadioState(RIL_RadioState newRadioState, SimNumber_t SimId);
 
 extern "C" const char * requestToString(int request);
 extern "C" const char * failCauseToString(RIL_Errno);
@@ -252,7 +275,7 @@ extern "C" const char * radioStateToString(RIL_RadioState);
 
 #ifdef RIL_SHLIB
 extern "C" void RIL_onUnsolicitedResponse(int unsolResponse, void *data,
-                                size_t datalen);
+                                size_t datalen, SimNumber_t SimId);
 #endif
 
 static UserCallbackInfo * internalRequestTimedCallback
@@ -382,6 +405,56 @@ processCommandBuffer(void *buffer, size_t buflen) {
     pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
 
     pRI->token = token;
+    pRI->SimId = SIM_DUAL_FIRST;
+    pRI->pCI = &(s_commands[request]);
+
+    ret = pthread_mutex_lock(&s_pendingRequestsMutex);
+    assert (ret == 0);
+
+    pRI->p_next = s_pendingRequests;
+    s_pendingRequests = pRI;
+
+    ret = pthread_mutex_unlock(&s_pendingRequestsMutex);
+    assert (ret == 0);
+
+/*    sLastDispatchedToken = token; */
+
+    pRI->pCI->dispatchFunction(p, pRI);
+
+    return 0;
+}
+
+static int
+processCommandBufferEx(void *buffer, size_t buflen) {
+    Parcel p;
+    status_t status;
+    int32_t request;
+    int32_t token;
+    RequestInfo *pRI;
+    int ret;
+
+    p.setData((uint8_t *) buffer, buflen);
+
+    // status checked at end
+    status = p.readInt32(&request);
+    status = p.readInt32 (&token);
+
+    if (status != NO_ERROR) {
+        RLOGE("invalid request block");
+        return 0;
+    }
+
+    if (request < 1 || request >= (int32_t)NUM_ELEMS(s_commands)) {
+        RLOGE("unsupported request code %d token %d", request, token);
+        // FIXME this should perhaps return a response
+        return 0;
+    }
+
+    pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
+
+    pRI->token = token;
+    pRI->SimId = SIM_DUAL_SECOND;
+
     pRI->pCI = &(s_commands[request]);
 
     ret = pthread_mutex_lock(&s_pendingRequestsMutex);
@@ -615,6 +688,8 @@ dispatchDial (Parcel &p, RequestInfo *pRI) {
 
     dial.address = strdupReadString(p);
 
+    dial.isVTcall=0; //VideoPhone
+
     status = p.readInt32(&t);
     dial.clir = (int)t;
 
@@ -661,6 +736,14 @@ dispatchDial (Parcel &p, RequestInfo *pRI) {
             uusInfo.uusLength = len;
             dial.uusInfo = &uusInfo;
         }
+
+#ifdef VIDEO_TELEPHONY_ENABLE
+        int vt=0;
+        //add for vtcall, VideoPhone
+        p.readInt32(&vt);
+        dial.isVTcall=vt;
+#endif //VIDEO_TELEPHONY_ENABLE
+
         sizeOfDial = sizeof(dial);
     }
 
@@ -693,6 +776,105 @@ invalid:
     return;
 }
 
+#ifdef VIDEO_TELEPHONY_ENABLE
+static void dispatchDialVT (Parcel &p, RequestInfo *pRI) {
+    RIL_Dial dial;
+    int32_t t;
+    status_t status;
+
+    memset (&dial, 0, sizeof(dial));
+
+    dial.address = strdupReadString(p);
+
+    status = p.readInt32(&t);
+    dial.clir = (int)t;
+
+    if (status != NO_ERROR || dial.address == NULL) {
+        goto invalid;
+    }
+
+    startRequest;
+    appendPrintBuf("%snum=%s,clir=%d", printBuf, dial.address, dial.clir);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &dial, sizeof(dial), pRI);
+
+#ifdef MEMSET_FREED
+    memsetString (dial.address);
+#endif
+
+    free (dial.address);
+
+#ifdef MEMSET_FREED
+    memset(&dial, 0, sizeof(dial));
+#endif
+
+    return;
+invalid:
+    invalidCommandBlock(pRI);
+    return;
+}
+
+
+/** Callee expects const int * */
+static void
+dispatchVTInts (Parcel &p, RequestInfo *pRI) {
+    int32_t count;
+    status_t status;
+    size_t datalen;
+    int *pInts;
+
+    status = p.readInt32 (&count);
+
+    if (status != NO_ERROR || count == 0) {
+        goto invalid;
+    }
+
+    datalen = sizeof(int) * count;
+    pInts = (int *)alloca(datalen);
+
+    startRequest;
+    for (int i = 0 ; i < count ; i++) {
+        int32_t t;
+
+        status = p.readInt32(&t);
+        pInts[i] = (int)t;
+        appendPrintBuf("%s%d,", printBuf, t);
+
+        if (status != NO_ERROR) {
+            goto invalid;
+        }
+   }
+   removeLastChar;
+   closeRequest;
+   printRequest(pRI->token, pRI->pCI->requestNumber);
+
+   s_callbacks.onRequest(pRI->pCI->requestNumber, const_cast<int *>(pInts),
+                       datalen, pRI);
+
+#ifdef MEMSET_FREED
+    memset(pInts, 0, datalen);
+#endif
+
+    return;
+invalid:
+    invalidCommandBlock(pRI);
+    return;
+}
+
+
+/** Callee expects NULL */
+static void
+dispatchVTVoid (Parcel& p, RequestInfo *pRI) {
+    clearPrintBuf;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+    s_callbacks.onRequest(pRI->pCI->requestNumber, NULL, 0, pRI);
+}
+
+#endif //VIDEO_TELEPHONY_ENABLE
+
+
 /**
  * Callee expects const RIL_SIM_IO *
  * Payload is:
@@ -718,6 +900,12 @@ dispatchSIM_IO (Parcel &p, RequestInfo *pRI) {
     memset (&simIO, 0, sizeof(simIO));
 
     // note we only check status at the end
+
+    simIO.v6.cla = 0;
+    if(pRI->pCI->requestNumber != RIL_REQUEST_SIM_IO) {
+        status = p.readInt32(&t);
+        simIO.v6.cla = (int)t;
+    }
 
     status = p.readInt32(&t);
     simIO.v6.command = (int)t;
@@ -1482,7 +1670,7 @@ static void dispatchDataCall(Parcel& p, RequestInfo *pRI) {
 // When all RILs handle this request, this function can be removed and
 // the request can be sent directly to the RIL using dispatchVoid.
 static void dispatchVoiceRadioTech(Parcel& p, RequestInfo *pRI) {
-    RIL_RadioState state = s_callbacks.onStateRequest();
+    RIL_RadioState state = s_callbacks.onStateRequest(pRI->SimId);
 
     if ((RADIO_STATE_UNAVAILABLE == state) || (RADIO_STATE_OFF == state)) {
         RIL_onRequestComplete(pRI, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
@@ -1509,7 +1697,7 @@ static void dispatchVoiceRadioTech(Parcel& p, RequestInfo *pRI) {
 // When all RILs handle this request, this function can be removed and
 // the request can be sent directly to the RIL using dispatchVoid.
 static void dispatchCdmaSubscriptionSource(Parcel& p, RequestInfo *pRI) {
-    RIL_RadioState state = s_callbacks.onStateRequest();
+    RIL_RadioState state = s_callbacks.onStateRequest(pRI->SimId);
 
     if ((RADIO_STATE_UNAVAILABLE == state) || (RADIO_STATE_OFF == state)) {
         RIL_onRequestComplete(pRI, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
@@ -1654,6 +1842,52 @@ sendResponse (Parcel &p) {
     return sendResponseRaw(p.data(), p.dataSize());
 }
 
+static int
+sendResponseRawEx (const void *data, size_t dataSize) {
+    int fd = s_fdCommandEx;
+    int ret;
+    uint32_t header;
+
+    if (s_fdCommandEx < 0) {
+        return -1;
+    }
+
+    if (dataSize > MAX_COMMAND_BYTES) {
+        RLOGE("RIL: packet larger than %u (%u)",
+                MAX_COMMAND_BYTES, (unsigned int )dataSize);
+
+        return -1;
+    }
+
+    pthread_mutex_lock(&s_writeMutex);
+
+    header = htonl(dataSize);
+
+    ret = blockingWrite(fd, (void *)&header, sizeof(header));
+
+    if (ret < 0) {
+        pthread_mutex_unlock(&s_writeMutex);
+        return ret;
+    }
+
+    ret = blockingWrite(fd, data, dataSize);
+
+    if (ret < 0) {
+        pthread_mutex_unlock(&s_writeMutex);
+        return ret;
+    }
+
+    pthread_mutex_unlock(&s_writeMutex);
+
+    return 0;
+}
+
+static int
+sendResponseEx (Parcel &p) {
+    printResponse;
+    return sendResponseRawEx(p.data(), p.dataSize());
+}
+
 /** response is an int* pointing to an array of ints*/
 
 static int
@@ -1795,6 +2029,11 @@ static int responseCallList(Parcel &p, void *response, size_t responselen) {
             p.writeInt32(uusInfo->uusLength);
             p.write(uusInfo->uusData, uusInfo->uusLength);
         }
+#ifdef VIDEO_TELEPHONY_ENABLE
+        p.writeInt32(p_cur->isVideoCall);//vt call added VideoPhone, should be same order as RIL.java responseCallList
+#else
+        p.writeInt32(0);
+#endif //VIDEO_TELEPHONY_ENABLE
         appendPrintBuf("%s[id=%d,%s,toa=%d,",
             printBuf,
             p_cur->index,
@@ -2865,16 +3104,62 @@ static void processCommandsCallback(int fd, short flags, void *param) {
     }
 }
 
+static void processCommandsCallbackEx(int fd, short flags, void *param) {
+    RecordStream *p_rs;
+    void *p_record;
+    size_t recordlen;
+    int ret;
 
-static void onNewCommandConnect() {
+    assert(fd == s_fdCommandEx);
+
+    p_rs = (RecordStream *)param;
+
+    for (;;) {
+        /* loop until EAGAIN/EINTR, end of stream, or other error */
+        ret = record_stream_get_next(p_rs, &p_record, &recordlen);
+
+        if (ret == 0 && p_record == NULL) {
+            /* end-of-stream */
+            break;
+        } else if (ret < 0) {
+            break;
+        } else if (ret == 0) { /* && p_record != NULL */
+            processCommandBufferEx(p_record, recordlen);
+        }
+    }
+
+    if (ret == 0 || !(errno == EAGAIN || errno == EINTR)) {
+        /* fatal error or end-of-stream */
+        if (ret != 0) {
+            RLOGE("error on reading command socket errno:%d\n", errno);
+        } else {
+            RLOGW("EOS.  Closing command socket.");
+        }
+
+        close(s_fdCommandEx);
+        s_fdCommandEx = -1;
+
+        ril_event_del(&s_commands_eventEx);
+
+        record_stream_free(p_rs);
+
+        /* start listening for new connections again */
+        rilEventAddWakeup(&s_listen_eventEx);
+
+        onCommandsSocketClosed();
+    }
+}
+
+
+static void onNewCommandConnect(SimNumber_t SimId) {
     // Inform we are connected and the ril version
     int rilVer = s_callbacks.version;
     RIL_onUnsolicitedResponse(RIL_UNSOL_RIL_CONNECTED,
-                                    &rilVer, sizeof(rilVer));
+                                    &rilVer, sizeof(rilVer), SimId);
 
     // implicit radio state changed
     RIL_onUnsolicitedResponse(RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED,
-                                    NULL, 0);
+                                    NULL, 0, SimId);
 
     // Send last NITZ time data, in case it was missed
     if (s_lastNITZTimeData != NULL) {
@@ -2977,7 +3262,92 @@ static void listenCallback (int fd, short flags, void *param) {
 
     rilEventAddWakeup (&s_commands_event);
 
-    onNewCommandConnect();
+    RLOGD("listenCallback::SIM1");
+    onNewCommandConnect(SIM_DUAL_FIRST);
+}
+
+static void listenCallbackEx (int fd, short flags, void *param) {
+    int ret;
+    int err;
+    int is_phone_socket;
+    RecordStream *p_rs;
+
+    struct sockaddr_un peeraddr;
+    socklen_t socklen = sizeof (peeraddr);
+
+    struct ucred creds;
+    socklen_t szCreds = sizeof(creds);
+
+    struct passwd *pwd = NULL;
+
+    assert (s_fdCommandEx < 0);
+    assert (fd == s_fdCommandEx);
+
+    s_fdCommandEx = accept(s_fdListenEx, (sockaddr *) &peeraddr, &socklen);
+
+    if (s_fdCommandEx < 0 ) {
+        RLOGE("Error on accept() errno:%d", errno);
+        /* start listening for new connections again */
+        rilEventAddWakeup(&s_listen_eventEx);
+
+        return;
+    }
+
+    /* check the credential of the other side and only accept socket from
+     * phone process
+     */
+    errno = 0;
+    is_phone_socket = 0;
+
+    err = getsockopt(s_fdCommandEx, SOL_SOCKET, SO_PEERCRED, &creds, &szCreds);
+
+    if (err == 0 && szCreds > 0) {
+        errno = 0;
+        pwd = getpwuid(creds.uid);
+        if (pwd != NULL) {
+            if (strcmp(pwd->pw_name, PHONE_PROCESS) == 0) {
+                is_phone_socket = 1;
+            } else {
+                RLOGE("RILD can't accept socket from process %s", pwd->pw_name);
+            }
+        } else {
+            RLOGE("Error on getpwuid() errno: %d", errno);
+        }
+    } else {
+        RLOGD("Error on getsockopt() errno: %d", errno);
+    }
+
+    if ( !is_phone_socket ) {
+      RLOGE("RILD must accept socket from %s", PHONE_PROCESS);
+
+      close(s_fdCommand);
+      s_fdCommand = -1;
+
+      onCommandsSocketClosed();
+
+      /* start listening for new connections again */
+      rilEventAddWakeup(&s_listen_eventEx);
+
+      return;
+    }
+
+    ret = fcntl(s_fdCommandEx, F_SETFL, O_NONBLOCK);
+
+    if (ret < 0) {
+        RLOGE ("Error setting O_NONBLOCK errno:%d", errno);
+    }
+
+    RLOGI("libril: new connection");
+
+    p_rs = record_stream_new(s_fdCommandEx, MAX_COMMAND_BYTES);
+
+    ril_event_set (&s_commands_eventEx, s_fdCommandEx, 1,
+        processCommandsCallbackEx, p_rs);
+
+    rilEventAddWakeup (&s_commands_eventEx);
+
+    RLOGD("listenCallback::SIM2");
+    onNewCommandConnect(SIM_DUAL_SECOND);
 }
 
 static void freeDebugCallbackArgs(int number, char **args) {
@@ -3050,7 +3420,7 @@ static void debugCallback (int fd, short flags, void *param) {
         case 2:
             RLOGI ("Debug port: issuing unsolicited voice network change.");
             RIL_onUnsolicitedResponse(RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED,
-                                      NULL, 0);
+                                      NULL, 0, SIM_DUAL_FIRST);
             break;
         case 3:
             RLOGI ("Debug port: QXDM log enable.");
@@ -3286,7 +3656,26 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
                 listenCallback, NULL);
 
     rilEventAddWakeup (&s_listen_event);
+// second socket for Dual SIM
+    s_fdListenEx = android_get_control_socket(SOCKET_NAME_RIL1);
+    if (s_fdListenEx < 0) {
+        RLOGE("Failed to get socket '" SOCKET_NAME_RIL1 "'");
+        exit(-1);
+    }
 
+    ret = listen(s_fdListenEx, 4);
+
+    if (ret < 0) {
+        RLOGE("Failed to listen on control socket '%d': %s",
+             s_fdListenEx, strerror(errno));
+        exit(-1);
+    }
+    /* note: non-persistent so we can accept only one connection at a time */
+    ril_event_set (&s_listen_eventEx, s_fdListenEx, false,
+                listenCallbackEx, NULL);
+
+    rilEventAddWakeup (&s_listen_eventEx);
+// second socket for Dual SIM End
 #if 1
     // start debug interface socket
 
@@ -3388,10 +3777,31 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
             appendPrintBuf("%s fails by %s", printBuf, failCauseToString(e));
         }
 
-        if (s_fdCommand < 0) {
-            RLOGD ("RIL onRequestComplete: Command channel closed");
+        if(SIM_DUAL_FIRST == pRI->SimId)
+        {
+            if (s_fdCommand < 0)
+                RLOGD ("RIL onRequestComplete: Command channel closed");
+            sendResponse(p);
         }
-        sendResponse(p);
+        else if(SIM_DUAL_SECOND == pRI->SimId)
+        {
+            if (s_fdCommandEx < 0) {
+                RLOGD ("RIL onRequestComplete: Command channel closed");
+            }
+            sendResponseEx(p);
+        }
+        else
+        {
+            if (s_fdCommand < 0) {
+                RLOGD ("RIL onRequestComplete: Command channel closed");
+            }
+            sendResponse(p);
+
+            if (s_fdCommandEx < 0) {
+                RLOGD ("RIL onRequestComplete: Command channel closed");
+            }
+            sendResponseEx(p);
+        }
     }
 
 done:
@@ -3505,7 +3915,7 @@ static bool is3gpp2(int radioTech) {
  * returned when telephony framework requests them
  */
 static RIL_RadioState
-processRadioState(RIL_RadioState newRadioState) {
+processRadioState(RIL_RadioState newRadioState, SimNumber_t SimId) {
 
     if((newRadioState > RADIO_STATE_UNAVAILABLE) && (newRadioState < RADIO_STATE_ON)) {
         int newVoiceRadioTech;
@@ -3518,20 +3928,20 @@ processRadioState(RIL_RadioState newRadioState) {
         if(newVoiceRadioTech != voiceRadioTech) {
             voiceRadioTech = newVoiceRadioTech;
             RIL_onUnsolicitedResponse (RIL_UNSOL_VOICE_RADIO_TECH_CHANGED,
-                        &voiceRadioTech, sizeof(voiceRadioTech));
+                        &voiceRadioTech, sizeof(voiceRadioTech), SimId);
         }
         if(is3gpp2(newVoiceRadioTech)) {
             newCdmaSubscriptionSource = decodeCdmaSubscriptionSource(newRadioState);
             if(newCdmaSubscriptionSource != cdmaSubscriptionSource) {
                 cdmaSubscriptionSource = newCdmaSubscriptionSource;
                 RIL_onUnsolicitedResponse (RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED,
-                        &cdmaSubscriptionSource, sizeof(cdmaSubscriptionSource));
+                        &cdmaSubscriptionSource, sizeof(cdmaSubscriptionSource), SimId);
             }
         }
         newSimStatus = decodeSimStatus(newRadioState);
         if(newSimStatus != simRuimStatus) {
             simRuimStatus = newSimStatus;
-            RIL_onUnsolicitedResponse(RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED, NULL, 0);
+            RIL_onUnsolicitedResponse(RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED, NULL, 0, SimId);
         }
 
         /* Send RADIO_ON to telephony */
@@ -3542,8 +3952,8 @@ processRadioState(RIL_RadioState newRadioState) {
 }
 
 extern "C"
-void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
-                                size_t datalen)
+void RIL_onUnsolicitedResponse(int unsolResponse, void *data,
+                                size_t datalen, SimNumber_t SimId)
 {
     int unsolResponseIndex;
     int ret;
@@ -3606,10 +4016,10 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     // some things get more payload
     switch(unsolResponse) {
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
-            newState = processRadioState(s_callbacks.onStateRequest());
+            newState = processRadioState(s_callbacks.onStateRequest(SimId), SimId);
             p.writeInt32(newState);
             appendPrintBuf("%s {%s}", printBuf,
-                radioStateToString(s_callbacks.onStateRequest()));
+                radioStateToString(s_callbacks.onStateRequest(SimId)));
         break;
 
 
@@ -3623,7 +4033,20 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
         break;
     }
 
-    ret = sendResponse(p);
+    if (SIM_DUAL_FIRST == SimId)
+    {
+        ret = sendResponse(p);
+    }
+    else if (SIM_DUAL_SECOND == SimId)
+    {
+        ret = sendResponseEx(p);
+    }
+    else
+    {
+        ret = sendResponse(p);
+        ret = sendResponseEx(p);
+    }
+
     if (ret != 0 && unsolResponse == RIL_UNSOL_NITZ_TIME_RECEIVED) {
 
         // Unfortunately, NITZ time is not poll/update like everything

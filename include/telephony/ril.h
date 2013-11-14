@@ -189,6 +189,7 @@ typedef struct {
     char *          name;       /* Remote party name */
     int             namePresentation; /* 0=Allowed, 1=Restricted, 2=Not Specified/Unknown 3=Payphone */
     RIL_UUS_Info *  uusInfo;    /* NULL or Pointer to User-User Signaling Information */
+    char            isVideoCall;    /* nonzero if this is is a video call vt added VideoPhone */	    
 } RIL_Call;
 
 /* Deprecated, use RIL_Data_Call_Response_v6 */
@@ -291,6 +292,8 @@ typedef struct {
              * clir == 2 on "CLIR suppression" (allow CLI presentation)
              */
     RIL_UUS_Info *  uusInfo;    /* NULL or Pointer to User-User Signaling Information */
+    int isVTcall;	//add for vtcall, VideoPhone
+
 } RIL_Dial;
 
 typedef struct {
@@ -308,6 +311,7 @@ typedef struct {
 } RIL_SIM_IO_v5;
 
 typedef struct {
+    int cla;
     int command;    /* one of the commands listed for TS 27.007 +CRSM*/
     int fileid;     /* EF id */
     char *path;     /* "pathid" from TS 27.007 +CRSM command.
@@ -3663,7 +3667,6 @@ typedef struct {
  */
 #define RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL 117
 
-
 /***********************************************************************/
 
 
@@ -4169,6 +4172,32 @@ typedef struct {
  */
 #define RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED 1037
 
+/**
+ * RIL_UNSOL_RESERVED_DUMMY
+ *
+ *
+ *
+ * "data" is 0 = IMS_NOT_REGISTERED, 1 = IMS_REGISTERED
+ */
+#define RIL_UNSOL_RESERVED_DUMMY  1038
+
+#ifdef VIDEO_TELEPHONY_ENABLE
+#define RIL_UNSOL_RESPONSE_VT_BASE                               RIL_UNSOL_RESERVED_DUMMY
+
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_CALL_CONF               RIL_UNSOL_RESPONSE_VT_BASE + 1
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_PROGRESS_INFO_IND       RIL_UNSOL_RESPONSE_VT_BASE + 2
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_CONNECT                 RIL_UNSOL_RESPONSE_VT_BASE + 3
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_SETUP_IND               RIL_UNSOL_RESPONSE_VT_BASE + 4
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_INCOM                   RIL_UNSOL_RESPONSE_VT_BASE + 5
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_END                     RIL_UNSOL_RESPONSE_VT_BASE + 6
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_MODIFY_IND              RIL_UNSOL_RESPONSE_VT_BASE + 7
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_MODIFY_REQ              RIL_UNSOL_RESPONSE_VT_BASE + 8
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_MODIFY_COMPLETE_CONF    RIL_UNSOL_RESPONSE_VT_BASE + 9
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_MODIFY_RES              RIL_UNSOL_RESPONSE_VT_BASE + 10
+#define RIL_UNSOL_RESPONSE_VT_CALL_EVENT_UNKNOWN                 RIL_UNSOL_RESPONSE_VT_BASE + 11
+
+#endif //VIDEO_TELEPHONY_ENABLE
+
 /***********************************************************************/
 
 
@@ -4188,7 +4217,7 @@ typedef void (*RIL_RequestFunc) (int request, void *data,
 /**
  * This function should return the current radio state synchronously
  */
-typedef RIL_RadioState (*RIL_RadioStateRequest)();
+typedef RIL_RadioState (*RIL_RadioStateRequest)(char SimId);
 
 /**
  * This function returns "1" if the specified RIL_REQUEST code is
@@ -4269,7 +4298,7 @@ struct RIL_Env {
      */
 
     void (*OnUnsolicitedResponse)(int unsolResponse, const void *data,
-                                    size_t datalen);
+                                    size_t datalen, char SimId);
 
     /**
      * Call user-specifed "callback" function on on the same thread that
@@ -4329,7 +4358,7 @@ void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
  */
 
 void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
-                                size_t datalen);
+                                size_t datalen, char SimId);
 
 
 /**

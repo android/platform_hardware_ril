@@ -44,6 +44,17 @@
 
 #define MAX_AT_RESPONSE 0x1000
 
+/**
+Structure : Sim Identifier Type
+**/
+typedef enum
+{
+    SIM_SINGLE,                         ///< single SIM case
+    SIM_DUAL_FIRST,                     ///< the first SIM
+    SIM_DUAL_SECOND,                    ///< the second SIM
+    SIM_ALL = 0xFF                      ///< for all the SIMs
+} SimNumber_t;
+
 /* pathname returned from RIL_REQUEST_SETUP_DATA_CALL / RIL_REQUEST_SETUP_DEFAULT_PDP */
 #define PPP_TTY_PATH "eth0"
 
@@ -187,7 +198,7 @@ static const RIL_RadioFunctions s_callbacks = {
 static const struct RIL_Env *s_rilenv;
 
 #define RIL_onRequestComplete(t, e, response, responselen) s_rilenv->OnRequestComplete(t,e, response, responselen)
-#define RIL_onUnsolicitedResponse(a,b,c) s_rilenv->OnUnsolicitedResponse(a,b,c)
+#define RIL_onUnsolicitedResponse(a,b,c) s_rilenv->OnUnsolicitedResponse(a,b,c,SIM_DUAL_FIRST)
 #define RIL_requestTimedCallback(a,b,c) s_rilenv->RequestTimedCallback(a,b,c)
 #endif
 
@@ -291,6 +302,10 @@ static int callFromCLCCLine(char *line, RIL_Call *p_call)
     if (err < 0) goto error;
 
     p_call->isVoice = (mode == 0);
+
+
+    p_call->isVideoCall = 0; //vt call added VideoPhone
+
 
     err = at_tok_nextbool(&line, &(p_call->isMpty));
     if (err < 0) goto error;

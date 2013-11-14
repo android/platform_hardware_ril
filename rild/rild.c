@@ -51,7 +51,7 @@ extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
                            void *response, size_t responselen);
 
 extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
-                                size_t datalen);
+                                size_t datalen, char SimId);
 
 extern void RIL_requestTimedCallback (RIL_TimedCallback callback,
                                void *param, const struct timeval *relativeTime);
