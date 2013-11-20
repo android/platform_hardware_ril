@@ -34,6 +34,24 @@
       "revId": "e2a70cfbf3b3db7ab87c5799fc264f52a8326ae2",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ed03988_a8161b2e",
+        "filename": "rild/rild.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2013-11-20T22:55:23Z",
+      "side": 1,
+      "message": "hack removed in https://android-review.googlesource.com/70470",
+      "parentUuid": "bea77522_ebb811b1",
+      "revId": "e2a70cfbf3b3db7ab87c5799fc264f52a8326ae2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
