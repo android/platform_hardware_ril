@@ -89,12 +89,23 @@ void switchUser() {
     setuid(AID_RADIO);
 
     struct __user_cap_header_struct header;
-    struct __user_cap_data_struct cap;
-    header.version = _LINUX_CAPABILITY_VERSION;
+    memset(&header, 0, sizeof(header));
+    header.version = _LINUX_CAPABILITY_VERSION_3;
     header.pid = 0;
-    cap.effective = cap.permitted = (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW);
-    cap.inheritable = 0;
-    capset(&header, &cap);
+
+    struct __user_cap_data_struct data[2];
+    memset(&data, 0, sizeof(data));
+
+    int64_t caps = (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW);
+
+    data[0].effective = caps;
+    data[1].effective = caps >> 32;
+    data[0].permitted = caps;
+    data[1].permitted = caps >> 32;
+
+    if (capset(&header, &data[0]) == -1) {
+        RLOGE("capset failed: %s", strerror(errno));
+    }
 }
 
 int main(int argc, char **argv)
