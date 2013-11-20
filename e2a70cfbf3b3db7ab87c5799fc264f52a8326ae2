@@ -16,6 +16,24 @@
       "revId": "e2a70cfbf3b3db7ab87c5799fc264f52a8326ae2",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "deaa69eb_cf04412d",
+        "filename": "rild/rild.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1003966
+      },
+      "writtenOn": "2013-11-20T22:54:21Z",
+      "side": 1,
+      "message": "If we wanted to keep this same structure, then pause() might be more appropriate instead of sleep().\n\nBut ya, it seems odd to keep this thread around if we never plan on doing anything with it...",
+      "parentUuid": "bea77522_ebb811b1",
+      "revId": "e2a70cfbf3b3db7ab87c5799fc264f52a8326ae2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
