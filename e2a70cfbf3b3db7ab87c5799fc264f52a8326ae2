@@ -52,6 +52,24 @@
       "revId": "e2a70cfbf3b3db7ab87c5799fc264f52a8326ae2",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "deaa69eb_af53b52f",
+        "filename": "rild/rild.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2013-11-20T22:59:41Z",
+      "side": 1,
+      "message": "(the most intention-revealing \"sleep\" for the main thread would be to pthread_join the event thread created by RIL_startEventLoop.)",
+      "parentUuid": "deaa69eb_cf04412d",
+      "revId": "e2a70cfbf3b3db7ab87c5799fc264f52a8326ae2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
