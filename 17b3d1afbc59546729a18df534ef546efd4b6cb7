@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5e64b999_7d7cb145",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1003966
+      },
+      "writtenOn": "2013-11-20T21:59:19Z",
+      "side": 1,
+      "message": "Can you write this as:\n\ndata[CAP_TO_INDEX(CAP_NET_ADMIN)].effective |\u003d CAP_TO_MASK(CAP_NET_ADMIN);\ndata[CAP_TO_INDEX(CAP_NET_RAW)].effective |\u003d CAP_TO_MASK(CAP_NET_RAW);\ndata[CAP_TO_INDEX(CAP_NET_ADMIN)].permitted |\u003d CAP_TO_MASK(CAP_NET_ADMIN);\ndata[CAP_TO_INDEX(CAP_NET_RAW)].permitted |\u003d CAP_TO_MASK(CAP_NET_RAW);\n\nCAP_TO_INDEX / CAP_TO_MASK are the preferred ways of doing these bit shifts.",
+      "revId": "17b3d1afbc59546729a18df534ef546efd4b6cb7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9e08f1da_4bd6578f",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1003966
+      },
+      "writtenOn": "2013-11-20T21:59:19Z",
+      "side": 1,
+      "message": "Is this a fatal error? It probably should be...",
+      "revId": "17b3d1afbc59546729a18df534ef546efd4b6cb7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
