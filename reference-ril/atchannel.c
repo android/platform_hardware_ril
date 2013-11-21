@@ -33,10 +33,10 @@
 #define LOG_TAG "AT"
 #include <utils/Log.h>
 
-#ifdef HAVE_ANDROID_OS
+#ifdef OMAP_CSMI_POWER_CONTROL
 /* for IOCTL's */
 #include <linux/omap_csmi.h>
-#endif /*HAVE_ANDROID_OS*/
+#endif /* OMAP_CSMI_POWER_CONTROL */
 
 #include "misc.h"
 
@@ -468,13 +468,13 @@ static void *readerLoop(void *arg)
             processLine(line);
         }
 
-#ifdef HAVE_ANDROID_OS
+#ifdef OMAP_CSMI_POWER_CONTROL
         if (s_ackPowerIoctl > 0) {
             /* acknowledge that bytes have been read and processed */
             ioctl(s_fd, OMAP_CSMI_TTY_ACK, &s_readCount);
             s_readCount = 0;
         }
-#endif /*HAVE_ANDROID_OS*/
+#endif /* OMAP_CSMI_POWER_CONTROL */
     }
 
     onReaderClosed();
