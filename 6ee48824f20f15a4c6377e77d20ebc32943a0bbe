@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9e7b915f_2546d8da",
+        "filename": "reference-ril/atchannel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2013-11-22T00:12:09Z",
+      "side": 1,
+      "message": "The other use of OMAP_CSMI_POWER_CONTROL at line 602 is wrapped with HAVE_ANDROID_OS. We should probably do that everywhere.\n\nOn the other hand my search turned up no other C file is using it omap_csmi.h. I suggest removing all of the code as well as linux/omap_csmi.h.\n\n $ f c \u0027omap_csmi\\.h\u0027\n ./hardware/ril/reference-ril/atchannel.c:38:#include \u003clinux/omap_csmi.h\u003e\n ./external/kernel-headers/original/linux/omap_csmi.h:1:/* linux/omap_csmi.h",
+      "revId": "6ee48824f20f15a4c6377e77d20ebc32943a0bbe",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
