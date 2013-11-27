@@ -199,6 +199,7 @@ static void dispatchStrings (Parcel& p, RequestInfo *pRI);
 static void dispatchInts (Parcel& p, RequestInfo *pRI);
 static void dispatchDial (Parcel& p, RequestInfo *pRI);
 static void dispatchSIM_IO (Parcel& p, RequestInfo *pRI);
+static void dispatchSIM_APDU (Parcel& p, RequestInfo *pRI);
 static void dispatchCallForward(Parcel& p, RequestInfo *pRI);
 static void dispatchRaw(Parcel& p, RequestInfo *pRI);
 static void dispatchSmsWrite (Parcel &p, RequestInfo *pRI);
@@ -775,6 +776,74 @@ invalid:
     invalidCommandBlock(pRI);
     return;
 }
+
+/**
+ * Callee expects const RIL_SIM_APDU *
+ * Payload is:
+ *   int32_t sessionid
+ *   int32_t cla
+ *   int32_t instruction
+ *   int32_t p1, p2, p3
+ *   String data
+ */
+static void
+dispatchSIM_APDU (Parcel &p, RequestInfo *pRI) {
+    int32_t t;
+    status_t status;
+    RIL_SIM_APDU apdu;
+
+    memset (&apdu, 0, sizeof(RIL_SIM_APDU));
+
+    // Note we only check status at the end. Any single failure leads to
+    // subsequent reads filing.
+    status = p.readInt32(&t);
+    apdu.sessionid = (int)t;
+
+    status = p.readInt32(&t);
+    apdu.cla = (int)t;
+
+    status = p.readInt32(&t);
+    apdu.instruction = (int)t;
+
+    status = p.readInt32(&t);
+    apdu.p1 = (int)t;
+
+    status = p.readInt32(&t);
+    apdu.p2 = (int)t;
+
+    status = p.readInt32(&t);
+    apdu.p3 = (int)t;
+
+    apdu.data = strdupReadString(p);
+
+    startRequest;
+    appendPrintBuf("%ssessionid=%d,cla=%d,ins=%d,p1=%d,p2=%d,p3=%d,data=%s",
+        printBuf, apdu.sessionid, apdu.cla, apdu.instruction, apdu.p1, apdu.p2,
+        apdu.p3, (char*)apdu.data);
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    if (status != NO_ERROR) {
+        goto invalid;
+    }
+
+    s_callbacks.onRequest(pRI->pCI->requestNumber, &apdu, sizeof(RIL_SIM_APDU), pRI);
+
+#ifdef MEMSET_FREED
+    memsetString(apdu.data);
+#endif
+    free(apdu.data);
+
+#ifdef MEMSET_FREED
+    memset(&apdu, 0, sizeof(RIL_SIM_APDU));
+#endif
+
+    return;
+invalid:
+    invalidCommandBlock(pRI);
+    return;
+}
+
 
 /**
  * Callee expects const RIL_CallForwardInfo *
@@ -3812,6 +3881,10 @@ requestToString(int request) {
         case RIL_REQUEST_SET_INITIAL_ATTACH_APN: return "RIL_REQUEST_SET_INITIAL_ATTACH_APN";
         case RIL_REQUEST_IMS_REGISTRATION_STATE: return "IMS_REGISTRATION_STATE";
         case RIL_REQUEST_IMS_SEND_SMS: return "IMS_SEND_SMS";
+        case RIL_REQUEST_SIM_TRANSMIT_BASIC: return "SIM_TRANSMIT_BASIC";
+        case RIL_REQUEST_SIM_OPEN_CHANNEL: return "SIM_OPEN_CHANNEL";
+        case RIL_REQUEST_SIM_CLOSE_CHANNEL: return "SIM_CLOSE_CHANNEL";
+        case RIL_REQUEST_SIM_TRANSMIT_CHANNEL: return "SIM_TRANSMIT_CHANNEL";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED: return "UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED";
