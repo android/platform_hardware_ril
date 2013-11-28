@@ -58,6 +58,7 @@ namespace android {
 
 #define SOCKET_NAME_RIL "rild"
 #define SOCKET_NAME_RIL_DEBUG "rild-debug"
+#define SOCKET_NAME_RIL_OEM "rild-oem"
 
 #define ANDROID_WAKE_LOCK_NAME "radio-interface"
 
@@ -156,6 +157,7 @@ static int s_started = 0;
 static int s_fdListen = -1;
 static int s_fdCommand = -1;
 static int s_fdDebug = -1;
+static int s_fdOem = -1;
 
 static int s_fdWakeupRead;
 static int s_fdWakeupWrite;
@@ -165,6 +167,7 @@ static struct ril_event s_wakeupfd_event;
 static struct ril_event s_listen_event;
 static struct ril_event s_wake_timeout_event;
 static struct ril_event s_debug_event;
+static struct ril_event s_oem_event;
 
 
 static const struct timeval TIMEVAL_WAKE_TIMEOUT = {1,0};
@@ -243,6 +246,7 @@ static int responseCellInfoList(Parcel &p, void *response, size_t responselen);
 static int decodeVoiceRadioTechnology (RIL_RadioState radioState);
 static int decodeCdmaSubscriptionSource (RIL_RadioState radioState);
 static RIL_RadioState processRadioState(RIL_RadioState newRadioState);
+static int handleOemRequestWithArgs(int argCount, char** args);
 
 extern "C" const char * requestToString(int request);
 extern "C" const char * failCauseToString(RIL_Errno);
@@ -3047,6 +3051,61 @@ static void debugCallback (int fd, short flags, void *param) {
     close(acceptFD);
 }
 
+static void oemCallback (int fd, short flags, void *param) {
+    int acceptFD;
+    struct sockaddr_un peeraddr;
+    socklen_t socklen = sizeof (peeraddr);
+    int number;
+    char **args;
+
+    acceptFD = accept (fd,  (sockaddr *) &peeraddr, &socklen);
+
+    if (acceptFD < 0) {
+        RLOGE ("error accepting on oem port: %d\n", errno);
+        return;
+    }
+    
+    if (recv(acceptFD, &number, sizeof(int), 0) != sizeof(int)) {
+        RLOGE ("error reading on socket: number of Args: \n");
+        return;
+    }
+    args = (char **) malloc(sizeof(char*) * number);
+
+
+    RLOGI("NUMBER:%d", number);
+
+    for (int i = 0; i < number; i++) {
+        unsigned int len;
+        if (recv(acceptFD, &len, sizeof(int), 0) != sizeof(int)) {
+            RLOGE ("error reading on socket: Len of Args: \n");
+            freeDebugCallbackArgs(i, args);
+            return;
+        }
+        
+        RLOGI("arg len:%d", len);
+
+        args[i] = (char *) malloc((sizeof(char) * len) + 1);
+        if (recv(acceptFD, args[i], sizeof(char) * len, 0)
+                != (int)(sizeof(char) * len)) {
+            RLOGE ("error reading on socket: Args[%d] \n", i);
+            freeDebugCallbackArgs(i, args);
+            return;
+        }
+        char * buf = args[i];
+        buf[len] = 0;
+
+        RLOGI("ARGS[%d]:%s",i, buf);
+    }
+
+    if(0 < handleOemRequestWithArgs(number, args)){
+        RLOGI("Oem port: OemRequest support");
+    } else {
+        RLOGI("Oem port: OemRequest not support");
+    }
+	
+    freeDebugCallbackArgs(number, args);
+    close(acceptFD);    
+}
 
 static void userTimerCallback (int fd, short flags, void *param) {
     UserCallbackInfo *p_info;
@@ -3064,6 +3123,27 @@ static void userTimerCallback (int fd, short flags, void *param) {
     free(p_info);
 }
 
+static int handleOemRequestWithArgs(int argCount, char** args){
+    char *cmd;
+		
+    if (1 == argCount) {
+        cmd = strsep(args[0], ",");
+                
+        if(strcmp(cmd, "EAP_SIM") == 0){
+            issueLocalRequest(RIL_REQUEST_SIM_AUTHENTICATION,args[0],sizeof(args[0]);
+            return 1;
+        }else if(strcmp(cmd, "EAP_AKA") == 0){
+            issueLocalRequest(RIL_REQUEST_USIM_AUTHENTICATION,args[0],sizeof(args[0]));
+            return 1;
+        }else{
+            RLOGE ("Invalid request");
+            return 0;
+        }
+    } else {
+        RLOGE ("Invalid request");
+        return 0;
+    }
+}
 
 static void *
 eventLoop(void *param) {
@@ -3241,6 +3321,23 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
 
     rilEventAddWakeup (&s_debug_event);
 #endif
+
+    s_fdOem = android_get_control_socket(SOCKET_NAME_RIL_OEM);
+    if (s_fdOem < 0) {
+        RLOGE("Failed to get socket '%s' errno:%d", s_fdOem, errno);
+        exit(-1);
+    }
+
+    ret = listen(s_fdOem, 4);
+
+    if (ret < 0) {
+        RLOGE("Failed to listen on ril Oem socket '%d': %s",
+        s_fdOem, strerror(errno));
+        exit(-1);
+    }
+
+    ril_event_set (&s_oem_event, s_fdOem, true, oemCallback, NULL);
+    rilEventAddWakeup (&s_oem_event);
 
 }
 
