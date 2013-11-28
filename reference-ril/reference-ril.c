@@ -814,6 +814,115 @@ error:
     at_response_free(p_response);
 }
 
+void requestSimAuthentication(void *data, size_t datalen, RIL_Token t)
+{
+    ATResponse *p_response = NULL;
+    int err;
+    const char* strRand = (const char*)data;
+    char* cmd = NULL;
+    int sw1, sw2;
+    char *line, *sv;
+    asprintf(&cmd, "AT+EAUTH=\"%s\"", strRand);
+    err = at_send_command_singleline(cmd, "+EAUTH:",  &p_response);
+    free(cmd);
+
+    if (err < 0 || NULL == p_response) {
+         goto error;
+    }
+
+    switch (at_get_cme_error(p_response)) {
+        case CME_SUCCESS:
+            break;
+        default:
+            goto error;
+    }
+
+    if (err < 0 || p_response->success == 0) {
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+    } else {
+        line = p_response->p_intermediates->line;
+
+        err = at_tok_start(&line);
+        if(err < 0) goto error;
+
+        err = at_tok_nextint(&line, &sw1);
+        if(err < 0) goto error;
+
+        err = at_tok_nextint(&line, &sw2);
+        if(err < 0) goto error;
+
+        if (sw1 == 0x90 && sw2 == 0)  {
+            err = at_tok_nextstr(&line, &sv);
+            if(err < 0) goto error;
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, sv, strlen(sv));
+        } else {
+            goto error;
+        }
+
+        at_response_free(p_response);
+    }
+    return;
+
+error:
+    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+    at_response_free(p_response);
+
+}
+
+void requestUSimAuthentication(void *data, size_t datalen, RIL_Token t)
+{
+    ATResponse *p_response = NULL;
+    int err;
+    const char** strings = (const char**)data;
+    char* cmd = NULL;
+    int sw1, sw2;
+    char *line, *sv;
+    asprintf(&cmd, "AT+EAUTH=\"%s\",\"%s\"", strings[0], strings[1]);
+    err = at_send_command_singleline(cmd, "+EAUTH:", &p_response);
+
+    if (err < 0 || NULL == p_response) {
+         goto error;
+    }
+
+    switch (at_get_cme_error(p_response)) {
+        case CME_SUCCESS:
+            break;
+        default:
+            goto error;
+    }
+
+    if (err < 0 || p_response->success == 0) {
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+    } else {
+        line = p_response->p_intermediates->line;
+
+        err = at_tok_start(&line);
+        if(err < 0) goto error;
+
+        err = at_tok_nextint(&line, &sw1);
+        if(err < 0) goto error;
+
+        err = at_tok_nextint(&line, &sw2);
+        if(err < 0) goto error;
+
+        if (sw1 == 0x90 && sw2 == 0)  {
+            err = at_tok_nextstr(&line, &sv);
+            if(err < 0) goto error;
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, sv, strlen(sv));
+        } else {
+            goto error;
+        }
+
+        at_response_free(p_response);
+    }
+    return;
+error:
+    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+    at_response_free(p_response);
+
+}
+
+
 static void requestHangup(void *data, size_t datalen, RIL_Token t)
 {
     int *p_line;
@@ -2332,6 +2441,14 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
                 requestExitEmergencyMode(data, datalen, t);
                 break;
             } // Fall-through if tech is not cdma
+
+        case RIL_REQUEST_SIM_AUTHENTICATION:
+            requestSimAuthentication(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_USIM_AUTHENTICATION:
+            requestUSimAuthentication(data, datalen, t);
+            break;
 
         default:
             RLOGD("Request not supported. Tech: %d",TECH(sMdmInfo));
