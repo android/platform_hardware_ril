@@ -128,3 +128,5 @@
     {RIL_REQUEST_SET_INITIAL_ATTACH_APN, dispatchSetInitialAttachApn, responseVoid},
     {RIL_REQUEST_IMS_REGISTRATION_STATE, dispatchVoid, responseInts},
     {RIL_REQUEST_IMS_SEND_SMS, dispatchImsSms, responseSMS},
+    {RIL_REQUEST_SIM_AUTHENTICATION, dispatchString, responseString},
+    {RIL_REQUEST_USIM_AUTHENTICATION, dispatchStrings, responseString},

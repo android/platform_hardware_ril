@@ -3565,6 +3565,38 @@ typedef struct {
  */
 #define RIL_REQUEST_IMS_SEND_SMS 113
 
+/**
+ * RIL_REQUEST_SIM_AUTHENTICATION
+ *
+ * Request the SIM application on the UICC to perform AKA
+ * challenge/response algorithm for IMS authentication
+ *
+ * "data" is a const char * containing the challenge string in Base64 format
+ * "response" is a const char * containing the response in Base64 format
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SIM_AUTHENTICATION 114
+
+/**
+ * RIL_REQUEST_USIM_AUTHENTICATION
+ *
+ * Request the USIM application on the UICC to perform AKA
+ * challenge/response algorithm for IMS authentication
+ *
+ * "data" is a const char * containing the challenge string in Base64 format
+ * "response" is a const char * containing the response in Base64 format
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_USIM_AUTHENTICATION 115
+
 /***********************************************************************/
 
 
