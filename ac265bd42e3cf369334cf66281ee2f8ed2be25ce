@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "632006df_cbae6913",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3072,
+      "author": {
+        "id": 1000414
+      },
+      "writtenOn": "2013-12-02T18:53:53Z",
+      "side": 1,
+      "message": "malloc can fail",
+      "revId": "ac265bd42e3cf369334cf66281ee2f8ed2be25ce",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4325c2ed_6abe574c",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3087,
+      "author": {
+        "id": 1000414
+      },
+      "writtenOn": "2013-12-02T18:53:53Z",
+      "side": 1,
+      "message": "malloc can fail",
+      "revId": "ac265bd42e3cf369334cf66281ee2f8ed2be25ce",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "832b3ac2_0fb7e9e1",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3094,
+      "author": {
+        "id": 1000414
+      },
+      "writtenOn": "2013-12-02T18:53:53Z",
+      "side": 1,
+      "message": "Obsolete var",
+      "revId": "ac265bd42e3cf369334cf66281ee2f8ed2be25ce",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "632006df_6bd77d8c",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3106,
+      "author": {
+        "id": 1000414
+      },
+      "writtenOn": "2013-12-02T18:53:53Z",
+      "side": 1,
+      "message": "You need also to free args",
+      "revId": "ac265bd42e3cf369334cf66281ee2f8ed2be25ce",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "832b3ac2_cfccb171",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3135,
+      "author": {
+        "id": 1000414
+      },
+      "writtenOn": "2013-12-02T18:53:53Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "ac265bd42e3cf369334cf66281ee2f8ed2be25ce",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4325c2ed_aa220f01",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 881,
+      "author": {
+        "id": 1000414
+      },
+      "writtenOn": "2013-12-02T18:53:53Z",
+      "side": 1,
+      "message": "Don\u0027t you need to free cmd?",
+      "revId": "ac265bd42e3cf369334cf66281ee2f8ed2be25ce",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
