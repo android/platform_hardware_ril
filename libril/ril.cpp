@@ -3176,27 +3176,25 @@ eventLoop(void *param) {
 
 extern "C" void
 RIL_startEventLoop(void) {
-    int ret;
-    pthread_attr_t attr;
-
     /* spin up eventLoop thread and wait for it to get started */
     s_started = 0;
     pthread_mutex_lock(&s_startupMutex);
 
-    pthread_attr_init (&attr);
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    ret = pthread_create(&s_tid_dispatch, &attr, eventLoop, NULL);
+
+    int ret = pthread_create(&s_tid_dispatch, &attr, eventLoop, NULL);
+    if (ret < 0) {
+        RLOGE("Failed to create dispatch thread: %s", strerror(errno));
+        return;
+    }
 
     while (s_started == 0) {
         pthread_cond_wait(&s_startupCond, &s_startupMutex);
     }
 
     pthread_mutex_unlock(&s_startupMutex);
-
-    if (ret < 0) {
-        RLOGE("Failed to create dispatch thread errno:%d", errno);
-        return;
-    }
 }
 
 // Used for testing purpose only.
