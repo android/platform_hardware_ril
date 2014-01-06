@@ -22,6 +22,30 @@
       "revId": "bd47ac18a446e7d289945fe7fc755dd82b55bc3a",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8d5d2962_99a33bc8",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3189,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-01-06T19:26:54Z",
+      "side": 1,
+      "message": "Yes, I\u0027d say that\u0027s a good idea, you might have a single exit. Add a \"goto done\" here and add the \"done:\" label above the mutex unlock.",
+      "parentUuid": "eda78588_44616eeb",
+      "range": {
+        "startLine": 3189,
+        "startChar": 13,
+        "endLine": 3189,
+        "endChar": 15
+      },
+      "revId": "bd47ac18a446e7d289945fe7fc755dd82b55bc3a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
