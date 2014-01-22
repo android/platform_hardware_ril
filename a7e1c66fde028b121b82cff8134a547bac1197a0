@@ -93,6 +93,30 @@
       "revId": "a7e1c66fde028b121b82cff8134a547bac1197a0",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "92bf0a8c_29c0cdc9",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3696,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-01-22T23:51:32Z",
+      "side": 1,
+      "message": "we can\u0027t assume there can be only one data. So I think this should have RIL_SelectUiccSub but apparently the activate/deactivate field should probably be removed and then pass that as a separate parameter separately when needed, for instance in the above command.\n\nAlso, maybe this should be called RIL_REQUEST_SELECT_DATA_SUBSCRIPTION. Should there be a DESELECT or maybe a true/false parameter? Or maybe generalize the activate/deactivate field?",
+      "parentUuid": "92bf0a8c_095949ca",
+      "range": {
+        "startLine": 3696,
+        "startChar": 13,
+        "endLine": 3696,
+        "endChar": 17
+      },
+      "revId": "a7e1c66fde028b121b82cff8134a547bac1197a0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
