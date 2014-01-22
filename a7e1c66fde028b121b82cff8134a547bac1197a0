@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "b2ba4e9a_10fc0cde",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3675,
+      "author": {
+        "id": 1023068
+      },
+      "writtenOn": "2014-01-22T22:56:56Z",
+      "side": 1,
+      "message": "This request is used to activate/de-activate a subscription. This is to let the modem know which card application is to be used to go acquire service. And this applies for voice and SMS.",
+      "parentUuid": "92bf0a8c_e95cf5e1",
+      "range": {
+        "startLine": 3675,
+        "startChar": 3,
+        "endLine": 3675,
+        "endChar": 36
+      },
+      "revId": "a7e1c66fde028b121b82cff8134a547bac1197a0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "127dda9f_fea4b5ca",
         "filename": "include/telephony/ril.h",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2014-01-22T22:38:44Z",
       "side": 1,
       "message": "No parameter, what should it be set too?\n\nShould this be RIL_REQUEST_SET_UICC_DATA_SUBSCRIPTION",
+      "range": {
+        "startLine": 3696,
+        "startChar": 13,
+        "endLine": 3696,
+        "endChar": 17
+      },
+      "revId": "a7e1c66fde028b121b82cff8134a547bac1197a0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "92bf0a8c_095949ca",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3696,
+      "author": {
+        "id": 1023068
+      },
+      "writtenOn": "2014-01-22T22:56:56Z",
+      "side": 1,
+      "message": "Since only 1 of the active subscriptions can do data at any time, this message is sent to the RIL instance that is to be used for data subscription. \n\nThat modem instance will then bring up the data.",
+      "parentUuid": "127dda9f_fea4b5ca",
       "range": {
         "startLine": 3696,
         "startChar": 13,
