@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "92bf0a8c_e95cf5e1",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3675,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-01-22T22:38:44Z",
+      "side": 1,
+      "message": "Is this \"voice\" specific, I\u0027m a little confused how this and SET_DATA_SUBSCRIPTION are supposed to work.",
+      "range": {
+        "startLine": 3675,
+        "startChar": 3,
+        "endLine": 3675,
+        "endChar": 36
+      },
+      "revId": "a7e1c66fde028b121b82cff8134a547bac1197a0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "127dda9f_fea4b5ca",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3696,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-01-22T22:38:44Z",
+      "side": 1,
+      "message": "No parameter, what should it be set too?\n\nShould this be RIL_REQUEST_SET_UICC_DATA_SUBSCRIPTION",
+      "range": {
+        "startLine": 3696,
+        "startChar": 13,
+        "endLine": 3696,
+        "endChar": 17
+      },
+      "revId": "a7e1c66fde028b121b82cff8134a547bac1197a0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
