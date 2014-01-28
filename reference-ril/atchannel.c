@@ -33,11 +33,16 @@
 #define LOG_TAG "AT"
 #include <utils/Log.h>
 
+#ifdef HAVE_ANDROID_OS
+/* for IOCTL's */
+#include <linux/omap_csmi.h>
+#endif /*HAVE_ANDROID_OS*/
+
 #include "misc.h"
 
-#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE
+#ifdef HAVE_ANDROID_OS
 #define USE_NP 1
-#endif /* HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE */
+#endif /* HAVE_ANDROID_OS */
 
 
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
@@ -54,6 +59,10 @@ static ATUnsolHandler s_unsolHandler;
 
 static char s_ATBuffer[MAX_AT_RESPONSE+1];
 static char *s_ATBufferCur = s_ATBuffer;
+
+static int s_ackPowerIoctl; /* true if TTY has android byte-count
+                                handshake for low power*/
+static int s_readCount = 0;
 
 #if AT_DEBUG
 void  AT_DUMP(const char*  prefix, const char*  buff, int  len)
@@ -72,18 +81,18 @@ void  AT_DUMP(const char*  prefix, const char*  buff, int  len)
 static pthread_mutex_t s_commandmutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t s_commandcond = PTHREAD_COND_INITIALIZER;
 
-static ATCommandType s_type;
-static const char *s_responsePrefix = NULL;
-static const char *s_smsPDU = NULL;
-static ATResponse *sp_response = NULL;
-
 static void (*s_onTimeout)(void) = NULL;
 static void (*s_onReaderClosed)(void) = NULL;
 static int s_readerClosed;
 
 static void onReaderClosed();
 static int writeCtrlZ (const char *s);
-static int writeline (const char *s);
+static int writeline (const char *s, SocketTransCtx *p_socket_trans);
+
+static SocketTransCtx s_SocketTransInfo[RIL_SOCKET_NUM];
+/* To queue request */
+static SocketTransCtx* currnetchannel=NULL;
+static RequestQueue* currnetchannel_q = NULL;
 
 #ifndef USE_NP
 static void setTimespecRelative(struct timespec *p_ts, long long msec)
@@ -116,7 +125,7 @@ static void sleepMsec(long long msec)
 
 
 /** add an intermediate response to sp_response*/
-static void addIntermediate(const char *line)
+static void addIntermediate(const char *line, SocketTransCtx *p_socket_trans)
 {
     ATLine *p_new;
 
@@ -127,8 +136,8 @@ static void addIntermediate(const char *line)
     /* note: this adds to the head of the list, so the list
        will be in reverse order of lines received. the order is flipped
        again before passing on to the command issuer */
-    p_new->p_next = sp_response->p_intermediates;
-    sp_response->p_intermediates = p_new;
+    p_new->p_next = p_socket_trans->response->p_intermediates;
+    p_socket_trans->response->p_intermediates = p_new;
 }
 
 
@@ -215,77 +224,95 @@ static int isSMSUnsolicited(const char *line)
 
 
 /** assumes s_commandmutex is held */
-static void handleFinalResponse(const char *line)
+static void handleFinalResponse(const char *line, SocketTransCtx *p_socket_trans)
 {
-    sp_response->finalResponse = strdup(line);
+    p_socket_trans->response->finalResponse = strdup(line);
 
     pthread_cond_signal(&s_commandcond);
 }
 
-static void handleUnsolicited(const char *line)
+static void handleUnsolicited(const char *line, RIL_SOCKET_ID socket_id)
 {
     if (s_unsolHandler != NULL) {
-        s_unsolHandler(line, NULL);
+        s_unsolHandler(line, NULL, socket_id);
     }
 }
 
-static void processLine(const char *line)
+static void processLine(const char *line, SocketTransCtx *p_socket_trans)
 {
+    int isComplete = 0;
+
     pthread_mutex_lock(&s_commandmutex);
 
-    if (sp_response == NULL) {
+    if (p_socket_trans == NULL) {
+        p_socket_trans = currnetchannel_q->requestchannel;
+    } else {
+        /* This is an URC */
+    }
+    if (p_socket_trans->response == NULL) {
         /* no command pending */
-        handleUnsolicited(line);
+        handleUnsolicited(line, p_socket_trans->socket_id);
     } else if (isFinalResponseSuccess(line)) {
-        sp_response->success = 1;
-        handleFinalResponse(line);
+        p_socket_trans->response->success = 1;
+        handleFinalResponse(line, p_socket_trans);
     } else if (isFinalResponseError(line)) {
-        sp_response->success = 0;
-        handleFinalResponse(line);
-    } else if (s_smsPDU != NULL && 0 == strcmp(line, "> ")) {
+        p_socket_trans->response->success = 0;
+        handleFinalResponse(line, p_socket_trans);
+    } else if (p_socket_trans->smsPDU != NULL && 0 == strcmp(line, "> ")) {
         // See eg. TS 27.005 4.3
         // Commands like AT+CMGS have a "> " prompt
-        writeCtrlZ(s_smsPDU);
-        s_smsPDU = NULL;
-    } else switch (s_type) {
+        writeCtrlZ(p_socket_trans->smsPDU);
+        p_socket_trans->smsPDU = NULL;
+    } else switch (p_socket_trans->type) {
         case NO_RESULT:
-            handleUnsolicited(line);
+            handleUnsolicited(line, p_socket_trans->socket_id);
+            isComplete = 1;
             break;
         case NUMERIC:
-            if (sp_response->p_intermediates == NULL
+            if (p_socket_trans->response->p_intermediates == NULL
                 && isdigit(line[0])
             ) {
-                addIntermediate(line);
+                addIntermediate(line, p_socket_trans);
             } else {
                 /* either we already have an intermediate response or
                    the line doesn't begin with a digit */
-                handleUnsolicited(line);
+                handleUnsolicited(line, p_socket_trans->socket_id);
+                isComplete = 1;
             }
             break;
         case SINGLELINE:
-            if (sp_response->p_intermediates == NULL
-                && strStartsWith (line, s_responsePrefix)
+            if (p_socket_trans->response->p_intermediates == NULL
+                && strStartsWith (line, p_socket_trans->responsePrefix)
             ) {
-                addIntermediate(line);
+                addIntermediate(line, p_socket_trans);
             } else {
                 /* we already have an intermediate response */
-                handleUnsolicited(line);
+                handleUnsolicited(line, p_socket_trans->socket_id);
+                isComplete = 1;
             }
             break;
         case MULTILINE:
-            if (strStartsWith (line, s_responsePrefix)) {
-                addIntermediate(line);
+            if (strStartsWith (line, p_socket_trans->responsePrefix)) {
+                addIntermediate(line, p_socket_trans);
             } else {
-                handleUnsolicited(line);
+                handleUnsolicited(line, p_socket_trans->socket_id);
+                isComplete = 1;
             }
         break;
 
         default: /* this should never be reached */
-            RLOGE("Unsupported AT command type %d\n", s_type);
-            handleUnsolicited(line);
+            RLOGE("Unsupported AT command type %d\n", p_socket_trans->type);
+            handleUnsolicited(line, p_socket_trans->socket_id);
+            isComplete = 1;
         break;
     }
 
+    if (isComplete == 1) {
+        RLOGD("Ready to remove current request(type %d) from queue", p_socket_trans->type);
+        RequestQueue* temp = currnetchannel_q;
+    	currnetchannel_q = currnetchannel_q->next;
+    	free(temp);
+    }
     pthread_mutex_unlock(&s_commandmutex);
 }
 
@@ -376,6 +403,7 @@ static const char *readline()
 
         if (count > 0) {
             AT_DUMP( "<< ", p_read, count );
+            s_readCount += count;
 
             p_read[count] = '\0';
 
@@ -427,6 +455,8 @@ static void onReaderClosed()
 
 static void *readerLoop(void *arg)
 {
+    SocketTransCtx *socket_trans = NULL;
+    
     for (;;) {
         const char * line;
 
@@ -436,7 +466,9 @@ static void *readerLoop(void *arg)
             break;
         }
 
+        /* TODO: Create SocketTransCtx for URC */
         if(isSMSUnsolicited(line)) {
+            RIL_SOCKET_ID socket_id = RIL_SOCKET_1;
             char *line1;
             const char *line2;
 
@@ -451,12 +483,20 @@ static void *readerLoop(void *arg)
             }
 
             if (s_unsolHandler != NULL) {
-                s_unsolHandler (line1, line2);
+                s_unsolHandler (line1, line2, socket_id);
             }
             free(line1);
         } else {
-            processLine(line);
+            processLine(line, socket_trans);
         }
+
+#ifdef HAVE_ANDROID_OS
+        if (s_ackPowerIoctl > 0) {
+            /* acknowledge that bytes have been read and processed */
+            ioctl(s_fd, OMAP_CSMI_TTY_ACK, &s_readCount);
+            s_readCount = 0;
+        }
+#endif /*HAVE_ANDROID_OS*/
     }
 
     onReaderClosed();
@@ -471,24 +511,47 @@ static void *readerLoop(void *arg)
  * This function exists because as of writing, android libc does not
  * have buffered stdio.
  */
-static int writeline (const char *s)
+static int writeline (const char *s, SocketTransCtx *p_socket_trans)
 {
     size_t cur = 0;
     size_t len = strlen(s);
+    char send[len+2];
     ssize_t written;
+
+    memset(send, 0, (sizeof(char)*(len+2)));
+
+    if (NULL == currnetchannel_q) {
+        currnetchannel_q = (RequestQueue*)malloc(sizeof(RequestQueue));
+        currnetchannel_q->requestchannel = p_socket_trans;
+        currnetchannel_q->next = NULL;
+        RLOGD("Create the first channel");
+    } else {
+        RLOGD("Put the new request into queue");
+        RequestQueue* newchannel = (RequestQueue*)malloc(sizeof(RequestQueue));
+        RequestQueue* temp = currnetchannel_q;
+        int n=1;
+        while(temp->next != NULL){
+            temp= temp->next;
+            n++;
+        }
+        RLOGD("There are %d pending request in the queue",n);
+        temp->next=newchannel;
+        newchannel->requestchannel = p_socket_trans;
+        newchannel->next = NULL;
+    }
 
     if (s_fd < 0 || s_readerClosed > 0) {
         return AT_ERROR_CHANNEL_CLOSED;
     }
+    strncpy(send, s, len);
+    RLOGD("AT> %s\n", send);
 
-    RLOGD("AT> %s\n", s);
-
-    AT_DUMP( ">> ", s, strlen(s) );
+    AT_DUMP( ">> ", send, strlen(send) );
 
     /* the main string */
     while (cur < len) {
         do {
-            written = write (s_fd, s + cur, len - cur);
+            written = write (s_fd, send + cur, len - cur);
         } while (written < 0 && errno == EINTR);
 
         if (written < 0) {
@@ -550,15 +613,15 @@ static int writeCtrlZ (const char *s)
     return 0;
 }
 
-static void clearPendingCommand()
+static void clearPendingCommand(SocketTransCtx *p_socket_trans)
 {
-    if (sp_response != NULL) {
-        at_response_free(sp_response);
+    if (p_socket_trans->response != NULL) {
+        at_response_free(p_socket_trans->response);
     }
 
-    sp_response = NULL;
-    s_responsePrefix = NULL;
-    s_smsPDU = NULL;
+    p_socket_trans->response = NULL;
+    p_socket_trans->responsePrefix = NULL;
+    p_socket_trans->smsPDU = NULL;
 }
 
 
@@ -576,9 +639,39 @@ int at_open(int fd, ATUnsolHandler h)
     s_unsolHandler = h;
     s_readerClosed = 0;
 
-    s_responsePrefix = NULL;
-    s_smsPDU = NULL;
-    sp_response = NULL;
+    /* Android power control ioctl */
+#ifdef HAVE_ANDROID_OS
+#ifdef OMAP_CSMI_POWER_CONTROL
+    ret = ioctl(fd, OMAP_CSMI_TTY_ENABLE_ACK);
+    if(ret == 0) {
+        int ack_count;
+		int read_count;
+        int old_flags;
+        char sync_buf[256];
+        old_flags = fcntl(fd, F_GETFL, 0);
+        fcntl(fd, F_SETFL, old_flags | O_NONBLOCK);
+        do {
+            ioctl(fd, OMAP_CSMI_TTY_READ_UNACKED, &ack_count);
+			read_count = 0;
+            do {
+                ret = read(fd, sync_buf, sizeof(sync_buf));
+				if(ret > 0)
+					read_count += ret;
+            } while(ret > 0 || (ret < 0 && errno == EINTR));
+            ioctl(fd, OMAP_CSMI_TTY_ACK, &ack_count);
+         } while(ack_count > 0 || read_count > 0);
+        fcntl(fd, F_SETFL, old_flags);
+        s_readCount = 0;
+        s_ackPowerIoctl = 1;
+    }
+    else
+        s_ackPowerIoctl = 0;
+
+#else // OMAP_CSMI_POWER_CONTROL
+    s_ackPowerIoctl = 0;
+
+#endif // OMAP_CSMI_POWER_CONTROL
+#endif /*HAVE_ANDROID_OS*/
 
     pthread_attr_init (&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
@@ -668,28 +761,29 @@ static void reverseIntermediates(ATResponse *p_response)
 
 static int at_send_command_full_nolock (const char *command, ATCommandType type,
                     const char *responsePrefix, const char *smspdu,
-                    long long timeoutMsec, ATResponse **pp_outResponse)
+                    long long timeoutMsec, ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id)
 {
     int err = 0;
+    SocketTransCtx *p_socket_trans = &(s_SocketTransInfo[socket_id]);
 #ifndef USE_NP
     struct timespec ts;
 #endif /*USE_NP*/
 
-    if(sp_response != NULL) {
+    if(p_socket_trans->response != NULL) {
         err = AT_ERROR_COMMAND_PENDING;
         goto error;
     }
 
-    err = writeline (command);
+    err = writeline (command, p_socket_trans);
 
     if (err < 0) {
         goto error;
     }
 
-    s_type = type;
-    s_responsePrefix = responsePrefix;
-    s_smsPDU = smspdu;
-    sp_response = at_response_new();
+    p_socket_trans->type = type;
+    p_socket_trans->responsePrefix = responsePrefix;
+    p_socket_trans->smsPDU = smspdu;
+    p_socket_trans->response = at_response_new();
 
 #ifndef USE_NP
     if (timeoutMsec != 0) {
@@ -697,7 +791,7 @@ static int at_send_command_full_nolock (const char *command, ATCommandType type,
     }
 #endif /*USE_NP*/
 
-    while (sp_response->finalResponse == NULL && s_readerClosed == 0) {
+    while (p_socket_trans->response->finalResponse == NULL && s_readerClosed == 0) {
         if (timeoutMsec != 0) {
 #ifdef USE_NP
             err = pthread_cond_timeout_np(&s_commandcond, &s_commandmutex, timeoutMsec);
@@ -715,14 +809,14 @@ static int at_send_command_full_nolock (const char *command, ATCommandType type,
     }
 
     if (pp_outResponse == NULL) {
-        at_response_free(sp_response);
+        at_response_free(p_socket_trans->response);
     } else {
         /* line reader stores intermediate responses in reverse order */
-        reverseIntermediates(sp_response);
-        *pp_outResponse = sp_response;
+        reverseIntermediates(p_socket_trans->response);
+        *pp_outResponse = p_socket_trans->response;
     }
 
-    sp_response = NULL;
+    p_socket_trans->response = NULL;
 
     if(s_readerClosed > 0) {
         err = AT_ERROR_CHANNEL_CLOSED;
@@ -731,7 +825,7 @@ static int at_send_command_full_nolock (const char *command, ATCommandType type,
 
     err = 0;
 error:
-    clearPendingCommand();
+    clearPendingCommand(p_socket_trans);
 
     return err;
 }
@@ -743,7 +837,7 @@ error:
  */
 static int at_send_command_full (const char *command, ATCommandType type,
                     const char *responsePrefix, const char *smspdu,
-                    long long timeoutMsec, ATResponse **pp_outResponse)
+                    long long timeoutMsec, ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id)
 {
     int err;
 
@@ -756,7 +850,7 @@ static int at_send_command_full (const char *command, ATCommandType type,
 
     err = at_send_command_full_nolock(command, type,
                     responsePrefix, smspdu,
-                    timeoutMsec, pp_outResponse);
+                    timeoutMsec, pp_outResponse, socket_id);
 
     pthread_mutex_unlock(&s_commandmutex);
 
@@ -777,12 +871,12 @@ static int at_send_command_full (const char *command, ATCommandType type,
  * if non-NULL, the resulting ATResponse * must be eventually freed with
  * at_response_free
  */
-int at_send_command (const char *command, ATResponse **pp_outResponse)
+int at_send_command (const char *command, ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id)
 {
     int err;
 
     err = at_send_command_full (command, NO_RESULT, NULL,
-                                    NULL, 0, pp_outResponse);
+                                    NULL, 0, pp_outResponse, socket_id);
 
     return err;
 }
@@ -790,12 +884,12 @@ int at_send_command (const char *command, ATResponse **pp_outResponse)
 
 int at_send_command_singleline (const char *command,
                                 const char *responsePrefix,
-                                 ATResponse **pp_outResponse)
+                                 ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id)
 {
     int err;
 
     err = at_send_command_full (command, SINGLELINE, responsePrefix,
-                                    NULL, 0, pp_outResponse);
+                                    NULL, 0, pp_outResponse, socket_id);
 
     if (err == 0 && pp_outResponse != NULL
         && (*pp_outResponse)->success > 0
@@ -812,12 +906,12 @@ int at_send_command_singleline (const char *command,
 
 
 int at_send_command_numeric (const char *command,
-                                 ATResponse **pp_outResponse)
+                                 ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id)
 {
     int err;
 
     err = at_send_command_full (command, NUMERIC, NULL,
-                                    NULL, 0, pp_outResponse);
+                                    NULL, 0, pp_outResponse, socket_id);
 
     if (err == 0 && pp_outResponse != NULL
         && (*pp_outResponse)->success > 0
@@ -836,12 +930,12 @@ int at_send_command_numeric (const char *command,
 int at_send_command_sms (const char *command,
                                 const char *pdu,
                                 const char *responsePrefix,
-                                 ATResponse **pp_outResponse)
+                                 ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id)
 {
     int err;
 
     err = at_send_command_full (command, SINGLELINE, responsePrefix,
-                                    pdu, 0, pp_outResponse);
+                                    pdu, 0, pp_outResponse, socket_id);
 
     if (err == 0 && pp_outResponse != NULL
         && (*pp_outResponse)->success > 0
@@ -859,19 +953,19 @@ int at_send_command_sms (const char *command,
 
 int at_send_command_multiline (const char *command,
                                 const char *responsePrefix,
-                                 ATResponse **pp_outResponse)
+                                 ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id)
 {
     int err;
 
     err = at_send_command_full (command, MULTILINE, responsePrefix,
-                                    NULL, 0, pp_outResponse);
+                                    NULL, 0, pp_outResponse, socket_id);
 
     return err;
 }
 
 
 /** This callback is invoked on the command thread */
-void at_set_on_timeout(void (*onTimeout)(void))
+void at_set_on_timeout(void (*onTimeout)(RIL_SOCKET_ID))
 {
     s_onTimeout = onTimeout;
 }
@@ -883,7 +977,7 @@ void at_set_on_timeout(void (*onTimeout)(void))
  *  You should still call at_close()
  */
 
-void at_set_on_reader_closed(void (*onClose)(void))
+void at_set_on_reader_closed(void (*onClose)(RIL_SOCKET_ID))
 {
     s_onReaderClosed = onClose;
 }
@@ -894,7 +988,7 @@ void at_set_on_reader_closed(void (*onClose)(void))
  * Used to ensure channel has start up and is active
  */
 
-int at_handshake()
+int at_handshake(RIL_SOCKET_ID socket_id)
 {
     int i;
     int err = 0;
@@ -909,7 +1003,7 @@ int at_handshake()
     for (i = 0 ; i < HANDSHAKE_RETRY_COUNT ; i++) {
         /* some stacks start with verbose off */
         err = at_send_command_full_nolock ("ATE0Q0V1", NO_RESULT,
-                    NULL, NULL, HANDSHAKE_TIMEOUT_MSEC, NULL);
+                    NULL, NULL, HANDSHAKE_TIMEOUT_MSEC, NULL, socket_id);
 
         if (err == 0) {
             break;
