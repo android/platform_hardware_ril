@@ -28,13 +28,39 @@
 extern "C" {
 #endif
 
-#define RIL_VERSION 10     /* Current version */
+
+#if defined(ANDROID_SIM_COUNT_2)
+#define SIM_COUNT 2
+#elif defined(ANDROID_SIM_COUNT_3)
+#define SIM_COUNT 3
+#elif defined(ANDROID_SIM_COUNT_4)
+#define SIM_COUNT 4
+#else
+#define SIM_COUNT 1
+#endif
+
+#define RIL_VERSION 9     /* Current version */
 #define RIL_VERSION_MIN 6 /* Minimum RIL_VERSION supported */
 
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
 
 typedef void * RIL_Token;
+
+typedef enum {
+    RIL_SOCKET_1,
+#if (SIM_COUNT >= 2)
+    RIL_SOCKET_2,
+#if (SIM_COUNT >= 3)
+    RIL_SOCKET_3,
+#endif
+#if (SIM_COUNT >= 4)
+    RIL_SOCKET_4,
+#endif
+#endif 
+    RIL_SOCKET_NUM
+} RIL_SOCKET_ID;
+
 
 typedef enum {
     RIL_E_SUCCESS = 0,
@@ -57,10 +83,8 @@ typedef enum {
                                                    location */
     RIL_E_MODE_NOT_SUPPORTED = 13,              /* HW does not support preferred network type */
     RIL_E_FDN_CHECK_FAILURE = 14,               /* command failed because recipient is not on FDN list */
-    RIL_E_ILLEGAL_SIM_OR_ME = 15,               /* network selection failed due to
+    RIL_E_ILLEGAL_SIM_OR_ME = 15                /* network selection failed due to
                                                    illegal SIM or ME */
-    RIL_E_MISSING_RESOURCE = 16,                /* no logical channel available */
-    RIL_E_NO_SUCH_ELEMENT = 17,                 /* application not found on SIM */
 } RIL_Errno;
 
 typedef enum {
@@ -321,22 +345,6 @@ typedef struct {
     char *pin2;     /* May be NULL*/
     char *aidPtr;   /* AID value, See ETSI 102.221 8.1 and 101.220 4, NULL if no value. */
 } RIL_SIM_IO_v6;
-
-/* Used by RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL and
- * RIL_REQUEST_SIM_TRANSMIT_APDU_BASIC. */
-typedef struct {
-    int sessionid;  /* "sessionid" from TS 27.007 +CGLA command. Should be
-                       ignored for +CSIM command. */
-
-    /* Following fields are used to derive the APDU ("command" and "length"
-       values in TS 27.007 +CSIM and +CGLA commands). */
-    int cla;
-    int instruction;
-    int p1;
-    int p2;
-    int p3;         /* A negative P3 implies a 4 byte APDU. */
-    char *data;     /* May be NULL. In hex string format. */
-} RIL_SIM_APDU;
 
 typedef struct {
     int sw1;
@@ -3586,82 +3594,14 @@ typedef struct {
  */
 #define RIL_REQUEST_IMS_SEND_SMS 113
 
-/**
- * RIL_REQUEST_SIM_TRANSMIT_APDU_BASIC
- *
- * Request APDU exchange on the basic channel. This command reflects TS 27.007
- * "generic SIM access" operation (+CSIM). The modem must ensure proper function
- * of GSM/CDMA, and filter commands appropriately. It should filter
- * channel management and SELECT by DF name commands.
- *
- * "data" is a const RIL_SIM_APDU *
- * "sessionid" field should be ignored.
- *
- * "response" is a const RIL_SIM_IO_Response *
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- */
-#define RIL_REQUEST_SIM_TRANSMIT_APDU_BASIC 114
 
 /**
- * RIL_REQUEST_SIM_OPEN_CHANNEL
- *
- * Open a new logical channel and select the given application. This command
- * reflects TS 27.007 "open logical channel" operation (+CCHO).
- *
- * "data" is const char * and set to AID value, See ETSI 102.221 and 101.220.
- *
- * "response" is int *
- * ((int *)data)[0] contains the session id of the logical channel.
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- *  MISSING_RESOURCE
- *  NO_SUCH_ELEMENT
+ * RIL_REQUEST_DATA_IDLE
+ * Use to request data in idle state
+ * Expect to receive data connection detached event after this.
  */
-#define RIL_REQUEST_SIM_OPEN_CHANNEL 115
 
-/**
- * RIL_REQUEST_SIM_CLOSE_CHANNEL
- *
- * Close a previously opened logical channel. This command reflects TS 27.007
- * "close logical channel" operation (+CCHC).
- *
- * "data" is int *
- * ((int *)data)[0] is the session id of logical the channel to close.
- *
- * "response" is NULL
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- */
-#define RIL_REQUEST_SIM_CLOSE_CHANNEL 116
-
-/**
- * RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL
- *
- * Exchange APDUs with a UICC over a previously opened logical channel. This
- * command reflects TS 27.007 "generic logical channel access" operation
- * (+CGLA). The modem should filter channel management and SELECT by DF name
- * commands.
- *
- * "data" is a const RIL_SIM_APDU*
- *
- * "response" is a const RIL_SIM_IO_Response *
- *
- * Valid errors:
- *  SUCCESS
- *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
- */
-#define RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL 117
+#define RIL_REQUEST_DATA_IDLE 114
 
 
 /***********************************************************************/
@@ -4183,12 +4123,12 @@ typedef struct {
  *
  */
 typedef void (*RIL_RequestFunc) (int request, void *data,
-                                    size_t datalen, RIL_Token t);
+                                    size_t datalen, RIL_Token t, RIL_SOCKET_ID socket_id);
 
 /**
  * This function should return the current radio state synchronously
  */
-typedef RIL_RadioState (*RIL_RadioStateRequest)();
+typedef RIL_RadioState (*RIL_RadioStateRequest)(RIL_SOCKET_ID socket_id);
 
 /**
  * This function returns "1" if the specified RIL_REQUEST code is
@@ -4267,9 +4207,7 @@ struct RIL_Env {
      *
      * "data" is owned by caller, and should not be modified or freed by callee
      */
-
-    void (*OnUnsolicitedResponse)(int unsolResponse, const void *data,
-                                    size_t datalen);
+    void (*OnUnsolicitedResponse)(int unsolResponse, const void *data, size_t datalen, RIL_SOCKET_ID socket_id);
 
     /**
      * Call user-specifed "callback" function on on the same thread that
@@ -4329,7 +4267,7 @@ void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
  */
 
 void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
-                                size_t datalen);
+                                size_t datalen, RIL_SOCKET_ID socket_id);
 
 
 /**
