@@ -42,7 +42,7 @@
 static void usage(const char *argv0)
 {
     fprintf(stderr, "Usage: %s -l <ril impl library> [-- <args for impl library>]\n", argv0);
-    exit(EXIT_FAILURE);
+    exit(-1);
 }
 
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
@@ -50,8 +50,14 @@ extern void RIL_register (const RIL_RadioFunctions *callbacks);
 extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
                            void *response, size_t responselen);
 
+
+#if defined(ANDROID_MULTI_SIM)
+extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
+                                size_t datalen, RIL_SOCKET_ID socket_id);
+#else
 extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
                                 size_t datalen);
+#endif
 
 extern void RIL_requestTimedCallback (RIL_TimedCallback callback,
                                void *param, const struct timeval *relativeTime);
@@ -89,23 +95,12 @@ void switchUser() {
     setuid(AID_RADIO);
 
     struct __user_cap_header_struct header;
-    memset(&header, 0, sizeof(header));
-    header.version = _LINUX_CAPABILITY_VERSION_3;
+    struct __user_cap_data_struct cap;
+    header.version = _LINUX_CAPABILITY_VERSION;
     header.pid = 0;
-
-    struct __user_cap_data_struct data[2];
-    memset(&data, 0, sizeof(data));
-
-    data[CAP_TO_INDEX(CAP_NET_ADMIN)].effective |= CAP_TO_MASK(CAP_NET_ADMIN);
-    data[CAP_TO_INDEX(CAP_NET_ADMIN)].permitted |= CAP_TO_MASK(CAP_NET_ADMIN);
-
-    data[CAP_TO_INDEX(CAP_NET_RAW)].effective |= CAP_TO_MASK(CAP_NET_RAW);
-    data[CAP_TO_INDEX(CAP_NET_RAW)].permitted |= CAP_TO_MASK(CAP_NET_RAW);
-
-    if (capset(&header, &data[0]) == -1) {
-        RLOGE("capset failed: %s", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
+    cap.effective = cap.permitted = (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW);
+    cap.inheritable = 0;
+    capset(&header, &cap);
 }
 
 int main(int argc, char **argv)
@@ -257,7 +252,7 @@ OpenLib:
 
     if (dlHandle == NULL) {
         RLOGE("dlopen failed: %s", dlerror());
-        exit(EXIT_FAILURE);
+        exit(-1);
     }
 
     RIL_startEventLoop();
@@ -266,7 +261,7 @@ OpenLib:
 
     if (rilInit == NULL) {
         RLOGE("RIL_Init not defined or exported in %s\n", rilLibPath);
-        exit(EXIT_FAILURE);
+        exit(-1);
     }
 
     if (hasLibArgs) {
@@ -289,7 +284,9 @@ OpenLib:
 
 done:
 
-    while (true) {
-        sleep(UINT32_MAX);
+    while(1) {
+        // sleep(UINT32_MAX) seems to return immediately on bionic
+        sleep(0x00ffffff);
     }
 }
+

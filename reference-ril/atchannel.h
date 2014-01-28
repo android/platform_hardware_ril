@@ -18,6 +18,8 @@
 #ifndef ATCHANNEL_H
 #define ATCHANNEL_H 1
 
+#include <telephony/ril.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,41 +73,45 @@ typedef struct {
  * "s" is the line, and "sms_pdu" is either NULL or the PDU response
  * for multi-line TS 27.005 SMS PDU responses (eg +CMT:)
  */
-typedef void (*ATUnsolHandler)(const char *s, const char *sms_pdu);
+typedef void (*ATUnsolHandler)(const char *s, const char *sms_pdu, RIL_SOCKET_ID socket_id);
 
 int at_open(int fd, ATUnsolHandler h);
 void at_close();
 
 /* This callback is invoked on the command thread.
    You should reset or handshake here to avoid getting out of sync */
-void at_set_on_timeout(void (*onTimeout)(void));
+void at_set_on_timeout(void (*onTimeout)(RIL_SOCKET_ID));
 /* This callback is invoked on the reader thread (like ATUnsolHandler)
    when the input stream closes before you call at_close
    (not when you call at_close())
    You should still call at_close()
    It may also be invoked immediately from the current thread if the read
    channel is already closed */
-void at_set_on_reader_closed(void (*onClose)(void));
+void at_set_on_reader_closed(void (*onClose)(RIL_SOCKET_ID));
 
 int at_send_command_singleline (const char *command,
                                 const char *responsePrefix,
-                                 ATResponse **pp_outResponse);
+                                 ATResponse **pp_outResponse,
+                                 RIL_SOCKET_ID socket_id);
 
 int at_send_command_numeric (const char *command,
-                                 ATResponse **pp_outResponse);
+                                 ATResponse **pp_outResponse,
+                                 RIL_SOCKET_ID socket_id);
 
 int at_send_command_multiline (const char *command,
                                 const char *responsePrefix,
-                                 ATResponse **pp_outResponse);
+                                 ATResponse **pp_outResponse,
+                                 RIL_SOCKET_ID socket_id);
 
 
-int at_handshake();
+int at_handshake(RIL_SOCKET_ID socket_id);
 
-int at_send_command (const char *command, ATResponse **pp_outResponse);
+int at_send_command (const char *command, ATResponse **pp_outResponse, RIL_SOCKET_ID socket_id);
 
 int at_send_command_sms (const char *command, const char *pdu,
                             const char *responsePrefix,
-                            ATResponse **pp_outResponse);
+                            ATResponse **pp_outResponse,
+                                 RIL_SOCKET_ID socket_id);
 
 void at_response_free(ATResponse *p_response);
 
@@ -116,6 +122,20 @@ typedef enum {
 } AT_CME_Error;
 
 AT_CME_Error at_get_cme_error(const ATResponse *p_response);
+
+typedef struct SocketTransCtx {
+    RIL_SOCKET_ID socket_id;
+
+    ATCommandType type;
+    const char *responsePrefix;
+    const char *smsPDU;
+    ATResponse *response;
+} SocketTransCtx;
+
+typedef struct RequestQueue {
+	SocketTransCtx* requestchannel;
+	struct RequestQueue* next ;
+} RequestQueue;
 
 #ifdef __cplusplus
 }
