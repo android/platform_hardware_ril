@@ -15,12 +15,12 @@ LOCAL_SHARED_LIBRARIES := \
     liblog libcutils libutils libril librilutils
 
 # for asprinf
-LOCAL_CFLAGS := -D_GNU_SOURCE
+LOCAL_CFLAGS := -D_GNU_SOURCE -DANDROID_MULTI_SIM
 
-LOCAL_C_INCLUDES :=
+LOCAL_C_INCLUDES := $(KERNEL_HEADERS)
 
 ifeq ($(TARGET_DEVICE),sooner)
-  LOCAL_CFLAGS += -DUSE_TI_COMMANDS
+  LOCAL_CFLAGS += -DOMAP_CSMI_POWER_CONTROL -DUSE_TI_COMMANDS
 endif
 
 ifeq ($(TARGET_DEVICE),surf)
@@ -29,6 +29,10 @@ endif
 
 ifeq ($(TARGET_DEVICE),dream)
   LOCAL_CFLAGS += -DPOLL_CALL_STATE -DUSE_QMI
+endif
+
+ifeq ($(SIM_COUNT), 2)
+    LOCAL_CFLAGS += -DANDROID_SIM_COUNT_2
 endif
 
 ifeq (foo,foo)
