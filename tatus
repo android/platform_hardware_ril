@@ -1,0 +1,4435 @@
+commit 4c26a06e4d80719dc26a144bcc7264e5013bfe01
+Author: Owen Lee <owen.lee@mediatek.com>
+Date:   Wed Feb 26 15:54:44 2014 +0800
+
+    This is a test
+    
+    1. Patch Set 1
+    
+    2.
+    
+    3.
+    
+    Change-Id: I4ae2e500ffaafa3cf6a4a7296730b94bfdd761d8
+    signed-off-by: Owen Lee <owen.lee@mediatek.com>
+
+commit ebdf40e65a17e8758c059a736425cd47563cdace
+Merge: 2f29fdb 5cba488
+Author: Colin Cross <ccross@android.com>
+Date:   Thu Feb 6 07:33:19 2014 +0000
+
+    Merge "reference-ril: fix LP64 warnings"
+
+commit 5cba4885b9f41dfcc0cb35639f64cdab232380e5
+Author: Colin Cross <ccross@android.com>
+Date:   Wed Feb 5 18:55:42 2014 -0800
+
+    reference-ril: fix LP64 warnings
+    
+    Use %p to print pointers
+    
+    Change-Id: I5ad8e349a0dc0b471eb693f87b088edb555a48a7
+
+commit 2f29fdb8a8cb7f624801d35ab108f0321030c61b
+Merge: dcb3334 894fbbd
+Author: Colin Cross <ccross@android.com>
+Date:   Sat Jan 25 05:11:12 2014 +0000
+
+    Merge "Set USE_NP based on HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE"
+
+commit 894fbbd4272a5075d99a6aa245ca3f6bc2b62989
+Author: Colin Cross <ccross@android.com>
+Date:   Fri Jan 24 17:02:19 2014 -0800
+
+    Set USE_NP based on HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE
+    
+    64 bit bionic does not define pthread_cond_timeout_np, use
+    HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE to determine whether or
+    not to use it.
+    
+    Change-Id: Ia94dd76f7ea4b0268f07049c127342a8bd016ec0
+
+commit dcb3334ce57f28a525d7e86222d4c7c6e3907ba3
+Merge: 21538d9 fd81e71
+Author: Elliott Hughes <enh@google.com>
+Date:   Mon Jan 6 21:49:08 2014 +0000
+
+    Merge "Fix pthread_create error handling in ril harder."
+
+commit fd81e7146b2e9253aa2ab131d970b9e300f1f97e
+Author: Elliott Hughes <enh@google.com>
+Date:   Mon Jan 6 12:46:02 2014 -0800
+
+    Fix pthread_create error handling in ril harder.
+    
+    The previous patch fixed the behavior _if_ something goes wrong...
+    ...but didn't fix the check for whether something went wrong.
+    pthread_create isn't a regular Unix "return -1 and set errno" kind
+    of function; it returns 0 on success and an error number (without
+    setting errno) on failure.
+    
+    Bug: https://code.google.com/p/android/issues/detail?id=64189
+    Change-Id: I335af890885d6a672d7bac746fdfea3ed3995360
+
+commit 21538d9410d3d04cc15f08a3a25b5f2501a70f9e
+Merge: c4801e7 c0d8dc6
+Author: Elliott Hughes <enh@google.com>
+Date:   Mon Jan 6 20:44:05 2014 +0000
+
+    Merge "Fix pthread_create error handling in ril."
+
+commit c0d8dc63fa3a71f8731870d0e851eb47acf4f568
+Author: Elliott Hughes <enh@google.com>
+Date:   Fri Jan 3 15:31:42 2014 -0800
+
+    Fix pthread_create error handling in ril.
+    
+    Bug: https://code.google.com/p/android/issues/detail?id=64189
+    Change-Id: Ie6282dda582a574aaad5513c39f2d8d965f6dee3
+
+commit c4801e78cc7b75a744a45a2a855503daca5bf0f3
+Merge: af03f92 6e7c196
+Author: Wink Saville <wink@google.com>
+Date:   Mon Dec 16 20:26:32 2013 +0000
+
+    Merge "Fix parameter mismatch between header and implementation"
+
+commit af03f9284c7e775df8feeef6eb96ffb039949e9a
+Merge: 710f0c8 305028e
+Author: Wink Saville <wink@google.com>
+Date:   Mon Dec 16 19:48:14 2013 +0000
+
+    Merge "Removing the error return value requirement for RIL_REQUEST_SIM_OPEN_CHANNEL."
+
+commit 305028e203cb780bbc987695368fb32bcc3a1371
+Author: Shishir Agrawal <shishir@google.com>
+Date:   Mon Dec 16 10:10:01 2013 -0800
+
+    Removing the error return value requirement for RIL_REQUEST_SIM_OPEN_CHANNEL.
+    
+    On error, the RIL implementation should throw an error and the value returned
+    does not need to be valid.
+    
+    Change-Id: Idf81e6f7e2aa5e967e97cef402dfd53150b9b183
+
+commit 710f0c82afb8d1660539b74d7f4c137b0644b799
+Merge: dbff951 a93e075
+Author: Wink Saville <wink@google.com>
+Date:   Fri Dec 13 19:53:34 2013 +0000
+
+    Merge "Change in semantics for RIL_REQUEST_SIM_OPEN_CHANNEL: -1 indicates error."
+
+commit a93e075c1986873ff4d6656c9b17821c44b5aac2
+Author: Shishir Agrawal <shishir@google.com>
+Date:   Thu Dec 12 17:03:12 2013 -0800
+
+    Change in semantics for RIL_REQUEST_SIM_OPEN_CHANNEL: -1 indicates error.
+    
+    Changing the RIL_REQUEST_SIM_OPEN_CHANNEL comment to state that the modem
+    should return -1 on error and not 0.
+    
+    Change-Id: Ied71c23857659048f080531b79f98eb9db221c96
+
+commit 6e7c1966c6a41b6e7c0431dcc6bf65678438c79e
+Author: Bernhard Rosenkränzer <Bernhard.Rosenkranzer@linaro.org>
+Date:   Thu Dec 12 10:01:10 2013 +0100
+
+    Fix parameter mismatch between header and implementation
+    
+    RIL_onUnsolicitedResponse's second parameter is
+    const void *data
+    according to include/telephony/ril.h and rild/rild.c, but
+    void *data
+    according to libril/ril.cpp
+    
+    This mismatch causes a compile failure with clang (and I'm surprised
+    it compiles with gcc with the mismatch - probably gcc parses this as
+    function overloading even though it's extern "C", which wouldn't do
+    what is expected).
+    
+    Change-Id: Ib437040aeca4be43cc2d327c3715ffa98c76878c
+    Signed-off-by: Bernhard Rosenkränzer <Bernhard.Rosenkranzer@linaro.org>
+
+commit dbff95192afde6cf20d7d73b716f705329d0da7a
+Merge: 2e52ae0 81d1485
+Author: Wink Saville <wink@google.com>
+Date:   Wed Dec 11 22:29:57 2013 +0000
+
+    Merge "Send unsol_sim_status on radio_state change"
+
+commit 81d1485152e4ce69b534e969180b0dd691ca5351
+Author: Alex Yakavenka <ayakav@codeaurora.org>
+Date:   Wed Dec 4 13:54:37 2013 -0800
+
+    Send unsol_sim_status on radio_state change
+    
+    Sim status changes based on radio state.
+    Need to notify new sim state whenever radio state changes
+    
+    Change-Id: I8fef3a6ddf601647107e3059f2b2eb89a67242cf
+
+commit 2e52ae0ec0aa3564a49f245ef4720b78cd5abaeb
+Merge: d78be24 865ce3b
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Thu Dec 5 12:38:21 2013 -0800
+
+    Merge commit '865ce3b4a2ba0b3a31421ca671f4d6c5595f8690' into HEAD
+
+commit d78be248d253e6a5c46749b78d16115d547ab272
+Merge: 2c464b0 2458d8d
+Author: John Huang <jsh@android.com>
+Date:   Thu Dec 5 00:59:42 2013 +0000
+
+    Merge "RIL changes for supporting generic SIM communication."
+
+commit 2458d8d1e56faae7b00511ceeab19730572c22d9
+Author: Shishir Agrawal <shishir@google.com>
+Date:   Wed Nov 27 14:53:05 2013 -0800
+
+    RIL changes for supporting generic SIM communication.
+    
+    The RIL interface adds 4 new commands:
+      - RIL_REQUEST_SIM_TRANSMIT_BASIC (AT+CSIM - TS 27.007)
+      - RIL_REQUEST_SIM_OPEN_CHANNEL (AT+CCHO - TS 27.007)
+      - RIL_REQUEST_SIM_CLOSE_CHANNEL (AT+CCHC - TS 27.007)
+      - RIL_REQUEST_SIM_TRANSMIT_CHANNEL (AT+CGLA - TS 27.007)
+    
+    The RIL version is also increased to 10 by this change.
+    
+    Change-Id: Iee4d950d37a6097493cd945e611c914c40827215
+
+commit 2c464b0d9dbc759e4021b90029c4224adc1c8851
+Merge: 6a775fe a18b9d1
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Nov 22 16:48:36 2013 -0800
+
+    Merge commit 'a18b9d1e1a014290691d63a7f335085dadc83e46' into HEAD
+
+commit 6a775fe2ff760239ddce5d20813518ef8944d3cc
+Merge: 6b49c02 eb90dbe
+Author: Elliott Hughes <enh@google.com>
+Date:   Fri Nov 22 16:05:43 2013 -0800
+
+    am eb90dbe8: Merge "Remove references to <linux/omap_csmi.h>."
+    
+    * commit 'eb90dbe8f53ed85b58e6183b0041426a4bcc64aa':
+      Remove references to <linux/omap_csmi.h>.
+
+commit eb90dbe8f53ed85b58e6183b0041426a4bcc64aa
+Merge: 740edfc 88d0e0e
+Author: Elliott Hughes <enh@google.com>
+Date:   Sat Nov 23 00:03:20 2013 +0000
+
+    Merge "Remove references to <linux/omap_csmi.h>."
+
+commit 88d0e0e497af4da9bf571354197755dfe2496484
+Author: Elliott Hughes <enh@google.com>
+Date:   Thu Nov 21 12:48:17 2013 -0800
+
+    Remove references to <linux/omap_csmi.h>.
+    
+    This header no longer exists in modern kernels, and it looks like
+    this code was only meant to be enabled for 'sooner' anyway.
+    
+    Change-Id: I6e7449a31942a54daa925c14e8843752a835bd42
+
+commit 6b49c02448cf54f5bee6955cb6e42b54febf108e
+Merge: 5686526 740edfc
+Author: Elliott Hughes <enh@google.com>
+Date:   Thu Nov 21 12:48:43 2013 -0800
+
+    am 740edfcf: Merge "Remove an outdated hack."
+    
+    * commit '740edfcffce965294256bab23c49dcde799dfeda':
+      Remove an outdated hack.
+
+commit 740edfcffce965294256bab23c49dcde799dfeda
+Merge: 478bfb9 164d205
+Author: Elliott Hughes <enh@google.com>
+Date:   Thu Nov 21 20:46:19 2013 +0000
+
+    Merge "Remove an outdated hack."
+
+commit 164d2052f1bd1a9fe98fe90ca18f87438cba2a81
+Author: Elliott Hughes <enh@google.com>
+Date:   Wed Nov 20 14:53:08 2013 -0800
+
+    Remove an outdated hack.
+    
+    This is still a waste of your main thread, though.
+    
+    Change-Id: Ic904619b2e1065b2bab577070a73f8175c1a48f3
+
+commit 568652651ec5121891c80d1096b54ee917550a21
+Merge: d93bbed 478bfb9
+Author: Elliott Hughes <enh@google.com>
+Date:   Wed Nov 20 14:44:20 2013 -0800
+
+    am 478bfb9a: Merge "Stop the kernel complaining about rild."
+    
+    * commit '478bfb9aad83c2c6e91d54c80f88dd44211c2576':
+      Stop the kernel complaining about rild.
+
+commit 478bfb9aad83c2c6e91d54c80f88dd44211c2576
+Merge: 24a5c46 e2a70cf
+Author: Elliott Hughes <enh@google.com>
+Date:   Wed Nov 20 22:40:12 2013 +0000
+
+    Merge "Stop the kernel complaining about rild."
+
+commit e2a70cfbf3b3db7ab87c5799fc264f52a8326ae2
+Author: Elliott Hughes <enh@google.com>
+Date:   Wed Nov 20 13:51:45 2013 -0800
+
+    Stop the kernel complaining about rild.
+    
+    Even if you're only using capabilities that reside in the bottom 32-bits,
+    the kernel complains unless you're on __LINUX_CAPABILITY_VERSION_3.
+    
+      warning: `rild' uses 32-bit capabilities (legacy support in use)
+    
+    Change-Id: I6512cbc158971eb950e0fc2554e95fde72023cb2
+
+commit 865ce3b4a2ba0b3a31421ca671f4d6c5595f8690
+Author: Wink Saville <wink@google.com>
+Date:   Fri Nov 8 16:37:01 2013 -0800
+
+    Fix documenation IMS registration state.
+    
+    Bug: 11599127
+    Change-Id: Id0016bca45ea84983c9280f55b0b1ccdcececc03
+
+commit a18b9d1e1a014290691d63a7f335085dadc83e46
+Author: Sukanya Rajkhowa <srajkh@codeaurora.org>
+Date:   Tue Sep 10 12:30:13 2013 -0700
+
+    RIL: Support SMS over IMS
+    
+    RIL_REQUEST_IMS_REGISTRATION_STATE is used to aquire IMS registration state.
+    RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED is called when IMS registration
+    state has changed.
+    RIL_REQUEST_IMS_SEND_SMS is used to send MO SMS over IMS. However, if retry
+    field is set in case of failure, RIL_REQUEST_IMS_SEND_SMS sets messageRef from
+    RIL_SMS_RESPONSE of corresponding failed MO SMS, and sets retry field to
+    non-zero. If voice is available, sends RIL_REQUEST_IMS_SEND_SMS retries with
+    data encoded based on voice tech available.
+    
+    Bug: 9626411
+    
+    Change-Id: If0ecc9fa47661f6560171e472f3c464713e97968
+
+commit 3492c6e5917828645feb3dba4618629929a43ab1
+Author: Wink Saville <wink@google.com>
+Date:   Thu Oct 3 13:53:27 2013 -0700
+
+    Change PDP_FAIL_SIGNAL_LOST to be retryable.
+    
+    We've changed this in the framework:
+    
+     https://googleplex-android-review.git.corp.google.com/#/c/366996/
+    
+    So this updates ril.h to match.
+    
+    Bug: 10954174, 10804691
+    Change-Id: I820d44e74251fd4fc375551474341572e9020aee
+
+commit 35c5dd72d8a28a384e54393955e60a352a425f7e
+Merge: 3ed1461 38aaaa6
+Author: Ed Tam <etam@google.com>
+Date:   Fri Aug 30 18:14:59 2013 -0700
+
+    am 38aaaa64: (-s ours) am 1b4c3db6: Merge "RIL: Support SMS on IMS, DO NOT MERGE" into jb-mr2-dev
+    
+    * commit '38aaaa6494bd6deb42de8397fb421d1fb3b4e352':
+      RIL: Support SMS on IMS, DO NOT MERGE
+
+commit 38aaaa6494bd6deb42de8397fb421d1fb3b4e352
+Merge: f088ef9 1b4c3db
+Author: Ed Tam <etam@google.com>
+Date:   Fri Aug 30 14:06:49 2013 -0700
+
+    am 1b4c3db6: Merge "RIL: Support SMS on IMS, DO NOT MERGE" into jb-mr2-dev
+    
+    * commit '1b4c3db6f9d9da4d3115be1c4337b98aebdd6193':
+      RIL: Support SMS on IMS, DO NOT MERGE
+
+commit 1b4c3db6f9d9da4d3115be1c4337b98aebdd6193
+Merge: 3d14a71 6c09776
+Author: Ed Tam <etam@google.com>
+Date:   Fri Aug 30 20:50:44 2013 +0000
+
+    Merge "RIL: Support SMS on IMS, DO NOT MERGE" into jb-mr2-dev
+
+commit 6c09776c813e63715195bfc529b4d1886a8b675f
+Author: Rika Brooks <rbrooks@codeaurora.org>
+Date:   Tue Nov 15 11:19:30 2011 -0800
+
+    RIL: Support SMS on IMS, DO NOT MERGE
+    
+    RIL_REQUEST_IMS_REGISTRATION_STATE is used to aquire IMS registration state.
+    RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED is called when IMS registration
+    state has changed.
+    RIL_REQUEST_IMS_SEND_SMS is used to send MO SMS over IMS. However, if retry
+    field is set in case of failure, RIL_REQUEST_IMS_SEND_SMS sets messageRef from
+    RIL_SMS_RESPONSE of corresponding failed MO SMS, and sets retry field to
+    non-zero. If voice is available, sends RIL_REQUEST_IMS_SEND_SMS retries with
+    data encoded based on voice tech available.
+    
+    Bug: 9626411
+    Change-Id: I87ca9841b4ace931c55e2d379fe6d7589b2dc8a5
+
+commit 3ed1461d3589a38e162414e50371c621ea17e591
+Merge: b318ddd f088ef9
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Aug 13 10:11:58 2013 -0700
+
+    am f088ef91: (-s ours) Reconcile with jb-mr2-zeroday-deb-release - do not merge
+    
+    * commit 'f088ef91d98bf642d0944351daaec61df1e7c8e0':
+      Restart, cleanup or retry inactve connections.
+
+commit f088ef91d98bf642d0944351daaec61df1e7c8e0
+Merge: 7ee253c 44cb32c
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Aug 13 10:10:08 2013 -0700
+
+    Reconcile with jb-mr2-zeroday-deb-release - do not merge
+    
+    Change-Id: Iaf4deada88b56e1b5c6b719f8929091aa6bd0cfb
+
+commit b318ddd2ca6ece875dd028d5dac3a1a82bec1751
+Merge: d8df3fd 7ee253c
+Author: Wink Saville <wink@google.com>
+Date:   Thu Aug 8 17:10:38 2013 -0700
+
+    am 7ee253c8: am 3d14a71d: Restart, cleanup or retry inactve connections.
+    
+    * commit '7ee253c8baf442693ff6ed4603ca217fe9b9afdf':
+      Restart, cleanup or retry inactve connections.
+
+commit 44cb32cced29b8bb4a20047090335afbc7f8a58f
+Author: Wink Saville <wink@google.com>
+Date:   Mon Aug 5 14:44:01 2013 -0700
+
+    Restart, cleanup or retry inactve connections.
+    
+    Instead of retrying all inactive connections, restart radio on very bad
+    errors, clean up those that are permanent failures and retry
+    the others.
+    
+    Bug: 10131736
+    Change-Id: I2527b18d6cda52c55fb94be58fbb1a7a86818ef9
+    Signed-off-by: Wink Saville <wink@google.com>
+
+commit 7ee253c8baf442693ff6ed4603ca217fe9b9afdf
+Merge: d93bbed 3d14a71
+Author: Wink Saville <wink@google.com>
+Date:   Thu Aug 8 15:46:58 2013 -0700
+
+    am 3d14a71d: Restart, cleanup or retry inactve connections.
+    
+    * commit '3d14a71de78f2b0d02c7943e554c8726b1703935':
+      Restart, cleanup or retry inactve connections.
+
+commit 3d14a71de78f2b0d02c7943e554c8726b1703935
+Author: Wink Saville <wink@google.com>
+Date:   Mon Aug 5 14:44:01 2013 -0700
+
+    Restart, cleanup or retry inactve connections.
+    
+    Instead of retrying all inactive connections, restart radio on very bad
+    errors, clean up those that are permanent failures and retry
+    the others.
+    
+    Bug: 10131736
+    Change-Id: I2527b18d6cda52c55fb94be58fbb1a7a86818ef9
+    Signed-off-by: Wink Saville <wink@google.com>
+
+commit d8df3fd34fd10949967a6f0669a1ea934f94822d
+Merge: 86d6523 d93bbed
+Author: Jun Tian <jun.j.tian@intel.com>
+Date:   Tue Jul 30 15:09:03 2013 -0700
+
+    am d93bbed9: am a1a0952a: Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c
+    
+    * commit 'd93bbed95b5bd8ffe6ea5b2fbede6d13706f3a1a':
+      Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c
+
+commit d93bbed95b5bd8ffe6ea5b2fbede6d13706f3a1a
+Merge: 24a5c46 a1a0952
+Author: Jun Tian <jun.j.tian@intel.com>
+Date:   Tue Jul 30 15:04:36 2013 -0700
+
+    am a1a0952a: Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c
+    
+    * commit 'a1a0952a703d66dee1a749976b061a16c6e642a0':
+      Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c
+
+commit a1a0952a703d66dee1a749976b061a16c6e642a0
+Author: Jun Tian <jun.j.tian@intel.com>
+Date:   Tue Jul 30 11:07:22 2013 +0800
+
+    Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c
+    
+    If the tech is not CDMA, it will fall-through to the default case.
+    But the new added RIL_REQUEST_GET_CELL_INFO_LIST and RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE
+    cases will intercept it and cause the request call into wrong request functions.
+    Move these two new requests before the CDMA cases to fix the logic issue.
+    
+    Bug: 9193696
+    Change-Id: I2cb03cbdb6be8eb1afd92c01c764e87b6aa62796
+    
+    Signed-off-by: Jun Tian <jun.j.tian@intel.com>
+    Signed-off-by: Panfeng Chang <panfengx.chang@intel.com>
+    Signed-off-by: Yanglin Zhu <yanglinx.zhu@intel.com>
+    Signed-off-by: Jackie Wu <jackie.wu@intel.com>
+
+commit 86d65230689321d3698bfd602bf34a3034b64bf2
+Merge: 2258400 24a5c46
+Author: Wink Saville <wink@google.com>
+Date:   Tue Jul 30 10:28:15 2013 -0700
+
+    am 24a5c469: Merge "Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c"
+    
+    * commit '24a5c46926c45ce69c83b256b9e3b41647516ad9':
+      Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c
+
+commit 24a5c46926c45ce69c83b256b9e3b41647516ad9
+Merge: 83b1d8d 5802701
+Author: Wink Saville <wink@google.com>
+Date:   Tue Jul 30 04:55:11 2013 +0000
+
+    Merge "Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c"
+
+commit 5802701949894c743dc95731091af94307c54bd0
+Author: Jun Tian <jun.j.tian@intel.com>
+Date:   Tue Jul 30 11:07:22 2013 +0800
+
+    Fix libril.so crash issue caused by wrong switch logic of onRequest in reference-ril.c
+    
+    If the tech is not CDMA, it will fall-through to the default case.
+    But the new added RIL_REQUEST_GET_CELL_INFO_LIST and RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE
+    cases will intercept it and cause the request call into wrong request functions.
+    Move these two new requests before the CDMA cases to fix the logic issue.
+    
+    Bug: 9193696
+    Change-Id: I2cb03cbdb6be8eb1afd92c01c764e87b6aa62796
+    
+    Signed-off-by: Jun Tian <jun.j.tian@intel.com>
+    Signed-off-by: Panfeng Chang <panfengx.chang@intel.com>
+    Signed-off-by: Yanglin Zhu <yanglinx.zhu@intel.com>
+    Signed-off-by: Jackie Wu <jackie.wu@intel.com>
+
+commit 2258400415e59b905796280cbc0ee82c70880f47
+Merge: b963c47 83b1d8d
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jul 1 12:50:07 2013 -0700
+
+    am 83b1d8d9: am 8374641d: Merge "Support for LTE/WCDMA mode"
+    
+    * commit '83b1d8d9af8f7f7bf424af6faf229cfc04e0c896':
+      Support for LTE/WCDMA mode
+
+commit 83b1d8d9af8f7f7bf424af6faf229cfc04e0c896
+Merge: e1d9476 8374641
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jul 1 12:45:15 2013 -0700
+
+    am 8374641d: Merge "Support for LTE/WCDMA mode"
+    
+    * commit '8374641d142f0cdc05019d52587e492bad83bc72':
+      Support for LTE/WCDMA mode
+
+commit 8374641d142f0cdc05019d52587e492bad83bc72
+Merge: 6fde8b8 0e09487
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jul 1 19:42:44 2013 +0000
+
+    Merge "Support for LTE/WCDMA mode"
+
+commit 0e09487471b09e45b5fc1b1588a600f35157079a
+Author: Uma Maheswari Ramalingam <umam@codeaurora.org>
+Date:   Wed Sep 28 13:25:48 2011 -0700
+
+    Support for LTE/WCDMA mode
+    
+    Add network mode LTE/WCDMA to preferred network type
+    Operator mandated requirement
+    
+    Change-Id: I26454b69ce670a5fa2129c4cd75b68af80d210e1
+
+commit b963c473621fac74344937824be4d7f56a1d4719
+Merge: 6b0f914 8cc4c1d
+Author: Dima Zavin <dima@android.com>
+Date:   Thu May 23 19:44:37 2013 +0000
+
+    Merge "HACK: rild: include librilutils as whole static lib"
+
+commit 8cc4c1d4bda512472143835813fd6f79c5474e43
+Author: Dima Zavin <dima@android.com>
+Date:   Wed May 22 11:30:17 2013 -0700
+
+    HACK: rild: include librilutils as whole static lib
+    
+    To work around broken RILs that didn't link against
+    librilutils, include it as a whole static library
+    here.
+    
+    Change-Id: I7234c5b87b3e99814d67ef3c6900e9ccc679bf5c
+    Signed-off-by: Dima Zavin <dima@android.com>
+
+commit 6b0f914b499a9cc3482ca9919aab67ad4bd1b10b
+Merge: 7569753 622bf2b
+Author: Dima Zavin <dima@android.com>
+Date:   Thu May 23 17:29:37 2013 +0000
+
+    Merge "ril: move record_stream_xxx to librilutils and export header"
+
+commit 622bf2bf79849127cbedd1f56631615bf58aaf78
+Author: Dima Zavin <dima@android.com>
+Date:   Wed May 22 11:29:34 2013 -0700
+
+    ril: move record_stream_xxx to librilutils and export header
+    
+    Change-Id: I9986c8c5fb1777bbd2b686769ecc726319a73100
+    Signed-off-by: Dima Zavin <dima@android.com>
+
+commit 75697538e485ea2981960dcd4878bfdd032731ac
+Author: Sungmin Choi <sungmin.choi@lge.com>
+Date:   Fri Apr 26 15:04:45 2013 -0700
+
+    Set initial attach apn for LTE network
+    
+    When mobile register LTE network, APN provided by operators is needed.
+    If mobile does not have apn information, it could not register LTE network.
+    To deliver APN information which is used during LTE attach to modem chipset,
+    setLteAttachProfile() and RIL_REQUEST_SET_LTE_ATTACH_PROFILE command is added.
+    
+    When Telephony DB is loaded or Telephony DB is changed, follow steps.
+    1. If preferred default ApnContext exists, this is delivered to modem chipset.
+    2. If preferred default ApnContext is null, find other ApnContext which can
+       handle default type.
+    3. If other ApnContext which can handle default type does not exist, any other
+       ApnContext delivered to modem chipset.
+    
+    Then modem register LTE network with APN information delivered from AP.
+    
+    Bug: 8733613
+    
+    Change-Id: If84c62cddccf96a531dae0527ed1a6592ae76201
+    Signed-off-by: Seonju Oh <seonju.oh@lge.com>
+    Signed-off-by: Hyejin Kim <hyejin.kim@lge.com>
+    Signed-off-by: Sungmin Choi <sungmin.choi@lge.com>
+
+commit f467af616bbbc479771184731132d68e213a4419
+Author: Dima Zavin <dima@android.com>
+Date:   Mon May 6 23:59:40 2013 -0700
+
+    libril: move record_stream here as it is the sole client
+    
+    Change-Id: I85b94c4c6d61dfaa964367a58c773b5550a47995
+    Signed-off-by: Dima Zavin <dima@android.com>
+
+commit e1d947602a932047a4c8112c256b5f7832d3f255
+Merge: b06064f c57b3eb
+Author: Wink Saville <wink@google.com>
+Date:   Thu Apr 18 10:07:05 2013 -0700
+
+    am c57b3eb5: Add CellInfoWcdma.
+    
+    * commit 'c57b3eb525db241bd3e6092453f48388bc880447':
+      Add CellInfoWcdma.
+
+commit c57b3eb525db241bd3e6092453f48388bc880447
+Author: Wink Saville <wink@google.com>
+Date:   Wed Apr 17 12:51:41 2013 -0700
+
+    Add CellInfoWcdma.
+    
+    Update CellIdentityXxx docs to define unknown values as INT_MAX.
+    
+    Bug: 8622081
+    Change-Id: I513a67d4b46b72f03e0c3360abcc0ad5222c1c13
+
+commit b06064fb5294f83f939b0fb1651f8f026cdc3a36
+Merge: 12b02b4 5268826
+Author: Ying Wang <wangying@google.com>
+Date:   Wed Apr 10 10:05:46 2013 -0700
+
+    am 52688265: Add liblog
+    
+    * commit '526882652bc7f97dfbdbf33f1a5966b1f05fbacf':
+      Add liblog
+
+commit 526882652bc7f97dfbdbf33f1a5966b1f05fbacf
+Author: Ying Wang <wangying@google.com>
+Date:   Tue Apr 9 22:31:00 2013 -0700
+
+    Add liblog
+    
+    Bug: 8580410
+    Change-Id: Ifc86215fe3f57e0247e819b74ad82a397201a329
+
+commit 12b02b453f8c7ee1dcdc93eb9219e395cfc420bd
+Merge: 8a9e021 6fde8b8
+Author: Robert Greenwalt <rgreenwalt@google.com>
+Date:   Tue Apr 9 15:56:54 2013 -0700
+
+    am 6fde8b8d: Merge "Fixes typo in logging string."
+    
+    * commit '6fde8b8d0b9fdcf7fb93aeafd17e7f52bd57e7db':
+      Fixes typo in logging string.
+
+commit 6fde8b8d0b9fdcf7fb93aeafd17e7f52bd57e7db
+Merge: ba498dd 2126ab2
+Author: Robert Greenwalt <rgreenwalt@google.com>
+Date:   Tue Apr 9 21:53:56 2013 +0000
+
+    Merge "Fixes typo in logging string."
+
+commit 2126ab2f05c1033fdca7542f38372dffd1468e1c
+Author: Robert Greenwalt <rgreenwalt@google.com>
+Date:   Tue Apr 9 12:20:45 2013 -0700
+
+    Fixes typo in logging string.
+    
+    Pointed out by bodhisatwa in
+    https://code.google.com/p/android/issues/detail?id=54098
+    
+    Change-Id: I4cb42627bb0858360d6f88dedf9412720e4b5cca
+
+commit 8a9e02161271505de274db0c3a88087056dd5dfc
+Author: Wink Saville <wink@google.com>
+Date:   Tue Apr 9 12:11:38 2013 -0700
+
+    Add support for CellInfo RIL commands.
+    
+    These commands allow for more precise location determination.
+    
+    To support CellInfo I created librilutils which adds ril_nano_time
+    over time librilutils will be expanded to have other common methods
+    that would be used by ril implementations.
+    
+    Bug: 8235566
+    Change-Id: I7ad7dabc4b6c38bfba4461b08e6e30d0eb9efea1
+
+commit 18e4ab167c7d8549a360ab5ae1fadddcad8c0523
+Author: Wink Saville <wink@google.com>
+Date:   Sun Apr 7 17:31:04 2013 -0700
+
+    Fix SignalStrength response.
+    
+    Properly remap LTE values to appropriate values
+    for older code.
+    
+    Bug: 8561333
+    Change-Id: Ie6eb3b0335e8d7ea114ec70b3fb72e917094632e
+
+commit 74329db7f4a052f2b602803f7e51ae1bb8558051
+Merge: 4fa0aba ba498dd
+Author: Nick Kralevich <nnk@google.com>
+Date:   Thu Feb 28 23:22:05 2013 +0000
+
+    am ba498ddb: Merge "rild: use correct header file."
+    
+    * commit 'ba498ddb1fe7dd7205442872e922ff25e34e1750':
+      rild: use correct header file.
+
+commit ba498ddb1fe7dd7205442872e922ff25e34e1750
+Merge: 68773ab fe4e1ec
+Author: Nick Kralevich <nnk@google.com>
+Date:   Thu Feb 28 22:54:02 2013 +0000
+
+    Merge "rild: use correct header file."
+
+commit fe4e1ec0233967f537e21d1b2ae30e7d33a97051
+Author: Nick Kralevich <nnk@google.com>
+Date:   Thu Feb 28 14:16:41 2013 -0800
+
+    rild: use correct header file.
+    
+    Change-Id: I1e969b36f19671f0502c8f952633b6c98e8f527d
+
+commit 4fa0abaab7d33fe34fa3dc10c98f147c47abc6ab
+Merge: 513fe1b 68773ab
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jan 23 09:46:52 2013 -0800
+
+    am 68773ab8: am 2ad928a8: Merge "Rild: Ril should try to write again to the socket EAGAIN error"
+    
+    * commit '68773ab87d858f41ae59e796669bd78891e140db':
+      Rild: Ril should try to write again to the socket EAGAIN error
+
+commit 68773ab87d858f41ae59e796669bd78891e140db
+Merge: 9391751 2ad928a
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jan 23 09:41:04 2013 -0800
+
+    am 2ad928a8: Merge "Rild: Ril should try to write again to the socket EAGAIN error"
+    
+    * commit '2ad928a82b311ff463281d440039435da8bc3b03':
+      Rild: Ril should try to write again to the socket EAGAIN error
+
+commit 2ad928a82b311ff463281d440039435da8bc3b03
+Merge: 171a192 3888490
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jan 23 17:13:25 2013 +0000
+
+    Merge "Rild: Ril should try to write again to the socket EAGAIN error"
+
+commit 388849057a8cc91dbc3fff357d2df524ffec9a4d
+Author: Banavathu, Srinivas Naik <snb@codeaurora.org>
+Date:   Tue Jul 5 20:04:25 2011 +0530
+
+    Rild: Ril should try to write again to the socket EAGAIN error
+    
+    In case of  EAGAIN error, the RIL should write to socket again after some
+    time.
+    
+    Change-Id: Ia4c8d17b7c16040a49a4c607a1d1350ebbe7847c
+    CRs-Fixed: 285312
+
+commit 513fe1be1f4fb2fc7b41a91c6133503860bb7728
+Merge: a73c780 9391751
+Author: Wink Saville <wink@google.com>
+Date:   Wed Dec 12 08:48:23 2012 -0800
+
+    am 93917519: am 171a192f: Merge "Add RLOGx"
+    
+    * commit '939175198fcc818178bd09a46ea976a5ff7d4686':
+      Add RLOGx
+
+commit 939175198fcc818178bd09a46ea976a5ff7d4686
+Merge: 989e788 171a192
+Author: Wink Saville <wink@google.com>
+Date:   Wed Dec 12 08:46:49 2012 -0800
+
+    am 171a192f: Merge "Add RLOGx"
+    
+    * commit '171a192f19a5753e03ef91578430e7a5ee680b7f':
+      Add RLOGx
+
+commit 171a192f19a5753e03ef91578430e7a5ee680b7f
+Merge: d216ab2 8eb2a12
+Author: Wink Saville <wink@google.com>
+Date:   Wed Dec 12 08:26:58 2012 -0800
+
+    Merge "Add RLOGx"
+
+commit a73c7809a248836fe56aad2a3c3d047bf044a7c5
+Merge: d539bb6 989e788
+Author: Wink Saville <wink@google.com>
+Date:   Sat Dec 8 08:42:27 2012 -0800
+
+    am 989e788f: am d216ab2b: Merge "Update documenation for DATA_REGISTRATION_STATE"
+    
+    * commit '989e788f5e51851e320f86cc197e1327d0ec259e':
+      Update documenation for DATA_REGISTRATION_STATE
+
+commit 989e788f5e51851e320f86cc197e1327d0ec259e
+Merge: ae67953 d216ab2
+Author: Wink Saville <wink@google.com>
+Date:   Sat Dec 8 08:40:16 2012 -0800
+
+    am d216ab2b: Merge "Update documenation for DATA_REGISTRATION_STATE"
+    
+    * commit 'd216ab2b5b82a60505205e62f881bb26ead845a7':
+      Update documenation for DATA_REGISTRATION_STATE
+
+commit 8eb2a12cb7b525e74736300962a5f3848427275a
+Author: Wink Saville <wink@google.com>
+Date:   Mon Nov 19 16:05:13 2012 -0800
+
+    Add RLOGx
+    
+    This will eventually allow us to remove the code in
+    logd_write.c#__android_log_write which uses the tag
+    to direct logs to the radio buffer.
+    
+    Change-Id: I7a6a966bc12e59a3ec68a56a41dd681fb325dfd8
+
+commit d216ab2b5b82a60505205e62f881bb26ead845a7
+Merge: ea51a9d bb5b71c
+Author: Wink Saville <wink@google.com>
+Date:   Sat Dec 8 07:59:11 2012 -0800
+
+    Merge "Update documenation for DATA_REGISTRATION_STATE"
+
+commit bb5b71cd23a8a2aeab73bfacfb7af46f485aa805
+Author: Wink Saville <wink@google.com>
+Date:   Mon Dec 3 14:59:45 2012 -0800
+
+    Update documenation for DATA_REGISTRATION_STATE
+    
+    Be specific on the formats supported for the LTE information.
+    
+    Bug: 7651566
+    Change-Id: I553b3e3ea8005ede2da121950626c9584f74f234
+
+commit d539bb64e022757311bc35b7e8d1610dcdf932a7
+Merge: 4dcab4f ae67953
+Author: Wink Saville <wink@google.com>
+Date:   Mon Dec 3 16:26:50 2012 -0800
+
+    am ae67953e: Update documenation for DATA_REGISTRATION_STATE
+    
+    * commit 'ae67953e93218859806918f20175693015fd8ecc':
+      Update documenation for DATA_REGISTRATION_STATE
+
+commit ae67953e93218859806918f20175693015fd8ecc
+Author: Wink Saville <wink@google.com>
+Date:   Mon Dec 3 14:59:45 2012 -0800
+
+    Update documenation for DATA_REGISTRATION_STATE
+    
+    Be specific on the formats supported for the LTE information.
+    
+    Bug: 7651566
+    Change-Id: I553b3e3ea8005ede2da121950626c9584f74f234
+
+commit 4dcab4f90d2d49e40100e4888b1411dfbd1c9783
+Author: Wink Saville <wink@google.com>
+Date:   Mon Nov 19 16:05:13 2012 -0800
+
+    Add RLOGx
+    
+    This will eventually allow us to remove the code in
+    logd_write.c#__android_log_write which uses the tag
+    to direct logs to the radio buffer.
+    
+    Change-Id: I7a6a966bc12e59a3ec68a56a41dd681fb325dfd8
+
+commit ba888f46a9d93b8569e4d394cb5362549856e5bd
+Author: Wink Saville <wink@google.com>
+Date:   Fri Nov 16 17:52:22 2012 -0800
+
+    Remove mockril.
+    
+    Mock ril isn't being used and the V8 library is being removed,
+    so mockril is being removed.
+    
+    Change-Id: I90cc83ac5ee9d06c473c42c847b83798730649de
+
+commit ea51a9d8cbd0a5eaea9d7d6088fd64317a547f68
+Author: Wink Saville <wink@google.com>
+Date:   Sat Sep 15 07:54:06 2012 -0700
+
+    Add LTE location information to DATA_REGISTRATION_STATE
+    
+    Bug: 5534290
+    Change-Id: I4a72cf68cfd79311fa694b4816e963bdf4a7b3c7
+
+commit d456f4035fec8dfecb0440c8134ae96a414ebae0
+Merge: 9889af0 a1d41fe
+Author: Wink Saville <wink@google.com>
+Date:   Tue Sep 4 17:06:21 2012 -0700
+
+    am a1d41fea: Merge "Add CDMA and multimode support to reference-ril"
+    
+    * commit 'a1d41fea6ee68c5edc077ddf4bb6bac8b32e9e41':
+      Add CDMA and multimode support to reference-ril
+
+commit a1d41fea6ee68c5edc077ddf4bb6bac8b32e9e41
+Merge: d5580e1 e964504
+Author: Wink Saville <wink@google.com>
+Date:   Tue Sep 4 16:55:02 2012 -0700
+
+    Merge "Add CDMA and multimode support to reference-ril"
+
+commit e9645049ba5ec9081b208f92400669613c2a8aa7
+Author: Jaime A Lopez-Sollano <jaimel@codeaurora.org>
+Date:   Wed Aug 29 07:27:27 2012 -0700
+
+    Add CDMA and multimode support to reference-ril
+    
+    Reference RIL will query emulator modem the supported radio technologies
+    and the current radio technology and respond to telephony with the
+    information. Support for basic CDMA RIL request messages and messages
+    to set and query preferred network mode to be able to switch between
+    radio technologies.
+    
+    Change-Id: I950d36691f3e4029f42efe265dc1bb0016b0f410
+
+commit 9889af03ffab6a9afb23c391aab0225d26c337e3
+Merge: 188d84f d5580e1
+Author: Wink Saville <wink@google.com>
+Date:   Wed Aug 29 10:58:25 2012 -0700
+
+    am d5580e18: Merge "Fix logging for setup_data_call response"
+    
+    * commit 'd5580e18a7a1ce1a227e98d5170ffd268b0a1e0a':
+      Fix logging for setup_data_call response
+
+commit d5580e18a7a1ce1a227e98d5170ffd268b0a1e0a
+Merge: 183b1d0 5638415
+Author: Wink Saville <wink@google.com>
+Date:   Wed Aug 29 09:30:25 2012 -0700
+
+    Merge "Fix logging for setup_data_call response"
+
+commit 56384157f32856066ee9c1b77cbcf96d4ee90a98
+Author: Naveen Kalla <nkalla@codeaurora.org>
+Date:   Wed Nov 16 11:12:37 2011 -0800
+
+    Fix logging for setup_data_call response
+    
+    Change-Id: I611d96e7653da4f14d73c6d6f9663365dd983628
+
+commit 188d84fb9121a2c92f9c1b8dbae36a3255417b88
+Author: Wink Saville <wink@google.com>
+Date:   Tue Aug 28 15:42:46 2012 -0700
+
+    Use ALOGE instead of fprintf in rild
+    
+    This allows the errors to be seen in the log, otherwise there is
+    no visibility unless you run rild from the command line.
+    
+    Change-Id: Id6c25eeef6c2cb118c2dff80a9d3742b99563bde
+
+commit 183b1d020f847abee137c2ecb5d83f150fdfa470
+Merge: 3a8afda 96dcdbc
+Author: Wink Saville <wink@google.com>
+Date:   Fri Aug 24 17:47:52 2012 -0700
+
+    Merge "Fixed goto into scope."
+
+commit 96dcdbcfe5111346f1a1f4542a8533a0a6611c01
+Author: Kevin Schoedel <kevin.p.schoedel@intel.com>
+Date:   Fri May 25 17:00:17 2012 -0400
+
+    Fixed goto into scope.
+    
+    Two functions contained goto statements entering the scope of
+    automatic variables; added explicit blocks to limit these scopes.
+    
+    Change-Id: Ib2d46bdc235089e208ac70bdaf405ea9e5b91ab1
+    Reviewed-by: Ariel J Bernal <ariel.j.bernal@intel.com>
+    Author: Kevin Schoedel <kevin.p.schoedel@intel.com>
+
+commit 3a8afda88d9fb3e18344ee137f60dbe9236fe368
+Merge: 18cb387 9efcac5
+Author: Wink Saville <wink@google.com>
+Date:   Mon Aug 13 11:24:30 2012 -0700
+
+    Merge "Workaround for LTE RSRP -ve values in Signal"
+
+commit 9efcac5782b93564d47c1687e67e85849c72afed
+Author: Uma Maheswari Ramalingam <umam@codeaurora.org>
+Date:   Thu Aug 9 11:59:17 2012 -0700
+
+    Workaround for LTE RSRP -ve values in Signal
+    
+    Ril version 6 and below sends negative values
+    for lte rsrp in signalstrength.
+    Workaround to maintain backward compatibility
+    and convert this to positive
+    values in compliance with ril.h
+    
+    Support for processing all fields in
+    SignalStrength in reference-ril
+    
+    Change-Id: I4d480aa2f607cd617b18681f722de246a7894348
+
+commit 18cb387015842420fb5afa6fdc6484c6ef3c490c
+Merge: bbc67ff 2805905
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jul 26 12:07:11 2012 -0700
+
+    Merge "Fix the signal strength errors"
+
+commit bbc67ff29bf9ba370f0d384214677dc1503361fb
+Merge: b3e09b7 5b16efd
+Author: Wink Saville <wink@google.com>
+Date:   Thu May 31 13:25:44 2012 -0700
+
+    am 5b16efde: Fix rild running in Nakasi.
+    
+    * commit '5b16efdeca04c524df241af9315c8ec3bf774491':
+      Fix rild running in Nakasi.
+
+commit 5b16efdeca04c524df241af9315c8ec3bf774491
+Author: Wink Saville <wink@google.com>
+Date:   Wed May 30 16:20:55 2012 -0700
+
+    Fix rild running in Nakasi.
+    
+    The module rild is telephony specific, since Nakasi has no radio
+    it shouldn't run rild. Make the rild module optional and add a
+    cleanstep.
+    
+    Bug: 6463864
+    Change-Id: Iaf931082ef96a3f79059cfe55e8a1ec145d95ed3
+
+commit b3e09b7abc7c08c567a3995450ca9fae7b47360d
+Merge: 8add905 527e4e5
+Author: Andrew Hsieh <andrewhsieh@google.com>
+Date:   Mon May 21 00:27:00 2012 -0700
+
+    am 527e4e5b: Merge "Add libdl for all platforms"
+    
+    * commit '527e4e5bc0dbd28bc8afa7857df0491412aef24e':
+      Add libdl for all platforms
+
+commit 527e4e5bc0dbd28bc8afa7857df0491412aef24e
+Merge: c09eacf 6f9c7dd
+Author: Andrew Hsieh <andrewhsieh@google.com>
+Date:   Mon May 21 00:20:32 2012 -0700
+
+    Merge "Add libdl for all platforms"
+
+commit 6f9c7dde09a99bd7972283460a7bbd1b4e66b040
+Author: Haitao Feng <haitao.feng@intel.com>
+Date:   Mon May 21 02:49:04 2012 -0400
+
+    Add libdl for all platforms
+    
+    Change-Id: I427357aaba4b7089e8ee76d344c21f58fb9fdaab
+    Signed-off-by: Haitao Feng <haitao.feng@intel.com>
+
+commit 28059051b016c4c13f3b81398ba78fbbb3bb1f95
+Author: Chih-Wei Huang <cwhuang@linux.org.tw>
+Date:   Mon Apr 30 01:13:27 2012 +0800
+
+    Fix the signal strength errors
+    
+    Change the response to RIL_SignalStrength_v6 format.
+    
+    Change-Id: Id7797969e3433fe422625c902f54c965e806cb16
+
+commit 8add90564c4c0ba63c42314706aa7592f330aa7a
+Merge: 43d1c78 062ebd5
+Author: Mike Lockwood <lockwood@google.com>
+Date:   Tue Apr 3 10:48:14 2012 -0700
+
+    Merge remote-tracking branch 'goog/ics-aah'
+
+commit 43d1c783bcb87a0b2738c6364da2f988f6989954
+Author: Colin Cross <ccross@android.com>
+Date:   Tue Mar 27 14:50:46 2012 -0700
+
+    disable mock-ril on pdk builds
+    
+    pdk builds cannot compile java, disable the mock-ril for now.
+    
+    Change-Id: I4d982deb9da7965dcaf27f4fd0190785c4595cb7
+
+commit 4092e363aed09f26c5e758c3eb1afdb1767ddb47
+Author: Alex Yakavenka <ayakaven@quicinc.com>
+Date:   Fri Dec 9 16:39:46 2011 -0800
+
+    Telephony: Get_imsi should use strings as per ril.h
+    
+    Change-Id: I4f0f84ffb0e4c2387069b4a9149508c2abac032d
+
+commit 45e740ef3c422bf75aadca21f98614fc120f49fb
+Author: Alex Yakavenka <ayakaven@quicinc.com>
+Date:   Tue Jan 31 11:48:27 2012 -0800
+
+    Implement sim_refresh as per ril v6
+    
+    Change-Id: Icc620fd191f8542f61bd38e365813753bfedefdf
+
+commit 0b5d0bc6f19b4b945e5a0dc83ca66c24312e2d36
+Merge: f423cde c09eacf
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Wed Jan 18 12:30:18 2012 -0800
+
+    am c09eacf6: (-s ours) Merge changes Ib10d1000,Ibc332506,Ib429c9b5,I9a87ab49,I948ff132
+    
+    * commit 'c09eacf62df8ab605a07a078258b31cc5caf9019':
+      Rename (IF_)LOGE(_IF) to (IF_)ALOGE(_IF)
+      Rename (IF_)LOGW(_IF) to (IF_)ALOGW(_IF)
+      Rename (IF_)LOGI(_IF) to (IF_)ALOGI(_IF)
+      Rename (IF_)LOGD(_IF) to (IF_)ALOGD(_IF)
+      Rename LOGV(_IF) to ALOGV(_IF)
+
+commit c09eacf62df8ab605a07a078258b31cc5caf9019
+Merge: 300105d 170fbda
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Wed Jan 18 08:26:12 2012 -0800
+
+    Merge changes Ib10d1000,Ibc332506,Ib429c9b5,I9a87ab49,I948ff132
+    
+    * changes:
+      Rename (IF_)LOGE(_IF) to (IF_)ALOGE(_IF)
+      Rename (IF_)LOGW(_IF) to (IF_)ALOGW(_IF)
+      Rename (IF_)LOGI(_IF) to (IF_)ALOGI(_IF)
+      Rename (IF_)LOGD(_IF) to (IF_)ALOGD(_IF)
+      Rename LOGV(_IF) to ALOGV(_IF)
+
+commit 170fbdad83cba7ec4c67873bbafda389d9bec4cb
+Author: Steve Block <steveblock@google.com>
+Date:   Sun Jan 8 13:48:26 2012 +0000
+
+    Rename (IF_)LOGE(_IF) to (IF_)ALOGE(_IF)
+    
+    Change-Id: Ib10d100087fd0239c075e1dfee9e77a903c00b4a
+
+commit c6f53428cc5f8447262debc1b81b8d0602b742b2
+Author: Steve Block <steveblock@google.com>
+Date:   Fri Jan 6 10:14:35 2012 +0000
+
+    Rename (IF_)LOGW(_IF) to (IF_)ALOGW(_IF)
+    
+    Change-Id: Ibc3325063e1b34e2eb71eb4643dc6fbfddf8ec96
+
+commit b4e26162dd18f8db7308393ec8a63dfd5fd8b4ac
+Author: Steve Block <steveblock@google.com>
+Date:   Thu Jan 5 00:10:31 2012 +0000
+
+    Rename (IF_)LOGI(_IF) to (IF_)ALOGI(_IF)
+    
+    Change-Id: Ib429c9b5f0eb14786231e203738a8062d718e5b0
+
+commit 20cd1140431e2d4013fe3be529e14e45d973bec4
+Author: Steve Block <steveblock@google.com>
+Date:   Tue Dec 20 20:47:51 2011 +0000
+
+    Rename (IF_)LOGD(_IF) to (IF_)ALOGD(_IF)
+    
+    Change-Id: I9a87ab49edcee3281e419366ced3cbbb5ead8bc2
+
+commit 24975f5438333c47c7588c89979cd48fc46f4949
+Author: Steve Block <steveblock@google.com>
+Date:   Wed Oct 26 11:02:56 2011 +0100
+
+    Rename LOGV(_IF) to ALOGV(_IF)
+    
+    Change-Id: I948ff13208ff121d3ef1f6ae8fd9e728259d8c76
+
+commit f423cde8f901a72fd0cb811583a2cdabe62c64bd
+Author: Steve Block <steveblock@google.com>
+Date:   Sun Jan 8 13:48:26 2012 +0000
+
+    Rename (IF_)LOGE(_IF) to (IF_)ALOGE(_IF)  DO NOT MERGE
+    
+    See https://android-git.corp.google.com/g/#/c/157220
+    
+    Bug: 5449033
+    Change-Id: Id52de89149d4580873215fafc922ec4bd8d722ed
+
+commit 43b9c52fcaab343282243b6cbc3c5b2a56760f09
+Author: Steve Block <steveblock@google.com>
+Date:   Fri Jan 6 10:14:35 2012 +0000
+
+    Rename (IF_)LOGW(_IF) to (IF_)ALOGW(_IF)  DO NOT MERGE
+    
+    See https://android-git.corp.google.com/g/157065
+    
+    Bug: 5449033
+    Change-Id: Id6f7d536955c731454f1063fd19a51da0c6713a1
+
+commit 9139bfbe5c2bf26dfac14fedd5b7defafbaecb7f
+Author: Steve Block <steveblock@google.com>
+Date:   Thu Jan 5 00:10:31 2012 +0000
+
+    Rename (IF_)LOGI(_IF) to (IF_)ALOGI(_IF)  DO NOT MERGE
+    
+    See https://android-git.corp.google.com/g/156801
+    
+    Bug: 5449033
+    Change-Id: I42dbe6812878b39c75babc1ba95737937f45fdcc
+
+commit 6464068a31ff890d42d3da9cdf580d07c9c630d8
+Author: Steve Block <steveblock@google.com>
+Date:   Tue Dec 20 20:47:51 2011 +0000
+
+    Rename (IF_)LOGD(_IF) to (IF_)ALOGD(_IF)  DO NOT MERGE
+    
+    See https://android-git.corp.google.com/g/156016
+    
+    Bug: 5449033
+    Change-Id: Ib3eab0b780391f9a0ac9b53282616d66a0154ade
+
+commit 2bc78d614e349574426d198c37e51ccb7455b5bb
+Author: Naveen Kalla <nkalla@quicinc.com>
+Date:   Wed Dec 7 16:22:53 2011 -0800
+
+    Separate SIM states from Radio States
+    
+    A UICC can have multiple applications (USIM, CSIM). Both USIM and CSIM may be Ready.
+    So indicating modem state as SIM_READY/RUIM_READY will be incorrect. RADIO_ON is a more
+    appropriate Radio State. SIM status can be obtained from the RIL_REQUEST_GET_SIM_STATUS
+    and RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED messages.
+    
+    The change does the following
+    
+     - Remove SIM states from RIL_RadioState
+     - Add messages to indicate voice radio technology
+    
+    Change-Id: Ic7b540eefb741169ec22499d0e00961feb22a456
+
+commit 062ebd53e649e46ee44d8ea54de3045d831635e2
+Merge: 300105d a5ce7e7
+Author: Ed Heyl <ed@google.com>
+Date:   Fri Oct 28 19:05:54 2011 +0000
+
+    keep previous history after reset to mr1 plus aah changes (ics-aah-wip)
+
+commit a5ce7e730cac1d03b61d72984b0d40fcc5c21446
+Merge: 89ad127 1551f47
+Author: Ed Heyl <ed@google.com>
+Date:   Wed Oct 26 21:53:25 2011 +0000
+
+    undo reset to ics-mr1 until we have a better method
+
+commit 1551f471fdbbeb682f55031f53e05fbf2f752d63
+Merge: 300105d 89ad127
+Author: Ed Heyl <ed@google.com>
+Date:   Wed Oct 26 18:50:22 2011 +0000
+
+    reset to ics-mr1, but keep history
+
+commit 89ad127cd3489d7c681eae5f9710a29298aacefc
+Merge: 300105d eb902b8
+Author: Steve Block <steveblock@google.com>
+Date:   Wed Oct 26 04:48:29 2011 -0700
+
+    am eb902b80: (-s ours) Rename LOGV(_IF) to ALOGV(_IF)  DO NOT MERGE
+    
+    * commit 'eb902b80c2b46e59b12b2bded315e7f620f87c7e':
+      Rename LOGV(_IF) to ALOGV(_IF)  DO NOT MERGE
+
+commit eb902b80c2b46e59b12b2bded315e7f620f87c7e
+Author: Steve Block <steveblock@google.com>
+Date:   Wed Oct 26 11:02:56 2011 +0100
+
+    Rename LOGV(_IF) to ALOGV(_IF)  DO NOT MERGE
+    
+    See https://android-git.corp.google.com/g/#/c/143865
+    
+    Bug: 5449033
+    Change-Id: I9cb91455767731254a8d5bee140ea23474543f02
+
+commit 300105d1487f5238940c18792b879793826b61f4
+Author: Jake Hamby <jhamby@google.com>
+Date:   Mon Sep 26 01:01:44 2011 -0700
+
+    Add new RIL requests to support SIM data download via SMS over IMS.
+    
+    On an LTE device where incoming SMS messages over IMS are sent to
+    the framework via RIL_UNSOL_RESPONSE_NEW_SMS responses sent to
+    the RIL, it may be necessary to process USIM data download SM's
+    (message class 2). This requires the RIL to implement two new requests.
+    
+    1) RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS:
+       send an ENVELOPE command to the UICC, receiving the SW1 and SW2
+       status bytes in addition to the command response.
+    
+    2) RIL_REQUEST_SMS_ACKNOWLEDGE_WITH_PDU:
+       send an RP-ACK or RP-ERROR acknowledgement to the incoming SM,
+       including an acknowledgement PDU containing the envelope response.
+    
+    Change-Id: Id134dd90611b147fdc8aebc8ccdf0e989a6542a9
+
+commit 5cdc1354de1e1b98347fe67c5fefdb0be7e0f589
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Fri Oct 14 17:50:58 2011 -0500
+
+    RIL occasionally stopps event loop on phone process crash
+    
+    RIL occasionally exits from its event loop due to race condition
+    upon phone process crash. And there is no recovery mechanism
+    provided and causing permanent cellular data loss until reset.
+    
+    The solution is simply to kill rild process to start over when
+    event loop exits for some reason.
+    
+    Bug:5428218
+    Change-Id: I88a9b8e966158f0f943fe3d189d91b1352481d9b
+
+commit fa8d584ca7984bf7d73ff37c7c2bc1e0dfa5fb71
+Author: Jake Hamby <jhamby@google.com>
+Date:   Fri Aug 19 16:22:18 2011 -0700
+
+    Changes to RIL to support IMS features for LTE.
+    
+    - There is a new RIL request, RIL_REQUEST_ISIM_AUTHENTICATION, which is
+      used to perform IMS AKA authentication using the algorithm on the ISIM
+      application of the UICC. The challenge nonce and response are both encoded
+      as Base64 strings.
+    
+    Change-Id: I072b43d2b66b2013f8e58d3bd8251d75a453f167
+
+commit 2c8c96556ba797789b45ba2465ef892568c7312d
+Merge: 2cc6032 d8ad6c9
+Author: Vladimir Chtchetkine <vchtchetkine@google.com>
+Date:   Wed Aug 10 12:21:05 2011 -0700
+
+    am d8ad6c98: resolved conflicts for merge of 988d3d71 to honeycomb-plus-aosp
+    
+    * commit 'd8ad6c98086c410243e0e8ad8285f02d6b696bd6':
+      Enable QEMUD pipe connection
+
+commit d8ad6c98086c410243e0e8ad8285f02d6b696bd6
+Merge: 3c3569d 988d3d7
+Author: Vladimir Chtchetkine <vchtchetkine@google.com>
+Date:   Mon Aug 8 14:47:04 2011 -0700
+
+    resolved conflicts for merge of 988d3d71 to honeycomb-plus-aosp
+    
+    Change-Id: I85178afbca0b8b51eb3890958b063a70a1b33b96
+
+commit 988d3d7181473e36df8679368b06d0fb766c52e4
+Merge: 8dbc643 385a739
+Author: Vladimir Chtchetkine <vchtchetkine@google.com>
+Date:   Mon Aug 8 13:02:49 2011 -0700
+
+    Merge "Enable QEMUD pipe connection"
+
+commit 385a73934b05fd28915e0ae17020dbfe3b20afd4
+Author: Vladimir Chtchetkine <vchtchetkine@google.com>
+Date:   Thu Aug 4 14:03:07 2011 -0700
+
+    Enable QEMUD pipe connection
+    
+    Change-Id: I8cdeda261ebaf203310262951e8253cb8a42c8c6
+
+commit 2cc60325243c41bfcd9c76603f03e2c8d8b7f5ab
+Merge: 3b4ab8a 3c3569d
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Sun Jul 24 09:13:55 2011 -0700
+
+    am 3c3569d3: am 16157587: Allow suggestedRetryTime to indicate no retry is needed.
+    
+    * commit '3c3569d30c274c5d5ff040d3379427cea3175d06':
+      Allow suggestedRetryTime to indicate no retry is needed.
+
+commit 3c3569d30c274c5d5ff040d3379427cea3175d06
+Merge: c35ee11 1615758
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Sun Jul 24 09:11:31 2011 -0700
+
+    am 16157587: Allow suggestedRetryTime to indicate no retry is needed.
+    
+    * commit '16157587c02b83a93f4e02f83a934442aa0e3e6a':
+      Allow suggestedRetryTime to indicate no retry is needed.
+
+commit 16157587c02b83a93f4e02f83a934442aa0e3e6a
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Sun Jul 24 07:56:32 2011 -0700
+
+    Allow suggestedRetryTime to indicate no retry is needed.
+    
+    If suggestedRetryTime is 0x7fffffff then no retry is needed
+    and the framework should not initiate a retry.
+    
+    Bug: 4949208
+    Change-Id: I6db070c33e3716bc98bb4f9411354b9949fe5f52
+
+commit 3b4ab8a169edccbc5ae04d3687d7b44c66687195
+Author: Jeff Brown <jeffbrown@google.com>
+Date:   Mon Jul 11 22:12:24 2011 -0700
+
+    Remove the simulator target from all makefiles.
+    Bug: 5010576
+    
+    Change-Id: Ifb59ea7e454d8ce832610e0979935e889e7621e2
+
+commit d313401d266b6c519ccbc105f86683180b0a4d84
+Merge: fa99470 c35ee11
+Author: Wink Saville <wink@google.com>
+Date:   Fri Jun 24 17:14:59 2011 -0700
+
+    am c35ee118: am 250eb3c8: Initialize new field RIL_Data_Call_Response_v6.suggestedRetryTime.
+    
+    * commit 'c35ee11808954fc6cb9e87c1b8f92d7d0efcc7df':
+      Initialize new field RIL_Data_Call_Response_v6.suggestedRetryTime.
+
+commit c35ee11808954fc6cb9e87c1b8f92d7d0efcc7df
+Merge: 470f53b 250eb3c
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jun 23 08:19:55 2011 -0700
+
+    am 250eb3c8: Initialize new field RIL_Data_Call_Response_v6.suggestedRetryTime.
+    
+    * commit '250eb3c8c3adbbbaf49c30ee09a061268d9a491a':
+      Initialize new field RIL_Data_Call_Response_v6.suggestedRetryTime.
+
+commit fa99470b6d5046c30f88b71ba8e6610fd209d15c
+Merge: 3f8ea10 470f53b
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Thu Jun 23 07:49:20 2011 -0700
+
+    am 470f53b5: am beb25b58: Added a special retry back-off timer value for call retry
+    
+    * commit '470f53b56567df2600163e31164f1273e0a70f9a':
+      Added a special retry back-off timer value for call retry
+
+commit 250eb3c8c3adbbbaf49c30ee09a061268d9a491a
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jun 22 09:11:34 2011 -0700
+
+    Initialize new field RIL_Data_Call_Response_v6.suggestedRetryTime.
+    
+    Change-Id: Idd3c9665785322a2a3fe013db459d9c8302a48d6
+
+commit 470f53b56567df2600163e31164f1273e0a70f9a
+Merge: b53c641 beb25b5
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Tue Jun 21 19:35:24 2011 -0700
+
+    am beb25b58: Added a special retry back-off timer value for call retry
+    
+    * commit 'beb25b58dcb48a2cfa2cfe10f5fb15908ff465f8':
+      Added a special retry back-off timer value for call retry
+
+commit beb25b58dcb48a2cfa2cfe10f5fb15908ff465f8
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Fri Jun 17 16:26:45 2011 -0500
+
+    Added a special retry back-off timer value for call retry
+    
+    Added suggestedRetryTime value in v6 Data_Call_Response
+    structure so RIL can override retry back-off time
+    for some special cases.
+    
+    Bug: 4723641
+    Change-Id: If5a683be6bcc1f530f0a5512ce3012a6102393d2
+
+commit 3f8ea1073d4c54b72eee5348ea76eeaae898a73b
+Merge: 4a09753 b53c641
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jun 13 11:40:20 2011 -0700
+
+    am b53c6412: am 473adc9b: Update RIL_LTE_SignalStrength comments.
+    
+    * commit 'b53c6412c8420fcb5250fe43af9c3297f818af72':
+      Update RIL_LTE_SignalStrength comments.
+
+commit b53c6412c8420fcb5250fe43af9c3297f818af72
+Merge: b089144 473adc9
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jun 13 11:38:59 2011 -0700
+
+    am 473adc9b: Update RIL_LTE_SignalStrength comments.
+    
+    * commit '473adc9b38240d180fc1935812ac80473f571f56':
+      Update RIL_LTE_SignalStrength comments.
+
+commit 473adc9b38240d180fc1935812ac80473f571f56
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jun 13 10:24:09 2011 -0700
+
+    Update RIL_LTE_SignalStrength comments.
+    
+    Add INT_MAX to denote invalid values and doc references.
+    Created bug 4575689 to get Xoom LTE ril fixed and the FW updated.
+    
+    Change-Id: Ib1f7055b469ac8756bb5c0911d180ad7ba849227
+
+commit 4a0975347941bd0e2c0fe1d2116b1666ad5b5711
+Merge: 04753f4 b089144
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Tue May 3 16:20:11 2011 -0700
+
+    am b0891447: (-s ours) am 8dbc643b: (-s ours) am 60d10ec9: (-s ours) Merge from gingerbread - do not merge
+    
+    * commit 'b08914475e4e94d8390996d54d87f905979238d8':
+
+commit b08914475e4e94d8390996d54d87f905979238d8
+Merge: d0bc13e 8dbc643
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Tue May 3 16:14:58 2011 -0700
+
+    am 8dbc643b: (-s ours) am 60d10ec9: (-s ours) Merge from gingerbread - do not merge
+    
+    * commit '8dbc643bbc65d89c1fac69f09d02d8ff12b008fb':
+
+commit 8dbc643bbc65d89c1fac69f09d02d8ff12b008fb
+Merge: 08929fd 60d10ec
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Tue May 3 11:22:03 2011 -0700
+
+    am 60d10ec9: (-s ours) Merge from gingerbread - do not merge
+    
+    * commit '60d10ec91aa9de6b4699a87557ba8f041bf34be3':
+      Port RIL v4 to gingerbread from master.
+
+commit 04753f4bb3abbcca2e78545c3c08fd230fb55383
+Merge: e70d0c9 d0bc13e
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Mon May 2 12:20:24 2011 -0700
+
+    am d0bc13e1: (-s ours) am 60d10ec9: (-s ours) Merge from gingerbread - do not merge
+    
+    * commit 'd0bc13e161401f92c73fa6ba0d4e525b30dac4c8':
+      Port RIL v4 to gingerbread from master.
+
+commit d0bc13e161401f92c73fa6ba0d4e525b30dac4c8
+Merge: ed82b9a 60d10ec
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Mon May 2 12:12:00 2011 -0700
+
+    am 60d10ec9: (-s ours) Merge from gingerbread - do not merge
+    
+    * commit '60d10ec91aa9de6b4699a87557ba8f041bf34be3':
+      Port RIL v4 to gingerbread from master.
+
+commit 60d10ec91aa9de6b4699a87557ba8f041bf34be3
+Merge: 08929fd 3b1530a
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Mon May 2 09:43:05 2011 -0700
+
+    Merge from gingerbread - do not merge
+    
+    Change-Id: I3529a5f85d93e66aa5fca62ac44c242c4f7e163d
+
+commit e70d0c9c1b85a233608d85433a8dfc5dcb8441c9
+Merge: 18cf248 ed82b9a
+Author: Wink Saville <wink@google.com>
+Date:   Sat Apr 16 15:12:31 2011 -0700
+
+    am ed82b9ae: am ee274582: Fix debug output.
+    
+    * commit 'ed82b9aea44672386bafe208cf6bf540e95f21f3':
+      Fix debug output.
+
+commit ed82b9aea44672386bafe208cf6bf540e95f21f3
+Merge: 16bf23c ee27458
+Author: Wink Saville <wink@google.com>
+Date:   Sat Apr 16 15:10:00 2011 -0700
+
+    am ee274582: Fix debug output.
+    
+    * commit 'ee2745825fae9561c5f83fcf179bbbfa111e5224':
+      Fix debug output.
+
+commit ee2745825fae9561c5f83fcf179bbbfa111e5224
+Author: Wink Saville <wink@google.com>
+Date:   Sat Apr 16 15:05:49 2011 -0700
+
+    Fix debug output.
+    
+    Previously I'd fixed the constant RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED
+    now I'm fixing the debug output.
+    
+    Change-Id: I5115ce21141175140645a63d3937c7da21705f11
+
+commit 18cf248a896d80589a17eee5e6e95128ff312909
+Merge: e81947b 16bf23c
+Author: Wink Saville <wink@google.com>
+Date:   Fri Apr 15 15:20:37 2011 -0700
+
+    am 16bf23cc: am 29487ef2: Added additional comments to some commands for clarification.
+    
+    * commit '16bf23cc08e4b240062d9f9a35998cc8de8b5af6':
+      Added additional comments to some commands for clarification.
+
+commit 16bf23cc08e4b240062d9f9a35998cc8de8b5af6
+Merge: 1e3dfd1 29487ef
+Author: Wink Saville <wink@google.com>
+Date:   Fri Apr 15 15:17:20 2011 -0700
+
+    am 29487ef2: Added additional comments to some commands for clarification.
+    
+    * commit '29487ef2685e5ee38f0348ab031cb96a608296ba':
+      Added additional comments to some commands for clarification.
+
+commit 29487ef2685e5ee38f0348ab031cb96a608296ba
+Author: Wink Saville <wink@google.com>
+Date:   Fri Apr 15 09:15:31 2011 -0700
+
+    Added additional comments to some commands for clarification.
+    
+    Change RIL_UNSOL_CDMA_SUBSCRIPTION_CHANGED to
+    RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED.
+    
+    Change-Id: Id946447c6ee9777696c3d7fa1a664ee7dc7deeba
+
+commit e81947b2055650460d254ee89210e1338d747441
+Merge: 9e287b5 1e3dfd1
+Author: Jake Hamby <jhamby@google.com>
+Date:   Tue Apr 12 23:46:02 2011 -0700
+
+    am 1e3dfd1b: (-s ours) am a9c18d17: Fix RIL_UNSOL_RIL_CONNECTED to return the vendor RIL version. DO NOT MERGE.
+    
+    * commit '1e3dfd1b203d85c892b27c9bf32e5fc09c2a6ebc':
+      Fix RIL_UNSOL_RIL_CONNECTED to return the vendor RIL version. DO NOT MERGE.
+
+commit 1e3dfd1b203d85c892b27c9bf32e5fc09c2a6ebc
+Merge: 6883717 a9c18d1
+Author: Jake Hamby <jhamby@google.com>
+Date:   Tue Apr 12 23:40:34 2011 -0700
+
+    am a9c18d17: Fix RIL_UNSOL_RIL_CONNECTED to return the vendor RIL version. DO NOT MERGE.
+    
+    * commit 'a9c18d17769ee475cf4fd5e76e18ddfa4070c7cd':
+      Fix RIL_UNSOL_RIL_CONNECTED to return the vendor RIL version. DO NOT MERGE.
+
+commit a9c18d17769ee475cf4fd5e76e18ddfa4070c7cd
+Author: Jake Hamby <jhamby@google.com>
+Date:   Tue Apr 12 23:32:08 2011 -0700
+
+    Fix RIL_UNSOL_RIL_CONNECTED to return the vendor RIL version. DO NOT MERGE.
+    
+    The new RIL_UNSOL_RIL_CONNECTED call should return the version of
+    the vendor RIL library and not the version of rild. Fixes data
+    connectivity on Crespo.
+    
+    Change-Id: Ib644216677e79b135214a546400372dd61c8d96d
+
+commit 9e287b5ef8a609c8f73f12238dfe640c302b2c4d
+Author: Jake Hamby <jhamby@google.com>
+Date:   Tue Apr 12 19:51:28 2011 -0700
+
+    Fix RIL_UNSOL_RIL_CONNECTED to return the vendor RIL version.
+    
+    The new RIL_UNSOL_RIL_CONNECTED call should return the version of
+    the vendor RIL library and not the version of rild. Fixes data
+    connectivity on Crespo.
+    
+    Change-Id: I7aeb89d11e6e45de6548254d29d941a537586a37
+
+commit 21ac31c063685c145b971e9a3dd373797a959aa4
+Merge: ab14571 6883717
+Author: Wink Saville <wink@google.com>
+Date:   Thu Apr 7 16:51:50 2011 -0700
+
+    am 6883717c: am 5b9df33c: Add RIL_UNSOL_RIL_CONNECTED.
+    
+    * commit '6883717cc1b821cd8362a5e72401a6d8bba0c9e0':
+      Add RIL_UNSOL_RIL_CONNECTED.
+
+commit 6883717cc1b821cd8362a5e72401a6d8bba0c9e0
+Merge: 0f0d20b 5b9df33
+Author: Wink Saville <wink@google.com>
+Date:   Thu Apr 7 16:50:08 2011 -0700
+
+    am 5b9df33c: Add RIL_UNSOL_RIL_CONNECTED.
+    
+    * commit '5b9df33c53682addaebc0b6073901a8b441d82f9':
+      Add RIL_UNSOL_RIL_CONNECTED.
+
+commit 5b9df33c53682addaebc0b6073901a8b441d82f9
+Author: Wink Saville <wink@google.com>
+Date:   Wed Apr 6 16:24:21 2011 -0700
+
+    Add RIL_UNSOL_RIL_CONNECTED.
+    
+    Change-Id: Id4cc2aff00ad0398f7a24e7f5a24626e5a63425a
+
+commit ab1457197e42b64c4a847d57679ced32a5534134
+Merge: 507b235 0f0d20b
+Author: Wink Saville <wink@google.com>
+Date:   Mon Mar 21 10:45:07 2011 -0700
+
+    am 0f0d20ba: am 714160a7: am ed1ce999: Change mock-ril and reference-ril to use include/telephony/ril.h
+    
+    * commit '0f0d20bafee53d44b58f2c69c48c047d4390af83':
+      Change mock-ril and reference-ril to use include/telephony/ril.h
+
+commit 0f0d20bafee53d44b58f2c69c48c047d4390af83
+Merge: 7da1eae 714160a
+Author: Wink Saville <wink@google.com>
+Date:   Mon Mar 21 10:43:44 2011 -0700
+
+    am 714160a7: am ed1ce999: Change mock-ril and reference-ril to use include/telephony/ril.h
+    
+    * commit '714160a74890167f888cae048fbdd670ba05747f':
+      Change mock-ril and reference-ril to use include/telephony/ril.h
+
+commit 714160a74890167f888cae048fbdd670ba05747f
+Merge: 2c1fb3a ed1ce99
+Author: Wink Saville <wink@google.com>
+Date:   Mon Mar 21 10:42:01 2011 -0700
+
+    am ed1ce999: Change mock-ril and reference-ril to use include/telephony/ril.h
+    
+    * commit 'ed1ce9998196ac235b215cb24e624a328e693e5c':
+      Change mock-ril and reference-ril to use include/telephony/ril.h
+
+commit 507b235b3b85dc580bca392d6ab2424b80ac1d0a
+Merge: c61867a 7da1eae
+Author: Wink Saville <wink@google.com>
+Date:   Sat Mar 19 13:55:25 2011 -0700
+
+    am 7da1eaec: am 2c1fb3a4: Change mock-ril and reference-ril to use include/telephony/ril.h
+    
+    * commit '7da1eaeccf0fc225fd9516eb4b8698cfcd8126e8':
+      Change mock-ril and reference-ril to use include/telephony/ril.h
+
+commit 7da1eaeccf0fc225fd9516eb4b8698cfcd8126e8
+Merge: abac655 2c1fb3a
+Author: Wink Saville <wink@google.com>
+Date:   Sat Mar 19 13:50:07 2011 -0700
+
+    am 2c1fb3a4: Change mock-ril and reference-ril to use include/telephony/ril.h
+    
+    * commit '2c1fb3a4e7aa8039bdefacceec98aa43cfe5784c':
+      Change mock-ril and reference-ril to use include/telephony/ril.h
+
+commit 2c1fb3a4e7aa8039bdefacceec98aa43cfe5784c
+Author: Wink Saville <wink@google.com>
+Date:   Sat Mar 19 13:42:45 2011 -0700
+
+    Change mock-ril and reference-ril to use include/telephony/ril.h
+    
+    I've done this by change the copy to a symbolic link, this allows
+    us to easily change from using the common include/telephony/ril.h
+    to a separate instance when ril.h is evolving.
+    
+    Bug: 3457628
+    Bug: 4132203
+    Change-Id: Idd8029e57dd0b2afc16c2659dbbc3e587b438f0a
+
+commit ed1ce9998196ac235b215cb24e624a328e693e5c
+Author: Wink Saville <wink@google.com>
+Date:   Sat Mar 19 10:45:46 2011 -0700
+
+    Change mock-ril and reference-ril to use include/telephony/ril.h
+    
+    I've done this by change the copy to a symbolic link, this allows
+    us to easily change from using the common include/telephony/ril.h
+    to a separate instance when ril.h is evolving.
+    
+    Bug: 3457628
+    Bug: 4132203
+    Change-Id: I0fca1c0409e9bf6381e491ad338d2299ab512405
+
+commit c61867a118e7703231d550e9ab43de9fd4d37219
+Author: Iliyan Malchev <malchev@google.com>
+Date:   Mon Mar 14 14:02:16 2011 -0700
+
+    hardware/ril: remove LOCAL_PRELINK_MODULE
+    
+    Change-Id: I8a42023d2c228040e2f32067f2eb71842d7d9578
+    Signed-off-by: Iliyan Malchev <malchev@google.com>
+
+commit 3af2ca044c945506c70ba1cd546d553f4932d331
+Merge: abac655 06332d7
+Author: Wink Saville <wink@google.com>
+Date:   Tue Mar 8 21:28:54 2011 -0800
+
+    Merge "Fix responseSimStatus use of responselen."
+
+commit 06332d79328bcd128fb5dfcd98e6b10e46b11d5d
+Author: Wink Saville <wink@google.com>
+Date:   Mon Mar 7 12:09:04 2011 -0800
+
+    Fix responseSimStatus use of responselen.
+    
+    Previously this code was checking that the responselen was a
+    multiple of the length of a pointer. I'd changed it to assume
+    it was supposed to be a pointer. But actually the reference-ril
+    sets it to the length of the object. So fixing this to assume
+    its the length of the object.
+    
+    Change-Id: I90e9fdee89151359041eccab3cfd2d442c7fbcbf
+
+commit abac65535d08c3945f40fcaab1fc0910109fd6f3
+Merge: fd72937 08929fd
+Author: Ying Wang <wangying@google.com>
+Date:   Mon Mar 7 10:30:29 2011 -0800
+
+    resolved conflicts for merge of 08929fd6 to honeycomb-plus-aosp
+    
+    Change-Id: Ic771d69d2824d5ff763313f94acf6125fb9bfb4f
+
+commit 08929fd6715b2b6a02f25b23704923d98c15a3b9
+Merge: 9ed40f3 c41c0dd
+Author: Ying Wang <wangying@android.com>
+Date:   Fri Mar 4 13:29:02 2011 -0800
+
+    Merge "Fix Android.mk"
+
+commit c41c0ddbb903b0fb7c0bfe8456d33719186406c3
+Author: Ying Wang <wangying@android.com>
+Date:   Fri Mar 4 11:53:04 2011 -0800
+
+    Fix Android.mk
+    
+    Use ":=" instead of "=".
+    The vars should be set outside the if..else.. block, because they are
+    used outside the block.
+    
+    Change-Id: I1e57cbef0843841c6ccd7051f068f663863ecee6
+
+commit fd7293711394c422711ff07d15a357955ff2194f
+Author: Wink Saville <wink@google.com>
+Date:   Tue Feb 22 16:19:39 2011 -0800
+
+    Fix bugs in responseSimStatus and update comments.
+    
+    Change-Id: I4b4e6ab712d2a5da6f9102bf818628e9c3d05f3b
+
+commit c0114b325877907fcdf7a5baa24e54a752e7e58b
+Author: Wink Saville <wink@google.com>
+Date:   Fri Feb 18 10:14:07 2011 -0800
+
+    Changes for ril.h version 6.
+    
+    - Changes to support LTE and EHRPD radio technology
+    - Support IPv6 in addition to IPv4 on the modems
+    - Detailed GPRS registration denied causes
+    - Access to multiple apps on UICC card
+    - Access to ISIM app on UICC
+    - Deprecate RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE as it can
+      causes problems when several PDN contexts are active. Failure reason
+      should be returned when setup_data_call returns
+    - Added RIL_RadioTechnology
+    - Added RIL_PreferredNetworkType
+    - Added RIL_CdmaSubscriptionSource
+    - Added RIL_LTE_SignalStrength
+    - Added AID to SIM requests as an optional parameter
+    - Add new error codes for returning disconnect reasons
+    - RIL_Data_Call_Response_v3/v5
+        Added fields to support IPv6 and return status as it will
+        now be returned as part of RIL_REQUEST_SETUP_DATA_CALL
+    - Rename RIL_REQUEST_REGISTRATION_STATE
+          to RIL_REQUEST_VOICE_REGISTRATION_STATE
+        response[3] return RIL_RadioTechnology for voice calls
+        response[13] more error codes
+    - Rename RIL_REQUEST_GPRS_REGISTRATION_STATE
+           to RIL_REQUEST_DATA_REGISTRATION_STATE
+        Changed response[3] to be RIL_RadioTechnology for data calls
+        Added response[4] error codes for registration being denied
+        Added response[5] Max simultaneous data calls
+    - RIL_REQUEST_SETUP_DATA_CALL
+        Changed data[0] to be RIL_RadioTechnology
+        Response is now a RIL_Data_Call_Response_v5
+    - RIL_REQUEST_DATA_CALL_LIST
+        Response is now a RIL_Data_Call_Response_v5
+    - RIL_UNSOL_DATA_CALL_LIST_CHANGED
+        Response is now a RIL_Data_Call_Response_v5
+    - RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE
+        Changed data[0] to be RIL_PreferredNetworkType
+    - RIL_REQUEST_GET_PREFERRED_NETWORK_TYPE
+        Changed response[0] to be RIL_PreferredNetworkType
+    - Rename RIL_REQUEST_SET_CDMA_SUBSCRIPTION
+        to RIL_REQUEST_SET_CDMA_SUBSCRIPTION_SOURCE
+    - Added RIL_REQUEST_GET_CDMA_SUBSCRIPTION_SOURCE
+    - Added support for AID to RIL_UNSOL_SIM_REFRESH
+    - Added RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED
+    - Added RIL_UNSOL_PRL_CHANGED
+    - Added RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE
+    - Rename RIL_UNSOL_RESPONSE_NETWORK_CHANGED
+         to RIL_UNSOL_RESPONSE_VOICE_NETWORK_CHANGED
+    
+    Have refercence-ril and mock-ril use a private copy of
+    ril.h so the ril may evolve separately from them.
+    
+    Change-Id: I1b952069f5406f5dc42480d019970d10f0120358
+
+commit fce03232dffed9b84b9ee549988727692e4a4233
+Author: Wink Saville <wink@google.com>
+Date:   Tue Feb 15 17:40:16 2011 -0800
+
+    Move the ril.h in mock-ril to src/cpp where it should be.
+    
+    Change-Id: I1e65936c648f6ca6a8b47851f3a0636b332d56ec
+
+commit 9a9fbd294bf8a7465cf10480935edea8304ef661
+Author: Wink Saville <wink@google.com>
+Date:   Tue Feb 15 17:13:10 2011 -0800
+
+    Use local copy of ril.h for reference-ril and mock-ril.
+    
+    This allows for greater stability while we're changing the ril
+    interface, as defined by ril.h. An example is that the emulator
+    will continue to run using an older ril while we upgrade to
+    newer rils.
+    
+    After the new ril has stabilized and these modules updated the
+    changes should be reverted and we should use
+    include/telephony/ril.h
+    
+    Change-Id: If5011ccbe64bcb65f98b02060165f899b6d4b5f9
+
+commit f4abb2e2724a6686e106e9df18abfef8e92bab38
+Author: Ying Wang <wangying@google.com>
+Date:   Wed Feb 9 13:43:06 2011 -0800
+
+    Use the correct syntax
+    
+    To fix x86 build.
+    
+    Change-Id: I31015c255e8bf441d83dd314003d614c2c2aaa97
+
+commit af1298d72fd6a8b2d5bed7db15f6d181240fce83
+Author: David 'Digit' Turner <digit@google.com>
+Date:   Fri Feb 4 13:36:47 2011 +0100
+
+    ril: Fix telephony under emulation.
+    
+    This patch fixes several regressions that were introduced in
+    a recent rewrite of the native RIL support code, and which
+    prevent networking from working under emulation.
+    
+    - 'apn' and 'type' were incorrectly swapped in the
+       AT+CGDCONT= command string, so the command was
+       never executed properly by the emulated modem.
+    
+    - The PDP context type was not properly written to the
+      parcel in responseDataCallList() in libril/ril.cpp.
+      Due to this the Java RIL code ignored the response.
+    
+    - The dns list returned by requestOrSendDataCallList()
+      was an empty string, which caused the Java RIL code to
+      fail with a "unknown host" exception when trying to setup
+      net.dns1
+    
+    Change-Id: I7f4e6f6f45d197960ecb20e7e8592272921fe694
+    Note: You also need to apply this emulator patch to verify
+          this one: http://review.source.android.com//#change,20965
+    
+          The code in requestOrSendDataCallList() assumes that
+          AT+CGACT? and AT+CGDCONT? will have answers with exactly
+          the same number of lines (this wasn't the case before
+          the emulator fix).
+
+commit c941961f4b2660f10352c0f715947a4d086f171d
+Author: Glenn Kasten <gkasten@google.com>
+Date:   Wed Feb 2 17:44:18 2011 -0800
+
+    Fix build break in RIL
+    
+    Change-Id: Idcdb06734231d04d159718ac98ca2b431915a13c
+
+commit 4b7a00c215327b70e76d54f573c96b5e935e350e
+Author: Robert Greenwalt <rgreenwalt@google.com>
+Date:   Wed Feb 2 14:40:15 2011 -0800
+
+    Add HSPA+ net type to the ril.
+    
+    Change-Id: Iade9b3478420456c5d8437e6455c72a72b8d24e1
+
+commit b7c76b1d920e177dd6a2e054aedc3c16e3e97c7e
+Merge: fd630df 7c91418
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Mon Jan 31 20:38:35 2011 -0800
+
+    am 7c914185: (-s ours) am ce6d7de4: Fix the comment for RIL_Data_Call_Response as well.
+    
+    * commit '7c914185a4e19c1a3216867c13a7ce90a63d182c':
+      Fix the comment for RIL_Data_Call_Response as well.
+
+commit fd630dfa23e65573adf402dac633ecbad5073dcb
+Merge: 4509cb1 52279ed
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jan 31 20:25:27 2011 -0800
+
+    am 52279edb: (-s ours) am 805093a8: Update comment for SETUP_DATA_CALL response.
+    
+    * commit '52279edb31c3656100479c803e74a8eca725660a':
+      Update comment for SETUP_DATA_CALL response.
+
+commit 7c914185a4e19c1a3216867c13a7ce90a63d182c
+Merge: 52279ed ce6d7de
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Mon Jan 31 18:31:57 2011 -0800
+
+    am ce6d7de4: Fix the comment for RIL_Data_Call_Response as well.
+    
+    * commit 'ce6d7de475fe64ddb51002491eef5e64b16ddcff':
+      Fix the comment for RIL_Data_Call_Response as well.
+
+commit 52279edb31c3656100479c803e74a8eca725660a
+Merge: f1da381 805093a
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jan 31 18:31:17 2011 -0800
+
+    am 805093a8: Update comment for SETUP_DATA_CALL response.
+    
+    * commit '805093a80f6e3136583b78b392d47b18b28e3f60':
+      Update comment for SETUP_DATA_CALL response.
+
+commit 3b1530aef62476248825a2092c9aea800395c3b1
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Wed Dec 29 15:50:50 2010 -0800
+
+    Port RIL v4 to gingerbread from master.
+    
+    Version 4 is backwards compatible with versions 2 and 3, so
+    this will not affect passion.
+    
+    Bug: 3333633
+    Change-Id: If2e48e9dd37e17e9955563d2cd2cb94ccb2a8efe
+
+commit ce6d7de475fe64ddb51002491eef5e64b16ddcff
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Mon Jan 31 16:55:38 2011 -0800
+
+    Fix the comment for RIL_Data_Call_Response as well.
+    
+    Bug: 3409252
+    Change-Id: I07aabee13f7ffc3854efc32ef661a7e09027a5c7
+
+commit 805093a80f6e3136583b78b392d47b18b28e3f60
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jan 31 15:18:00 2011 -0800
+
+    Update comment for SETUP_DATA_CALL response.
+    
+    Clarify that for version 4 rils there are two behaviors depending
+    upon the platform.
+    
+    bug: 3409252
+    Change-Id: I69208600b63195c1d755e34ea4c8db96f7e5d9a4
+
+commit 4509cb146ce7dce431564deda3bffd31ee7831eb
+Merge: 0c8c08e f1da381
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jan 20 17:27:59 2011 -0800
+
+    am f1da3813: (-s ours) am b58c9bfe: Add two more parameters too RIL_REQUEST_SETUP_DATA_CALL, DO NOT MERGE.
+    
+    * commit 'f1da381330d6d2369d948b69ada0a110abb4e1ad':
+      Add two more parameters too RIL_REQUEST_SETUP_DATA_CALL, DO NOT MERGE.
+
+commit f1da381330d6d2369d948b69ada0a110abb4e1ad
+Merge: 09b81af b58c9bf
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jan 20 17:02:47 2011 -0800
+
+    am b58c9bfe: Add two more parameters too RIL_REQUEST_SETUP_DATA_CALL, DO NOT MERGE.
+    
+    * commit 'b58c9bfe09830442088f8ddd4d8742e8be84c308':
+      Add two more parameters too RIL_REQUEST_SETUP_DATA_CALL, DO NOT MERGE.
+
+commit b58c9bfe09830442088f8ddd4d8742e8be84c308
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jan 19 22:37:56 2011 -0800
+
+    Add two more parameters too RIL_REQUEST_SETUP_DATA_CALL, DO NOT MERGE.
+    
+    Add DNS and gateway as parameters to RIL_REQUEST_SETUP_DATA_CALL so that
+    system properties aren't used for passing these to the ril. System
+    properties that are read right after a write doesn't always see the
+    result of the write. Another words writing system properties are not
+    not sequentially consistent.
+    
+    Bug: 3364487
+    Change-Id: I408e56cd8cf943dfb5d71a21a274fcfd14571b7b
+
+commit 0c8c08e8a6cab39671b6b0daf401fef5422c39fd
+Merge: 09b81af 4380897
+Author: Wink Saville <wink@google.com>
+Date:   Fri Jan 14 06:35:56 2011 -0800
+
+    Merge "RIL v5 RIL_REQUEST_SETUP_DATA_CALL."
+
+commit 4380897c6cdc99486a061b819943e3b290ebcf09
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jan 13 17:39:51 2011 -0800
+
+    RIL v5 RIL_REQUEST_SETUP_DATA_CALL.
+    
+    Change-Id: I30531e103416b1b817b9370304e3301a1c641cf5
+
+commit 09b81af681b101e1f99808c4ef134ac16afa4efe
+Merge: d1a6344 9ed40f3
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jan 13 10:26:15 2011 -0800
+
+    am 9ed40f35: am d663d381: Merge "Add a missing MUTEX_RELEASE() in ril_event_del"
+    
+    * commit '9ed40f355a9a3172d1f4428e2f009840a54d0283':
+      Add a missing MUTEX_RELEASE() in ril_event_del
+
+commit d1a63444472c6b8d3112647976890ce1309a2cde
+Merge: a793723 c83d92e
+Author: Jake Hamby <jhamby@google.com>
+Date:   Wed Jan 12 17:58:35 2011 -0800
+
+    am c83d92e8: am 29d9e18b: Merge "Modifying description for RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS."
+    
+    * commit 'c83d92e834422b8f5f1b309b5cba189647ebbe0f':
+      Modifying description for RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS.
+
+commit 9ed40f355a9a3172d1f4428e2f009840a54d0283
+Merge: c83d92e d663d38
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jan 12 15:23:21 2011 -0800
+
+    am d663d381: Merge "Add a missing MUTEX_RELEASE() in ril_event_del"
+    
+    * commit 'd663d3811f1de756bf4caaa31d5a5dda1f53966c':
+      Add a missing MUTEX_RELEASE() in ril_event_del
+
+commit d663d3811f1de756bf4caaa31d5a5dda1f53966c
+Merge: 29d9e18 11b35e6
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jan 12 12:44:39 2011 -0800
+
+    Merge "Add a missing MUTEX_RELEASE() in ril_event_del"
+
+commit c83d92e834422b8f5f1b309b5cba189647ebbe0f
+Merge: 6c407c5 29d9e18
+Author: Jake Hamby <jhamby@google.com>
+Date:   Tue Jan 11 13:21:36 2011 -0800
+
+    am 29d9e18b: Merge "Modifying description for RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS."
+    
+    * commit '29d9e18b4323f6a3b097bf5a1800492ed1aff244':
+      Modifying description for RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS.
+
+commit 29d9e18b4323f6a3b097bf5a1800492ed1aff244
+Merge: 54ff263 0eba202
+Author: Jake Hamby <jhamby@google.com>
+Date:   Tue Jan 11 13:09:44 2011 -0800
+
+    Merge "Modifying description for RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS."
+
+commit 11b35e613debbc9bcc162111d104e4c9f90fdbb8
+Author: Axel Lin <axel.lin@gmail.com>
+Date:   Wed Dec 29 15:34:56 2010 +0800
+
+    Add a missing MUTEX_RELEASE() in ril_event_del
+    
+    In the case of (ev->index < 0 || ev->index >= MAX_FD_EVENTS),
+    we must call MUTEX_RELEASE() before return.
+    
+    Change-Id: Ic0b21a8e1fbc940c4bfcc1fc8b606536e2484c71
+
+commit 0eba2026fd78f61e77a6adfece793cfaca92047c
+Author: Henrik Hall <henrik.hall@sonyericsson.com>
+Date:   Thu Nov 25 10:20:56 2010 +0100
+
+    Modifying description for RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS.
+    
+    Allowing for both GSM and UMTS format CBS message pdus.
+    
+    Change-Id: I0f920d2c1affe930a0da4c0ba5fce6d03f488146
+
+commit a79372347720af52d8cf10ad296a85597ea1e7fc
+Merge: d86799a 6c407c5
+Author: Nick Kralevich <nnk@google.com>
+Date:   Mon Dec 13 12:32:06 2010 -0800
+
+    am 6c407c5d: am aea7d5be: fix umask
+    
+    * commit '6c407c5da42d0c34a118f01ae0a48c9036298443':
+      fix umask
+
+commit 6c407c5da42d0c34a118f01ae0a48c9036298443
+Merge: 8973c8b aea7d5b
+Author: Nick Kralevich <nnk@google.com>
+Date:   Mon Dec 13 11:43:16 2010 -0800
+
+    am aea7d5be: fix umask
+    
+    * commit 'aea7d5beb2d2cc4d49954f9d5158b8a53c3d7d31':
+      fix umask
+
+commit aea7d5beb2d2cc4d49954f9d5158b8a53c3d7d31
+Author: Nick Kralevich <nnk@google.com>
+Date:   Fri Dec 10 15:53:02 2010 -0800
+
+    fix umask
+    
+    Don't create files / directories that are world writable.
+    
+    Bug: 3214214
+    
+    Change-Id: I6b6caede4446e9e952bffdb2b14e429b2699c69b
+
+commit d86799a04478e46b49cdf1f82f98b2279be1645c
+Author: Kazuhiro Ondo <kazuhiro.ondo@motorola.com>
+Date:   Thu Dec 2 13:22:35 2010 -0600
+
+    Added reason field in RIL_REQUEST_DEACTIVATE_DATA_CALL request.
+    
+    Change-Id: I24bcefe444d7799c283059e0f8816e9570a7314c
+
+commit a0ac3fa72b1e2c1dda1bce8eb14ccb04722f8983
+Merge: a3260a5 8973c8b
+Author: John Wang <johnwang@google.com>
+Date:   Wed Dec 1 17:36:41 2010 -0800
+
+    am 8973c8bd: am 06bae4bc: Add comments for HANGUP request.
+    
+    * commit '8973c8bd091b4689f3e9967addb11c886556aba8':
+      Add comments for HANGUP request.
+
+commit 8973c8bd091b4689f3e9967addb11c886556aba8
+Merge: 54ff263 06bae4b
+Author: John Wang <johnwang@google.com>
+Date:   Wed Dec 1 17:35:09 2010 -0800
+
+    am 06bae4bc: Add comments for HANGUP request.
+    
+    * commit '06bae4bcdc941fb1165fbf79cf6f2cb34e57e51d':
+      Add comments for HANGUP request.
+
+commit 06bae4bcdc941fb1165fbf79cf6f2cb34e57e51d
+Author: John Wang <johnwang@google.com>
+Date:   Thu Nov 18 16:37:09 2010 -0800
+
+    Add comments for HANGUP request.
+    
+    For bug #3136179
+    
+    Clarify RIL should NOT report active connection for GET_CURRENT_CALLS
+    
+    after HANGUP request returns.
+    
+    Change-Id: Icf9cc14b7d9cbfee6552cf51a648432caac28ab1
+
+commit a3260a508d30addf1c2130ea0674224dcfeb27f6
+Author: Wink Saville <wink@google.com>
+Date:   Mon Nov 8 19:18:30 2010 -0800
+
+    Some additional changes necessary so the Makefile works.
+    
+    We only need to manually build ".desc" and ".py" files.
+    
+    Change-Id: Ifd2f925ae985b80a1be3a7d512277870946702e5
+
+commit 44662d067dce6eb3234c6a861aefed4be198fe61
+Author: Ying Wang <wangying@google.com>
+Date:   Tue Nov 2 18:45:27 2010 -0700
+
+    Use the build system rules to compile the .proto files.
+    
+    Change-Id: If5f98e50a40fdca88c69e889e952adc9f4170d77
+
+commit 4b9b038563a48303952ae4581dd4b281f8e376b6
+Merge: 3950abd 54ff263
+Author: Xia Wang <xiaw@google.com>
+Date:   Wed Oct 13 15:59:26 2010 -0700
+
+    am 54ff2635: am 230e5a78: Disable response for CMD_UNSOL_CALL_RING in mock ril
+    
+    Merge commit '54ff26352fc6a8550e77265cb7c6409547935a2c'
+    
+    * commit '54ff26352fc6a8550e77265cb7c6409547935a2c':
+      Disable response for CMD_UNSOL_CALL_RING in mock ril
+
+commit 54ff26352fc6a8550e77265cb7c6409547935a2c
+Merge: c4412de 230e5a7
+Author: Xia Wang <xiaw@google.com>
+Date:   Mon Oct 11 18:37:44 2010 -0700
+
+    am 230e5a78: Disable response for CMD_UNSOL_CALL_RING in mock ril
+    
+    Merge commit '230e5a78415e41e7e41f087e369a589ca8d9c83e' into gingerbread-plus-aosp
+    
+    * commit '230e5a78415e41e7e41f087e369a589ca8d9c83e':
+      Disable response for CMD_UNSOL_CALL_RING in mock ril
+
+commit 3950abda5d9e0a5b5d7266cf48fcc4e855dbf960
+Merge: 3f6199c c4412de
+Author: Xia Wang <xiaw@google.com>
+Date:   Mon Oct 11 17:41:34 2010 -0700
+
+    am c4412dec: am 2b7b0f7d: Add control commands for Mock Ril
+    
+    Merge commit 'c4412dec705db8db6a580358612ade0c7c3e0203'
+    
+    * commit 'c4412dec705db8db6a580358612ade0c7c3e0203':
+      Add control commands for Mock Ril
+
+commit 230e5a78415e41e7e41f087e369a589ca8d9c83e
+Author: Xia Wang <xiaw@google.com>
+Date:   Mon Oct 11 14:54:05 2010 -0700
+
+    Disable response for CMD_UNSOL_CALL_RING in mock ril
+    
+    change incomingCallIsAnswered -> incomingCallIsProcessed:
+    Stop sending out UNSOL_CALL_RING if the incoming call is answered or hangup.
+    
+    Change-Id: Icccadc1d55e682f0705020d6af580979f200a755
+
+commit 3f6199cc56a22d35d16c256767196a83e8a422ad
+Merge: 58633e1 53d4ce8
+Author: Xia Wang <xiaw@google.com>
+Date:   Sun Oct 10 17:47:06 2010 -0700
+
+    am 53d4ce86: (-s ours) am bf40f252: Add command to start incoming call. DO NOT MERGE
+    
+    Merge commit '53d4ce860eac78385dad5e93aee7770ce0fc418e'
+    
+    * commit '53d4ce860eac78385dad5e93aee7770ce0fc418e':
+      Add command to start incoming call. DO NOT MERGE
+
+commit c4412dec705db8db6a580358612ade0c7c3e0203
+Merge: 53d4ce8 2b7b0f7
+Author: Xia Wang <xiaw@google.com>
+Date:   Sun Oct 10 14:36:56 2010 -0700
+
+    am 2b7b0f7d: Add control commands for Mock Ril
+    
+    Merge commit '2b7b0f7d61dd1ee99722e27b51810fe51de92f0f' into gingerbread-plus-aosp
+    
+    * commit '2b7b0f7d61dd1ee99722e27b51810fe51de92f0f':
+      Add control commands for Mock Ril
+
+commit 2b7b0f7d61dd1ee99722e27b51810fe51de92f0f
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Oct 8 00:35:00 2010 -0700
+
+    Add control commands for Mock Ril
+    
+    - Hangup a call remotely for the given cause.
+    - Set call transition flag
+    - set call to alert
+    - set call to active
+    - add a dialing call (this is for testing purpose
+    
+    Add ril request support: RIL_REQUEST_LAST_CALL_FAIL_CAUSE
+    
+    Change-Id: I56d0a10a7bff31eb11f4f9b64b53acf7931e6cb7
+
+commit 58633e1791606eaa02669f0d2e24c5afd268328f
+Merge: 996f0f2 2932f31
+Author: Wink Saville <wink@google.com>
+Date:   Sun Oct 10 12:55:37 2010 -0700
+
+    am 2932f312: (-s ours) Revert "Add timer delete support to rild" DO NOT MERGE
+    
+    Merge commit '2932f31296822b86ed945e09cadaabf2a453843c'
+    
+    * commit '2932f31296822b86ed945e09cadaabf2a453843c':
+      Revert "Add timer delete support to rild" DO NOT MERGE
+
+commit 996f0f2eba8f251bb76c5c32e885b9c806977de9
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Oct 8 17:57:06 2010 -0700
+
+    Sync with GB change: 72592
+    
+    Add command to start incoming call.
+    
+    Add start incoming call command
+    Add ril request: RIL_REQUEST_ANSWER to mock ril
+    
+    Change-Id: I91b1a4ec81e7bd6fccbd96c4c51c5b8e99a473fd
+
+commit bffcbfe7e31f88961eae070e3c9833d87ccd8a44
+Merge: 66d51de a4f9cab
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Oct 8 14:36:51 2010 -0700
+
+    am a4f9cab8: (-s ours) am 14171dca: Port Mock Ril from master branch to GB. DO NOT MERGE
+    
+    Merge commit 'a4f9cab81d7a97e6489f1a1629d5c40ce6058477'
+    
+    * commit 'a4f9cab81d7a97e6489f1a1629d5c40ce6058477':
+      Port Mock Ril from master branch to GB. DO NOT MERGE
+
+commit 53d4ce860eac78385dad5e93aee7770ce0fc418e
+Merge: 2932f31 bf40f25
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Oct 8 14:14:58 2010 -0700
+
+    am bf40f252: Add command to start incoming call. DO NOT MERGE
+    
+    Merge commit 'bf40f252c66f13c51fb113c343e1728f8a86662a' into gingerbread-plus-aosp
+    
+    * commit 'bf40f252c66f13c51fb113c343e1728f8a86662a':
+      Add command to start incoming call. DO NOT MERGE
+
+commit bf40f252c66f13c51fb113c343e1728f8a86662a
+Author: Xia Wang <xiaw@google.com>
+Date:   Wed Oct 6 18:54:58 2010 -0700
+
+    Add command to start incoming call. DO NOT MERGE
+    
+    Add start incoming call command,
+    add ril request: RIL_REQUEST_ANSWER to Mock Ril
+    Fix: rilRequestHangupWaitingOrBackground should also hang up incoming call
+    
+    Change-Id: I48b8cc98ced2ee5f449d4cc212a9b8e8413b0cff
+
+commit 2932f31296822b86ed945e09cadaabf2a453843c
+Author: Wink Saville <wink@google.com>
+Date:   Thu Oct 7 16:35:15 2010 -0700
+
+    Revert "Add timer delete support to rild" DO NOT MERGE
+    
+    This reverts commit 7edd07c9184a3abfaa3f4a161b74b3da9d7bbd56.
+    We need to revert here as this change is not in Gingerbread
+    or later branches.
+    
+    Change-Id: I1b0d68655e3a91647f455cbc43f421db39f9aa55
+
+commit a4f9cab81d7a97e6489f1a1629d5c40ce6058477
+Merge: 128ef9c 14171dc
+Author: Xia Wang <xiaw@google.com>
+Date:   Thu Oct 7 07:09:28 2010 -0700
+
+    am 14171dca: Port Mock Ril from master branch to GB. DO NOT MERGE
+    
+    Merge commit '14171dca025273fb64b239c1ec86ed7d4b677343' into gingerbread-plus-aosp
+    
+    * commit '14171dca025273fb64b239c1ec86ed7d4b677343':
+      Port Mock Ril from master branch to GB. DO NOT MERGE
+
+commit 14171dca025273fb64b239c1ec86ed7d4b677343
+Author: Xia Wang <xiaw@google.com>
+Date:   Tue Oct 5 19:29:48 2010 -0700
+
+    Port Mock Ril from master branch to GB. DO NOT MERGE
+    
+    - Replace functions in protobuf_v8.cpp, node_buffer.cpp with those in v8 version of GB:
+      replace Object::Get(uint32_t index) with Object::Get(Handle<Value> key)
+      replace As function with Object::Cast();
+    - Modify Android.mk file
+      Add "LOCAL_MODULE_TAGS" for librilproto-java
+      Tag modules as "debug" so that it can be build in userdebug build
+    
+    Change-Id: I1523786a63ef66b263b80e069dfcab865cab348f
+
+commit 66d51de2f22371280020a6057c6d128e3967024a
+Author: Xia Wang <xiaw@google.com>
+Date:   Wed Sep 15 15:55:32 2010 -0700
+
+    Add RIL_REQUEST_SEPARATE_CONNECTION and fix bugs
+    
+    . Fix connection indexing: limit the connection index to [1, 7]
+    . Fix conference call: the maximum number of connections within a call is 5.
+    
+    Change-Id: I261454c5c37b544da3f3d29f96f3f69a11b2a969
+
+commit 915335d27492938c1e875543e70a106369ef2957
+Author: Xia Wang <xiaw@google.com>
+Date:   Tue Sep 14 16:50:24 2010 -0700
+
+    Add RIL_REQUEST_CONFERENCE support to mock ril
+    
+    Change-Id: I91980e8a7cde04dbae8006c892ef85af04dbc7b9
+
+commit 92439d0d731e01a3b80b520ad24ed6f120a9b6d8
+Merge: 755763d 3880c96
+Author: Xia Wang <xiaw@google.com>
+Date:   Tue Sep 14 11:48:35 2010 -0700
+
+    Merge ". Add call hold support in Mock Ril . Fix issue: send unsolicited call state change after RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND,   RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND, and   RIL_REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE return. . Rename command handler to make the name consistent"
+
+commit 3880c967765bfa95cc8340aed1fc598a04fcaca0
+Author: Xia Wang <xiaw@google.com>
+Date:   Sun Sep 12 15:19:02 2010 -0700
+
+    . Add call hold support in Mock Ril
+    . Fix issue: send unsolicited call state change after RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND,
+      RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND, and
+      RIL_REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE return.
+    . Rename command handler to make the name consistent
+    
+    Change-Id: I136c329e8a404e190262871280099c15958b1c9f
+
+commit 755763de25e71fbe0f1c766acedca3784ad5c79e
+Merge: 57ce1f2 5b6f1f5
+Author: Xia Wang <xiaw@google.com>
+Date:   Mon Sep 13 18:42:14 2010 -0700
+
+    Merge "Add MockRil support for: RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND Change calls in mockril so it starts with index "1" (According to GsmCallTracker DriverCall)"
+
+commit 57ce1f2709484ef8911cabe9b5629d0c21557bd4
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Mon Sep 13 12:23:50 2010 -0700
+
+    Fix dispatchDataCall parcel length for v4 RILs.
+    
+    Bug: 2995438
+    Change-Id: I31400ae2a79c3a6e7cb82158ab529dfddbb7144e
+
+commit 5b6f1f5a2feadf7e858191fd18996541b6f99ccc
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Sep 10 18:24:19 2010 -0700
+
+    Add MockRil support for: RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND
+    Change calls in mockril so it starts with index "1" (According to GsmCallTracker DriverCall)
+    
+    Change-Id: I4e693134e6acbea14139f9f654218f0c92a6197e
+
+commit eff44bf50c501d06347c9c4b4144d2131bc8cc73
+Merge: 871f8ef 2640571
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Fri Sep 10 19:00:53 2010 -0700
+
+    Merge "Properly handle version 3 vendor RILs."
+
+commit 2640571b03bb2a95dbab65882bf7fce331d1e894
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Fri Sep 10 18:27:11 2010 -0700
+
+    Properly handle version 3 vendor RILs.
+    
+    Change-Id: I5a876aaebc17287a763eb243e2f2cdaff676c90b
+
+commit 871f8ef96970822bc2d33ef0c5d79a41d669b4e8
+Author: Xia Wang <xiaw@google.com>
+Date:   Thu Sep 9 17:46:54 2010 -0700
+
+    Add icc application status in simulated_icc
+    
+    Change-Id: I926db934a2f09b03df6100dc0fcfbdd4b470ca9a
+
+commit 86d59acd423ed66e4ff570b6469eb53ee8440459
+Author: Xia Wang <xiaw@google.com>
+Date:   Tue Sep 7 15:02:17 2010 -0700
+
+    Add RIL_REQUEST_SET_MUTE
+    Make the change in simulated_icc: pass the correct scope for function call
+    Remove extra space for function declaration in simulated_radio.
+    
+    Change-Id: I408bec6e6866b60e18b8317ff83639c8418184f4
+
+commit 79835c953f457f8471415eeda5f7a8907d723673
+Merge: 6e6f041 4f81dcf
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Wed Sep 8 09:29:59 2010 -0700
+
+    Merge "RIL changes for IPv6 / IPv4v6 data calls."
+
+commit 4f81dcf2a9bc84cbfbb6d3d658c452c22e9b6e83
+Author: Lorenzo Colitti <lorenzo@google.com>
+Date:   Wed Sep 1 19:38:57 2010 -0700
+
+    RIL changes for IPv6 / IPv4v6 data calls.
+    
+    - Add a PDP type parameter to REQUEST_SETUP_DATA_CALL.
+      Make this backwards compatible: if we're called with a PDP type parameter and
+      the RIL doesn't support it, remove the parameter from the request so the RIL
+      never sees it.
+    - Change the description of the address field in the RIL_Data_Call_Response
+      structure and in the response to RIL_REQUEST_SETUP_DATA_CALL from an address
+      to a space-separated list of addresses. This preserves both source and binary
+      compatibility but allows new RILs to return both an IPv4 and an IPv6 address
+      for dual-stack data calls.
+    
+    Change-Id: I0a77fc57c042bedfd18068c7faf7637a46f476d5
+
+commit 6e6f04159f9986f0197828293db3c02c19e227fb
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Sep 3 18:59:40 2010 -0700
+
+    Add ril request support in simulated_radio
+    Fix issue: pass the correct scope for function call in simulated radio
+    
+    Change-Id: Ie926fba2cb17e3ace79f61af3326d31893ffe5f1
+
+commit 6e9b68672783e613607e3f1e7867a4e5b863f344
+Author: Xia Wang <xiaw@google.com>
+Date:   Tue Aug 24 19:37:54 2010 -0700
+
+    Serialize the requests beforing inserting into the queue
+    Use buffer for request queue instead of data
+    Add RIL_REQUEST_DIAL (not in simulated_radio yet)
+    
+    Change-Id: Ibc824f7fb27b8ffea4edb61b0c3b870cb93e6de6
+
+commit bf14edddd5d1c29a046130cea65feab8c6e2e12b
+Author: Xia Wang <xiaw@google.com>
+Date:   Mon Aug 23 10:13:11 2010 -0700
+
+    Add mock ril to send unsolicited signal strength  periodically
+    
+    Issue: simulatedRadio.REQUEST_DELAY_TEST will return undefined.
+    Define REQUEST_DELAY_TEST and REQUEST_UNSOL_SIGNAL_STRENGTH
+    as global vars.
+    
+    Change-Id: I7c0e8714db06a5f242c70a0d5f7302830ef5e19f
+
+commit 65afce60eeaf9ab855d6d1ef262f144e95fb92c4
+Author: Xia Wang <xiaw@google.com>
+Date:   Thu Aug 12 16:13:53 2010 -0700
+
+    Add RIL_REQUEST_SIGNAL_STRENGTH
+    and setSignalStrength in simulated_radio.js
+    
+    Change-Id: I11b63c6b478f9c64620c2142a8161f2a57ab373e
+
+commit 6941405ff0bcfa877450e3d339d1e1466d556b9f
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Aug 13 16:02:46 2010 -0700
+
+    Move setRadioState command to simulated radio
+    Define commands in ril_var.js
+    
+    Change-Id: I1c3133c0d828caae7ffbe52a8915349b94ad3069
+
+commit d9c8c5f4a5fd11c4c13e8e0a23d2aa05e50f2c83
+Author: Wink Saville <wink@google.com>
+Date:   Thu Aug 12 16:34:07 2010 -0700
+
+    Add copying *tests.js to /sdcard/data/
+    
+    Change-Id: I73b86a9a5e28fedd491eec6f095ccd2c56c6d556
+
+commit 90ea368d1d4d489f60b786033fccce472634a977
+Author: Wink Saville <wink@google.com>
+Date:   Thu Aug 12 15:39:10 2010 -0700
+
+    Separate tests from normal code.
+    
+    Change-Id: I07e377bfdf3e04cc76010e1008d74ee2d7753944
+
+commit 67202fdfafe59b76dbfb593beeb2e9a7cd5f5956
+Author: Wink Saville <wink@google.com>
+Date:   Thu Aug 12 14:59:30 2010 -0700
+
+    Add support sending a message after delaying a number of milli-seconds.
+    
+    Added WorkerQueue::AddDelayed and WorkerV8#AddDelayed, which is visible
+    as addDelayed to javascript.
+    
+    Change-Id: I1e8306f2dd25d8782a9d374ed08aff063dc1f654
+
+commit e17995518741afea85856fc9a6460b38f4a1634d
+Merge: 9b92c6b 3e2cde5
+Author: Xia Wang <xiaw@google.com>
+Date:   Wed Aug 11 10:23:46 2010 -0700
+
+    Merge "Change varilables in ril_vars.js to be consistent in ril.proto Add setRadioState command to control server"
+
+commit 9b92c6b4651e608125a48f8f06a7a840042e090d
+Author: Wink Saville <wink@google.com>
+Date:   Wed Aug 11 07:18:24 2010 -0700
+
+    Change handling of bad enum values.
+    
+    Now the protobuf_v8 code will throw an exception which
+    may cause a crash but enough information is printed
+    to diagnose the problem.
+    
+    Change-Id: I4bdf0cd1c5ec350207ec5abc90502bbc240cb4ac
+
+commit 3e2cde5f8faae26089e7ce88ea8b504e5c1ef6d4
+Author: Xia Wang <xiaw@google.com>
+Date:   Mon Aug 9 15:02:42 2010 -0700
+
+    Change varilables in ril_vars.js to be consistent in ril.proto
+    Add setRadioState command to control server
+    
+    Change-Id: I39df3a0405872cc7f2d3fdc4d93a2c80797c14c1
+
+commit 34458664a716e42d9fd6ed1cf09f4a3abe83f7af
+Merge: 439ad18 0773075
+Author: Wink Saville <wink@google.com>
+Date:   Mon Aug 9 12:22:47 2010 -0700
+
+    Merge "Add RIL_REQUEST_GET_CURRENT_CALLS to mock-ril"
+
+commit 0773075fe2107ce33d751874f81d46826773458e
+Author: Wink Saville <wink@google.com>
+Date:   Fri Aug 6 21:44:53 2010 -0700
+
+    Add RIL_REQUEST_GET_CURRENT_CALLS to mock-ril
+    
+    Change-Id: Idfafdb5b404f2c4daeef66e38192266afaad31b8
+
+commit 439ad18f5ae6a8ba0095ec299e57f1ae2ee877c4
+Merge: a1e3f27 128ef9c
+Author: jsh <jsh@google.com>
+Date:   Thu Aug 5 11:46:15 2010 -0700
+
+    am 128ef9cb: am f44700c4: Support for fetching PSC of serving cell.
+    
+    Merge commit '128ef9cba5b604d9cbc7b77a0588e7c6d73cb22d'
+    
+    * commit '128ef9cba5b604d9cbc7b77a0588e7c6d73cb22d':
+      Support for fetching PSC of serving cell.
+
+commit 128ef9cba5b604d9cbc7b77a0588e7c6d73cb22d
+Merge: 2e97706 f44700c
+Author: jsh <jsh@google.com>
+Date:   Wed Aug 4 14:33:42 2010 -0700
+
+    am f44700c4: Support for fetching PSC of serving cell.
+    
+    Merge commit 'f44700c40c612f73b7ef3264828efb8923906f8a' into gingerbread-plus-aosp
+    
+    * commit 'f44700c40c612f73b7ef3264828efb8923906f8a':
+      Support for fetching PSC of serving cell.
+
+commit a1e3f27cee3a775c997d43420399b19991f5bca0
+Author: Wink Saville <wink@google.com>
+Date:   Wed Aug 4 06:49:23 2010 -0700
+
+    cleanup mock-ril.
+    
+    Remove old generated code and change Android.mk to not use
+    the old generated code.
+    
+    Make enum RADIO_STATE_XXX more consistent with other enum
+    naming and name it RADIOSTATE_XXX.
+    
+    Add the ril.h command numbers to the comments in ril.proto.
+    
+    Change Request in mock_ril.js to use this instead of making a new object.
+    
+    Regenerate the proto output files.
+    
+    Change-Id: I077cd8c7168cf779ab76d9eef1fdf46beca898bc
+
+commit a48cd1300bbbba382514b8592fc8416160e491d7
+Author: Wink Saville <wink@google.com>
+Date:   Tue Aug 3 16:35:34 2010 -0700
+
+    Add RIL_REQUEST_GET_IMSI to mock_ril.
+    
+    Also, fix indentation issue and ignore vim ".swp" files.
+    
+    Change-Id: I3d87bc8d0ddfa44afeadaf7d7276ab4860ee0955
+
+commit 0618c21c36e68797e9f4250c1f57410134cd4439
+Author: Wink Saville <wink@google.com>
+Date:   Tue Aug 3 15:11:55 2010 -0700
+
+    Add RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC.
+    
+    Change-Id: Idccf3d9a63eb828b75f98d8806c054fa506ccea5
+
+commit f44700c40c612f73b7ef3264828efb8923906f8a
+Author: jsh <jsh@google.com>
+Date:   Wed Jun 23 21:53:24 2010 -0700
+
+    Support for fetching PSC of serving cell.
+    
+    Instead of adding a new RIL command, just extend RIL_REQUEST_REGISTRATION_STATE.
+    
+    Bug: 2465036
+    Change-Id: I8f42bb8da65ec7d2f7627b14d7506c38b71ad83d
+
+commit 50eeaadcc6ca7a216dec62062dc3a90530fe176c
+Merge: 4c72a99 1d471c1
+Author: Wink Saville <wink@google.com>
+Date:   Sat Jul 31 06:58:12 2010 -0700
+
+    Merge "Add rilRequestGetImei and rilRequestGetImeisv."
+
+commit 4c72a99b9b8849be391b62d6ba913a3d567707eb
+Merge: faa5301 2e97706
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Jul 30 13:48:08 2010 -0700
+
+    am 2e977068: (-s ours) am 060f053e: DO NOT MERGE
+    
+    Merge commit '2e977068a167ea597b6514501d2221c5a4e22574'
+    
+    * commit '2e977068a167ea597b6514501d2221c5a4e22574':
+      DO NOT MERGE
+
+commit 2e977068a167ea597b6514501d2221c5a4e22574
+Merge: 678966d 060f053
+Author: Xia Wang <xiaw@google.com>
+Date:   Fri Jul 30 13:46:14 2010 -0700
+
+    am 060f053e: DO NOT MERGE
+    
+    Merge commit '060f053e816137fb4f5e03c15b5122c92219ed52' into gingerbread-plus-aosp
+    
+    * commit '060f053e816137fb4f5e03c15b5122c92219ed52':
+      DO NOT MERGE
+
+commit 1d471c1a2257ac6db6504ad00d52732d3e7bfca1
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jul 29 21:28:52 2010 -0700
+
+    Add rilRequestGetImei and rilRequestGetImeisv.
+    
+    Also, moved the mock_ril.js dispatchTable to the bottom of the file to
+    make it easier to edit.
+    
+    Change-Id: Ib636975d02cdd92d77b9a0c36912d2ff6947d833
+
+commit 060f053e816137fb4f5e03c15b5122c92219ed52
+Author: Xia Wang <xiaw@google.com>
+Date:   Tue Jul 27 17:26:55 2010 -0700
+
+    DO NOT MERGE
+    
+    Fix index error in the radiooptions enable/disable QXDM Log
+    
+    Change-Id: I6118742f76f6c90d47a9512c48ae2bacb03f93e9
+
+commit faa530146be1fd6de3cbeba7d60d88fc451de3f3
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jul 29 16:59:50 2010 -0700
+
+    Add rilRequestBaseBandVersion, RspString and cleaned up some debug output.
+    
+    Also missed reordering in SimulatedRadio and SimulatedIcc in the previous
+    change so did that in this change.
+    
+    Change-Id: I18c51a5ac175166301df97ef7517b8a706140754
+
+commit fea7c0f67ff6d6938c67f2cc10f591a150119439
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jul 29 15:56:08 2010 -0700
+
+    Reorder dispatch tables to be numeric.
+    
+    Change-Id: I0c79797bf997e33adde4383496102e7ccbee2ab4
+
+commit 311475aeb4f37eb50445d3a6ed04094a10fffe99
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jul 29 15:18:58 2010 -0700
+
+    Rename the global state varaibles to "gXxxx"
+    
+    Change-Id: I0aa8b4104750dc15bafd1f959f927cc84d826ce9
+
+commit 52bb1fc4e99ae01d7be7ce1bec6c890ba3f4ebe9
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jul 28 16:44:10 2010 -0700
+
+    Reorganize files.
+    
+    Separate generated from normal files and segrate the normal
+    files by their type.
+    
+    Change-Id: I9c50b18e07f599fd32c61ae5610499ef94f999d3
+
+commit 28fea8b8f2c67ec34c6020cf8129d0c34318207b
+Merge: d855ef4 a6b6baf
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jul 28 15:40:44 2010 -0700
+
+    Merge "Refactor mock-ril and some renaming in responses and requests."
+
+commit a6b6baf518c8814cfae9841f352503ce045eb3ed
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jul 28 14:40:48 2010 -0700
+
+    Refactor mock-ril and some renaming in responses and requests.
+    
+    Also support for several more requests/responses.
+    
+    Change-Id: If165745d86d979820fff888e2594200cdf78ba77
+
+commit d855ef4370e1185d79ecb3fb3434c9b5f84d15bd
+Author: Xia Wang <xiaw@google.com>
+Date:   Tue Jul 27 17:26:55 2010 -0700
+
+    Fix index error in the radiooptions enable/disable QXDM Log
+    
+    Change-Id: I7eb2ac166ccee106751ba5cdb6400e37e8750063
+
+commit 1d4c8a2492e3ecbe1585ebe2faca0c2e2254e3da
+Author: Wink Saville <wink@google.com>
+Date:   Tue Jul 27 09:29:33 2010 -0700
+
+    Always make librilproto-java.
+    
+    Second attempt to fix the sim-eng build.
+    
+    Change-Id: I968e30aeaef02a23a3c9509d01c450277feb0fa9
+
+commit b4e463df9529b545a792f5fffac068dd6c2314c8
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jul 26 23:22:15 2010 -0700
+
+    Try to fix sim-eng build.
+    
+    We need to build librilproto-java as its needed for framework telephony tests.
+    
+    Change-Id: Ief91b689098b49c30178e340fcfc7b8e7e41eac8
+
+commit 2cfb450e1a044b928917b2e40ec90ab03d66b12b
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jul 26 17:00:34 2010 -0700
+
+    Add a java library and change so the message header is a protobuf.
+    
+    Change-Id: Ie41b671089dce1081b2e535351d15aed7af2382f
+
+commit d0b7b490fa705bf11f682033bf58a6060c8b482f
+Merge: f838ede 3d6d348
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jul 19 22:54:36 2010 -0700
+
+    Merge "Create a very initial mock_ril.js and supporting code."
+
+commit 3d6d348df5378b3f3f79ebbfad21d86ae1c9f239
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jul 19 20:37:44 2010 -0700
+
+    Create a very initial mock_ril.js and supporting code.
+    
+    Change-Id: I742c413f33d99e8fe8e5a320dab067174b560e98
+
+commit f838ede4a7c8b5994a84b92de8c2bcb346379be4
+Author: Robert Greenwalt <robdroid@android.com>
+Date:   Thu Jul 15 18:54:53 2010 -0700
+
+    Fix reference ril to pass correct interface name
+    
+    Restores connectivity to emulator.
+    
+    Change-Id: I95e2026b16c78ebf70f5fd22ff2554751f90f0c9
+
+commit 985f527de71573b7ffb610b87e42f04704da3a79
+Merge: 0d9f0c0 678966d
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Wed Jul 14 11:41:04 2010 -0700
+
+    am 678966d7: merge from open-source froyo
+    
+    Merge commit '678966d7694d0c69c933bc7ff14886012358c200'
+    
+    * commit '678966d7694d0c69c933bc7ff14886012358c200':
+      Keep also the CAP_NET_RAW capability
+
+commit 678966d7694d0c69c933bc7ff14886012358c200
+Merge: 9a2f511 c45f467
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Wed Jul 14 11:38:12 2010 -0700
+
+    merge from open-source froyo
+    
+    Change-Id: If4c03c5f5492deb0c99925e8097a8670061a3a2e
+
+commit c45f4678481f1f38c969989cebbd4c3bd25d6667
+Author: Pal Szasz <pal.szasz@sonyericsson.com>
+Date:   Thu Apr 8 09:24:09 2010 +0200
+
+    Keep also the CAP_NET_RAW capability
+    
+    This capability is used to open a packet connection, needed by
+    do_dhcp -> dhcp_init_ifc -> open_raw_socket in libnetutils.
+    
+    Change-Id: Ib9fcabccea0bef551f93edf6d7f58f31ca748763
+
+commit 0d9f0c0ea45a0239653e04f2c63ccecb1bc62c6b
+Author: Dianne Hackborn <hackbod@google.com>
+Date:   Fri Jun 25 16:50:46 2010 -0700
+
+    Revert "am 9a2f5113: merge from open-source master"
+    
+    This reverts commit bb1375f6bdc6cf7d8c3642367cf35565ddb094a8, reversing
+    changes made to ca5e347ce4b2b51385c4b7395d51c30498c41a6b.
+
+commit bb1375f6bdc6cf7d8c3642367cf35565ddb094a8
+Merge: ca5e347 9a2f511
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Jun 25 14:21:13 2010 -0700
+
+    am 9a2f5113: merge from open-source master
+    
+    Merge commit '9a2f5113fd1db1e1605daad47b16b6f960045582'
+    
+    * commit '9a2f5113fd1db1e1605daad47b16b6f960045582':
+      Add timer delete support to rild
+
+commit ca5e347ce4b2b51385c4b7395d51c30498c41a6b
+Author: jsh <jsh@google.com>
+Date:   Wed Jun 23 21:53:24 2010 -0700
+
+    Support for fetching PSC of serving cell.
+    
+    Instead of adding a new RIL command, just extend RIL_REQUEST_REGISTRATION_STATE.
+    
+    Bug: 2465036
+    Change-Id: I36c3a7b730cace66621fc513773ec97c453ea619
+
+commit 563fd7207da27322bf3f3587ef6000a944a617b7
+Author: jsh <jsh@google.com>
+Date:   Tue Jun 8 16:52:24 2010 -0700
+
+    New RIL command to fetch PSC of current serving cell.
+    
+    Bug: 2465036
+    Change-Id: Iccd177747bb78e2cd5ec6d9d22e47aa0e7bfd64b
+
+commit 9a2f5113fd1db1e1605daad47b16b6f960045582
+Merge: dc50453 7edd07c
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Jun 22 14:18:59 2010 -0700
+
+    merge from open-source master
+    
+    Change-Id: I0628d21b4bf629896dad7b9b5b6a9357021e1278
+
+commit 7edd07c9184a3abfaa3f4a161b74b3da9d7bbd56
+Author: Naveen Kalla <nkalla@codeaurora.org>
+Date:   Mon Jun 21 18:54:47 2010 -0700
+
+    Add timer delete support to rild
+    
+    Change-Id: Ia862f4cac116bf1ee98788c004860cdb2c70f356
+
+commit dac2e4af74a75d16cc06757637f381a078f34111
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jun 17 21:23:21 2010 -0700
+
+    Handle the RIL_REQUEST_SCREEN_STATE using v8 object wrapping.
+    
+    Change-Id: Idc03583a88116aea2a7f71ac70c2da9136f03eee
+
+commit 9bc3e60491a0f7f66ceccd76bf634f42f02d6515
+Author: Wink Saville <wink@google.com>
+Date:   Wed Jun 16 15:33:54 2010 -0700
+
+    Test how to send a "request" to JS and "print" messages to Android log.
+    
+    Change-Id: Icf56b12c998096c1574c55cdd5bba17b369920a1
+
+commit eab8da37163e95e33f62c7d8dc2987f5ee202994
+Merge: a166472 dc50453
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Mon Jun 14 11:43:28 2010 -0700
+
+    am dc504536: merge from open-source master
+    
+    Merge commit 'dc5045360b73de2f4ebba0e212b426e31e59ec06'
+    
+    * commit 'dc5045360b73de2f4ebba0e212b426e31e59ec06':
+      Fix data type of RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS
+
+commit a1664721443e2f8f29f99d830447297b88c442fc
+Author: Wink Saville <wink@google.com>
+Date:   Fri Jun 11 15:45:56 2010 -0700
+
+    Make mock-ril optional and remove reference-cdma-sms.
+    
+    mock-ril is for testing and should not be included
+    by default on devices.
+    
+    reference-cdma-sms is vistigual and is not nor ever was used.
+    
+    Change-Id: I38707499685f62f3413f817635c0b6f3bdcaab02
+
+commit 841eabadb67a1d178fe47886ab2d358edb1d2656
+Author: Andy McFadden <fadden@android.com>
+Date:   Fri Jun 11 10:57:38 2010 -0700
+
+    Fix the x86 build.
+    
+    We're not currently building V8 for x86, and mock-ril was changed to
+    depend on it.  This updates the makefile to skip building mock-ril on
+    non-ARM builds (e.g. sim-eng).
+    
+    Change-Id: I50e1b6859d4d221316c87c2fdd5cb4d29fa5afbf
+
+commit 16c00522e27da0cfcbc4d926900e534e1583168f
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jun 10 14:28:15 2010 -0700
+
+    Add testV8.
+    
+    Change-Id: I26ec3bc964c523fe6f855e8fe3d436064acfb27a
+
+commit dc5045360b73de2f4ebba0e212b426e31e59ec06
+Merge: ed9d64a 6152f97
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Thu Jun 10 08:50:03 2010 -0700
+
+    merge from open-source master
+    
+    Change-Id: Ide06923b072534e0a21dcee54adbdbce92b71a8e
+
+commit 2db099fd7df0a37684b21a686cf2b2b6133d17a5
+Author: Kenny Root <kroot@google.com>
+Date:   Fri Jun 4 09:40:50 2010 -0700
+
+    Skip stlport for simulator
+    
+    The host's stl library conflicts with stlport, so we need to exclude
+    stlport from inclusion in the build if we're targeting the simulator.
+    
+    Change-Id: Idde6453687870a4e361d6a537482fe09dc2fdb47
+
+commit 934c2e281fb297e3b6b9cfa588d308f2171fc178
+Author: Wink Saville <wink@google.com>
+Date:   Thu Jun 3 15:39:13 2010 -0700
+
+    Add trivial tests of STLport and protobuf.
+    
+    Change-Id: Iff79fbb12bdaf9da397734ac732690536e207638
+
+commit c651f248bdfd0113b7b261582e8dcc8224b692e8
+Author: Wink Saville <wink@google.com>
+Date:   Fri May 28 17:52:55 2010 -0700
+
+    A minimal ril.
+    
+    This ril loads properly but most methods are just stubs return errors.
+    
+    Change-Id: Ie98e5ade9ae67956ab94efbcdc3b441818ef7354
+
+commit ed9d64aa98ec5c8654abf0e3decfc1706539170c
+Merge: 76e1a7b bdbc6b0
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Wed May 12 09:31:55 2010 -0700
+
+    merge from open-source master
+    
+    Change-Id: I7ce5870268166dffb6fabffb45b325b57dbe6ef0
+
+commit 6152f97ae4af620ed3d63826b4a8062358e564f6
+Author: Henrik Hall <henrik.hall@sonyericsson.com>
+Date:   Wed Feb 24 12:53:13 2010 +0100
+
+    Fix data type of RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS
+    
+    Fixing incorrect data type of RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS
+    in Android RIL.
+    
+    The Android RIL specifies that the unsolicited response signal
+    RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS should contain a raw byte array
+    (ril.h). However, in the implementation of the Java RIL and the C++
+    RIL daemon, the data is unpacked as a string. This causes data
+    delivered from the network stack to be garbled.
+    
+    Changing so that both the C++ RIL deamon in platform/hardware/ril and
+    the Java RIL in frameworks/base follows the specification.
+    
+    Change-Id: Ifa1b9907934256a46cba2b77a560873199e761dd
+
+commit bdbc6b00454c6d634746578bd851cc33cdfe5318
+Author: Naveen Kalla <nkalla@codeaurora.org>
+Date:   Wed Apr 21 11:10:08 2010 -0700
+
+    Add support for EVDO rev B
+    
+    Change-Id: Id81d062e1108c00121cb06d70eef1af9c57a25b7
+
+commit 1b3a6fe083ff049db50c3e6612ba6ccd9062326a
+Author: Naveen Kalla <nkalla@codeaurora.org>
+Date:   Wed Apr 21 16:44:37 2010 -0700
+
+    Notify user regarding invalid number during MO call.
+    
+    When user dials an invalid number, network returns a failure
+    as "unobtainable number" (See the Table 10.5.123/3GPP TS 24.008 for
+    the possible failure causes). Changes done to display message to
+    indicate user that an invalid number has been dialed.
+    
+    Change-Id: Ibe191991ee6f24dd683dca47f6af54e400ef17df
+
+commit 76e1a7bfbf7317789e49721abf1b37eded14208b
+Author: Dan Bornstein <danfuzz@android.com>
+Date:   Thu May 6 14:41:14 2010 -0700
+
+    For issue #2651381, allow library prelinking.
+    
+    Change-Id: I38bf6d01992aeb64d18551824fc834ffb43e297f
+
+commit 7553447d44bb3f494b00d573215d81398f61cfcd
+Author: John Wang <johnwang@google.com>
+Date:   Tue Apr 20 15:11:42 2010 -0700
+
+    Add RIL_E_ILLEGAL_SIM_OR_ME error code.
+    
+    It is for bug 2571583 to provide better failure information of network operator selection.
+    
+    Basically, network selection should return RIL_E_ILLEGAL_SIM_OR_ME when the failure is
+    permanent and don't need retry, such as illegal SIM, ME,  HRL config, etc.
+    
+    Change-Id: Idd5337423a3772febfcfe68b4a87eb3cf5a4696e
+
+commit 3a4840bea36ce53bc0fb181811ebf9d1cd0aa261
+Author: Wink Saville <wink@google.com>
+Date:   Wed Apr 7 13:29:58 2010 -0700
+
+    Remove STOP SHIP logs and comments from ril.cpp.
+    
+    bug: 2577644
+    Change-Id: I7021a12950b4a562c88c393ae75ad2394df3d655
+
+commit bd4b12efb8c4aff0fcd4f2908e5b4baef5054ad1
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Mon Mar 8 18:04:54 2010 -0800
+
+    Add an empty CleanSpec.mk
+    
+    Change-Id: Ia3388aad9c264d9cb2d6ade6e2800290f68d6dd4
+
+commit e65672b7c7bd6fd371bfc58536ae97a519717caf
+Merge: 3475b8a 64f6d1f
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Feb 5 14:20:15 2010 -0800
+
+    am 64f6d1f2: am 358c03ff: reconcile main tree with open-source eclair
+    
+    Merge commit '64f6d1f2ee0563cb8cffaf3ceeeab7393538cf31'
+    
+    * commit '64f6d1f2ee0563cb8cffaf3ceeeab7393538cf31':
+      android-2.1_r1 snapshot
+
+commit 64f6d1f2ee0563cb8cffaf3ceeeab7393538cf31
+Merge: 2a7411d 358c03f
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Feb 5 08:47:17 2010 -0800
+
+    am 358c03ff: reconcile main tree with open-source eclair
+    
+    Merge commit '358c03ff70ce697f4b6d57cc048c0c37b5feb3b8' into eclair-plus-aosp
+    
+    * commit '358c03ff70ce697f4b6d57cc048c0c37b5feb3b8':
+      android-2.1_r1 snapshot
+
+commit 358c03ff70ce697f4b6d57cc048c0c37b5feb3b8
+Merge: 5909cf8 2c21e09
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Feb 5 08:09:38 2010 -0800
+
+    reconcile main tree with open-source eclair
+
+commit 3475b8a74bf3d1e94688604326d5dd0f6d441852
+Merge: b8ee550 2a7411d
+Author: John Wang <johnwang@google.com>
+Date:   Fri Jan 29 20:11:50 2010 -0800
+
+    am 2a7411dc: am 5909cf83: Add RIL_UNSOL_RESEND_INCALL_MUTE.
+    
+    Merge commit '2a7411dc92f15111e36f72214216f96aab2c51f9'
+    
+    * commit '2a7411dc92f15111e36f72214216f96aab2c51f9':
+      Add RIL_UNSOL_RESEND_INCALL_MUTE.
+
+commit 2a7411dc92f15111e36f72214216f96aab2c51f9
+Merge: 8189813 5909cf8
+Author: John Wang <johnwang@google.com>
+Date:   Fri Jan 29 20:08:37 2010 -0800
+
+    am 5909cf83: Add RIL_UNSOL_RESEND_INCALL_MUTE.
+    
+    Merge commit '5909cf831f0d687e93164daaecc43a2ff792cc3a' into eclair-plus-aosp
+    
+    * commit '5909cf831f0d687e93164daaecc43a2ff792cc3a':
+      Add RIL_UNSOL_RESEND_INCALL_MUTE.
+
+commit 5909cf831f0d687e93164daaecc43a2ff792cc3a
+Author: John Wang <johnwang@google.com>
+Date:   Fri Jan 29 00:18:54 2010 -0800
+
+    Add RIL_UNSOL_RESEND_INCALL_MUTE.
+    
+    For bug 2400052.
+    
+    Notification requires user resend mute/unmute to get uplink audio in a call.
+
+commit 2c21e09266e5fa26061879918c877cb107ab9701
+Merge: 36b721c 001abad
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Jan 29 14:09:19 2010 -0800
+
+    reconcile android-2.1_r1 snapshot
+
+commit b8ee55034abce259759c62c8c3c826cac392474b
+Merge: 7bce082 8189813
+Author: John Wang <johnwang@google.com>
+Date:   Thu Jan 28 10:08:33 2010 -0800
+
+    am 81898138: am 7f8ded1d: Comments on the extension of registration status.
+    
+    Merge commit '818981384d43f849264d92b23534a989924604f1'
+    
+    * commit '818981384d43f849264d92b23534a989924604f1':
+      Comments on the extension of registration status.
+
+commit 818981384d43f849264d92b23534a989924604f1
+Merge: 2962397 7f8ded1
+Author: John Wang <johnwang@google.com>
+Date:   Fri Jan 22 10:24:31 2010 -0800
+
+    am 7f8ded1d: Comments on the extension of registration status.
+    
+    Merge commit '7f8ded1d8a337b6860dd7329b8a1be0ade4ea290' into eclair-plus-aosp
+    
+    * commit '7f8ded1d8a337b6860dd7329b8a1be0ade4ea290':
+      Comments on the extension of registration status.
+
+commit 7f8ded1d8a337b6860dd7329b8a1be0ade4ea290
+Author: John Wang <johnwang@google.com>
+Date:   Thu Jan 21 15:07:28 2010 -0800
+
+    Comments on the extension of registration status.
+    
+    Add status 10, 12, 13 and 14 to distinguish emergency calls only status from status 0, 2, 3 and 4.
+    
+    This feature will only be enabled in case setting "ro.ril.emc.mode"=2 in system property.
+
+commit 001abad3cd4948e4dc1fe77e906329c57ee0aeb7
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Jan 12 15:19:05 2010 -0800
+
+    android-2.1_r1 snapshot
+
+commit 7bce082edcee07339ebb06a35970b4b218ab8288
+Author: Wink Saville <wink@google.com>
+Date:   Fri Jan 8 15:20:12 2010 -0800
+
+    Fix bug 2353510 "Sholes can't make a call from device".
+    
+    Some new code in ril.cpp to handle both old and new rils
+    needed some tweaking so the new and old size was used.
+    
+    bug: 2353510
+
+commit dac5d5a630907424a999459cbd2c93069cdcfe84
+Author: Wink Saville <wink@google.com>
+Date:   Wed Dec 23 17:09:32 2009 -0800
+
+    Fix build.
+    
+    Change-Id: I2b28f321e48865212c3b970e61a86b578d71e89f
+
+commit 74fa38884320698c1623764850e3131b9769dff0
+Author: Wink Saville <wink@google.com>
+Date:   Tue Dec 22 15:35:41 2009 -0800
+
+    ril interface: Add support for User-User Signaling Information during call setup
+    
+    Define the UUS data structures and add a pointer to it in RIL_Call for
+    MT Calls and RIL_Dial for MO calls. UUS information can be used to pass
+    the skypeId on some networks. Make the corresponding changes to
+    serialize and deserialize the data at the RIL interface.
+    
+    Change-Id: Ibbd471cd062910fd4c365f76e809cfb224bd34a2
+
+commit 8ebaff8bec727eab4cdc2ae3090dde9465a16081
+Merge: e805c88 94ba73d
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Sun Nov 15 15:08:03 2009 -0800
+
+    am 94ba73d4: merge from open-source master
+    
+    Merge commit '94ba73d416d5a6f077c9abba4fefa0539a23701a'
+    
+    * commit '94ba73d416d5a6f077c9abba4fefa0539a23701a':
+      eclair snapshot
+
+commit 94ba73d416d5a6f077c9abba4fefa0539a23701a
+Merge: d14d79b 2962397
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Sun Nov 15 14:55:21 2009 -0800
+
+    merge from open-source master
+
+commit 2962397a2bb8fa6bfd96f90a4ca3fb402daab2b9
+Merge: 09aa7d1 6f7b5f0
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Sun Nov 15 14:06:34 2009 -0800
+
+    merge from open-source master
+    
+    Merge commit 'goog/stage-korg-master' into HEAD
+
+commit 6f7b5f043964d9ac9ee4e65ae7b7aaf47e57a87d
+Merge: 67121e0 de2c533
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Sun Nov 15 12:06:41 2009 -0800
+
+    merge from eclair
+
+commit de2c533f7252f15a5b9b056a7de380d4f23b987a
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Thu Nov 12 18:46:07 2009 -0800
+
+    eclair snapshot
+
+commit e805c88367ff1aeba9efae3d7fb9fc818f26a7a9
+Merge: 1371755 d14d79b
+Author: Naveen Kalla <nkalla@quicinc.com>
+Date:   Thu Oct 22 11:15:04 2009 -0700
+
+    am d14d79bc: am 36b721c2: ril.h: Change latitude-longitude fields to be compliant with 3GPP2 spec.
+    
+    Merge commit 'd14d79bc5079f898a7f3c0a9096da949e4115e19'
+    
+    * commit 'd14d79bc5079f898a7f3c0a9096da949e4115e19':
+      ril.h: Change latitude-longitude fields to be compliant with 3GPP2 spec.
+
+commit 09aa7d1ed20ae8697a36f9cf11e4e86e32dfee19
+Merge: d8a77cb 36b721c
+Author: Naveen Kalla <nkalla@quicinc.com>
+Date:   Thu Oct 22 11:12:40 2009 -0700
+
+    am 36b721c2: ril.h: Change latitude-longitude fields to be compliant with 3GPP2 spec.
+    
+    Merge commit '36b721c2fcbc98885a4ccd04ddf50dd690142d5e' into eclair-plus-aosp
+    
+    * commit '36b721c2fcbc98885a4ccd04ddf50dd690142d5e':
+      ril.h: Change latitude-longitude fields to be compliant with 3GPP2 spec.
+
+commit d14d79bc5079f898a7f3c0a9096da949e4115e19
+Merge: d8a77cb 36b721c
+Author: Naveen Kalla <nkalla@quicinc.com>
+Date:   Thu Oct 22 11:02:05 2009 -0700
+
+    am 36b721c2: ril.h: Change latitude-longitude fields to be compliant with 3GPP2 spec.
+    
+    Merge commit '36b721c2fcbc98885a4ccd04ddf50dd690142d5e' into eclair-mr2-plus-aosp
+    
+    * commit '36b721c2fcbc98885a4ccd04ddf50dd690142d5e':
+      ril.h: Change latitude-longitude fields to be compliant with 3GPP2 spec.
+
+commit 36b721c2fcbc98885a4ccd04ddf50dd690142d5e
+Author: Naveen Kalla <nkalla@quicinc.com>
+Date:   Tue Oct 13 18:29:41 2009 -0700
+
+    ril.h: Change latitude-longitude fields to be compliant with 3GPP2 spec.
+    
+    Base Station Latitude and Longitude values in the response to the
+    RIL_REQUEST_REGISTRATION_STATE message need to be changed from
+    hexadecimal values to decimal values compliant with the 3GPP2 C.S0005-A
+    specification.
+    
+    Bug: 2201613
+    Change-Id: I2591f43bf78b861cf5cadd1eb66866bcf6605a29
+
+commit 1371755ff9165d109138ba795aa24f64f10ae881
+Author: Doug Kwan <dougkwan@google.com>
+Date:   Tue Oct 6 16:24:51 2009 -0700
+
+    Add back a missing shared library used by rild to linker command line.  Currently this works because the library is linked via dependency of another shared library used by
+    rild.  This is fragile and not the right thing to do.  The library is used only for
+    ARM so also need to check the target.
+
+commit 05a10dd9667c7c3f775e1b63334bc6c644e5ca9a
+Author: Doug Kwan <dougkwan@google.com>
+Date:   Mon Oct 5 17:14:19 2009 -0700
+
+    Revert "Add missing shared library used by executable in linker command.  This execute"
+    
+    This reverts commit c1550f00857c0770e188566c567c11633077435b.
+
+commit c1550f00857c0770e188566c567c11633077435b
+Author: Doug Kwan <dougkwan@google.com>
+Date:   Fri Oct 2 15:13:33 2009 -0700
+
+    Add missing shared library used by executable in linker command.  This execute
+    contains call to a shared library without explicitly linking it.  Currently this
+    works because the library is linked via dependency of another shared library
+    used by the executable.  This is fragile and not the right thing to do.
+
+commit d8a77cbe18b2f498dbcd2b8c0faea1b2abd172fb
+Merge: 9f88d10 4326561
+Author: jsh <jsh@google.com>
+Date:   Wed Sep 30 21:14:32 2009 -0700
+
+    am 43265610: Update description for RIL_REQUEST_SET_LOCATION_UPDATES to include CDMA.
+    
+    Merge commit '432656105ccc2f4f891fbe8fb5b636f2428f1f4e' into eclair-plus-aosp
+    
+    * commit '432656105ccc2f4f891fbe8fb5b636f2428f1f4e':
+      Update description for RIL_REQUEST_SET_LOCATION_UPDATES to include CDMA.
+
+commit 432656105ccc2f4f891fbe8fb5b636f2428f1f4e
+Author: jsh <jsh@google.com>
+Date:   Tue Sep 29 17:46:11 2009 -0700
+
+    Update description for RIL_REQUEST_SET_LOCATION_UPDATES to include CDMA.
+
+commit 9f88d10357a6a52970843a58c566be3ad0028294
+Merge: 66fdf45 03c1edf
+Author: Naveen Kalla <nkalla@quicinc.com>
+Date:   Tue Sep 29 15:54:25 2009 -0700
+
+    am 03c1edf2: ril.h: Add a failure cause for CDMA call failures, rename RIL_REQUEST_CDMA_VALIDATE_AKEY and minor clarifications in the interface definitions.
+    
+    Merge commit '03c1edf23e76a83b95ac6847e333cb1329bbfa1d' into eclair-plus-aosp
+    
+    * commit '03c1edf23e76a83b95ac6847e333cb1329bbfa1d':
+      ril.h: Add a failure cause for CDMA call failures, rename
+
+commit 03c1edf23e76a83b95ac6847e333cb1329bbfa1d
+Author: Naveen Kalla <nkalla@quicinc.com>
+Date:   Wed Sep 23 11:18:35 2009 -0700
+
+    ril.h: Add a failure cause for CDMA call failures, rename
+    RIL_REQUEST_CDMA_VALIDATE_AKEY and minor clarifications
+    in the interface definitions.
+    
+    Add failure cause for CDMA call failures due to access blocked by the
+    network. Specify the fields in RIL_REQUEST_REGISTRATION_STATE response
+    that are applicable to EVDO. Rename RIL_REQUEST_CDMA_VALIDATE_AKEY to
+    RIL_REQUEST_VALIDATE_AND_WRITE_AKEY. Elaborate the meaning of Akey in the
+    RIL_REQUEST_CDMA_VALIDATE_AND_WRITE_AKEY message.
+
+commit 66fdf452b632bc88e312919de43f7587ce1e68a4
+Merge: 24b3038 5d621da
+Author: John Wang <johnwang@google.com>
+Date:   Sun Sep 20 13:57:25 2009 -0700
+
+    am 5d621da5: Add UNSOL_CALL_RINGBACK_TONE to ril.
+    
+    Merge commit '5d621da539abea83309d77317ede40126f47d5f0' into eclair-plus-aosp
+    
+    * commit '5d621da539abea83309d77317ede40126f47d5f0':
+      Add UNSOL_CALL_RINGBACK_TONE to ril.
+
+commit 5d621da539abea83309d77317ede40126f47d5f0
+Author: John Wang <johnwang@google.com>
+Date:   Fri Sep 18 17:17:48 2009 -0700
+
+    Add UNSOL_CALL_RINGBACK_TONE to ril.
+    
+    Some networks may not play ring back tone, RIL will send UNSOL ringback notification.
+    
+    It indicates to play tone to user for receiving ALERTING message.
+
+commit 24b30380321312f04742998737eedef4d71fc95f
+Merge: ddeb23b e0ba6a9
+Author: johnwang <johnwang@google.com>
+Date:   Sun Sep 20 10:14:58 2009 -0700
+
+    am e0ba6a98: Update comment of Neighboring Cell.
+    
+    Merge commit 'e0ba6a98408e1efd3d1d1043d75f0ab53daddaaa' into eclair-plus-aosp
+    
+    * commit 'e0ba6a98408e1efd3d1d1043d75f0ab53daddaaa':
+      Update comment of Neighboring Cell.
+
+commit e0ba6a98408e1efd3d1d1043d75f0ab53daddaaa
+Author: johnwang <johnwang@google.com>
+Date:   Fri Sep 11 19:14:52 2009 -0700
+
+    Update comment of Neighboring Cell.
+
+commit ddeb23b2fe121449fb1038568f64af8d9c168dd2
+Merge: 4d249c8 bfb151b
+Author: johnwang <johnwang@google.com>
+Date:   Fri Sep 11 16:02:13 2009 -0700
+
+    am bfb151ba: Update comment for CDMA_SEND_SMS in ril.h
+    
+    Merge commit 'bfb151ba844bb97d8b21e827c0cb1556082151fa' into eclair-plus-aosp
+    
+    * commit 'bfb151ba844bb97d8b21e827c0cb1556082151fa':
+      Update comment for CDMA_SEND_SMS in ril.h
+
+commit bfb151ba844bb97d8b21e827c0cb1556082151fa
+Author: johnwang <johnwang@google.com>
+Date:   Fri Sep 11 15:20:38 2009 -0700
+
+    Update comment for CDMA_SEND_SMS in ril.h
+    
+    Update the comment of error class in CDMA_SEND_SMS to better document possible errors.
+
+commit 4d249c85359db1041e724472b9893403cf579004
+Merge: 3efcc4d 8e3a2ca
+Author: Tammo Spalink <tammo@google.com>
+Date:   Thu Sep 10 23:03:27 2009 -0700
+
+    am 8e3a2cad: Document CDMA messageRef value.
+    
+    Merge commit '8e3a2cad4ed875394c833124df98255b1fd18a77' into eclair-plus-aosp
+    
+    * commit '8e3a2cad4ed875394c833124df98255b1fd18a77':
+      Document CDMA messageRef value.
+
+commit 8e3a2cad4ed875394c833124df98255b1fd18a77
+Author: Tammo Spalink <tammo@google.com>
+Date:   Fri Sep 11 11:26:30 2009 +0800
+
+    Document CDMA messageRef value.
+    
+    Change-Id: Iad417c2449a8b3d5b8bce7f42ff698ab62988e47
+
+commit 3efcc4d56d663d7195802b75bdb3f242bc745dcc
+Merge: 6453306 67121e0
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Tue Sep 1 08:28:16 2009 -0700
+
+    merge from open-source master
+
+commit 6453306c90eee1356a14a9e6679d1171ec126173
+Author: Wink Saville <wink@google.com>
+Date:   Fri Aug 28 11:16:03 2009 -0700
+
+    Add comment to RIL_UNSOL_CALL_RING.
+    
+    Document the expected behavior and the new system properties
+    ro.telephony.call_ring.multiple and ro.telephony.call_ring.delay.
+    
+    Change-Id: I600358ea29a31cafba99c58492003b7c2c6f77ed
+
+commit 3a63fbc342d031dac10933f7f657902b0ff0fea3
+Author: Li Zhe <zhe.li@motorola.com>
+Date:   Tue Aug 4 13:14:34 2009 +0800
+
+    HSDPA/HSUPA/HSPA support in ril.
+    
+    HSDPA: High-Speed Downlink Packet Access
+    HSUPA: High-Speend Uplink Packet Access
+    HSPA: High-Speed Packet Access
+    
+    Changes include:
+    1) add HSDPA/HSUPA/HSPA in response of RIL_REQUEST_REGISTRATION_STATE
+    2) rdd HSDPA/HSUPA/HSPA in response of RIL_REQUEST_GPRS_REGISTRATION_STATE
+
+commit 084f6708312265b501561a9c6d6e9cb38943985c
+Author: Jaikumar Ganesh <jaikumar@google.com>
+Date:   Tue Aug 18 16:40:29 2009 -0700
+
+    Release mutex locks on error conditions.
+
+commit ee1fadc192a63724e416b05666844a62d1e75d38
+Author: Kenny <gongwuchun@gmail.com>
+Date:   Thu Aug 13 00:45:53 2009 +0800
+
+    fix return value check issue in sendResponseRaw function
+
+commit 67121e09d894c2f971bb01451371c0fb9d00adcc
+Author: Kenny <gongwuchun@gmail.com>
+Date:   Thu Aug 13 00:45:53 2009 +0800
+
+    fix return value check issue in sendResponseRaw function
+
+commit b4e2706fdd9efe7516e23f2367b331d1aae31717
+Merge: 107e779 bcf8ffa
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Tue Aug 4 09:00:28 2009 -0700
+
+    merge from open-source master
+
+commit bcf8ffa1a87d91ea60fe0a536e88be1b71bdfb18
+Merge: fa6c179 309ac29
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Mon Aug 3 07:45:46 2009 -0700
+
+    merge from donut
+
+commit 107e779838cd86b6de16fe858b53ac00fff572b6
+Merge: e1118ce 309ac29
+Author: John Wang <johnwang@google.com>
+Date:   Thu Jul 30 16:07:42 2009 -0700
+
+    am 309ac294: Clean RIL_SIM_* in ril.h
+    
+    Merge commit '309ac294bd529ff5a71f1c1e62cd493df1010271'
+    
+    * commit '309ac294bd529ff5a71f1c1e62cd493df1010271':
+      Clean RIL_SIM_* in ril.h
+
+commit 309ac294bd529ff5a71f1c1e62cd493df1010271
+Author: John Wang <johnwang@google.com>
+Date:   Thu Jul 30 14:53:23 2009 -0700
+
+    Clean RIL_SIM_* in ril.h
+    
+    GET_SIM_STATUS returns structure RIL_CardStatus instead of an integer of RIL_SIM_*. Update reference-ril for RIL_CardStatus and cleanup RIL_SIM_*.
+    
+    	modified:   include/telephony/ril.h
+    	modified:   reference-ril/reference-ril.c
+
+commit e1118ce4b442643f7c90ff32b7fca0d00500e8f5
+Author: johnwang <johnwang@google.com>
+Date:   Wed Jul 29 23:34:48 2009 -0700
+
+    Update comments on SID/NID format.
+    
+    	modified:   include/telephony/ril.h
+
+commit fa6c179d60ddcde3e62985fe51d48d34b3f9d014
+Merge: 72f27df 29be25c
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Wed Jul 29 14:57:05 2009 -0700
+
+    merge from donut
+
+commit 2e2650e5b8dffadbcdeb0b0929c4bc60e107138d
+Merge: 66469f1 72f27df
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Sun Jul 26 11:43:55 2009 -0700
+
+    reconcile korg/master into goog/master
+
+commit 72f27dffd92fe96249c4d54026bf017bf4bcf848
+Merge: 0891de9 6f189a6
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Sat Jul 25 17:48:03 2009 -0700
+
+    Merge korg/donut into korg/master
+
+commit 66469f1bf19e0bb0b32ec79e70ead59369c2294c
+Author: johnwang <johnwang@google.com>
+Date:   Thu Jul 23 15:51:21 2009 -0700
+
+    Add comments for CDMA_SUBSCRIPTION
+    
+    The SID and NID in CDMA_SUBSCRIPTION are represented in hexadecimal format (See bug # 1997056).
+    
+    	modified:   ril.h
+
+commit 86dda6a42e63931254a98624885a8ca077a43d76
+Merge: 9fc5161 29be25c
+Author: jsh <jsh@google.com>
+Date:   Wed Jul 15 18:15:21 2009 -0700
+
+    am 29be25c1: Minor tweak to RIL_REQUEST_CDMA_SUBSCRIPTION
+    
+    Merge commit '29be25c17885e6c7c32b6aea293d689d5b9fb463'
+    
+    * commit '29be25c17885e6c7c32b6aea293d689d5b9fb463':
+      Minor tweak to RIL_REQUEST_CDMA_SUBSCRIPTION
+
+commit 29be25c17885e6c7c32b6aea293d689d5b9fb463
+Author: jsh <jsh@google.com>
+Date:   Tue Jul 14 20:18:59 2009 -0700
+
+    Minor tweak to RIL_REQUEST_CDMA_SUBSCRIPTION
+    
+    H_SID and H_NID now returned as comma separated lists instead of single
+    value, since the home network may be comprised of more than one SID/NID.
+    
+    Also update description of registration denied cause and manual network
+    selection.
+
+commit 9fc5161a1e9e7c1a6ab63c96d735bb1e32cd5228
+Merge: 26ce28b 602f80f
+Author: jsh <jsh@google.com>
+Date:   Sun Jul 12 06:06:58 2009 -0700
+
+    am 602f80f9: (Hopefully) final updates to ril.h for donut.
+    
+    Merge commit '602f80f98a06a8ed009a6c9b9aa3e0bcfc4afb23'
+    
+    * commit '602f80f98a06a8ed009a6c9b9aa3e0bcfc4afb23':
+      (Hopefully) final updates to ril.h for donut.
+
+commit 602f80f98a06a8ed009a6c9b9aa3e0bcfc4afb23
+Author: jsh <jsh@google.com>
+Date:   Fri Jul 10 15:44:37 2009 -0700
+
+    (Hopefully) final updates to ril.h for donut.
+    
+    Some new error values; additional parameters for BURST_DTMF.
+
+commit 26ce28b64edbdf9c9891982fe7b69fce457a621e
+Merge: 7994c25 6f189a6
+Author: John Wang <johnwang@google.com>
+Date:   Wed Jul 1 17:27:43 2009 -0700
+
+    am 6f189a6a: Fix bug 1687659 - cell id in reference ril.
+    
+    Merge commit '6f189a6a1b53adfa9570cf5911c3f81ef1b1fcf8'
+    
+    * commit '6f189a6a1b53adfa9570cf5911c3f81ef1b1fcf8':
+      Fix bug 1687659 - cell id in reference ril.
+
+commit 6f189a6a1b53adfa9570cf5911c3f81ef1b1fcf8
+Author: John Wang <johnwang@google.com>
+Date:   Tue Jun 30 13:12:53 2009 -0700
+
+    Fix bug 1687659 - cell id in reference ril.
+    
+    The LAC and CID of RIL_REQUEST_REGISTRATION_STATE should be in the hex format. The valid LAC are from 0x0000 to 0xffff and Valid CID are from 0x00000000 to 0xffffffff. reference-ril should return hex value instead of decimal one.
+    
+    	modified:   reference-ril/reference-ril.c
+
+commit 7994c252953515e4ff29dc7eece167dea023256e
+Merge: b589a11 593c910
+Author: jsh <jsh@google.com>
+Date:   Wed Jun 24 17:39:08 2009 -0700
+
+    am 593c910c: Update comments for PIN/PUK commands.
+    
+    Merge commit '593c910c9a98973ff1be5afe39987bafaa546170'
+    
+    * commit '593c910c9a98973ff1be5afe39987bafaa546170':
+      Update comments for PIN/PUK commands.
+
+commit 593c910c9a98973ff1be5afe39987bafaa546170
+Author: jsh <jsh@google.com>
+Date:   Wed Jun 24 16:13:44 2009 -0700
+
+    Update comments for PIN/PUK commands.
+    
+    These now have a response value.
+
+commit b589a1171e6c4a9524c7bac473514954571b5da1
+Merge: fb4e4fe 09a68ba
+Author: jsh <jsh@google.com>
+Date:   Mon Jun 22 10:05:29 2009 -0700
+
+    am 09a68ba3: Add remaining retry count to response for PIN/PUK commands.
+    
+    Merge commit '09a68ba315ca3d6b092fd8078cc42b93b7934a1a'
+    
+    * commit '09a68ba315ca3d6b092fd8078cc42b93b7934a1a':
+      Add remaining retry count to response for PIN/PUK commands.
+
+commit 09a68ba315ca3d6b092fd8078cc42b93b7934a1a
+Author: jsh <jsh@google.com>
+Date:   Wed Jun 10 11:56:38 2009 -0700
+
+    Add remaining retry count to response for PIN/PUK commands.
+    
+    RIL_REQUEST_ENTER_SIM_PIN
+    RIL_REQUEST_ENTER_SIM_PUK
+    RIL_REQUEST_ENTER_SIM_PIN2
+    RIL_REQUEST_ENTER_SIM_PUK2
+    RIL_REQUEST_CHANGE_SIM_PIN
+    RIL_REQUEST_CHANGE_SIM_PIN2
+    RIL_REQUEST_SET_FACILITY_LOCK
+    RIL_ENTER_NETWORK_DEPERSONALIZATION
+    
+    Also add requestToString entry for REPORT_SMS_MEMORY_STATUS.
+
+commit fb4e4fe2cb0ed76fe87d56a950163a47d2738a0f
+Merge: 40202d7 d6aa2e3
+Author: Jaikumar Ganesh <jaikumar@google.com>
+Date:   Tue Jun 16 10:28:57 2009 -0700
+
+    am d6aa2e32: Add PDP failure cause.
+    
+    Merge commit 'd6aa2e32a44f883b008b9bb12b322f5b7e8dced4'
+    
+    * commit 'd6aa2e32a44f883b008b9bb12b322f5b7e8dced4':
+      Add PDP failure cause.
+
+commit d6aa2e32a44f883b008b9bb12b322f5b7e8dced4
+Author: Jaikumar Ganesh <jaikumar@google.com>
+Date:   Mon May 4 11:09:46 2009 -0700
+
+    Add PDP failure cause.
+    
+    The RIL API LAST_PDP_FAIL_CAUSE, gives us the error
+    codes for PDP falure. Add these to ril.h.
+
+commit 40202d7a40a84cddf88957de6e042503ebfa1920
+Merge: a2f6c8a 920c78f
+Author: Jaikumar Ganesh <jaikumar@google.com>
+Date:   Wed Jun 10 11:37:21 2009 -0700
+
+    am 920c78f1: Add authType to SETUP_DATA_CALL, errorCode to RIL_SMS_Response.
+    
+    Merge commit '920c78f166e787dc799bf5df7d6be30034ac0e77'
+    
+    * commit '920c78f166e787dc799bf5df7d6be30034ac0e77':
+      Add authType to SETUP_DATA_CALL, errorCode to RIL_SMS_Response.
+
+commit 920c78f166e787dc799bf5df7d6be30034ac0e77
+Author: Jaikumar Ganesh <jaikumar@google.com>
+Date:   Thu Jun 4 10:53:15 2009 -0700
+
+    Add authType to SETUP_DATA_CALL, errorCode to RIL_SMS_Response.
+    
+    1.Add an additional parameter to specify the
+    authType (PAP / CHAP) to SETUP_DATA_CALL.
+    2.Add errorCode to RIL_SMS_Response
+
+commit a2f6c8a60f349acc9808a7406470d00b7ddc35b2
+Merge: 6735738 7f85680
+Author: Wink Saville <wink@google.com>
+Date:   Tue Jun 9 18:10:02 2009 -0700
+
+    am 7f856808: Cleanup whitespace.
+    
+    Merge commit '7f8568086f2ea14885b0091c793e14c2656f0da2'
+    
+    * commit '7f8568086f2ea14885b0091c793e14c2656f0da2':
+      Cleanup whitespace.
+
+commit 7f8568086f2ea14885b0091c793e14c2656f0da2
+Author: Wink Saville <wink@google.com>
+Date:   Tue Jun 9 10:23:37 2009 -0700
+
+    Cleanup whitespace.
+
+commit 6735738139a618a3734bd746685e98ae55c76d26
+Merge: 5b147de 2641d5b
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jun 8 23:05:24 2009 -0700
+
+    am 2641d5b8: Add RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING.
+    
+    Merge commit '2641d5b8426beb86870611e5bc7c4eb0a877025b'
+    
+    * commit '2641d5b8426beb86870611e5bc7c4eb0a877025b':
+      Add RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING.
+
+commit 2641d5b8426beb86870611e5bc7c4eb0a877025b
+Author: Wink Saville <wink@google.com>
+Date:   Mon Jun 8 17:40:42 2009 -0700
+
+    Add RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING.
+    
+    Also add RIL_REQUEST_REPORT_SMS_MEMORY_STATUS which was missing from ril_commands.h.
+
+commit 5b147de4f1cda12dbdfd0189a2773547c79b437e
+Merge: 15d5350 d4ee7dc
+Author: Wink Saville <wink@google.com>
+Date:   Fri Jun 5 21:17:47 2009 -0700
+
+    am d4ee7dc0: Add a fifth response string to RIL_REQUEST_CDMA_SUBSCRIPTION which has the PRL version.
+    
+    Merge commit 'd4ee7dc0e98de1aa990e6c8a63f639779f9a86e9'
+    
+    * commit 'd4ee7dc0e98de1aa990e6c8a63f639779f9a86e9':
+      Add a fifth response string to RIL_REQUEST_CDMA_SUBSCRIPTION which has the PRL version.
+
+commit d4ee7dc0e98de1aa990e6c8a63f639779f9a86e9
+Author: Wink Saville <wink@google.com>
+Date:   Fri Jun 5 15:11:30 2009 -0700
+
+    Add a fifth response string to RIL_REQUEST_CDMA_SUBSCRIPTION which has the PRL version.
+
+commit 15d535048cf4acac97b24d025dac2162ac449bb0
+Merge: 9836220 b2a6184
+Author: johnwang <johnwang@google.com>
+Date:   Tue Jun 2 18:21:50 2009 -0700
+
+    am b2a6184e: Allow response payload on RIL_REQUEST error
+    
+    Merge commit 'b2a6184ec942c4c1728cbac723db90fbed4f85c5'
+    
+    * commit 'b2a6184ec942c4c1728cbac723db90fbed4f85c5':
+      Allow response payload on RIL_REQUEST error
+
+commit b2a6184ec942c4c1728cbac723db90fbed4f85c5
+Author: johnwang <johnwang@google.com>
+Date:   Tue Jun 2 14:55:45 2009 -0700
+
+    Allow response payload on RIL_REQUEST error
+    
+    Enable response payload while RIL_REQUEST returns error. RIL must explicitly pass NULL
+    for the response parameter if there is no response payload.
+    
+    	modified:   ril.cpp
+
+commit 98362207cc8ab587e5a0dc528c11f3072b436cb1
+Merge: 2a058e1 b60444e
+Author: jsh <jsh@google.com>
+Date:   Fri May 29 15:17:26 2009 -0700
+
+    am b60444ef: Support for SMS error reporting to the network.
+    
+    Merge commit 'b60444ef2fe63b372e13f3d38ebf8448d6c127f5'
+    
+    * commit 'b60444ef2fe63b372e13f3d38ebf8448d6c127f5':
+      Support for SMS error reporting to the network.
+
+commit b60444ef2fe63b372e13f3d38ebf8448d6c127f5
+Author: jsh <jsh@google.com>
+Date:   Fri May 29 11:09:17 2009 -0700
+
+    Support for SMS error reporting to the network.
+    
+    - Update RIL_REQUEST_SMS_ACKNOWLDGE to report fail cause.
+    - Update comments for RIL_CMDA_SMS_Ack.
+    - Add RIL_REQUEST_REPORT_SMS_MEMORY_STATUS.
+
+commit 2a058e1ad9d1df198a161e40fced963e9f49ca03
+Merge: e5c30e1 a592eeb
+Author: Wink Saville <wink@google.com>
+Date:   Thu May 28 20:30:43 2009 -0700
+
+    am a592eebc: Cleanup and changes of responseCdmaInformationReocrds, Broadcast SMS configuration and reponseRilSignalStrength.
+    
+    Merge commit 'a592eebc476a3d234f47f93e58252f8c822fc772'
+    
+    * commit 'a592eebc476a3d234f47f93e58252f8c822fc772':
+      Cleanup and changes of responseCdmaInformationReocrds, Broadcast SMS
+
+commit a592eebc476a3d234f47f93e58252f8c822fc772
+Author: Wink Saville <wink@google.com>
+Date:   Fri May 22 13:26:36 2009 -0700
+
+    Cleanup and changes of responseCdmaInformationReocrds, Broadcast SMS
+    configuration and reponseRilSignalStrength.
+    
+    From Motorola, change reponseCdmaInformationRecords to use string for
+    marshalling and simplify by removing duplicate code.
+    
+    Change Broadcast SMS configuration adding some some new fields
+    for Gsm Broadcast configuration and some name changes to be
+    more coherent.
+    
+    Cleanup responseRilSignalStrength, includes some code refactoring
+    and removing the sending of the number of intergers. Now it is assumed
+    that a RIL_SignalStrength structure being sent so it is not necessary to
+    send the length. There is a corresponding change in
+    frameworks/base/telephony/java/com/android/internal/telephony/RIL.java.
+
+commit e5c30e1e3f5bed38915e3ddb7e9f6645031b7b1a
+Merge: 8a3c48c fdf825f
+Author: johnwang <johnwang@google.com>
+Date:   Tue May 26 14:55:36 2009 -0700
+
+    am fdf825f9: Enable new libhtc_ril which supporting new CDMA ril interface.
+    
+    Merge commit 'fdf825f9d0dc639787b8523638bb61874ed0b540'
+    
+    * commit 'fdf825f9d0dc639787b8523638bb61874ed0b540':
+      Enable new libhtc_ril which supporting new CDMA ril interface.
+
+commit fdf825f9d0dc639787b8523638bb61874ed0b540
+Author: johnwang <johnwang@google.com>
+Date:   Fri May 22 15:50:34 2009 -0700
+
+    Enable new libhtc_ril which supporting new CDMA ril interface.
+    
+    1) Enable new libhtc_ril and support new RIL_Call structure 2) Remove "#define NEWRIL".
+
+commit 8a3c48c4eac62f9c25ab3f0dbfd8f829a1e32778
+Author: Mathias Agopian <mathias@google.com>
+Date:   Tue May 19 19:11:50 2009 -0700
+
+    move libbinder's header files under includes/binder
+
+commit 62ae034e5c4e6dd341023eb635794ce4f60bc742
+Author: Mathias Agopian <mathias@google.com>
+Date:   Tue May 19 17:29:08 2009 -0700
+
+    add libbinder deps where needed
+
+commit f2f2d8095ca8dbd4de20157451aa0b9bc8853b56
+Merge: 144f7c2 3d54e74
+Author: Wink Saville <wink@google.com>
+Date:   Mon May 18 23:56:11 2009 -0700
+
+    am 3d54e74b: Teleca 2b changes.
+    
+    Merge commit '3d54e74bc450bb40977e3ae6fab6185fe687bdae'
+    
+    * commit '3d54e74bc450bb40977e3ae6fab6185fe687bdae':
+      Teleca 2b changes.
+
+commit 3d54e74bc450bb40977e3ae6fab6185fe687bdae
+Author: Wink Saville <wink@google.com>
+Date:   Mon May 18 18:00:44 2009 -0700
+
+    Teleca 2b changes.
+
+commit 144f7c2da98ee622d3a294436e22b28e8008f196
+Merge: 0fb1ee7 f8bc167
+Author: johnwang <johnwang@dhcp-172-19-12-233.mtv.corp.google.com>
+Date:   Fri May 15 17:24:36 2009 -0700
+
+    am f8bc1675: Update comments in ril.h to clarify the format in RIL_SMS_WriteArgs and deprecate RIL_REQUEST_RESET_RADIO. Fix couple typo.
+    
+    Merge commit 'f8bc167551e4a5af4c22dab4855468a166b9ed30'
+    
+    * commit 'f8bc167551e4a5af4c22dab4855468a166b9ed30':
+      Update comments in ril.h to clarify the format in RIL_SMS_WriteArgs and deprecate RIL_REQUEST_RESET_RADIO. Fix couple typo.
+
+commit f8bc167551e4a5af4c22dab4855468a166b9ed30
+Author: johnwang <johnwang@dhcp-172-19-12-233.mtv.corp.google.com>
+Date:   Thu May 14 19:19:47 2009 -0700
+
+    Update comments in ril.h to clarify the format in RIL_SMS_WriteArgs and deprecate RIL_REQUEST_RESET_RADIO. Fix couple typo.
+
+commit 0fb1ee78fba35cb66cef48960acf4e4b45b6ce71
+Merge: c467a8f 000a9fe
+Author: jsh <jsh@google.com>
+Date:   Mon May 11 18:26:38 2009 -0700
+
+    am 000a9fe: Add get/set SMSC address to ril.h.
+    
+    Merge commit '000a9fe96fdf9111387d2bc389d2f6bb3e627d0f'
+    
+    * commit '000a9fe96fdf9111387d2bc389d2f6bb3e627d0f':
+      Add get/set SMSC address to ril.h.
+
+commit 000a9fe96fdf9111387d2bc389d2f6bb3e627d0f
+Author: jsh <jsh@google.com>
+Date:   Mon May 11 14:52:35 2009 -0700
+
+    Add get/set SMSC address to ril.h.
+
+commit c467a8ff031f87259fe560d6c73aec8cfc0d3a4d
+Merge: d2b72ef 6b65348
+Author: Android (Google) Code Review <android-gerrit@google.com>
+Date:   Thu Apr 30 23:51:19 2009 -0700
+
+    am 6b65348: Merge change 744 into donut
+    
+    Merge commit '6b6534839eb7a2a0a94f5f828bb81d0399b7446a'
+    
+    * commit '6b6534839eb7a2a0a94f5f828bb81d0399b7446a':
+      Add RIL_UNSOL_OEM_HOOK_RAW
+
+commit 6b6534839eb7a2a0a94f5f828bb81d0399b7446a
+Merge: f6aa7c1 af6ecbf
+Author: Android (Google) Code Review <android-gerrit@google.com>
+Date:   Thu Apr 30 18:59:48 2009 -0700
+
+    Merge change 744 into donut
+    
+    * changes:
+      Add RIL_UNSOL_OEM_HOOK_RAW
+
+commit d2b72ef7b85bb7fbbacfeed70587d6a4c34fe155
+Merge: 0a907d7 f6aa7c1
+Author: Wink Saville <wink@google.com>
+Date:   Thu Apr 30 18:55:28 2009 -0700
+
+    am f6aa7c1: Handle RIL_REQUEST_GET_SIM_STATUS as per the new ril.h speci
+    
+    Merge commit 'f6aa7c1c8a9531a254970f85860d74cdd033821c'
+    
+    * commit 'f6aa7c1c8a9531a254970f85860d74cdd033821c':
+      Handle RIL_REQUEST_GET_SIM_STATUS as per the new ril.h specification.
+
+commit f6aa7c1c8a9531a254970f85860d74cdd033821c
+Author: Wink Saville <wink@google.com>
+Date:   Thu Apr 30 14:20:52 2009 -0700
+
+    Handle RIL_REQUEST_GET_SIM_STATUS as per the new ril.h specification.
+
+commit 0a907d7e97e1d9e1ac6703da499ac14c1f98977c
+Merge: f0a4479 4a24d11
+Author: Wink Saville <wink@google.com>
+Date:   Wed Apr 29 21:22:11 2009 -0700
+
+    am 4a24d11: Partially fix 1820187 by using RIL_CallOld since we\'re not
+    
+    Merge commit '4a24d11778bff3f2b4b99eb03b0dfafa6c3c059c'
+    
+    * commit '4a24d11778bff3f2b4b99eb03b0dfafa6c3c059c':
+      Partially fix 1820187 by using RIL_CallOld since we're not
+
+commit af6ecbf0fa03379818038459ee1b61ea393ffd4f
+Author: Jaikumar Ganesh <jaikumar@google.com>
+Date:   Wed Apr 29 13:27:51 2009 -0700
+
+    Add RIL_UNSOL_OEM_HOOK_RAW
+    
+    Add RIL_UNSOL_OEM_HOOK_RAW to send unsolicited OEM
+    commands from the baseband.
+    
+    Tested using radiooptions tool.
+
+commit 4a24d11778bff3f2b4b99eb03b0dfafa6c3c059c
+Author: Wink Saville <wink@google.com>
+Date:   Wed Apr 29 15:53:39 2009 -0700
+
+    Partially fix 1820187 by using RIL_CallOld since we're not
+    yet fully switched to the new ril.h.
+    
+    This is only partially fixed because there is an opposite
+    problem with getSIMStatus in reference-ril.c. Here we should
+    be returning the new RIL_CardStatus but we're returning the
+    just the integer. This will be fixed in a subsequent Change.
+
+commit f0a44798a8c056eaddb4d80efe3af0af8e321981
+Merge: 94216c5 f5903df
+Author: Wink Saville <wink@google.com>
+Date:   Wed Apr 29 13:43:11 2009 -0700
+
+    am f5903df: Teleca 090414 & 090423 patches for CDMA to complete phase1 w
+    
+    Merge commit 'f5903dfd25c2ef104b3e9267b53f6ee3e7588063'
+    
+    * commit 'f5903dfd25c2ef104b3e9267b53f6ee3e7588063':
+      Teleca 090414 & 090423 patches for CDMA to complete phase1 work.
+
+commit f5903dfd25c2ef104b3e9267b53f6ee3e7588063
+Author: Wink Saville <wink@google.com>
+Date:   Fri Apr 24 11:54:14 2009 -0700
+
+    Teleca 090414 & 090423 patches for CDMA to complete phase1 work.
+
+commit 94216c500a7269516ba098398e6b9e14b1a3dd9c
+Merge: b0e64fc 44904f7
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Wed Apr 22 18:33:17 2009 -0700
+
+    Merge donut into master
+
+commit b0e64fcecb202f62a25db5b67b6031466c254b9f
+Merge: da95b0a 1b5fd23
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Wed Apr 22 18:28:01 2009 -0700
+
+    Merge donut into master
+
+commit 44904f768c2a12013064911d22f88a4a304ff6ab
+Merge: 1b5fd23 1582588
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Wed Apr 22 17:56:59 2009 -0700
+
+    merge cupcake into donut
+
+commit da95b0ae5fd8fc4d39ec20e82b40c2bbca4b277d
+Merge: f7996ab eafe79d
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Wed Apr 22 17:12:35 2009 -0700
+
+    Merge donut into master
+
+commit 1b5fd23e2bc82e5bed48125317cf2f9837cf6ae8
+Author: Wink Saville <wink@google.com>
+Date:   Wed Apr 22 14:50:00 2009 -0700
+
+    New ril.h & changes to ril.cpp to support it.
+    
+    There are NEWRIL:TODO's in the code to identify
+    additional changes needed when a new vendor ril
+    is delivered.
+    
+    Also changes to some appendPrintBuf's, apparently
+    it's been a while since debug has been turn on
+    as there were quite a few compile time errors.
+
+commit f7996abf5dcc424c01c4f29eaf48a62f3005f880
+Merge: daeb9a3 307a184
+Author: Wink Saville <>
+Date:   Fri Apr 3 18:05:36 2009 -0700
+
+    Merge branch 'readonly-p4-master'
+
+commit 307a1841a4e74310b5cf581efde976f2e205c223
+Author: Wink Saville <>
+Date:   Fri Apr 3 18:04:25 2009 -0700
+
+    AI 144571: am: CL 144570 Fix some non-sequential RIL commands.
+      RIL_REQUEST_CDMA_SUBSCRITION ... RIL_REQUEST_DEVICE_IDENTLY changed
+      from 99 .. 102 to 95 to 98 so they directly follow
+      RIL_REQUEST_CDMA_BROADCAST_ACTIVATION which is 94. These values are
+      used as indexes into s_commands an array of CommandInfo which
+      is a non-sparse arrary so there should be no gap.
+      Original author: wink
+    
+    Automated import of CL 144571
+
+commit eafe79ddae0509f3173274c338e69241f5055111
+Author: Wink Saville <>
+Date:   Fri Apr 3 18:02:34 2009 -0700
+
+    AI 144570: Fix some non-sequential RIL commands.
+      RIL_REQUEST_CDMA_SUBSCRITION ... RIL_REQUEST_DEVICE_IDENTLY changed
+      from 99 .. 102 to 95 to 98 so they directly follow
+      RIL_REQUEST_CDMA_BROADCAST_ACTIVATION which is 94. These values are
+      used as indexes into s_commands an array of CommandInfo which
+      is a non-sparse arrary so there should be no gap.
+      BUG=1765265
+    
+    Automated import of CL 144570
+
+commit daeb9a3d2bad41a76b7162952bec91dc69e69dc8
+Merge: 91645f6 510a9bc
+Author: Wink Saville <>
+Date:   Thu Apr 2 11:02:15 2009 -0700
+
+    Merge branch 'readonly-p4-master'
+
+commit 510a9bc7e2444cdb2b6a923ca3c4d0b45eebc400
+Author: Wink Saville <>
+Date:   Thu Apr 2 11:00:56 2009 -0700
+
+    AI 144245: Fix merge conflict for megering in the CDMA changes in to master from donutburger.
+    
+    Automated import of CL 144245
+
+commit f4c4d36c410a3501d282dd7de1c7c3350734f27e
+Author: Wink Saville <>
+Date:   Thu Apr 2 01:37:03 2009 -0700
+
+    AI 144185: Integrate cdma into the main code base.
+    
+    Automated import of CL 144185
+
+commit 91645f68aa78c5f9b65c66a1800c30bb32430bdb
+Merge: 19b7fb0 0891de9
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Sun Mar 29 08:55:10 2009 -0700
+
+    Merge branch 'open_source_no_contributions' into google_internal
+
+commit 19b7fb02da802c76f211d38ab1d2a243b0d08561
+Author: Mike Lockwood <>
+Date:   Fri Mar 27 19:01:43 2009 -0700
+
+    AI 143349: am: CL 143198 am: CL 142968 Remove showlease, wpa_cli and radiooptions tools from user builds.
+      Should save us 52K in /system
+      BUG=1739507
+      Original author: lockwood
+      Merged from: //branches/cupcake/...
+      Original author: android-build
+      Merged from: //branches/donutburger/...
+    
+    Automated import of CL 143349
+
+commit 207cbd4edffb61dab46f76fe25c3998ab28b0fae
+Author: Mike Lockwood <>
+Date:   Fri Mar 27 17:32:57 2009 -0700
+
+    AI 143198: am: CL 142968 Remove showlease, wpa_cli and radiooptions tools from user builds.
+      Should save us 52K in /system
+      BUG=1739507
+      Original author: lockwood
+      Merged from: //branches/cupcake/...
+    
+    Automated import of CL 143198
+
+commit 0891de9450bd1f49c7c60e311f38f0d0f9547e72
+Merge: e41352e 1582588
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Mar 27 15:31:11 2009 -0700
+
+    Merge commit 'korg/cupcake'
+
+commit 1582588e3d14d31b7c52afba52278420a07e9c70
+Author: Mike Lockwood <>
+Date:   Thu Mar 26 12:50:55 2009 -0700
+
+    Automated import from //branches/cupcake/...@142968,142968
+
+commit 4d648bf84dbfc86a2026c0f12b91a6fc3221feb2
+Author: John Wang <>
+Date:   Tue Mar 24 17:59:06 2009 -0700
+
+    Automated import from //branches/master/...@140575,140575
+
+commit ff36874070b246c40f2ecfcbd584a2d663fa493d
+Author: John Wang <>
+Date:   Tue Mar 24 17:56:29 2009 -0700
+
+    Automated import from //branches/donutburger/...@140572,140572
+
+commit d60c412937de533f6ed509aca18e9a5836c4269e
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Thu Mar 19 23:08:56 2009 -0700
+
+    auto import from //branches/cupcake_rel/...@141571
+
+commit e6e6fb2ebbaae681ab45b866bb9bba57aff1c33c
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Wed Mar 18 17:39:47 2009 -0700
+
+    auto import from //branches/cupcake_rel/...@140373
+
+commit e41352e4287633b570270990a78176e6ef631b78
+Merge: 154a2ef 34a5108
+Author: Jean-Baptiste Queru <jbq@google.com>
+Date:   Tue Mar 17 17:37:30 2009 -0700
+
+    Merge commit 'remotes/korg/cupcake' into merge
+
+commit 34a5108969fbfc6cf8140513b7246da805902b7a
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Thu Mar 5 14:34:37 2009 -0800
+
+    auto import from //depot/cupcake/@136594
+
+commit 00f06fc3fdb05d4276e76091cacb42b6f6862222
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Mar 3 19:32:15 2009 -0800
+
+    auto import from //depot/cupcake/@135843
+
+commit c2efc51d848d68147320a5983954f9c76428885c
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Mar 3 18:28:48 2009 -0800
+
+    auto import from //depot/cupcake/@135843
+
+commit 31f41943663ccc71bef87d42585b04afb23f6754
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Fri Feb 20 07:38:32 2009 -0800
+
+    auto import from //branches/cupcake/...@132569
+
+commit 80bb41e3445d96fb8508609e5bfcae6ea477da18
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Feb 10 15:44:04 2009 -0800
+
+    auto import from //branches/cupcake/...@130745
+
+commit 154a2efc9b75de255cf9c3916d9d778c445df2ae
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Thu Jan 15 16:12:12 2009 -0800
+
+    auto import from //branches/cupcake/...@126645
+
+commit a8657f8726ba81b72eb532c884545b4ad52ff471
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Wed Dec 17 18:05:51 2008 -0800
+
+    Code drop from //branches/cupcake/...@124589
+
+commit dbbb392e15b5ace6f19e76c49c80ea14292e8a4d
+Author: The Android Open Source Project <initial-contribution@android.com>
+Date:   Tue Oct 21 07:00:00 2008 -0700
+
+    Initial Contribution
