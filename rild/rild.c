@@ -15,20 +15,22 @@
 ** limitations under the License.
 */
 
+// Test by Owen
 #include <stdio.h>
-#include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdlib.h>
 
+// Test by Owen for Patch Set 5
 #include <telephony/ril.h>
 #define LOG_TAG "RILD"
 #include <utils/Log.h>
-#include <cutils/properties.h>
 #include <cutils/sockets.h>
+#include <cutils/properties.h>
 #include <sys/capability.h>
 #include <linux/prctl.h>
 
