@@ -3214,6 +3214,14 @@ static void onATTimeout()
     setRadioState (RADIO_STATE_UNAVAILABLE);
 }
 
+/* Called to pass hardware configuration information to telephony
+ * framework.
+ */
+static void setHardwareConfiguration(RIL_HardwareConfig *cfg)
+{
+   RIL_onUnsolicitedResponse(RIL_UNSOL_HARDWARE_CONFIG_CHANGED, cfg, sizeof(*cfg));
+}
+
 static void usage(char *s)
 {
 #ifdef RIL_SHLIB
