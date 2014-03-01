@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c8801e4_5b07fb75",
+        "filename": "libril/ril_unsol_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-03-01T16:04:29Z",
+      "side": 1,
+      "message": "We need to create responseHardwareConfigChanged and then add it here.",
+      "range": {
+        "startLine": 55,
+        "startChar": 40,
+        "endLine": 55,
+        "endChar": 52
+      },
+      "revId": "270c5f002304ac37ddd28f3d0647f16d70e358b6",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
