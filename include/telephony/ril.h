@@ -982,10 +982,47 @@ typedef struct {
 
 #define RIL_CDMA_MAX_NUMBER_OF_INFO_RECS 10
 
+#define RIL_HARDWARE_CONFIG_UUID_LENGTH 64
+
 typedef struct {
   char numberOfInfoRecs;
   RIL_CDMA_InformationRecord infoRec[RIL_CDMA_MAX_NUMBER_OF_INFO_RECS];
 } RIL_CDMA_InformationRecords;
+
+/* hardware configuration reported to RILJ. */
+typedef enum {
+   RIL_HARDWARE_CONFIG_MODEM = 0,
+   RIL_HARDWARE_CONFIG_SIM = 1,
+} RIL_HardwareConfig_Type;
+
+typedef enum {
+   RIL_HARDWARE_CONFIG_STATE_ENABLED = 0,
+   RIL_HARDWARE_CONFIG_STATE_STANDBY = 1,
+   RIL_HARDWARE_CONFIG_STATE_DISABLED = 2,
+} RIL_HardwareConfig_State;
+
+typedef struct {
+   char uuid[RIL_HARDWARE_CONFIG_UUID_LENGTH];
+   RIL_HardwareConfig_State state;
+   uint32_t rat; /* bitset. */
+   int maxVoice;
+   int maxData;
+   int maxStandby;
+} RIL_HardwareConfig_Modem;
+
+typedef struct {
+   char uuid[RIL_HARDWARE_CONFIG_UUID_LENGTH];
+   char modemUuid[RIL_HARDWARE_CONFIG_UUID_LENGTH];
+   RIL_HardwareConfig_State state;
+} RIL_HardwareConfig_Sim;
+
+typedef struct {
+  RIL_HardwareConfig_Type type;
+  union {
+     RIL_HardwareConfig_Modem modem;
+     RIL_HardwareConfig_Sim sim;
+  } cfg;
+} RIL_HardwareConfig;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -3663,6 +3700,17 @@ typedef struct {
  */
 #define RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL 117
 
+/**
+ * RIL_REQUEST_GET_HARDWARE_CONFIG
+ *
+ * Request all of the current hardware (modem and sim) associated
+ * with the RIL.
+ *
+ * "data" is NULL
+ *
+ * "response" is an array of  RIL_HardwareConfig.
+ */
+#define RIL_REQUEST_GET_HARDWARE_CONFIG 118
 
 /***********************************************************************/
 
@@ -4168,6 +4216,16 @@ typedef struct {
  *
  */
 #define RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED 1037
+
+/**
+ * RIL_UNSOL_HARDWARE_CONFIG_CHANGED
+ *
+ * Called when the hardware configuration associated with the RILd changes
+ *
+ * "data" is an array of RIL_HardwareConfig
+ *
+ */
+#define RIL_UNSOL_HARDWARE_CONFIG_CHANGED 1038
 
 /***********************************************************************/
 
