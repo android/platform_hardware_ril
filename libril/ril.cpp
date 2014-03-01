@@ -240,6 +240,7 @@ static int responseCdmaSignalInfoRecord(Parcel &p,void *response, size_t respons
 static int responseCdmaCallWaiting(Parcel &p,void *response, size_t responselen);
 static int responseSimRefresh(Parcel &p, void *response, size_t responselen);
 static int responseCellInfoList(Parcel &p, void *response, size_t responselen);
+static int responseHardwareConfig(Parcel &p, void *response, size_t responselen);
 
 static int decodeVoiceRadioTechnology (RIL_RadioState radioState);
 static int decodeCdmaSubscriptionSource (RIL_RadioState radioState);
@@ -2594,6 +2595,57 @@ static int responseCellInfoList(Parcel &p, void *response, size_t responselen)
     return 0;
 }
 
+static int responseHardwareConfig(Parcel &p, void *response, size_t responselen)
+{
+   if (response == NULL && responselen != 0) {
+       RLOGE("invalid response: NULL");
+       return RIL_ERRNO_INVALID_RESPONSE;
+   }
+
+   if (responselen % sizeof(RIL_HardwareConfig) != 0) {
+       RLOGE("invalid response length %d expected multiple of %d",
+          (int)responselen, (int)sizeof(RIL_HardwareConfig));
+       return RIL_ERRNO_INVALID_RESPONSE;
+   }
+
+   int num = responselen / sizeof(RIL_HardwareConfig);
+   int i;
+   RIL_HardwareConfig *p_cur = (RIL_HardwareConfig *) response;
+
+   p.writeInt32(num);
+
+   startResponse;
+   for (i = 0; i < num; i++) {
+      switch (p_cur[i].type) {
+         case RIL_HARDWARE_CONFIG_MODEM: {
+            writeStringToParcel(p, p_cur[i].uuid);
+            p.writeInt32((int)p_cur[i].state);
+            p.writeInt32(p_cur[i].cfg.modem.rat);
+            p.writeInt32(p_cur[i].cfg.modem.maxVoice);
+            p.writeInt32(p_cur[i].cfg.modem.maxData);
+            p.writeInt32(p_cur[i].cfg.modem.maxStandby);
+
+            appendPrintBuf("%s modem: uuid=%s,state=%d,rat=%08x,maxV=%d,maxD=%d,maxS=%d", printBuf,
+               p_cur[i].uuid, (int)p_cur[i].state, p_cur[i].cfg.modem.rat,
+               p_cur[i].cfg.modem.maxVoice, p_cur[i].cfg.modem.maxData, p_cur[i].cfg.modem.maxStandby);
+            break;
+         }
+         case RIL_HARDWARE_CONFIG_SIM: {
+            writeStringToParcel(p, p_cur[i].uuid);
+            p.writeInt32((int)p_cur[i].state);
+            writeStringToParcel(p, p_cur[i].cfg.sim.modemUuid);
+
+            appendPrintBuf("%s sim: uuid=%s,state=%d,modem-uuid=%s", printBuf,
+               p_cur[i].uuid, (int)p_cur[i].state, p_cur[i].cfg.sim.modemUuid);
+            break;
+         }
+      }
+   }
+   removeLastChar;
+   closeResponse;
+   return 0;
+}
+
 static void triggerEvLoop() {
     int ret;
     if (!pthread_equal(pthread_self(), s_tid_dispatch)) {
@@ -3884,6 +3936,7 @@ requestToString(int request) {
         case RIL_REQUEST_SIM_OPEN_CHANNEL: return "SIM_OPEN_CHANNEL";
         case RIL_REQUEST_SIM_CLOSE_CHANNEL: return "SIM_CLOSE_CHANNEL";
         case RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL: return "SIM_TRANSMIT_APDU_CHANNEL";
+        case RIL_REQUEST_GET_HARDWARE_CONFIG: return"GET_HARDWARE_CONFIG";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED: return "UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED";
@@ -3921,6 +3974,7 @@ requestToString(int request) {
         case RIL_UNSOL_VOICE_RADIO_TECH_CHANGED: return "UNSOL_VOICE_RADIO_TECH_CHANGED";
         case RIL_UNSOL_CELL_INFO_LIST: return "UNSOL_CELL_INFO_LIST";
         case RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED: return "RESPONSE_IMS_NETWORK_STATE_CHANGED";
+        case RIL_UNSOL_HARDWARE_CONFIG_CHANGED: return "HARDWARE_CONFIG_CHANGED";
         default: return "<unknown request>";
     }
 }
