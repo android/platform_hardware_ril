@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c8801e4_7be19f7e",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 0,
+      "message": "Can you please comment, why these error codes are from base google code?",
+      "revId": "ebdf40e65a17e8758c059a736425cd47563cdace",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_90d0d9e6",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 0,
+      "message": "Can you please comment, why these error codes are from base google code?",
+      "revId": "ebdf40e65a17e8758c059a736425cd47563cdace",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_70d55dd4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 3590,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 0,
+      "message": "Can you please comment, why these error codes are from base google code?",
+      "revId": "ebdf40e65a17e8758c059a736425cd47563cdace",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c8801e4_3beb1761",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 0,
+      "message": "why this is removed?",
+      "revId": "ebdf40e65a17e8758c059a736425cd47563cdace",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c58ad41_becf266a",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 0,
+      "message": "why this code is removed?",
+      "revId": "ebdf40e65a17e8758c059a736425cd47563cdace",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}

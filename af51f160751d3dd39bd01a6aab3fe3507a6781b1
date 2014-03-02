@@ -1,0 +1,259 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c8801e4_bb73a727",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "Can we avoid these compilation conditionals and come up with generic design for multi sim. Ideal expectation would be the same system.img should be usable for dsds/tsts/qsqs.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_50ca6138",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4124,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "Is this interface change required? Can\u0027t we depend on SIM absent available through GET_SIM_STATUS?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_30cfe548",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4134,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "We get SIM PLUG/UNPLUG information from GET_SIM_STATUS why another request required?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_10e4e9c2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4138,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "As I understand the backward compatibility is being achieved through compile conditional flags. \n\nSuppose there is an android build avialable with ANDROID_MULTI_SIM flag enabled. This build may not be directly working with existing any of the vendor RILs. Vendors need to make a build with ANDROID_MULTI_SIM flag disabled.\n\nThe problem is because the backward compatibility is achieved through compile conditionals.\n\nCan we achieve this backward compatibility through run time mechanism? May be based of RIL version?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c58ad41_1ec99268",
+        "filename": "libril/Android.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "where this macro DSDA_RILD1 is used?\nWhat is the purpose of this macro, can you please explain?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c8801e4_9be6e396",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "can we identify socket name \nby SOCKET_NAME_RIL+  instace id/sim id etc.\n\nrather than declaring each socket name to make it generic.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_f0e02db0",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "each instance should not have another variable,\n\nThere should be an array of variables and these should be controlled runtime based on current configuration(dsds/tsts).\n\nAlso the memory should be allocated for these variables based on that configuration.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c58ad41_fec59e4b",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "array of variables would be good and memory should be allocated at runtime based on configuration.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c58ad41_ded2da0f",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "This code to be optimized and make it generic.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_83a9b162",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3529,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "how debug sockets would be handled for 2nd SIM, 3rd SIM?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c58ad41_b942a027",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3809,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "How about defining new callback RIL_onUnsolicitedResponseSub() function in ril.h which would be used for multi sim functionality and keeping existing RIL_onUnsolicitedResponse() as it is.\n\nWith this way we may not need to have compile conditional mechanism but still we can achieve backward compatibility?\n\nThe older rils call RIL_onUnsolicitedResponse() and in ril.cpp it can be routed to RIL_onUnsolicitedResponseSub()  to default socket.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_63aeb56a",
+        "filename": "reference-ril/Android.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "why includes needs to be changed here?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_23b8bda6",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "How about defining new callback RIL_onUnsolicitedResponseSub() function in ril.h which would be used for multi sim functionality and keeping existing RIL_onUnsolicitedResponse() as it is.\nWith this way we may not need to have compile conditional mechanism but still we can achieve backward compatibility?\nThe older rils call RIL_onUnsolicitedResponse() and in ril.cpp it can be routed to RIL_onUnsolicitedResponseSub() to default socket.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_43b3b9cc",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "Can you please why changes are required here?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c58ad41_99e35cf8",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-02T11:45:34Z",
+      "side": 1,
+      "message": "In case of two rild architecture for DSDS, how the second rild can listen on second sockets (rild2)?\n\nI am not able to trace any code which can handle 2nd RILD and in ril.cpp the second rild listen on rild2 socket.\n\nCan you please point that code.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
