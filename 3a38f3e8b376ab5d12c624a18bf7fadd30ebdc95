@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c52b523_839c115c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 4217,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-03-02T06:00:14Z",
+      "side": 1,
+      "message": "I think this should return an array of RIL_HardwareConfig like RIL_UNSOL_DATA_CALL_LIST_CHANGED. And then also have RIL_GET_HARDWARE_CONFIG return exactly the same thing. Both would then use \"responseHardwareConfig\".",
+      "revId": "3a38f3e8b376ab5d12c624a18bf7fadd30ebdc95",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c52b523_4396193a",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2598,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-03-02T06:00:14Z",
+      "side": 1,
+      "message": "Rename to responseHardwareConfig and so \"GET_HARDWARE_CONFIG\" would also use this and in addition I think it should return an array of RIL_HardwareConfig.",
+      "range": {
+        "startLine": 2598,
+        "startChar": 11,
+        "endLine": 2598,
+        "endChar": 40
+      },
+      "revId": "3a38f3e8b376ab5d12c624a18bf7fadd30ebdc95",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
