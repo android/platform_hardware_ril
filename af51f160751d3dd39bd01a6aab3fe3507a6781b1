@@ -124,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "5c920913_4e097bf8",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4138,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-03T20:38:09Z",
+      "side": 1,
+      "message": "But I can check RIL_VERSION in RIL_onUnsolicitedResponse. If callback.RIL_VERSION \u003c RIL_VERSION, then just use RIL_SOCKET_1 directly",
+      "parentUuid": "5c920913_6e523f30",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c58ad41_1ec99268",
         "filename": "libril/Android.mk",
         "patchSetId": 3
