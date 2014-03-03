@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5c920913_538cc471",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-03T20:14:05Z",
+      "side": 1,
+      "message": "Someone may want to use the macro as an array size. For example, RADIO_STATE[SIM_COUNT].",
+      "parentUuid": "9c8801e4_bb73a727",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c52b523_50ca6138",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2014-03-02T11:45:34Z",
       "side": 1,
       "message": "Is this interface change required? Can\u0027t we depend on SIM absent available through GET_SIM_STATUS?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c58ad41_404cc460",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4124,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-03T20:14:05Z",
+      "side": 1,
+      "message": "We use the UNSOL message to notify ServiceTracker and setRadioPower can be triggered.",
+      "parentUuid": "3c52b523_50ca6138",
       "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -64,6 +100,24 @@
       "writtenOn": "2014-03-02T11:45:34Z",
       "side": 1,
       "message": "As I understand the backward compatibility is being achieved through compile conditional flags. \n\nSuppose there is an android build avialable with ANDROID_MULTI_SIM flag enabled. This build may not be directly working with existing any of the vendor RILs. Vendors need to make a build with ANDROID_MULTI_SIM flag disabled.\n\nThe problem is because the backward compatibility is achieved through compile conditionals.\n\nCan we achieve this backward compatibility through run time mechanism? May be based of RIL version?",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c920913_6e523f30",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4138,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-03T20:14:05Z",
+      "side": 1,
+      "message": "In the case of several sockets within one RILD, caller have to pass socket id in the API RIL_onUnsolicitedResponse. If we would like to support run time mechanism, we have to have two APIs at the same time. This means vendors who would like to use new RIL have to modify their current vendor-ril. I think build time mechanism is easy and quick to migration for vendors",
+      "parentUuid": "3c52b523_10e4e9c2",
       "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false

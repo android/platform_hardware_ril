@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3c52b523_97b68b05",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-03T20:14:05Z",
+      "side": 0,
+      "message": "This is because our codebase is not from AOPS Master. We will sync code from AOSP Master then merge again later",
+      "parentUuid": "9c8801e4_7be19f7e",
+      "revId": "ebdf40e65a17e8758c059a736425cd47563cdace",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c52b523_90d0d9e6",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
