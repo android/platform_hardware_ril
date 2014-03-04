@@ -366,6 +366,24 @@
     },
     {
       "key": {
+        "uuid": "1c7df19f_de90d983",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-04T05:56:14Z",
+      "side": 1,
+      "message": "After we sync codebase from AOSP MASTER, it will be the same here",
+      "parentUuid": "3c52b523_43b3b9cc",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c58ad41_99e35cf8",
         "filename": "rild/rild.c",
         "patchSetId": 3
