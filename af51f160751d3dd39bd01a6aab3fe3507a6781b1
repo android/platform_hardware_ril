@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1c7df19f_b8adf517",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-04T02:42:06Z",
+      "side": 1,
+      "message": "I think The SIM_COUNT would be provided by TelephonyDevController which BRCM is working on.",
+      "parentUuid": "5c920913_538cc471",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c52b523_50ca6138",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -136,6 +154,24 @@
       "side": 1,
       "message": "But I can check RIL_VERSION in RIL_onUnsolicitedResponse. If callback.RIL_VERSION \u003c RIL_VERSION, then just use RIL_SOCKET_1 directly",
       "parentUuid": "5c920913_6e523f30",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c66ed13_5ed045e5",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4138,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-04T02:42:06Z",
+      "side": 1,
+      "message": "I think you may not need to have version check also, as per my comment in the below file.  (ANDROID_MULTI_SIM compilation conditional to be removed)\n\nhttps://android-review.googlesource.com/#/c/80190/3/rild/rild.c",
+      "parentUuid": "5c920913_4e097bf8",
       "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
