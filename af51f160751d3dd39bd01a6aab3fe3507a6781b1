@@ -331,6 +331,24 @@
     },
     {
       "key": {
+        "uuid": "7c66ed13_21a9b42e",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-04T05:30:47Z",
+      "side": 1,
+      "message": "If RIL_onUnsolicitedResponseSub is added, the structure RIL_Env in ril.h should be modified also. Is it ok for old vendor RIL?",
+      "parentUuid": "3c52b523_23b8bda6",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c52b523_43b3b9cc",
         "filename": "rild/rild.c",
         "patchSetId": 3
@@ -359,6 +377,24 @@
       "writtenOn": "2014-03-02T11:45:34Z",
       "side": 1,
       "message": "In case of two rild architecture for DSDS, how the second rild can listen on second sockets (rild2)?\n\nI am not able to trace any code which can handle 2nd RILD and in ril.cpp the second rild listen on rild2 socket.\n\nCan you please point that code.",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c7df19f_5b3e1bf1",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-04T05:30:47Z",
+      "side": 1,
+      "message": "In DSDS, one rild can listen 2 sockets",
+      "parentUuid": "7c58ad41_99e35cf8",
       "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
