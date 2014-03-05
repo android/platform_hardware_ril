@@ -32,12 +32,12 @@
 #define LOG_NDEBUG 0
 #define LOG_TAG "AT"
 #include <utils/Log.h>
-
+#ifdef ANDROID_MULTI_SIM
 #ifdef HAVE_ANDROID_OS
 /* for IOCTL's */
 #include <linux/omap_csmi.h>
 #endif /*HAVE_ANDROID_OS*/
-
+#endif
 #include "misc.h"
 
 #ifdef HAVE_ANDROID_OS
@@ -489,7 +489,7 @@ static void *readerLoop(void *arg)
         } else {
             processLine(line, socket_trans);
         }
-
+#ifdef ANDROID_MULTI_SIM
 #ifdef HAVE_ANDROID_OS
         if (s_ackPowerIoctl > 0) {
             /* acknowledge that bytes have been read and processed */
@@ -497,6 +497,7 @@ static void *readerLoop(void *arg)
             s_readCount = 0;
         }
 #endif /*HAVE_ANDROID_OS*/
+#endif
     }
 
     onReaderClosed();
@@ -640,6 +641,8 @@ int at_open(int fd, ATUnsolHandler h)
     s_readerClosed = 0;
 
     /* Android power control ioctl */
+
+#ifdef ANDROID_MULTI_SIM
 #ifdef HAVE_ANDROID_OS
 #ifdef OMAP_CSMI_POWER_CONTROL
     ret = ioctl(fd, OMAP_CSMI_TTY_ENABLE_ACK);
@@ -672,6 +675,7 @@ int at_open(int fd, ATUnsolHandler h)
 
 #endif // OMAP_CSMI_POWER_CONTROL
 #endif /*HAVE_ANDROID_OS*/
+#endif
 
     pthread_attr_init (&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);

@@ -129,4 +129,6 @@
     {RIL_REQUEST_IMS_REGISTRATION_STATE, dispatchVoid, responseInts},
     {RIL_REQUEST_IMS_SEND_SMS, dispatchImsSms, responseSMS},
     {RIL_REQUEST_DATA_IDLE, dispatchVoid, responseVoid},
+    {RIL_REQUEST_SET_UICC_SUBSCRIPTION, dispatchUiccSubscripton, responseVoid},
+    {RIL_REQUEST_SET_DATA_SUBSCRIPTION, dispatchVoid, responseVoid},
 
