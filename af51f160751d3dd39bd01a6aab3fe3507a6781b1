@@ -314,6 +314,23 @@
     },
     {
       "key": {
+        "uuid": "1c7df19f_6380009e",
+        "filename": "reference-ril/atchannel.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-05T19:56:45Z",
+      "side": 1,
+      "message": "When this gerrit is compiled on top of aosp tip it gives compilation error saying not able to find \"linux/omap_csmi.h\u003e\n\nWhat is the purpose of this file? Can you please explain.\n\nand how to enable this macro its not enabled in make files",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c52b523_23b8bda6",
         "filename": "rild/rild.c",
         "patchSetId": 3
@@ -343,6 +360,24 @@
       "side": 1,
       "message": "If RIL_onUnsolicitedResponseSub is added, the structure RIL_Env in ril.h should be modified also. Is it ok for old vendor RIL?",
       "parentUuid": "3c52b523_23b8bda6",
+      "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c7df19f_83075c75",
+        "filename": "rild/rild.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1025864
+      },
+      "writtenOn": "2014-03-05T19:56:45Z",
+      "side": 1,
+      "message": "I think for RIL_onUnsolicitedResponseSub function will not have any impact with RIL_Env strcuture.\n\nThe same mechanism can be done for RIL_RadioFunctions\nto achieve runtime backward compatibility.\n\nonRequest\nonStateRequest\netc\n\nto have another set of functions like\nonRequestSocket\nonStateRequestSocket\n\nTo handle these callback in ril.cpp ril version check needs to be done before calling onRequest or onRequestSocket",
+      "parentUuid": "7c66ed13_21a9b42e",
       "revId": "af51f160751d3dd39bd01a6aab3fe3507a6781b1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
