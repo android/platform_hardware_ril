@@ -49,7 +49,12 @@ static void print_usage() {
            7 - DEACTIVE_PDP, \n\
            8 number - DIAL_CALL number, \n\
            9 - ANSWER_CALL, \n\
-           10 - END_CALL \n");
+           10 - END_CALL \n\
+           The last argument must be SIM slot \n\
+           0 - SIM1, \n\
+           1 - SIM2, \n\
+           2 - SIM3, \n\
+           3 - SIM4 \n");
 }
 
 static int error_check(int argc, char * argv[]) {
@@ -59,9 +64,9 @@ static int error_check(int argc, char * argv[]) {
     const int option = atoi(argv[1]);
     if (option < 0 || option > 10) {
         return 0;
-    } else if ((option == DIAL_CALL || option == SETUP_PDP) && argc == 3) {
+    } else if ((option == DIAL_CALL || option == SETUP_PDP) && argc == 4) {
         return 0;
-    } else if ((option != DIAL_CALL && option != SETUP_PDP) && argc == 2) {
+    } else if ((option != DIAL_CALL && option != SETUP_PDP) && argc == 3) {
         return 0;
     }
     return -1;
@@ -70,9 +75,9 @@ static int error_check(int argc, char * argv[]) {
 static int get_number_args(char *argv[]) {
     const int option = atoi(argv[1]);
     if (option != DIAL_CALL && option != SETUP_PDP) {
-        return 1;
-    } else {
         return 2;
+    } else {
+        return 3;
     }
 }
 
