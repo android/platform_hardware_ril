@@ -50,8 +50,14 @@ extern void RIL_register (const RIL_RadioFunctions *callbacks);
 extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
                            void *response, size_t responselen);
 
+
+#if defined(ANDROID_MULTI_SIM)
+extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
+                                size_t datalen, RIL_SOCKET_ID socket_id);
+#else
 extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
                                 size_t datalen);
+#endif
 
 extern void RIL_requestTimedCallback (RIL_TimedCallback callback,
                                void *param, const struct timeval *relativeTime);
