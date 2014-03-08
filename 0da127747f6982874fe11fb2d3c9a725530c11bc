@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3cf1d5a2_2e6467f7",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 3242,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-08T02:07:47Z",
+      "side": 1,
+      "message": "Could you explain how to get the modem and SIM config when the API RIL_register in ril.cpp is running and need the both configurations to create socket?",
+      "range": {
+        "startLine": 3242,
+        "startChar": 12,
+        "endLine": 3242,
+        "endChar": 36
+      },
+      "revId": "0da127747f6982874fe11fb2d3c9a725530c11bc",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
