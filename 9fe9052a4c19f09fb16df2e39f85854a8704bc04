@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c2ba1c2_2373e66e",
+        "filename": "rild/rild.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2014-03-10T19:28:55Z",
+      "side": 1,
+      "message": "At line 143, if vendor did not start rild with the argument \"c\", I thought it should not be put here",
+      "range": {
+        "startLine": 307,
+        "startChar": 4,
+        "endLine": 307,
+        "endChar": 27
+      },
+      "revId": "9fe9052a4c19f09fb16df2e39f85854a8704bc04",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
