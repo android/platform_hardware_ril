@@ -1489,7 +1489,7 @@ static void requestCdmaSendSMS(void *data, size_t datalen, RIL_Token t)
     RIL_SMS_Response response;
     RIL_CDMA_SMS_Message* rcsm;
 
-    RLOGD("requestCdmaSendSMS datalen=%d, sizeof(RIL_CDMA_SMS_Message)=%d",
+    RLOGD("requestCdmaSendSMS datalen=%zu, sizeof(RIL_CDMA_SMS_Message)=%zu",
             datalen, sizeof(RIL_CDMA_SMS_Message));
 
     // verify data content to test marshalling/unmarshalling:
@@ -1528,7 +1528,7 @@ static void requestSendSMS(void *data, size_t datalen, RIL_Token t)
     ATResponse *p_response = NULL;
 
     memset(&response, 0, sizeof(response));
-    RLOGD("requestSendSMS datalen =%d", datalen);
+    RLOGD("requestSendSMS datalen =%zu", datalen);
 
     if (s_ims_gsm_fail != 0) goto error;
     if (s_ims_gsm_retry != 0) goto error2;
@@ -1576,7 +1576,7 @@ static void requestImsSendSMS(void *data, size_t datalen, RIL_Token t)
 
     memset(&response, 0, sizeof(response));
 
-    RLOGD("requestImsSendSMS: datalen=%d, "
+    RLOGD("requestImsSendSMS: datalen=%zu, "
         "registered=%d, service=%d, format=%d, ims_perm_fail=%d, "
         "ims_retry=%d, gsm_fail=%d, gsm_retry=%d",
         datalen, s_ims_registered, s_ims_services, s_ims_format,
