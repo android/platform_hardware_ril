@@ -4169,6 +4169,17 @@ typedef struct {
  */
 #define RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED 1037
 
+/**
+* RIL_UNSOL_SIM_INTERNAL_RESET
+*
+* Indicated when an internal SIM reset is triggered and completed successfully.
+* This event will be sent in the following scenarios
+*  - Physical errors (ie. Short disconnect, RX breaks, parity errors)
+*  - Command response timeouts
+*
+*/
+#define RIL_UNSOL_SIM_INTERNAL_RESET 1038
+
 /***********************************************************************/
 
 
