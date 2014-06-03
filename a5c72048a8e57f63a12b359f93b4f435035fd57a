@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf505ca5_e5ecac76",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2146,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-06-03T23:56:35Z",
+      "side": 1,
+      "message": "I don\u0027t think this works because in CdmaInformationRecords it reads the data as a string. It seems we need to change both sides to use write/readByteArrays and then be sure the resulting value is properly displayed.",
+      "revId": "a5c72048a8e57f63a12b359f93b4f435035fd57a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
