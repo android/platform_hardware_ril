@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "64865967_f0a3f98b",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 4175,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-06-28T15:39:37Z",
+      "side": 1,
+      "message": "What if an internal SIM reset is unsuccessful?",
+      "revId": "9a64a4824f832bec116017e23dcf3d56b263b3d4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2490e198_d5fcacdb",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 4178,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-06-28T15:39:37Z",
+      "side": 1,
+      "message": "I assume you mean S\"IM command response timeouts\"?",
+      "revId": "9a64a4824f832bec116017e23dcf3d56b263b3d4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "448b1570_1754730c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 4181,
+      "author": {
+        "id": 1001401
+      },
+      "writtenOn": "2014-06-28T15:39:37Z",
+      "side": 1,
+      "message": "How would we test this command? Testing has been something sorely lacking and we now actually have a test team, hence my question.",
+      "revId": "9a64a4824f832bec116017e23dcf3d56b263b3d4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
