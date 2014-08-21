@@ -79,6 +79,7 @@ extern "C" {
  *                    RIL_REQUEST_SET_SIM_CARD_POWER,
  *                    RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION,
  *                    RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
+ *                    RIL_REQUEST_SIM_QUERY_ATR
  *                    The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
  *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
  *                    New data structure RIL_DataRegistrationStateResponse,
@@ -5591,6 +5592,25 @@ typedef struct {
  */
 #define RIL_REQUEST_STOP_KEEPALIVE 145
 
+/**
+ * RIL_REQUEST_SIM_QUERY_ATR
+ *
+ * Query the ATR from SIM Card
+ *
+ * Only valid when radio state is "RADIO_STATE_ON"
+ *
+ * "data" is null
+ * "response" is a const char * containing the ATR, See ETSI 102.221 8.1 and ISO/IEC 7816 3
+ *
+ * Valid errors:
+ *
+ * NONE
+ * NO_MEMORY
+ * INTERNAL_ERR
+ * INVALID_ARGUMENTS
+ * MODEM_ERR
+ */
+#define RIL_REQUEST_SIM_QUERY_ATR 146
 /***********************************************************************/
 
 /**
