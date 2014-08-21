@@ -541,6 +541,10 @@ int setSimCardPowerResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
+int getAtrResponse(int slotId,
+                    int responseType, int serial, RIL_Errno e,
+                    void *response, size_t responselen);
+
 void acknowledgeRequest(int slotId, int serial);
 
 int radioStateChangedInd(int slotId,
