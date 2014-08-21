@@ -75,7 +75,8 @@ extern "C" {
  * RIL_VERSION = 15 : New commands added:
  *                    RIL_REQUEST_SEND_DEVICE_STATE,
  *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER,
- *                    RIL_REQUEST_SET_SIM_CARD_POWER
+ *                    RIL_REQUEST_SET_SIM_CARD_POWER,
+ *                    RIL_REQUEST_SIM_QUERY_ATR
  *                    The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
  *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
  *                    New data structure RIL_DataRegistrationStateResponse,
@@ -5321,6 +5322,24 @@ typedef enum {
   *  INVALID_ARGUMENTS
   */
 #define RIL_REQUEST_SET_SIM_CARD_POWER 140
+
+/**
+ * RIL_REQUEST_SIM_QUERY_ATR
+ *
+ * Query the ATR from SIM Card
+ *
+ * Only valid when radio state is "RADIO_STATE_ON"
+ *
+ * "data" is null
+ * "response" is a const char * containing the ATR, See ETSI 102.221 8.1 and ISO/IEC 7816 3
+ *
+ * Valid errors:
+ *
+ * SUCCESS
+ * RADIO_NOT_AVAILABLE (radio resetting)
+ * GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SIM_QUERY_ATR 141
 /***********************************************************************/
 
 /**

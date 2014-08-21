@@ -155,3 +155,4 @@
     {RIL_REQUEST_SEND_DEVICE_STATE, radio::sendDeviceStateResponse},
     {RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER, radio::setIndicationFilterResponse},
     {RIL_REQUEST_SET_SIM_CARD_POWER, radio::setSimCardPowerResponse},
+    {RIL_REQUEST_SIM_QUERY_ATR, radio::getAtrResponse},

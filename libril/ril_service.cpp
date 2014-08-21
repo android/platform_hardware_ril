@@ -363,6 +363,8 @@ struct RadioImpl : public IRadio {
 
     Return<void> getImsRegistrationState(int32_t serial);
 
+    Return<void> getAtr(int32_t serial);
+
     Return<void> sendImsSms(int32_t serial, const ImsSmsMessage& message);
 
     Return<void> iccTransmitApduBasicChannel(int32_t serial, const SimApdu& message);
@@ -1960,6 +1962,12 @@ Return<void> RadioImpl::getImsRegistrationState(int32_t serial) {
     return Void();
 }
 
+Return<void> RadioImpl::getAtr(int32_t serial) {
+    RLOGD("RadioImpl::getAtr: serial %d", serial);
+    dispatchVoid(serial, mSlotId, RIL_REQUEST_SIM_QUERY_ATR);
+    return Void();
+}
+
 bool dispatchImsGsmSms(const ImsSmsMessage& message, RequestInfo *pRI) {
     RIL_IMS_SMS_Message rism = {};
     char **pStrings;
@@ -2997,6 +3005,27 @@ int radio::getIMSIForAppResponse(int slotId,
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("getIMSIForAppResponse: radioService[%d]->mRadioResponse == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
+int radio::getAtrResponse(int slotId,
+                          int responseType, int serial, RIL_Errno e, void *response,
+                          size_t responseLen) {
+#if VDBG
+    RLOGD("radio::getAtrResponse: serial %d", serial);
+#endif
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->getAtrResponse(
+                responseInfo, convertCharPtrToHidlString((char *) response));
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::getAtrResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
     }
 
