@@ -1125,6 +1125,7 @@ requestToString(int request) {
         case RIL_REQUEST_NV_WRITE_ITEM: return "NV_WRITE_ITEM";
         case RIL_REQUEST_NV_WRITE_CDMA_PRL: return "NV_WRITE_CDMA_PRL";
         case RIL_REQUEST_NV_RESET_CONFIG: return "NV_RESET_CONFIG";
+        case RIL_REQUEST_SIM_QUERY_ATR: return "SIM_QUERY_ATR";
         case RIL_REQUEST_SET_UICC_SUBSCRIPTION: return "SET_UICC_SUBSCRIPTION";
         case RIL_REQUEST_ALLOW_DATA: return "ALLOW_DATA";
         case RIL_REQUEST_GET_HARDWARE_CONFIG: return "GET_HARDWARE_CONFIG";

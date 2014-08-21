@@ -90,6 +90,8 @@ extern "C" {
  *                    RIL_REQUEST_START_NETWORK_SCAN
  *                    RIL_REQUEST_STOP_NETWORK_SCAN
  *                    RIL_UNSOL_NETWORK_SCAN_RESULT
+ * RIL_VERSION = 16 : New commands added:
+ *                    RIL_REQUEST_SIM_QUERY_ATR
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -6322,6 +6324,29 @@ typedef struct {
  */
 #define RIL_REQUEST_STOP_KEEPALIVE 145
 
+/**
+ * RIL_REQUEST_SIM_QUERY_ATR
+ *
+ * Query the ATR (Answer to Reset) from SIM Card.
+ * The ATR is a message output by a contact Smart Card specified
+ * by ISO/IEC 7816 standards, following an electric reset of the
+ * card's chip by a card reader. It conveys information about the
+ * communication parameters proposed by the card, as well as the
+ * card's nature and state.
+ *
+ * Only valid when radio state is "RADIO_STATE_ON"
+ *
+ * "data" is null
+ * "response" is a const char * containing the ATR, See ETSI 102.221 8.1 and ISO/IEC 7816 3
+ *
+ * Valid errors:
+ *   NONE
+ *   NO_MEMORY
+ *   INTERNAL_ERR
+ *   INVALID_ARGUMENTS
+ *   MODEM_ERR
+ */
+#define RIL_REQUEST_SIM_QUERY_ATR 146
 /***********************************************************************/
 
 /**
