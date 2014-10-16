@@ -3616,6 +3616,8 @@ typedef struct {
  *
  * "response" is int *
  * ((int *)data)[0] contains the session id of the logical channel.
+ * ((int *)data)[1] onwards may optionally contain the select response for the
+ *     open channel command with one byte per integer.
  *
  * Valid errors:
  *  SUCCESS
