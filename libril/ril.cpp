@@ -148,7 +148,9 @@ typedef struct UserCallbackInfo {
     struct UserCallbackInfo *p_next;
 } UserCallbackInfo;
 
-typedef struct SocketListenParam {
+struct SocketListenParam {
+    SocketListenParam() {}
+    SocketListenParam(RIL_SOCKET_ID s, int fdL, int fdC, char *pn, ril_event* ce, ril_event* le, void (*pcc)(int,short,void*), RecordStream *rs):socket_id(s),fdListen(fdL),fdCommand(fdC),processName(pn),commands_event(ce),listen_event(le),processCommandsCallback(pcc),p_rs(rs) {}
     RIL_SOCKET_ID socket_id;
     int fdListen;
     int fdCommand;
@@ -157,7 +159,7 @@ typedef struct SocketListenParam {
     struct ril_event* listen_event;
     void (*processCommandsCallback)(int fd, short flags, void *param);
     RecordStream *p_rs;
-} SocketListenParam;
+};
 
 extern "C" const char * requestToString(int request);
 extern "C" const char * failCauseToString(RIL_Errno);
@@ -3906,7 +3908,7 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
     memcpy(&s_callbacks, callbacks, sizeof (RIL_RadioFunctions));
 
     /* Initialize socket1 parameters */
-    s_ril_param_socket = {
+    s_ril_param_socket = SocketListenParam(
                         RIL_SOCKET_1,             /* socket_id */
                         -1,                       /* fdListen */
                         -1,                       /* fdCommand */
@@ -3915,10 +3917,10 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
                         &s_listen_event,          /* listen_event */
                         processCommandsCallback,  /* processCommandsCallback */
                         NULL                      /* p_rs */
-                        };
+                        );
 
 #if (SIM_COUNT >= 2)
-    s_ril_param_socket2 = {
+    s_ril_param_socket2 = SocketListenParam(
                         RIL_SOCKET_2,               /* socket_id */
                         -1,                         /* fdListen */
                         -1,                         /* fdCommand */
@@ -3927,11 +3929,11 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
                         &s_listen_event_socket2,    /* listen_event */
                         processCommandsCallback,    /* processCommandsCallback */
                         NULL                        /* p_rs */
-                        };
+                        );
 #endif
 
 #if (SIM_COUNT >= 3)
-    s_ril_param_socket3 = {
+    s_ril_param_socket3 = SocketListenParam(
                         RIL_SOCKET_3,               /* socket_id */
                         -1,                         /* fdListen */
                         -1,                         /* fdCommand */
@@ -3940,11 +3942,11 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
                         &s_listen_event_socket3,    /* listen_event */
                         processCommandsCallback,    /* processCommandsCallback */
                         NULL                        /* p_rs */
-                        };
+                        );
 #endif
 
 #if (SIM_COUNT >= 4)
-    s_ril_param_socket4 = {
+    s_ril_param_socket4 = SocketListenParam(
                         RIL_SOCKET_4,               /* socket_id */
                         -1,                         /* fdListen */
                         -1,                         /* fdCommand */
@@ -3953,7 +3955,7 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
                         &s_listen_event_socket4,    /* listen_event */
                         processCommandsCallback,    /* processCommandsCallback */
                         NULL                        /* p_rs */
-                        };
+                        );
 #endif
 
 
