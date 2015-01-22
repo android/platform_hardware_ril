@@ -91,6 +91,7 @@ static int make_argv(char * args, char ** argv)
 /*
  * switchUser - Switches UID to radio, preserving CAP_NET_ADMIN capabilities.
  * Our group, cache, was set by init.
+ * Set DUMPABLE after being cleared by setuid, to have tombstone on RIL crash
  */
 void switchUser() {
     prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
@@ -114,6 +115,8 @@ void switchUser() {
         RLOGE("capset failed: %s", strerror(errno));
         exit(EXIT_FAILURE);
     }
+
+    prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
 }
 
 int main(int argc, char **argv)
