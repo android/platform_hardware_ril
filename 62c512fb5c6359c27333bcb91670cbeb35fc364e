@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b519ba8_9c7665fc",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2015-01-23T05:14:10Z",
+      "side": 1,
+      "message": "so add a prctl(PR_GET_DUMPABLE, 0, 0, 0, 0) here and pass that to the PR_SET_DUMPABLE call below?",
+      "revId": "62c512fb5c6359c27333bcb91670cbeb35fc364e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
