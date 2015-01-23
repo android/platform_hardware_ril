@@ -34,6 +34,24 @@
       "revId": "62c512fb5c6359c27333bcb91670cbeb35fc364e",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4b8a4f30_335a3046",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1061864
+      },
+      "writtenOn": "2015-01-23T12:05:44Z",
+      "side": 1,
+      "message": "Done\nChange updated accordingly - just removed the test of property_get() returned value because \"0\" is explicit default result if property unset/error (seems to be the common property_get() usage pattern in AOSP)",
+      "parentUuid": "4b732f24_34acdea6",
+      "revId": "62c512fb5c6359c27333bcb91670cbeb35fc364e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
