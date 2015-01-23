@@ -16,6 +16,24 @@
       "revId": "62c512fb5c6359c27333bcb91670cbeb35fc364e",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4b732f24_34acdea6",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1003966
+      },
+      "writtenOn": "2015-01-23T06:01:52Z",
+      "side": 1,
+      "message": "That\u0027s not going to work. There needs to be an explicit property_get call to get the ro.debuggable value.\n\nYou\u0027re thinking of EnableDebugger() in art/runtime/native/dalvik_system_ZygoteHooks.cc, which is only called if ro.debuggable\u003d1 or debuggable\u003d\"true\" in the Android manifest.\n\nSomething like this around line 119:\n\n  char debuggable[PROP_VALUE_MAX];\n  int ret \u003d property_get(\"ro.debuggable\", debuggable, \"0\");\n  if (ret \u0026\u0026 (strcmp(debuggable, \"1\") \u003d\u003d 0)) {\n    prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);\n  }",
+      "parentUuid": "2b519ba8_9c7665fc",
+      "revId": "62c512fb5c6359c27333bcb91670cbeb35fc364e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
