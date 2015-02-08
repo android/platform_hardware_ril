@@ -4013,7 +4013,7 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
 
     char rildebug[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_DEBUG;
     if (inst != NULL) {
-        strncat(rildebug, inst, MAX_DEBUG_SOCKET_NAME_LENGTH);
+        strlcat(rildebug, inst, MAX_DEBUG_SOCKET_NAME_LENGTH);
     }
 
     s_fdDebug = android_get_control_socket(rildebug);
