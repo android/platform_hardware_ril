@@ -3732,7 +3732,10 @@ static void listenCallback (int fd, short flags, void *param) {
     RecordStream *p_rs;
     SocketListenParam *p_info = (SocketListenParam *)param;
 
-    struct sockaddr_un peeraddr;
+    union {
+        struct sockaddr sa;
+        struct sockaddr_un un;
+    } peeraddr;
     socklen_t socklen = sizeof (peeraddr);
 
     struct ucred creds;
@@ -3743,7 +3746,7 @@ static void listenCallback (int fd, short flags, void *param) {
     assert (*p_info->fdCommand < 0);
     assert (fd == *p_info->fdListen);
 
-    fdCommand = accept(fd, (sockaddr *) &peeraddr, &socklen);
+    fdCommand = accept(fd, &peeraddr.sa, &socklen);
 
     if (fdCommand < 0 ) {
         RLOGE("Error on accept() errno:%d", errno);
@@ -3823,7 +3826,10 @@ static void freeDebugCallbackArgs(int number, char **args) {
 
 static void debugCallback (int fd, short flags, void *param) {
     int acceptFD, option;
-    struct sockaddr_un peeraddr;
+    union {
+        struct sockaddr sa;
+        struct sockaddr_un un;
+    } peeraddr;
     socklen_t socklen = sizeof (peeraddr);
     int data;
     unsigned int qxdm_data[6];
@@ -3838,7 +3844,7 @@ static void debugCallback (int fd, short flags, void *param) {
 
     RLOGI("debugCallback for socket %s", rilSocketIdToString(socket_id));
 
-    acceptFD = accept (fd,  (sockaddr *) &peeraddr, &socklen);
+    acceptFD = accept (fd,  &peeraddr.sa, &socklen);
 
     if (acceptFD < 0) {
         RLOGE ("error accepting on debug port: %d\n", errno);
