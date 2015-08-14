@@ -26,8 +26,18 @@ endif
 
 LOCAL_MODULE:= rild
 LOCAL_MODULE_TAGS := optional
+LOCAL_REQUIRED_MODULES := rild.rc
 
 include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := rild.rc
+LOCAL_SRC_FILES := $(LOCAL_MODULE)
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT)/init
+
+include $(BUILD_PREBUILT)
 
 # For radiooptions binary
 # =======================
