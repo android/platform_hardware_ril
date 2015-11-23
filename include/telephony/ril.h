@@ -71,6 +71,7 @@ extern "C" {
  *                    New commands added: RIL_REQUEST_SET_CARRIER_RESTRICTIONS,
  *                    RIL_REQUEST_SET_CARRIER_RESTRICTIONS and
  *                    RIL_UNSOL_PCO_DATA
+ * RIL_VERSION = 15 : New data structure is added: RIL_OpenChannelParams.
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -1726,6 +1727,12 @@ typedef struct {
    * the transmitter is inactive */
   uint32_t rx_mode_time_ms;
 } RIL_ActivityStatsInfo;
+
+typedef struct {
+    char * aidPtr; /* AID value, See ETSI 102.221 and 101.220*/
+    uint8_t p2; /* P2 parameter (described in ISO 7816-4) */
+
+} RIL_OpenChannelParams;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -4764,9 +4771,11 @@ typedef struct {
  * RIL_REQUEST_SIM_OPEN_CHANNEL
  *
  * Open a new logical channel and select the given application. This command
- * reflects TS 27.007 "open logical channel" operation (+CCHO).
+ * reflects TS 27.007 "open logical channel" operation (+CCHO). This request
+ * also specifies the P2 parameter (described in ISO 7816-4).
  *
- * "data" is const char * and set to AID value, See ETSI 102.221 and 101.220.
+ * "data" is a const RIL_OpenChannelParam * if RIL_VERSION >= 15
+ * "data" is const char * and set to AID value, See ETSI 102.221 and 101.220, otherwise.
  *
  * "response" is int *
  * ((int *)data)[0] contains the session id of the logical channel.
