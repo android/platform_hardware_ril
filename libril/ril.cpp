@@ -322,6 +322,7 @@ static void wakeTimeoutCallback(void *);
 static bool isServiceTypeCfQuery(RIL_SsServiceType serType, RIL_SsRequestType reqType);
 
 static bool isDebuggable();
+static void dispatchOpenChannelWithP2(Parcel &p, RequestInfo *pRI);
 
 #ifdef RIL_SHLIB
 #if defined(ANDROID_MULTI_SIM)
@@ -2154,6 +2155,56 @@ exit:
     if (excluded_carriers != NULL) {
         free(excluded_carriers);
     }
+    return;
+}
+
+/**
+ * Callee expects const RIL_OpenChannelParams *
+ * Payload is:
+ * byte p2
+ * char * aidPtr
+ */
+static void dispatchOpenChannelWithP2 (Parcel &p, RequestInfo *pRI) {
+    RIL_OpenChannelParams openChannel;
+    status_t status;
+    uint8_t p2;
+
+#if VDBG
+    RLOGD("dispatchOpenChannelWithP2");
+#endif
+    memset (&openChannel, 0, sizeof(RIL_OpenChannelParams));
+
+    status = p.read(&p2, sizeof(p2));
+    openChannel.p2 = (uint8_t) p2;
+
+    openChannel.aidPtr = strdupReadString(p);
+    if (status != NO_ERROR || openChannel.aidPtr == NULL) {
+        goto invalid;
+    }
+
+    startRequest;
+    appendPrintBuf("%s[p2:%d, aid:%s]", printBuf, openChannel.p2, openChannel.aidPtr);
+
+    closeRequest;
+    printRequest(pRI->token, pRI->pCI->requestNumber);
+
+    CALL_ONREQUEST(pRI->pCI->requestNumber,
+                &openChannel,
+                sizeof(openChannel),
+                pRI, pRI->socket_id);
+
+#ifdef MEMSET_FREED
+    memsetString(openChannel.aidPtr);
+#endif
+    free(openChannel.aidPtr);
+
+#ifdef MEMSET_FREED
+    memset(&openChannel, 0, sizeof(openChannel));
+#endif
+    return;
+
+invalid:
+    invalidCommandBlock(pRI);
     return;
 }
 
