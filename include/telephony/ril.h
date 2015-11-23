@@ -82,6 +82,7 @@ extern "C" {
  *                    RIL_VoiceRegistrationStateResponse same is
  *                    used in RIL_REQUEST_DATA_REGISTRATION_STATE and
  *                    RIL_REQUEST_VOICE_REGISTRATION_STATE respectively.
+ *                    New data structure RIL_OpenChannelParams.
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -2007,6 +2008,12 @@ typedef enum {
                                               // RIL_UNSOL_DATA_CALL_LIST_CHANGED regardless this
                                               // bit is set or not.
 } RIL_UnsolicitedResponseFilter;
+
+typedef struct {
+    char * aidPtr; /* AID value, See ETSI 102.221 and 101.220*/
+    int p2;        /* P2 parameter (described in ISO 7816-4)
+                      P2Constants:NO_P2 if to be ignored */
+} RIL_OpenChannelParams;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -4847,9 +4854,10 @@ typedef enum {
  * RIL_REQUEST_SIM_OPEN_CHANNEL
  *
  * Open a new logical channel and select the given application. This command
- * reflects TS 27.007 "open logical channel" operation (+CCHO).
+ * reflects TS 27.007 "open logical channel" operation (+CCHO). This request
+ * also specifies the P2 parameter (described in ISO 7816-4).
  *
- * "data" is const char * and set to AID value, See ETSI 102.221 and 101.220.
+ * "data" is a const RIL_OpenChannelParam *
  *
  * "response" is int *
  * ((int *)data)[0] contains the session id of the logical channel.

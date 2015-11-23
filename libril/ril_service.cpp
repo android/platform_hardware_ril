@@ -368,7 +368,7 @@ struct RadioImpl : public IRadio {
     Return<void> iccTransmitApduBasicChannel(int32_t serial, const SimApdu& message);
 
     Return<void> iccOpenLogicalChannel(int32_t serial,
-            const ::android::hardware::hidl_string& aid);
+            const ::android::hardware::hidl_string& aid, int32_t p2);
 
     Return<void> iccCloseLogicalChannel(int32_t serial, int32_t channelId);
 
@@ -2071,11 +2071,31 @@ Return<void> RadioImpl::iccTransmitApduBasicChannel(int32_t serial, const SimApd
     return Void();
 }
 
-Return<void> RadioImpl::iccOpenLogicalChannel(int32_t serial, const hidl_string& aid) {
+Return<void> RadioImpl::iccOpenLogicalChannel(int32_t serial, const hidl_string& aid, int32_t p2) {
 #if VDBG
     RLOGD("iccOpenLogicalChannel: serial %d", serial);
 #endif
-    dispatchString(serial, mSlotId, RIL_REQUEST_SIM_OPEN_CHANNEL, aid.c_str());
+    if (s_vendorFunctions->version < 15) {
+        dispatchString(serial, mSlotId, RIL_REQUEST_SIM_OPEN_CHANNEL, aid.c_str());
+    } else {
+        RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_SIM_OPEN_CHANNEL);
+        if (pRI == NULL) {
+            return Void();
+        }
+
+        RIL_OpenChannelParams params;
+        memset (&params, 0, sizeof(RIL_OpenChannelParams));
+
+        params.p2 = p2;
+
+        if (!copyHidlStringToRil(&params.aidPtr, (const char *)aid, pRI)) {
+            return Void();
+        }
+
+        s_vendorFunctions->onRequest(pRI->pCI->requestNumber, &params, sizeof(params), pRI);
+
+        memsetAndFreeStrings(1, params.aidPtr);
+    }
     return Void();
 }
 
