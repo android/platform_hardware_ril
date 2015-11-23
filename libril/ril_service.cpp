@@ -366,7 +366,7 @@ struct RadioImpl : public IRadio {
     Return<void> iccTransmitApduBasicChannel(int32_t serial, const SimApdu& message);
 
     Return<void> iccOpenLogicalChannel(int32_t serial,
-            const ::android::hardware::hidl_string& aid);
+            const ::android::hardware::hidl_string& aid, uint8_t p2);
 
     Return<void> iccCloseLogicalChannel(int32_t serial, int32_t channelId);
 
@@ -695,6 +695,28 @@ bool dispatchIccApdu(int serial, int slotId, int request, const SimApdu& message
     s_vendorFunctions->onRequest(request, &apdu, sizeof(apdu), pRI);
 
     memsetAndFreeStrings(1, apdu.data);
+
+    return true;
+}
+
+bool dispatchOpenChannelWithP2(int serial, int slotId, int request, const char * str, uint8_t p2) {
+    RequestInfo *pRI = android::addRequestToList(serial, slotId, request);
+    if (pRI == NULL) {
+        return false;
+    }
+
+    RIL_OpenChannelParams openChannel;
+    memset (&openChannel, 0, sizeof(RIL_OpenChannelParams));
+
+    openChannel.p2 = p2;
+
+    if (!copyHidlStringToRil(&openChannel.aidPtr, str, pRI)) {
+        return false;
+    }
+
+    s_vendorFunctions->onRequest(request, &openChannel, sizeof(openChannel), pRI);
+
+    memsetAndFreeStrings(1, openChannel.aidPtr);
 
     return true;
 }
@@ -1865,10 +1887,14 @@ Return<void> RadioImpl::iccTransmitApduBasicChannel(int32_t serial, const SimApd
     return Void();
 }
 
-Return<void> RadioImpl::iccOpenLogicalChannel(int32_t serial, const hidl_string& aid) {
-    RLOGD("iccOpenLogicalChannel: serial %d", serial);
-    dispatchString(serial, mSlotId, RIL_REQUEST_SIM_OPEN_CHANNEL,
-            (const char *) aid);
+Return<void> RadioImpl::iccOpenLogicalChannel(int32_t serial, const hidl_string& aid, uint8_t p2) {
+    RLOGD("RadioImpl::iccOpenLogicalChannel: serial %d", serial);
+    if (s_vendorFunctions->version < 15) {
+        dispatchString(serial, mSlotId, RIL_REQUEST_SIM_OPEN_CHANNEL, (const char *)aid);
+    } else {
+        dispatchOpenChannelWithP2(serial, mSlotId, RIL_REQUEST_SIM_OPEN_CHANNEL,
+                (const char *)aid, p2);
+    }
     return Void();
 }
 
