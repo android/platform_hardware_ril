@@ -16,6 +16,24 @@
       "revId": "556110fb28cfe25b9e7d9491dbaded9fd1730924",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0512320e_f3181002",
+        "filename": "libril/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1002751
+      },
+      "writtenOn": "2015-12-16T22:38:13Z",
+      "side": 1,
+      "message": "No, and it is triply broken:\n1. TARGET_OUT_HEADER is undefined, it should be TARGET_OUT_HEADERS\n2. librilutils doesn\u0027t copy headers to TARGET_OUT_HEADERS\n3. TARGET_OUT_HEADERS is already in the include path, it should be including librilutils/header.h instead of adding a new include search path",
+      "parentUuid": "85bb823a_2fcea9dc",
+      "revId": "556110fb28cfe25b9e7d9491dbaded9fd1730924",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
