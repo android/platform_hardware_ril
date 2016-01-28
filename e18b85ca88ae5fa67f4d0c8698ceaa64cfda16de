@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d4b8d2d6_96975dbc",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3120,
+      "author": {
+        "id": 1010056
+      },
+      "writtenOn": "2016-01-28T05:41:26Z",
+      "side": 1,
+      "message": "Yuck. It took me a second to see the use of response.",
+      "revId": "e18b85ca88ae5fa67f4d0c8698ceaa64cfda16de",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
