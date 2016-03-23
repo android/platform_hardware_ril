@@ -4460,6 +4460,22 @@ typedef struct {
  */
 #define RIL_REQUEST_GET_ACTIVITY_INFO 135
 
+/**
+ * RIL_REQUEST_SET_TRANSMIT_POWER
+ *
+ * Notify modem of Tx power backoff, so that modem can control Tx power.
+ *
+ * "data" is const char *
+ * ((const char *)data)[0] is the parameter for this request
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ */
+#define RIL_REQUEST_SET_TRANSMIT_POWER 136
+
 /***********************************************************************/
 
 

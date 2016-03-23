@@ -5157,6 +5157,7 @@ requestToString(int request) {
         case RIL_UNSOL_DC_RT_INFO_CHANGED: return "UNSOL_DC_RT_INFO_CHANGED";
         case RIL_REQUEST_SHUTDOWN: return "SHUTDOWN";
         case RIL_UNSOL_RADIO_CAPABILITY: return "RIL_UNSOL_RADIO_CAPABILITY";
+        case RIL_REQUEST_SET_TRANSMIT_POWER: return "RIL_REQUEST_SET_TRANSMIT_POWER";
         default: return "<unknown request>";
     }
 }
