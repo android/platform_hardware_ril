@@ -2680,6 +2680,7 @@ static int responseSsn(Parcel &p, void *response, size_t responselen) {
     p.writeInt32(p_cur->index);
     p.writeInt32(p_cur->type);
     writeStringToParcel(p, p_cur->number);
+    writeStringToParcel(p, p_cur->history);
 
     startResponse;
     appendPrintBuf("%s%s,code=%d,id=%d,type=%d,%s", printBuf,
