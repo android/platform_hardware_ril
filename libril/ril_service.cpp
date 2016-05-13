@@ -6697,6 +6697,7 @@ int radio::suppSvcNotifyInd(int slotId, int indicationType,
         suppSvc.index = ssn->index;
         suppSvc.type = ssn->type;
         suppSvc.number = convertCharPtrToHidlString(ssn->number);
+        suppSvc.history = ssn->history;
 
 #if VDBG
         RLOGD("suppSvcNotifyInd: isMT %d code %d index %d type %d",

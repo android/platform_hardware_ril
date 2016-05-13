@@ -967,6 +967,9 @@ typedef struct {
     int     type;               /* "type" from 27.007 7.17 (MT only). */
     char *  number;             /* "number" from 27.007 7.17
                                    (MT only, may be NULL). */
+    char *  history;            /* List of forwarded numbers. If the list has plural forwarded
+                                   numbers, those are separated with "\n\r" characters.
+                                   (e.g. "1111\n\r2222") */
 } RIL_SuppSvcNotification;
 
 #define RIL_CARD_MAX_APPS     8
