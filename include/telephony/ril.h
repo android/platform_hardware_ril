@@ -303,6 +303,7 @@ typedef struct {
     char *          name;       /* Remote party name */
     int             namePresentation; /* 0=Allowed, 1=Restricted, 2=Not Specified/Unknown 3=Payphone */
     RIL_UUS_Info *  uusInfo;    /* NULL or Pointer to User-User Signaling Information */
+    const char *    codec;      /* Null or Codec=QCELP13K/EVRC/EVRC_B/EVRC_WB/EVRC_NW/AMR_NB/AMR_WB/GSM_EFR/GSM_FR/GSM_HR */
 } RIL_Call;
 
 /* Deprecated, use RIL_Data_Call_Response_v6 */

@@ -2315,6 +2315,7 @@ static int responseCallList(Parcel &p, void *response, size_t responselen) {
             p.writeInt32(uusInfo->uusLength);
             p.write(uusInfo->uusData, uusInfo->uusLength);
         }
+        writeStringToParcel(p, p_cur->codec);
         appendPrintBuf("%s[id=%d,%s,toa=%d,",
             printBuf,
             p_cur->index,
@@ -2333,6 +2334,9 @@ static int responseCallList(Parcel &p, void *response, size_t responselen) {
             p_cur->numberPresentation,
             p_cur->name,
             p_cur->namePresentation);
+        appendPrintBuf("%s%s]",
+            printBuf,
+            p_cur->codec);
     }
     removeLastChar;
     closeResponse;
