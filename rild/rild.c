@@ -36,7 +36,6 @@
 #include <libril/ril_ex.h>
 
 #include <private/android_filesystem_config.h>
-#include "hardware/qemu_pipe.h"
 
 #define LIB_PATH_PROPERTY   "rild.libpath"
 #define LIB_ARGS_PROPERTY   "rild.libargs"
@@ -136,6 +135,31 @@ void switchUser() {
     }
 }
 
+static int qemu_pipe_open(const char* pipename) {
+    int fd = TEMP_FAILURE_RETRY(open("/dev/qemu_pipe", O_RDWR));
+    if (fd < 0 && errno == ENOENT) {
+        fd = TEMP_FAILURE_RETRY(open("/dev/goldfish_pipe", O_RDWR));
+    }
+    if (fd < 0) {
+        return -1;
+    }
+
+    // NOTE: Write the pipe name _including_ the terminating zero.
+    int pipenamelen = strlen(pipename);
+    int ret = TEMP_FAILURE_RETRY(write(fd, pipename, pipenamelen + 1));
+    if (ret != pipenamelen + 1) {
+        if (ret == 0) {
+            errno = ECONNRESET;
+        } else if (ret > 0) {
+            errno = EINVAL;
+        }
+        close(fd);
+        return -1;
+    }
+
+    return fd;
+}
+
 int main(int argc, char **argv) {
     const char * rilLibPath = NULL;
     char **rilArgv;
@@ -220,47 +244,21 @@ int main(int argc, char **argv) {
         }
         close(fd);
 
-        if (strstr(buffer, "android.qemud=") != NULL)
-        {
-            /* the qemud daemon is launched after rild, so
-            * give it some time to create its GSM socket
-            */
-            int  tries = 5;
-#define  QEMUD_SOCKET_NAME    "qemud"
-
-            while (1) {
-                int  fd;
-
-                sleep(1);
-
-                fd = qemu_pipe_open("qemud:gsm");
-                if (fd < 0) {
-                    fd = socket_local_client(
-                                QEMUD_SOCKET_NAME,
-                                ANDROID_SOCKET_NAMESPACE_RESERVED,
-                                SOCK_STREAM );
-                }
-                if (fd >= 0) {
-                    close(fd);
-                    snprintf( arg_device, sizeof(arg_device), "%s/%s",
-                                ANDROID_SOCKET_DIR, QEMUD_SOCKET_NAME );
-
-                    arg_overrides[1] = "-s";
-                    arg_overrides[2] = arg_device;
-                    done = 1;
-                    break;
-                }
-                RLOGD("could not connect to %s socket: %s",
-                    QEMUD_SOCKET_NAME, strerror(errno));
-                if (--tries == 0)
-                    break;
-            }
-            if (!done) {
-                RLOGE("could not connect to %s socket (giving up): %s",
-                    QEMUD_SOCKET_NAME, strerror(errno));
+        if (strstr(buffer, "android.qemud=") != NULL) {
+            int fd = qemu_pipe_open("pipe:qemud:gsm");
+            if (fd < 0) {
+                RLOGE("could not connect to gsm pipe server (giving up): %s",
+                      strerror(errno));
                 while(1)
                     sleep(0x00ffffff);
             }
+            close(fd);
+            snprintf(arg_device, sizeof(arg_device), "%s/%s",
+                        ANDROID_SOCKET_DIR, "qemud");
+
+            arg_overrides[1] = "-s";
+            arg_overrides[2] = arg_device;
+            done = 1;
         }
 
         /* otherwise, try to see if we passed a device name from the kernel */
