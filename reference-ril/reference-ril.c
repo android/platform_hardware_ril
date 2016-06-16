@@ -36,9 +36,9 @@
 #include <cutils/sockets.h>
 #include <termios.h>
 #include <sys/system_properties.h>
+#include <system/qemu_pipe.h>
 
 #include "ril.h"
-#include "hardware/qemu_pipe.h"
 
 #define LOG_TAG "RIL"
 #include <utils/Log.h>
@@ -251,6 +251,16 @@ static void setRadioTechnology(ModemInfo *mdm, int newtech);
 static int query_ctec(ModemInfo *mdm, int *current, int32_t *preferred);
 static int parse_technology_response(const char *response, int *current, int32_t *preferred);
 static int techFromModemType(int mdmtype);
+
+// Returns true if running inside the emulator.
+static int isUnderEmulation(void) {
+    static int result = -1;
+    if (result < 0) {
+        char  propValue[PROP_VALUE_MAX];
+        result = (__system_property_get("ro.kernel.qemu", propValue) != 0);
+    }
+    return result;
+}
 
 static int clccStateToRILState(int state, RIL_CallState *p_state)
 
@@ -551,9 +561,7 @@ static void requestOrSendDataCallList(RIL_Token *t)
         strcpy(responses[i].addresses, out);
 
         {
-            char  propValue[PROP_VALUE_MAX];
-
-            if (__system_property_get("ro.kernel.qemu", propValue) != 0) {
+            if (isUnderEmulation()) {
                 /* We are in the emulator - the dns servers are listed
                  * by the following system properties, setup in
                  * /system/etc/init.goldfish.sh:
@@ -571,6 +579,8 @@ static void requestOrSendDataCallList(RIL_Token *t)
                 for (nn = 1; nn <= 4; nn++) {
                     /* Probe net.eth0.dns<n> */
                     char  propName[PROP_NAME_MAX];
+                    char  propValue[PROP_VALUE_MAX];
+
                     snprintf(propName, sizeof propName, "net.eth0.dns%d", nn);
 
                     /* Ignore if undefined */
@@ -3299,34 +3309,9 @@ mainLoop(void *param __unused)
             if (s_port > 0) {
                 fd = socket_loopback_client(s_port, SOCK_STREAM);
             } else if (s_device_socket) {
-                if (!strcmp(s_device_path, "/dev/socket/qemud")) {
-                    /* Before trying to connect to /dev/socket/qemud (which is
-                     * now another "legacy" way of communicating with the
-                     * emulator), we will try to connecto to gsm service via
-                     * qemu pipe. */
-                    fd = qemu_pipe_open("qemud:gsm");
-                    if (fd < 0) {
-                        /* Qemu-specific control socket */
-                        fd = socket_local_client( "qemud",
-                                                  ANDROID_SOCKET_NAMESPACE_RESERVED,
-                                                  SOCK_STREAM );
-                        if (fd >= 0 ) {
-                            char  answer[2];
-
-                            if ( write(fd, "gsm", 3) != 3 ||
-                                 read(fd, answer, 2) != 2 ||
-                                 memcmp(answer, "OK", 2) != 0)
-                            {
-                                close(fd);
-                                fd = -1;
-                            }
-                       }
-                    }
-                }
-                else
-                    fd = socket_local_client( s_device_path,
-                                            ANDROID_SOCKET_NAMESPACE_FILESYSTEM,
-                                            SOCK_STREAM );
+                fd = socket_local_client( s_device_path,
+                                        ANDROID_SOCKET_NAMESPACE_FILESYSTEM,
+                                        SOCK_STREAM );
             } else if (s_device_path != NULL) {
                 fd = open (s_device_path, O_RDWR);
                 if ( fd >= 0 && !memcmp( s_device_path, "/dev/ttyS", 9 ) ) {
@@ -3336,6 +3321,8 @@ mainLoop(void *param __unused)
                     ios.c_lflag = 0;  /* disable ECHO, ICANON, etc... */
                     tcsetattr( fd, TCSANOW, &ios );
                 }
+            } else if (isUnderEmulation()) {
+                fd = qemu_pipe_open("pipe:qemud:gsm");
             }
 
             if (fd < 0) {
