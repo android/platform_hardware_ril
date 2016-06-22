@@ -17,6 +17,7 @@
 
 #include <telephony/ril_cdma_sms.h>
 #include <telephony/librilutils.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -238,6 +239,16 @@ static int s_repollCallsCount = 0;
 // Should we expect a call to be answered in the next CLCC?
 static int s_expectAnswer = 0;
 #endif /* WORKAROUND_ERRONEOUS_ANSWER */
+
+// Returns true iff running this process in an emulator VM
+static bool isInEmulator(void) {
+    static int inQemu = -1;
+    if (inQemu < 0) {
+        char propValue[PROP_VALUE_MAX];
+        inQemu = (__system_property_get("ro.kernel.qemu", propValue) != 0);
+    }
+    return inQemu == 1;
+}
 
 static int s_cell_info_rate_ms = INT_MAX;
 static int s_mcc = 0;
@@ -550,52 +561,50 @@ static void requestOrSendDataCallList(RIL_Token *t)
         responses[i].addresses = alloca(strlen(out) + 1);
         strcpy(responses[i].addresses, out);
 
-        {
-            char  propValue[PROP_VALUE_MAX];
+        if (isInEmulator()) {
+            /* We are in the emulator - the dns servers are listed
+                * by the following system properties, setup in
+                * /system/etc/init.goldfish.sh:
+                *  - net.eth0.dns1
+                *  - net.eth0.dns2
+                *  - net.eth0.dns3
+                *  - net.eth0.dns4
+                */
+            const int   dnslist_sz = 128;
+            char*       dnslist = alloca(dnslist_sz);
+            const char* separator = "";
+            int         nn;
 
-            if (__system_property_get("ro.kernel.qemu", propValue) != 0) {
-                /* We are in the emulator - the dns servers are listed
-                 * by the following system properties, setup in
-                 * /system/etc/init.goldfish.sh:
-                 *  - net.eth0.dns1
-                 *  - net.eth0.dns2
-                 *  - net.eth0.dns3
-                 *  - net.eth0.dns4
-                 */
-                const int   dnslist_sz = 128;
-                char*       dnslist = alloca(dnslist_sz);
-                const char* separator = "";
-                int         nn;
+            dnslist[0] = 0;
+            for (nn = 1; nn <= 4; nn++) {
+                /* Probe net.eth0.dns<n> */
+                char  propName[PROP_NAME_MAX];
+                char  propValue[PROP_VALUE_MAX];
 
-                dnslist[0] = 0;
-                for (nn = 1; nn <= 4; nn++) {
-                    /* Probe net.eth0.dns<n> */
-                    char  propName[PROP_NAME_MAX];
-                    snprintf(propName, sizeof propName, "net.eth0.dns%d", nn);
+                snprintf(propName, sizeof propName, "net.eth0.dns%d", nn);
 
-                    /* Ignore if undefined */
-                    if (__system_property_get(propName, propValue) == 0) {
-                        continue;
-                    }
-
-                    /* Append the DNS IP address */
-                    strlcat(dnslist, separator, dnslist_sz);
-                    strlcat(dnslist, propValue, dnslist_sz);
-                    separator = " ";
+                /* Ignore if undefined */
+                if (__system_property_get(propName, propValue) == 0) {
+                    continue;
                 }
-                responses[i].dnses = dnslist;
 
-                /* There is only on gateway in the emulator */
-                responses[i].gateways = "10.0.2.2";
-                responses[i].mtu = DEFAULT_MTU;
+                /* Append the DNS IP address */
+                strlcat(dnslist, separator, dnslist_sz);
+                strlcat(dnslist, propValue, dnslist_sz);
+                separator = " ";
             }
-            else {
-                /* I don't know where we are, so use the public Google DNS
-                 * servers by default and no gateway.
-                 */
-                responses[i].dnses = "8.8.8.8 8.8.4.4";
-                responses[i].gateways = "";
-            }
+            responses[i].dnses = dnslist;
+
+            /* There is only on gateway in the emulator */
+            responses[i].gateways = "10.0.2.2";
+            responses[i].mtu = DEFAULT_MTU;
+        }
+        else {
+            /* I don't know where we are, so use the public Google DNS
+                * servers by default and no gateway.
+                */
+            responses[i].dnses = "8.8.8.8 8.8.4.4";
+            responses[i].gateways = "";
         }
     }
 
@@ -3296,37 +3305,14 @@ mainLoop(void *param __unused)
     for (;;) {
         fd = -1;
         while  (fd < 0) {
-            if (s_port > 0) {
+            if (isInEmulator()) {
+                fd = qemu_pipe_open("pipe:qemud:gsm");
+            } else if (s_port > 0) {
                 fd = socket_loopback_client(s_port, SOCK_STREAM);
             } else if (s_device_socket) {
-                if (!strcmp(s_device_path, "/dev/socket/qemud")) {
-                    /* Before trying to connect to /dev/socket/qemud (which is
-                     * now another "legacy" way of communicating with the
-                     * emulator), we will try to connecto to gsm service via
-                     * qemu pipe. */
-                    fd = qemu_pipe_open("pipe:qemud:gsm");
-                    if (fd < 0) {
-                        /* Qemu-specific control socket */
-                        fd = socket_local_client( "qemud",
-                                                  ANDROID_SOCKET_NAMESPACE_RESERVED,
-                                                  SOCK_STREAM );
-                        if (fd >= 0 ) {
-                            char  answer[2];
-
-                            if ( write(fd, "gsm", 3) != 3 ||
-                                 read(fd, answer, 2) != 2 ||
-                                 memcmp(answer, "OK", 2) != 0)
-                            {
-                                close(fd);
-                                fd = -1;
-                            }
-                       }
-                    }
-                }
-                else
-                    fd = socket_local_client( s_device_path,
-                                            ANDROID_SOCKET_NAMESPACE_FILESYSTEM,
-                                            SOCK_STREAM );
+                fd = socket_local_client(s_device_path,
+                                         ANDROID_SOCKET_NAMESPACE_FILESYSTEM,
+                                         SOCK_STREAM);
             } else if (s_device_path != NULL) {
                 fd = open (s_device_path, O_RDWR);
                 if ( fd >= 0 && !memcmp( s_device_path, "/dev/ttyS", 9 ) ) {
@@ -3409,7 +3395,7 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
         }
     }
 
-    if (s_port < 0 && s_device_path == NULL) {
+    if (s_port < 0 && s_device_path == NULL && !isInEmulator()) {
         usage(argv[0]);
         return NULL;
     }
@@ -3458,7 +3444,7 @@ int main (int argc, char **argv)
         }
     }
 
-    if (s_port < 0 && s_device_path == NULL) {
+    if (s_port < 0 && s_device_path == NULL && !isInEmulator()) {
         usage(argv[0]);
     }
 
