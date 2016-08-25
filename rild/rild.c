@@ -50,6 +50,7 @@ static void usage(const char *argv0) {
 extern char rild[MAX_SOCKET_NAME_LENGTH];
 
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
+extern void rilc_thread_pool ();
 
 extern void RIL_register_socket (RIL_RadioFunctions *(*rilUimInit)
         (const struct RIL_Env *, int, char **), RIL_SOCKET_TYPE socketType, int argc, char **argv);
@@ -155,6 +156,7 @@ int main(int argc, char **argv) {
 
     int i;
     const char *clientId = NULL;
+
     RLOGD("**RIL Daemon Started**");
     RLOGD("**RILd param count=%d**", argc);
 
@@ -260,6 +262,8 @@ int main(int argc, char **argv) {
     RLOGD("RIL_register_socket completed");
 
 done:
+
+    rilc_thread_pool();
 
     RLOGD("RIL_Init starting sleep loop");
     while (true) {

@@ -8,6 +8,8 @@ LOCAL_SRC_FILES:= \
     ril_event.cpp\
     RilSocket.cpp \
     RilSapSocket.cpp \
+    ril_service.cpp \
+    ril_internal.cpp
 
 LOCAL_SHARED_LIBRARIES := \
     liblog \
@@ -16,6 +18,9 @@ LOCAL_SHARED_LIBRARIES := \
     libcutils \
     libhardware_legacy \
     librilutils \
+    android.hardware.radio@1.0 \
+    libhidl  \
+    libhwbinder
 
 LOCAL_STATIC_LIBRARIES := \
     libprotobuf-c-nano-enable_malloc \
