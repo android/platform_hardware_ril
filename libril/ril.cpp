@@ -26,7 +26,6 @@
 #include <utils/Log.h>
 #include <utils/SystemClock.h>
 #include <pthread.h>
-#include <binder/Parcel.h>
 #include <cutils/jstring.h>
 #include <sys/types.h>
 #include <sys/limits.h>
@@ -47,6 +46,7 @@
 #include <netinet/in.h>
 #include <cutils/properties.h>
 #include <RilSapSocket.h>
+#include <ril_service.h>
 
 extern "C" void
 RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responselen);
@@ -57,11 +57,6 @@ namespace android {
 
 #define PHONE_PROCESS "radio"
 #define BLUETOOTH_PROCESS "bluetooth"
-
-#define SOCKET_NAME_RIL "rild"
-#define SOCKET2_NAME_RIL "rild2"
-#define SOCKET3_NAME_RIL "rild3"
-#define SOCKET4_NAME_RIL "rild4"
 
 #define SOCKET_NAME_RIL_DEBUG "rild-debug"
 
@@ -83,13 +78,6 @@ namespace android {
 #define NUM_ELEMS(a)     (sizeof (a) / sizeof (a)[0])
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
-
-/* Constants for response types */
-#define RESPONSE_SOLICITED 0
-#define RESPONSE_UNSOLICITED 1
-#define RESPONSE_SOLICITED_ACK 2
-#define RESPONSE_SOLICITED_ACK_EXP 3
-#define RESPONSE_UNSOLICITED_ACK_EXP 4
 
 /* Negative values for private RIL errno's */
 #define RIL_ERRNO_INVALID_RESPONSE (-1)
@@ -133,25 +121,10 @@ enum WakeType {DONT_WAKE, WAKE_PARTIAL};
 
 typedef struct {
     int requestNumber;
-    void (*dispatchFunction) (Parcel &p, struct RequestInfo *pRI);
-    int(*responseFunction) (Parcel &p, void *response, size_t responselen);
-} CommandInfo;
-
-typedef struct {
-    int requestNumber;
-    int (*responseFunction) (Parcel &p, void *response, size_t responselen);
+    int (*responseFunction) (Parcel &p, int slotId, int requestNumber, int responseType, int token,
+            RIL_Errno e, void *response, size_t responselen);
     WakeType wakeType;
 } UnsolResponseInfo;
-
-typedef struct RequestInfo {
-    int32_t token;      //this is not RIL_Token
-    CommandInfo *pCI;
-    struct RequestInfo *p_next;
-    char cancelled;
-    char local;         // responses to local commands do not go back to command process
-    RIL_SOCKET_ID socket_id;
-    int wasAckSent;    // Indicates whether an ack was sent earlier
-} RequestInfo;
 
 typedef struct UserCallbackInfo {
     RIL_TimedCallback p_callback;
@@ -160,7 +133,6 @@ typedef struct UserCallbackInfo {
     struct UserCallbackInfo *p_next;
 } UserCallbackInfo;
 
-extern "C" const char * requestToString(int request);
 extern "C" const char * failCauseToString(RIL_Errno);
 extern "C" const char * callStateToString(RIL_CallState);
 extern "C" const char * radioStateToString(RIL_RadioState);
@@ -279,38 +251,68 @@ static void dispatchUiccSubscripton(Parcel &p, RequestInfo *pRI);
 static void dispatchSimAuthentication(Parcel &p, RequestInfo *pRI);
 static void dispatchDataProfile(Parcel &p, RequestInfo *pRI);
 static void dispatchRadioCapability(Parcel &p, RequestInfo *pRI);
-static int responseInts(Parcel &p, void *response, size_t responselen);
-static int responseFailCause(Parcel &p, void *response, size_t responselen);
-static int responseStrings(Parcel &p, void *response, size_t responselen);
-static int responseString(Parcel &p, void *response, size_t responselen);
-static int responseVoid(Parcel &p, void *response, size_t responselen);
-static int responseCallList(Parcel &p, void *response, size_t responselen);
-static int responseSMS(Parcel &p, void *response, size_t responselen);
-static int responseSIM_IO(Parcel &p, void *response, size_t responselen);
-static int responseCallForwards(Parcel &p, void *response, size_t responselen);
-static int responseDataCallList(Parcel &p, void *response, size_t responselen);
-static int responseSetupDataCall(Parcel &p, void *response, size_t responselen);
-static int responseRaw(Parcel &p, void *response, size_t responselen);
-static int responseSsn(Parcel &p, void *response, size_t responselen);
-static int responseSimStatus(Parcel &p, void *response, size_t responselen);
-static int responseGsmBrSmsCnf(Parcel &p, void *response, size_t responselen);
-static int responseCdmaBrSmsCnf(Parcel &p, void *response, size_t responselen);
-static int responseCdmaSms(Parcel &p, void *response, size_t responselen);
-static int responseCellList(Parcel &p, void *response, size_t responselen);
-static int responseCdmaInformationRecords(Parcel &p,void *response, size_t responselen);
-static int responseRilSignalStrength(Parcel &p,void *response, size_t responselen);
-static int responseCallRing(Parcel &p, void *response, size_t responselen);
-static int responseCdmaSignalInfoRecord(Parcel &p,void *response, size_t responselen);
-static int responseCdmaCallWaiting(Parcel &p,void *response, size_t responselen);
-static int responseSimRefresh(Parcel &p, void *response, size_t responselen);
-static int responseCellInfoList(Parcel &p, void *response, size_t responselen);
-static int responseHardwareConfig(Parcel &p, void *response, size_t responselen);
-static int responseDcRtInfo(Parcel &p, void *response, size_t responselen);
-static int responseRadioCapability(Parcel &p, void *response, size_t responselen);
-static int responseSSData(Parcel &p, void *response, size_t responselen);
-static int responseLceStatus(Parcel &p, void *response, size_t responselen);
-static int responseLceData(Parcel &p, void *response, size_t responselen);
-static int responseActivityData(Parcel &p, void *response, size_t responselen);
+static int responseInts(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseFailCause(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseStrings(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseString(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseVoid(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseCallList(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseSMS(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseSIM_IO(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseCallForwards(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseDataCallList(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseSetupDataCall(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseRaw(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseSsn(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseGsmBrSmsCnf(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseCdmaBrSmsCnf(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseCdmaSms(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseCellList(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseCdmaInformationRecords(Parcel &p, int slotId, int requestNumber,
+        int responseType, int token, RIL_Errno e,void *response, size_t responselen);
+static int responseRilSignalStrength(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e,void *response, size_t responselen);
+static int responseCallRing(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseCdmaSignalInfoRecord(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e,void *response, size_t responselen);
+static int responseCdmaCallWaiting(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e,void *response, size_t responselen);
+static int responseSimRefresh(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseCellInfoList(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseHardwareConfig(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseDcRtInfo(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseRadioCapability(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
+static int responseSSData(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseLceStatus(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseLceData(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen);
+static int responseActivityData(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen);
 
 static void grabPartialWakeLock();
 static void releaseWakeLock();
@@ -353,7 +355,7 @@ static UnsolResponseInfo s_unsolResponses[] = {
 #include "ril_unsol_commands.h"
 };
 
-static char * RIL_getRilSocketName() {
+char * RIL_getRilSocketName() {
     return rild;
 }
 
@@ -545,9 +547,55 @@ processCommandBuffer(void *buffer, size_t buflen, RIL_SOCKET_ID socket_id) {
     ret = pthread_mutex_unlock(pendingRequestsMutexHook);
     assert (ret == 0);
 
-/*    sLastDispatchedToken = token; */
-
     pRI->pCI->dispatchFunction(p, pRI);
+
+    return 0;
+}
+
+int
+addRequestToList(RequestInfo *pRI, int request, int token, RIL_SOCKET_ID socket_id) {
+    status_t status;
+    int ret;
+    /* Hook for current context */
+    /* pendingRequestsMutextHook refer to &s_pendingRequestsMutex */
+    pthread_mutex_t* pendingRequestsMutexHook = &s_pendingRequestsMutex;
+    /* pendingRequestsHook refer to &s_pendingRequests */
+    RequestInfo**    pendingRequestsHook = &s_pendingRequests;
+
+#if (SIM_COUNT >= 2)
+    if (socket_id == RIL_SOCKET_2) {
+        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket2;
+        pendingRequestsHook = &s_pendingRequests_socket2;
+    }
+#if (SIM_COUNT >= 3)
+    else if (socket_id == RIL_SOCKET_3) {
+        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket3;
+        pendingRequestsHook = &s_pendingRequests_socket3;
+    }
+#endif
+#if (SIM_COUNT >= 4)
+    else if (socket_id == RIL_SOCKET_4) {
+        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket4;
+        pendingRequestsHook = &s_pendingRequests_socket4;
+    }
+#endif
+#endif
+
+    // Received an Ack for the previous result sent to RIL.java,
+    // so release wakelock and exit
+    if (request == RIL_RESPONSE_ACKNOWLEDGEMENT) {
+        releaseWakeLock();
+        return 0;
+    }
+
+    ret = pthread_mutex_lock(pendingRequestsMutexHook);
+    assert (ret == 0);
+
+    pRI->p_next = *pendingRequestsHook;
+    *pendingRequestsHook = pRI;
+
+    ret = pthread_mutex_unlock(pendingRequestsMutexHook);
+    assert (ret == 0);
 
     return 0;
 }
@@ -2155,7 +2203,8 @@ sendResponse (Parcel &p, RIL_SOCKET_ID socket_id) {
 /** response is an int* pointing to an array of ints */
 
 static int
-responseInts(Parcel &p, void *response, size_t responselen) {
+responseInts(Parcel &p, int slotId, int requestNumber, int responseType, int token, RIL_Errno e,
+        void *response, size_t responselen) {
     int numInts;
 
     if (response == NULL && responselen != 0) {
@@ -2188,7 +2237,8 @@ responseInts(Parcel &p, void *response, size_t responselen) {
 // Response is an int or RIL_LastCallFailCauseInfo.
 // Currently, only Shamu plans to use RIL_LastCallFailCauseInfo.
 // TODO(yjl): Let all implementations use RIL_LastCallFailCauseInfo.
-static int responseFailCause(Parcel &p, void *response, size_t responselen) {
+static int responseFailCause(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2221,13 +2271,15 @@ static int responseFailCause(Parcel &p, void *response, size_t responselen) {
 
 /** response is a char **, pointing to an array of char *'s
     The parcel will begin with the version */
-static int responseStringsWithVersion(int version, Parcel &p, void *response, size_t responselen) {
+static int responseStringsWithVersion(int version, Parcel &p, int slotId, int requestNumber,
+        int responseType, int token, RIL_Errno e, void *response, size_t responselen) {
     p.writeInt32(version);
-    return responseStrings(p, response, responselen);
+    return responseStrings(p, slotId, requestNumber, responseType, token, e, response, responselen);
 }
 
 /** response is a char **, pointing to an array of char *'s */
-static int responseStrings(Parcel &p, void *response, size_t responselen) {
+static int responseStrings(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     int numStrings;
 
     if (response == NULL && responselen != 0) {
@@ -2265,7 +2317,8 @@ static int responseStrings(Parcel &p, void *response, size_t responselen) {
  * NULL strings are accepted
  * FIXME currently ignores responselen
  */
-static int responseString(Parcel &p, void *response, size_t responselen) {
+static int responseString(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     /* one string only */
     startResponse;
     appendPrintBuf("%s%s", printBuf, (char*)response);
@@ -2276,13 +2329,15 @@ static int responseString(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseVoid(Parcel &p, void *response, size_t responselen) {
+static int responseVoid(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     startResponse;
     removeLastChar;
     return 0;
 }
 
-static int responseCallList(Parcel &p, void *response, size_t responselen) {
+static int responseCallList(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     int num;
 
     if (response == NULL && responselen != 0) {
@@ -2317,7 +2372,7 @@ static int responseCallList(Parcel &p, void *response, size_t responselen) {
         writeStringToParcel(p, p_cur->name);
         p.writeInt32(p_cur->namePresentation);
         // Remove when partners upgrade to version 3
-        if ((s_callbacks.version < 3) || (p_cur->uusInfo == NULL || p_cur->uusInfo->uusData == NULL)) {
+        if (s_callbacks.version < 3 || p_cur->uusInfo == NULL || p_cur->uusInfo->uusData == NULL) {
             p.writeInt32(0); /* UUS Information is absent */
         } else {
             RIL_UUS_Info *uusInfo = p_cur->uusInfo;
@@ -2352,7 +2407,8 @@ static int responseCallList(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseSMS(Parcel &p, void *response, size_t responselen) {
+static int responseSMS(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2378,8 +2434,8 @@ static int responseSMS(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseDataCallListV4(Parcel &p, void *response, size_t responselen)
-{
+static int responseDataCallListV4(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2418,8 +2474,8 @@ static int responseDataCallListV4(Parcel &p, void *response, size_t responselen)
     return 0;
 }
 
-static int responseDataCallListV6(Parcel &p, void *response, size_t responselen)
-{
+static int responseDataCallListV6(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2467,8 +2523,8 @@ static int responseDataCallListV6(Parcel &p, void *response, size_t responselen)
     return 0;
 }
 
-static int responseDataCallListV9(Parcel &p, void *response, size_t responselen)
-{
+static int responseDataCallListV9(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2518,7 +2574,8 @@ static int responseDataCallListV9(Parcel &p, void *response, size_t responselen)
     return 0;
 }
 
-static int responseDataCallListV11(Parcel &p, void *response, size_t responselen) {
+static int responseDataCallListV11(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
                 RLOGE("invalid response: NULL");
                 return RIL_ERRNO_INVALID_RESPONSE;
@@ -2570,18 +2627,22 @@ static int responseDataCallListV11(Parcel &p, void *response, size_t responselen
     return 0;
 }
 
-static int responseDataCallList(Parcel &p, void *response, size_t responselen)
-{
+static int responseDataCallList(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (s_callbacks.version <= LAST_IMPRECISE_RIL_VERSION) {
         if (s_callbacks.version < 5) {
             RLOGD("responseDataCallList: v4");
-            return responseDataCallListV4(p, response, responselen);
+            return responseDataCallListV4(p, slotId, requestNumber, responseType, token, e,
+                    response, responselen);
         } else if (responselen % sizeof(RIL_Data_Call_Response_v6) == 0) {
-            return responseDataCallListV6(p, response, responselen);
+            return responseDataCallListV6(p, slotId, requestNumber, responseType, token, e,
+                    response, responselen);
         } else if (responselen % sizeof(RIL_Data_Call_Response_v9) == 0) {
-            return responseDataCallListV9(p, response, responselen);
+            return responseDataCallListV9(p, slotId, requestNumber, responseType, token, e,
+                    response, responselen);
         } else {
-            return responseDataCallListV11(p, response, responselen);
+            return responseDataCallListV11(p, slotId, requestNumber, responseType, token, e,
+                    response, responselen);
         }
     } else { // RIL version >= 13
         if (responselen % sizeof(RIL_Data_Call_Response_v11) != 0) {
@@ -2592,20 +2653,24 @@ static int responseDataCallList(Parcel &p, void *response, size_t responselen)
                 assert(0);
             }
         }
-        return responseDataCallListV11(p, response, responselen);
+        return responseDataCallListV11(p, slotId, requestNumber, responseType, token, e, response,
+                responselen);
     }
 }
 
-static int responseSetupDataCall(Parcel &p, void *response, size_t responselen)
-{
+static int responseSetupDataCall(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (s_callbacks.version < 5) {
-        return responseStringsWithVersion(s_callbacks.version, p, response, responselen);
+        return responseStringsWithVersion(s_callbacks.version, p, slotId, requestNumber,
+                responseType, token, e, response, responselen);
     } else {
-        return responseDataCallList(p, response, responselen);
+        return responseDataCallList(p, slotId, requestNumber, responseType, token, e, response,
+                responselen);
     }
 }
 
-static int responseRaw(Parcel &p, void *response, size_t responselen) {
+static int responseRaw(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL with responselen != 0");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2623,7 +2688,8 @@ static int responseRaw(Parcel &p, void *response, size_t responselen) {
 }
 
 
-static int responseSIM_IO(Parcel &p, void *response, size_t responselen) {
+static int responseSIM_IO(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2649,7 +2715,8 @@ static int responseSIM_IO(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseCallForwards(Parcel &p, void *response, size_t responselen) {
+static int responseCallForwards(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     int num;
 
     if (response == NULL && responselen != 0) {
@@ -2689,7 +2756,8 @@ static int responseCallForwards(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseSsn(Parcel &p, void *response, size_t responselen) {
+static int responseSsn(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2718,7 +2786,8 @@ static int responseSsn(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseCellList(Parcel &p, void *response, size_t responselen) {
+static int responseCellList(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     int num;
 
     if (response == NULL && responselen != 0) {
@@ -2755,16 +2824,15 @@ static int responseCellList(Parcel &p, void *response, size_t responselen) {
 /**
  * Marshall the signalInfoRecord into the parcel if it exists.
  */
-static void marshallSignalInfoRecord(Parcel &p,
-            RIL_CDMA_SignalInfoRecord &p_signalInfoRecord) {
+static void marshallSignalInfoRecord(Parcel &p, RIL_CDMA_SignalInfoRecord &p_signalInfoRecord) {
     p.writeInt32(p_signalInfoRecord.isPresent);
     p.writeInt32(p_signalInfoRecord.signalType);
     p.writeInt32(p_signalInfoRecord.alertPitch);
     p.writeInt32(p_signalInfoRecord.signal);
 }
 
-static int responseCdmaInformationRecords(Parcel &p,
-            void *response, size_t responselen) {
+static int responseCdmaInformationRecords(Parcel &p, int slotId, int requestNumber,
+        int responseType, int token, RIL_Errno e, void *response, size_t responselen) {
     int num;
     char* string8 = NULL;
     int buffer_lenght;
@@ -2776,8 +2844,8 @@ static int responseCdmaInformationRecords(Parcel &p,
     }
 
     if (responselen != sizeof (RIL_CDMA_InformationRecords)) {
-        RLOGE("responseCdmaInformationRecords: invalid response length %d expected multiple of %d\n",
-            (int)responselen, (int)sizeof (RIL_CDMA_InformationRecords *));
+        RLOGE("responseCdmaInformationRecords: invalid response length %d expected multiple of \
+                %d\n", (int)responselen, (int)sizeof (RIL_CDMA_InformationRecords *));
         return RIL_ERRNO_INVALID_RESPONSE;
     }
 
@@ -2933,7 +3001,8 @@ static int responseCdmaInformationRecords(Parcel &p,
     return 0;
 }
 
-static void responseRilSignalStrengthV5(Parcel &p, RIL_SignalStrength_v10 *p_cur) {
+static void responseRilSignalStrengthV5(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, RIL_SignalStrength_v10 *p_cur) {
     p.writeInt32(p_cur->GW_SignalStrength.signalStrength);
     p.writeInt32(p_cur->GW_SignalStrength.bitErrorRate);
     p.writeInt32(p_cur->CDMA_SignalStrength.dbm);
@@ -2943,7 +3012,8 @@ static void responseRilSignalStrengthV5(Parcel &p, RIL_SignalStrength_v10 *p_cur
     p.writeInt32(p_cur->EVDO_SignalStrength.signalNoiseRatio);
 }
 
-static void responseRilSignalStrengthV6Extra(Parcel &p, RIL_SignalStrength_v10 *p_cur) {
+static void responseRilSignalStrengthV6Extra(Parcel &p, int slotId, int requestNumber,
+        int responseType, int token, RIL_Errno e, RIL_SignalStrength_v10 *p_cur) {
     /*
      * Fixup LTE for backwards compatibility
      */
@@ -2976,14 +3046,15 @@ static void responseRilSignalStrengthV6Extra(Parcel &p, RIL_SignalStrength_v10 *
     p.writeInt32(p_cur->LTE_SignalStrength.cqi);
 }
 
-static void responseRilSignalStrengthV10(Parcel &p, RIL_SignalStrength_v10 *p_cur) {
-    responseRilSignalStrengthV5(p, p_cur);
-    responseRilSignalStrengthV6Extra(p, p_cur);
+static void responseRilSignalStrengthV10(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, RIL_SignalStrength_v10 *p_cur) {
+    responseRilSignalStrengthV5(p, slotId, requestNumber, responseType, token, e, p_cur);
+    responseRilSignalStrengthV6Extra(p, slotId, requestNumber, responseType, token, e, p_cur);
     p.writeInt32(p_cur->TD_SCDMA_SignalStrength.rscp);
 }
 
-static int responseRilSignalStrength(Parcel &p,
-                    void *response, size_t responselen) {
+static int responseRilSignalStrength(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -2994,10 +3065,11 @@ static int responseRilSignalStrength(Parcel &p,
         if (responselen >= sizeof (RIL_SignalStrength_v5)) {
             p_cur = ((RIL_SignalStrength_v10 *) response);
 
-            responseRilSignalStrengthV5(p, p_cur);
+            responseRilSignalStrengthV5(p, slotId, requestNumber, responseType, token, e, p_cur);
 
             if (responselen >= sizeof (RIL_SignalStrength_v6)) {
-                responseRilSignalStrengthV6Extra(p, p_cur);
+                responseRilSignalStrengthV6Extra(p, slotId, requestNumber, responseType, token, e,
+                        p_cur);
                 if (responselen >= sizeof (RIL_SignalStrength_v10)) {
                     p.writeInt32(p_cur->TD_SCDMA_SignalStrength.rscp);
                 } else {
@@ -3025,7 +3097,7 @@ static int responseRilSignalStrength(Parcel &p,
             }
         }
         p_cur = ((RIL_SignalStrength_v10 *) response);
-        responseRilSignalStrengthV10(p, p_cur);
+        responseRilSignalStrengthV10(p, slotId, requestNumber, responseType, token, e, p_cur);
     }
     startResponse;
     appendPrintBuf("%s[signalStrength=%d,bitErrorRate=%d,\
@@ -3052,15 +3124,19 @@ static int responseRilSignalStrength(Parcel &p,
     return 0;
 }
 
-static int responseCallRing(Parcel &p, void *response, size_t responselen) {
+static int responseCallRing(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     if ((response == NULL) || (responselen == 0)) {
-        return responseVoid(p, response, responselen);
+        return responseVoid(p, slotId, requestNumber, responseType, token, e, response,
+                responselen);
     } else {
-        return responseCdmaSignalInfoRecord(p, response, responselen);
+        return responseCdmaSignalInfoRecord(p, slotId, requestNumber, responseType, token, e,
+                response, responselen);
     }
 }
 
-static int responseCdmaSignalInfoRecord(Parcel &p, void *response, size_t responselen) {
+static int responseCdmaSignalInfoRecord(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL || responselen == 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -3089,8 +3165,8 @@ static int responseCdmaSignalInfoRecord(Parcel &p, void *response, size_t respon
     return 0;
 }
 
-static int responseCdmaCallWaiting(Parcel &p, void *response,
-            size_t responselen) {
+static int responseCdmaCallWaiting(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -3147,7 +3223,8 @@ static int responseCdmaCallWaiting(Parcel &p, void *response,
     return 0;
 }
 
-static void responseSimRefreshV7(Parcel &p, void *response) {
+static void responseSimRefreshV7(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response) {
       RIL_SimRefreshResponse_v7 *p_cur = ((RIL_SimRefreshResponse_v7 *) response);
       p.writeInt32(p_cur->result);
       p.writeInt32(p_cur->ef_id);
@@ -3161,7 +3238,8 @@ static void responseSimRefreshV7(Parcel &p, void *response) {
 
 }
 
-static int responseSimRefresh(Parcel &p, void *response, size_t responselen) {
+static int responseSimRefresh(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("responseSimRefresh: invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -3170,7 +3248,7 @@ static int responseSimRefresh(Parcel &p, void *response, size_t responselen) {
     startResponse;
     if (s_callbacks.version <= LAST_IMPRECISE_RIL_VERSION) {
         if (s_callbacks.version >= 7) {
-            responseSimRefreshV7(p, response);
+            responseSimRefreshV7(p, slotId, requestNumber, responseType, token, e, response);
         } else {
             int *p_cur = ((int *) response);
             p.writeInt32(p_cur[0]);
@@ -3191,7 +3269,7 @@ static int responseSimRefresh(Parcel &p, void *response, size_t responselen) {
                 assert(0);
             }
         }
-        responseSimRefreshV7(p, response);
+        responseSimRefreshV7(p, slotId, requestNumber, responseType, token, e, response);
 
     }
     closeResponse;
@@ -3199,7 +3277,8 @@ static int responseSimRefresh(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseCellInfoListV6(Parcel &p, void *response, size_t responselen) {
+static int responseCellInfoListV6(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -3289,7 +3368,8 @@ static int responseCellInfoListV6(Parcel &p, void *response, size_t responselen)
     return 0;
 }
 
-static int responseCellInfoListV12(Parcel &p, void *response, size_t responselen) {
+static int responseCellInfoListV12(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -3383,15 +3463,17 @@ static int responseCellInfoListV12(Parcel &p, void *response, size_t responselen
     return 0;
 }
 
-static int responseCellInfoList(Parcel &p, void *response, size_t responselen)
-{
+static int responseCellInfoList(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (s_callbacks.version <= LAST_IMPRECISE_RIL_VERSION) {
         if (s_callbacks.version < 12) {
             RLOGD("responseCellInfoList: v6");
-            return responseCellInfoListV6(p, response, responselen);
+            return responseCellInfoListV6(p, slotId, requestNumber, responseType, token, e,
+                    response, responselen);
         } else {
             RLOGD("responseCellInfoList: v12");
-            return responseCellInfoListV12(p, response, responselen);
+            return responseCellInfoListV12(p, slotId, requestNumber, responseType, token, e,
+                    response, responselen);
         }
     } else { // RIL version >= 13
         if (responselen % sizeof(RIL_CellInfo_v12) != 0) {
@@ -3402,14 +3484,15 @@ static int responseCellInfoList(Parcel &p, void *response, size_t responselen)
                 assert(0);
             }
         }
-        return responseCellInfoListV12(p, response, responselen);
+        return responseCellInfoListV12(p, slotId, requestNumber, responseType, token, e, response,
+                responselen);
     }
 
     return 0;
 }
 
-static int responseHardwareConfig(Parcel &p, void *response, size_t responselen)
-{
+static int responseHardwareConfig(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
    if (response == NULL && responselen != 0) {
        RLOGE("invalid response: NULL");
        return RIL_ERRNO_INVALID_RESPONSE;
@@ -3439,8 +3522,9 @@ static int responseHardwareConfig(Parcel &p, void *response, size_t responselen)
             p.writeInt32(p_cur[i].cfg.modem.maxStandby);
 
             appendPrintBuf("%s modem: uuid=%s,state=%d,rat=%08x,maxV=%d,maxD=%d,maxS=%d", printBuf,
-               p_cur[i].uuid, (int)p_cur[i].state, p_cur[i].cfg.modem.rat,
-               p_cur[i].cfg.modem.maxVoice, p_cur[i].cfg.modem.maxData, p_cur[i].cfg.modem.maxStandby);
+                    p_cur[i].uuid, (int)p_cur[i].state, p_cur[i].cfg.modem.rat,
+                    p_cur[i].cfg.modem.maxVoice, p_cur[i].cfg.modem.maxData,
+                    p_cur[i].cfg.modem.maxStandby);
             break;
          }
          case RIL_HARDWARE_CONFIG_SIM: {
@@ -3459,7 +3543,8 @@ static int responseHardwareConfig(Parcel &p, void *response, size_t responselen)
    return 0;
 }
 
-static int responseRadioCapability(Parcel &p, void *response, size_t responselen) {
+static int responseRadioCapability(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL) {
         RLOGE("invalid response: NULL");
         return RIL_ERRNO_INVALID_RESPONSE;
@@ -3493,7 +3578,8 @@ static int responseRadioCapability(Parcel &p, void *response, size_t responselen
     return 0;
 }
 
-static int responseSSData(Parcel &p, void *response, size_t responselen) {
+static int responseSSData(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     RLOGD("In responseSSData");
     int num;
 
@@ -3587,91 +3673,8 @@ static void rilEventAddWakeup(struct ril_event *ev) {
     triggerEvLoop();
 }
 
-static void sendSimStatusAppInfo(Parcel &p, int num_apps, RIL_AppStatus appStatus[]) {
-        p.writeInt32(num_apps);
-        startResponse;
-        for (int i = 0; i < num_apps; i++) {
-            p.writeInt32(appStatus[i].app_type);
-            p.writeInt32(appStatus[i].app_state);
-            p.writeInt32(appStatus[i].perso_substate);
-            writeStringToParcel(p, (const char*)(appStatus[i].aid_ptr));
-            writeStringToParcel(p, (const char*)
-                                          (appStatus[i].app_label_ptr));
-            p.writeInt32(appStatus[i].pin1_replaced);
-            p.writeInt32(appStatus[i].pin1);
-            p.writeInt32(appStatus[i].pin2);
-            appendPrintBuf("%s[app_type=%d,app_state=%d,perso_substate=%d,\
-                    aid_ptr=%s,app_label_ptr=%s,pin1_replaced=%d,pin1=%d,pin2=%d],",
-                    printBuf,
-                    appStatus[i].app_type,
-                    appStatus[i].app_state,
-                    appStatus[i].perso_substate,
-                    appStatus[i].aid_ptr,
-                    appStatus[i].app_label_ptr,
-                    appStatus[i].pin1_replaced,
-                    appStatus[i].pin1,
-                    appStatus[i].pin2);
-        }
-        closeResponse;
-}
-
-static void responseSimStatusV5(Parcel &p, void *response) {
-    RIL_CardStatus_v5 *p_cur = ((RIL_CardStatus_v5 *) response);
-
-    p.writeInt32(p_cur->card_state);
-    p.writeInt32(p_cur->universal_pin_state);
-    p.writeInt32(p_cur->gsm_umts_subscription_app_index);
-    p.writeInt32(p_cur->cdma_subscription_app_index);
-    p.writeInt32(-1);
-
-    sendSimStatusAppInfo(p, p_cur->num_applications, p_cur->applications);
-}
-
-static void responseSimStatusV6(Parcel &p, void *response) {
-    RIL_CardStatus_v6 *p_cur = ((RIL_CardStatus_v6 *) response);
-
-    p.writeInt32(p_cur->card_state);
-    p.writeInt32(p_cur->universal_pin_state);
-    p.writeInt32(p_cur->gsm_umts_subscription_app_index);
-    p.writeInt32(p_cur->cdma_subscription_app_index);
-    p.writeInt32(p_cur->ims_subscription_app_index);
-
-    sendSimStatusAppInfo(p, p_cur->num_applications, p_cur->applications);
-}
-
-static int responseSimStatus(Parcel &p, void *response, size_t responselen) {
-    int i;
-
-    if (response == NULL && responselen != 0) {
-        RLOGE("invalid response: NULL");
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (s_callbacks.version <= LAST_IMPRECISE_RIL_VERSION) {
-        if (responselen == sizeof (RIL_CardStatus_v6)) {
-            responseSimStatusV6(p, response);
-        } else if (responselen == sizeof (RIL_CardStatus_v5)) {
-            responseSimStatusV5(p, response);
-        } else {
-            RLOGE("responseSimStatus: A RilCardStatus_v6 or _v5 expected\n");
-            return RIL_ERRNO_INVALID_RESPONSE;
-        }
-    } else { // RIL version >= 13
-        if (responselen % sizeof(RIL_CardStatus_v6) != 0) {
-            RLOGE("Data structure expected is RIL_CardStatus_v6");
-            if (!isDebuggable()) {
-                return RIL_ERRNO_INVALID_RESPONSE;
-            } else {
-                assert(0);
-            }
-        }
-        responseSimStatusV6(p, response);
-    }
-
-    return 0;
-}
-
-static int responseGsmBrSmsCnf(Parcel &p, void *response, size_t responselen) {
+static int responseGsmBrSmsCnf(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     int num = responselen / sizeof(RIL_GSM_BroadcastSmsConfigInfo *);
     p.writeInt32(num);
 
@@ -3696,7 +3699,8 @@ static int responseGsmBrSmsCnf(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseCdmaBrSmsCnf(Parcel &p, void *response, size_t responselen) {
+static int responseCdmaBrSmsCnf(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
     RIL_CDMA_BroadcastSmsConfigInfo **p_cur =
                (RIL_CDMA_BroadcastSmsConfigInfo **) response;
 
@@ -3719,7 +3723,8 @@ static int responseCdmaBrSmsCnf(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
+static int responseCdmaSms(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
     int num;
     int digitCount;
     int digitLimit;
@@ -3777,7 +3782,8 @@ static int responseCdmaSms(Parcel &p, void *response, size_t responselen) {
     return 0;
 }
 
-static int responseDcRtInfo(Parcel &p, void *response, size_t responselen)
+static int responseDcRtInfo(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen)
 {
     int num = responselen / sizeof(RIL_DcRtInfo);
     if ((responselen % sizeof(RIL_DcRtInfo) != 0) || (num != 1)) {
@@ -3798,13 +3804,14 @@ static int responseDcRtInfo(Parcel &p, void *response, size_t responselen)
     return 0;
 }
 
-static int responseLceStatus(Parcel &p, void *response, size_t responselen) {
+static int responseLceStatus(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
   if (response == NULL || responselen != sizeof(RIL_LceStatusInfo)) {
     if (response == NULL) {
       RLOGE("invalid response: NULL");
     }
     else {
-      RLOGE("responseLceStatus: invalid response length %d expecting len: d%",
+      RLOGE("responseLceStatus: invalid response length %d expecting len: %d",
             sizeof(RIL_LceStatusInfo), responselen);
     }
     return RIL_ERRNO_INVALID_RESPONSE;
@@ -3822,7 +3829,8 @@ static int responseLceStatus(Parcel &p, void *response, size_t responselen) {
   return 0;
 }
 
-static int responseLceData(Parcel &p, void *response, size_t responselen) {
+static int responseLceData(Parcel &p, int slotId, int requestNumber, int responseType, int token,
+        RIL_Errno e, void *response, size_t responselen) {
   if (response == NULL || responselen != sizeof(RIL_LceDataInfo)) {
     if (response == NULL) {
       RLOGE("invalid response: NULL");
@@ -3851,7 +3859,8 @@ static int responseLceData(Parcel &p, void *response, size_t responselen) {
   return 0;
 }
 
-static int responseActivityData(Parcel &p, void *response, size_t responselen) {
+static int responseActivityData(Parcel &p, int slotId, int requestNumber, int responseType,
+        int token, RIL_Errno e, void *response, size_t responselen) {
   if (response == NULL || responselen != sizeof(RIL_ActivityStatsInfo)) {
     if (response == NULL) {
       RLOGE("invalid response: NULL");
@@ -4612,6 +4621,9 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
     startListen(RIL_SOCKET_4, &s_ril_param_socket4);
 #endif /* (SIM_COUNT == 4) */
 
+    RLOGI("RILHIDL calling registerService");
+    radio::registerService(&s_callbacks, s_commands);
+    RLOGI("RILHIDL called registerService");
 
 #if 1
     // start debug interface socket
@@ -4649,7 +4661,8 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
 }
 
 extern "C" void
-RIL_register_socket (RIL_RadioFunctions *(*Init)(const struct RIL_Env *, int, char **),RIL_SOCKET_TYPE socketType, int argc, char **argv) {
+RIL_register_socket (RIL_RadioFunctions *(*Init)(const struct RIL_Env *, int, char **),
+        RIL_SOCKET_TYPE socketType, int argc, char **argv) {
 
     RIL_RadioFunctions* UimFuncs = NULL;
 
@@ -4790,7 +4803,6 @@ RIL_onRequestAck(RIL_Token t) {
         sendResponse(p, socket_id);
     }
 }
-
 extern "C" void
 RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responselen) {
     RequestInfo *pRI;
@@ -4808,7 +4820,6 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
 
     socket_id = pRI->socket_id;
     fd = findFd(socket_id);
-
 #if VDBG
     RLOGD("RequestComplete, %s", rilSocketIdToString(socket_id));
 #endif
@@ -4827,14 +4838,18 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
     if (pRI->cancelled == 0) {
         Parcel p;
 
+        int responseType;
         if (s_callbacks.version >= 13 && pRI->wasAckSent == 1) {
             // If ack was already sent, then this call is an asynchronous response. So we need to
             // send id indicating that we expect an ack from RIL.java as we acquire wakelock here.
+            responseType = RESPONSE_SOLICITED_ACK_EXP;
             p.writeInt32 (RESPONSE_SOLICITED_ACK_EXP);
             grabPartialWakeLock();
         } else {
+            responseType = RESPONSE_SOLICITED;
             p.writeInt32 (RESPONSE_SOLICITED);
         }
+
         p.writeInt32 (pRI->token);
         errorOffset = p.dataPosition();
 
@@ -4842,7 +4857,13 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
 
         if (response != NULL) {
             // there is a response payload, no matter success or not.
-            ret = pRI->pCI->responseFunction(p, response, responselen);
+            RLOGE ("Calling responseFunction() for token %d", pRI->token);
+            ret = pRI->pCI->responseFunction(p, (int) socket_id, pRI->pCI->requestNumber,
+                    responseType, pRI->token, e, response, responselen);
+
+            if (pRI->pCI->requestNumber == RIL_REQUEST_GET_SIM_STATUS) {
+                return;
+            }
 
             /* if an error occurred, rewind and mark it */
             if (ret != 0) {
@@ -5002,16 +5023,20 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     appendPrintBuf("[UNSL]< %s", requestToString(unsolResponse));
 
     Parcel p;
+    int responseType;
     if (s_callbacks.version >= 13
                 && s_unsolResponses[unsolResponseIndex].wakeType == WAKE_PARTIAL) {
+        responseType = RESPONSE_UNSOLICITED_ACK_EXP;
         p.writeInt32 (RESPONSE_UNSOLICITED_ACK_EXP);
     } else {
+        responseType = RESPONSE_UNSOLICITED;
         p.writeInt32 (RESPONSE_UNSOLICITED);
     }
     p.writeInt32 (unsolResponse);
 
-    ret = s_unsolResponses[unsolResponseIndex]
-                .responseFunction(p, const_cast<void*>(data), datalen);
+    ret = s_unsolResponses[unsolResponseIndex].responseFunction(
+            p, (int) soc_id, unsolResponse, responseType, 0, RIL_E_SUCCESS, const_cast<void*>(data),
+            datalen);
     if (ret != 0) {
         // Problem with the response. Don't continue;
         goto error_exit;
@@ -5054,9 +5079,19 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     }
 
 #if VDBG
-    RLOGI("%s UNSOLICITED: %s length:%d", rilSocketIdToString(soc_id), requestToString(unsolResponse), p.dataSize());
+    RLOGI("%s UNSOLICITED: %s length:%d", rilSocketIdToString(soc_id),
+            requestToString(unsolResponse), p.dataSize());
 #endif
-    ret = sendResponse(p, soc_id);
+    ret = 0;
+    switch (unsolResponse) {
+        case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
+            radio::radioStateChanged(soc_id, responseType, newState);
+            break;
+        default:
+            ret = sendResponse(p, soc_id);
+            break;
+    }
+
     if (ret != 0 && unsolResponse == RIL_UNSOL_NITZ_TIME_RECEIVED) {
 
         // Unfortunately, NITZ time is not poll/update like everything
