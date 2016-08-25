@@ -5892,6 +5892,8 @@ const RIL_RadioFunctions *RIL_SAP_Init(const struct RIL_Env *env, int argc, char
  */
 void RIL_register (const RIL_RadioFunctions *callbacks);
 
+void rilc_thread_pool();
+
 
 /**
  *
