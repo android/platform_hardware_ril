@@ -50,6 +50,7 @@ static void usage(const char *argv0) {
 extern char rild[MAX_SOCKET_NAME_LENGTH];
 
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
+extern void rilc_thread_pool ();
 
 extern void RIL_register_socket (RIL_RadioFunctions *(*rilUimInit)
         (const struct RIL_Env *, int, char **), RIL_SOCKET_TYPE socketType, int argc, char **argv);
@@ -142,19 +143,29 @@ void switchUser() {
 }
 
 int main(int argc, char **argv) {
+    // vendor ril lib path either passed in as -l parameter, or read from rild.libpath property
     const char * rilLibPath = NULL;
+    // ril arguments either passed in as -- parameter, or read from rild.libargs property
     char **rilArgv;
+    // handle for vendor ril lib
     void *dlHandle;
+    // Pointer to ril init function in vendor ril
     const RIL_RadioFunctions *(*rilInit)(const struct RIL_Env *, int, char **);
+    // Pointer to sap init function in vendor ril
     const RIL_RadioFunctions *(*rilUimInit)(const struct RIL_Env *, int, char **);
     const char *err_str = NULL;
 
+    // functions returned by ril init function in vendor ril
     const RIL_RadioFunctions *funcs;
+    // lib path from rild.libpath property (if it's read)
     char libPath[PROPERTY_VALUE_MAX];
+    // flat to indicate if -- parameters are present
     unsigned char hasLibArgs = 0;
 
     int i;
+    // ril/socket id received as -c parameter, otherwise set to 0
     const char *clientId = NULL;
+
     RLOGD("**RIL Daemon Started**");
     RLOGD("**RILd param count=%d**", argc);
 
@@ -260,6 +271,8 @@ int main(int argc, char **argv) {
     RLOGD("RIL_register_socket completed");
 
 done:
+
+    rilc_thread_pool();
 
     RLOGD("RIL_Init starting sleep loop");
     while (true) {
