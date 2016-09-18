@@ -14,6 +14,8 @@
 * limitations under the License.
 */
 
+#define LOG_TAG "RIL_UIM_SOCKET"
+
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #define RIL_SHLIB
@@ -21,7 +23,6 @@
 #include "RilSapSocket.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
-#define LOG_TAG "RIL_UIM_SOCKET"
 #include <utils/Log.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -351,7 +352,7 @@ void RilSapSocket::sendResponse(MsgHeader* hdr) {
         success = pb_encode(&ostream, MsgHeader_fields, hdr);
 
         if (success) {
-            RLOGD("Size: %d (0x%x) Size as written: 0x%x", encoded_size, encoded_size,
+            RLOGD("Size: %zu (0x%zx) Size as written: 0x%x", encoded_size, encoded_size,
         written_size);
             log_hex("onRequestComplete", &buffer[sizeof(written_size)], encoded_size);
             RLOGI("[%d] < SAP RESPONSE type: %d. id: %d. error: %d",
@@ -363,11 +364,11 @@ void RilSapSocket::sendResponse(MsgHeader* hdr) {
                 RLOGD("Write successful");
             }
         } else {
-            RLOGE("Error while encoding response of type %d id %d buffer_size: %d: %s.",
+            RLOGE("Error while encoding response of type %d id %d buffer_size: %zu: %s.",
             hdr->type, hdr->id, buffer_size, PB_GET_ERROR(&ostream));
         }
     } else {
-    RLOGE("Not sending response type %d: encoded_size: %u. commandFd: %d. encoded size result: %d",
+    RLOGE("Not sending response type %d: encoded_size: %zu. commandFd: %d. encoded size result: %d",
         hdr->type, encoded_size, commandFd, success);
     }
 
