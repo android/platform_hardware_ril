@@ -608,7 +608,7 @@ dispatchString (Parcel& p, RequestInfo *pRI) {
     printRequest(pRI->token, pRI->pCI->requestNumber);
 
     CALL_ONREQUEST(pRI->pCI->requestNumber, string8,
-                       sizeof(char *), pRI, pRI->socket_id);
+                       (strlen(string8) + 1), pRI, pRI->socket_id);
 
 #ifdef MEMSET_FREED
     memsetString(string8);
