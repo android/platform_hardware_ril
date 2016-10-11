@@ -156,7 +156,7 @@ static int is3gpp2(int radioTech) {
 typedef enum {
     SIM_ABSENT = 0,
     SIM_NOT_READY = 1,
-    SIM_READY = 2, /* SIM_READY means the radio state is RADIO_STATE_SIM_READY */
+    SIM_READY = 2,
     SIM_PIN = 3,
     SIM_PUK = 4,
     SIM_NETWORK_PERSONALIZATION = 5,
@@ -2768,7 +2768,7 @@ static void pollSIMState (void *param __unused)
     ATResponse *p_response;
     int ret;
 
-    if (sState != RADIO_STATE_SIM_NOT_READY) {
+    if (sState != RADIO_STATE_UNAVAILABLE) {
         // no longer valid to poll
         return;
     }
