@@ -264,10 +264,7 @@ static void dispatchCallForward(Parcel& p, RequestInfo *pRI);
 static void dispatchRaw(Parcel& p, RequestInfo *pRI);
 static void dispatchSmsWrite (Parcel &p, RequestInfo *pRI);
 static void dispatchDataCall (Parcel& p, RequestInfo *pRI);
-static void dispatchVoiceRadioTech (Parcel& p, RequestInfo *pRI);
 static void dispatchSetInitialAttachApn (Parcel& p, RequestInfo *pRI);
-static void dispatchCdmaSubscriptionSource (Parcel& p, RequestInfo *pRI);
-
 static void dispatchCdmaSms(Parcel &p, RequestInfo *pRI);
 static void dispatchImsSms(Parcel &p, RequestInfo *pRI);
 static void dispatchImsCdmaSms(Parcel &p, RequestInfo *pRI, uint8_t retry, int32_t messageRef);
@@ -315,9 +312,6 @@ static int responseLceStatus(Parcel &p, void *response, size_t responselen);
 static int responseLceData(Parcel &p, void *response, size_t responselen);
 static int responseActivityData(Parcel &p, void *response, size_t responselen);
 
-static int decodeVoiceRadioTechnology (RIL_RadioState radioState);
-static int decodeCdmaSubscriptionSource (RIL_RadioState radioState);
-static RIL_RadioState processRadioState(RIL_RadioState newRadioState);
 static void grabPartialWakeLock();
 static void releaseWakeLock();
 static void wakeTimeoutCallback(void *);
@@ -358,26 +352,6 @@ static CommandInfo s_commands[] = {
 static UnsolResponseInfo s_unsolResponses[] = {
 #include "ril_unsol_commands.h"
 };
-
-/* For older RILs that do not support new commands RIL_REQUEST_VOICE_RADIO_TECH and
-   RIL_UNSOL_VOICE_RADIO_TECH_CHANGED messages, decode the voice radio tech from
-   radio state message and store it. Every time there is a change in Radio State
-   check to see if voice radio tech changes and notify telephony
- */
-int voiceRadioTech = -1;
-
-/* For older RILs that do not support new commands RIL_REQUEST_GET_CDMA_SUBSCRIPTION_SOURCE
-   and RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED messages, decode the subscription
-   source from radio state and store it. Every time there is a change in Radio State
-   check to see if subscription source changed and notify telephony
- */
-int cdmaSubscriptionSource = -1;
-
-/* For older RILs that do not send RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED, decode the
-   SIM/RUIM state from radio state and store it. Every time there is a change in Radio State,
-   check to see if SIM/RUIM status changed and notify telephony
- */
-int simRuimStatus = -1;
 
 static char * RIL_getRilSocketName() {
     return rild;
@@ -1710,60 +1684,6 @@ static void dispatchDataCall(Parcel& p, RequestInfo *pRI) {
       p.setDataPosition(pos);
       dispatchStrings(p, pRI);
     }
-}
-
-// For backwards compatibility with RILs that dont support RIL_REQUEST_VOICE_RADIO_TECH.
-// When all RILs handle this request, this function can be removed and
-// the request can be sent directly to the RIL using dispatchVoid.
-static void dispatchVoiceRadioTech(Parcel& p, RequestInfo *pRI) {
-    RIL_RadioState state = CALL_ONSTATEREQUEST((RIL_SOCKET_ID)pRI->socket_id);
-
-    if ((RADIO_STATE_UNAVAILABLE == state) || (RADIO_STATE_OFF == state)) {
-        RIL_onRequestComplete(pRI, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
-    }
-
-    // RILs that support RADIO_STATE_ON should support this request.
-    if (RADIO_STATE_ON == state) {
-        dispatchVoid(p, pRI);
-        return;
-    }
-
-    // For Older RILs, that do not support RADIO_STATE_ON, assume that they
-    // will not support this new request either and decode Voice Radio Technology
-    // from Radio State
-    voiceRadioTech = decodeVoiceRadioTechnology(state);
-
-    if (voiceRadioTech < 0)
-        RIL_onRequestComplete(pRI, RIL_E_GENERIC_FAILURE, NULL, 0);
-    else
-        RIL_onRequestComplete(pRI, RIL_E_SUCCESS, &voiceRadioTech, sizeof(int));
-}
-
-// For backwards compatibility in RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE:.
-// When all RILs handle this request, this function can be removed and
-// the request can be sent directly to the RIL using dispatchVoid.
-static void dispatchCdmaSubscriptionSource(Parcel& p, RequestInfo *pRI) {
-    RIL_RadioState state = CALL_ONSTATEREQUEST((RIL_SOCKET_ID)pRI->socket_id);
-
-    if ((RADIO_STATE_UNAVAILABLE == state) || (RADIO_STATE_OFF == state)) {
-        RIL_onRequestComplete(pRI, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
-    }
-
-    // RILs that support RADIO_STATE_ON should support this request.
-    if (RADIO_STATE_ON == state) {
-        dispatchVoid(p, pRI);
-        return;
-    }
-
-    // For Older RILs, that do not support RADIO_STATE_ON, assume that they
-    // will not support this new request either and decode CDMA Subscription Source
-    // from Radio State
-    cdmaSubscriptionSource = decodeCdmaSubscriptionSource(state);
-
-    if (cdmaSubscriptionSource < 0)
-        RIL_onRequestComplete(pRI, RIL_E_GENERIC_FAILURE, NULL, 0);
-    else
-        RIL_onRequestComplete(pRI, RIL_E_SUCCESS, &cdmaSubscriptionSource, sizeof(int));
 }
 
 static void dispatchSetInitialAttachApn(Parcel &p, RequestInfo *pRI)
@@ -5019,124 +4939,6 @@ wakeTimeoutCallback (void *param) {
     }
 }
 
-static int
-decodeVoiceRadioTechnology (RIL_RadioState radioState) {
-    switch (radioState) {
-        case RADIO_STATE_SIM_NOT_READY:
-        case RADIO_STATE_SIM_LOCKED_OR_ABSENT:
-        case RADIO_STATE_SIM_READY:
-            return RADIO_TECH_UMTS;
-
-        case RADIO_STATE_RUIM_NOT_READY:
-        case RADIO_STATE_RUIM_READY:
-        case RADIO_STATE_RUIM_LOCKED_OR_ABSENT:
-        case RADIO_STATE_NV_NOT_READY:
-        case RADIO_STATE_NV_READY:
-            return RADIO_TECH_1xRTT;
-
-        default:
-            RLOGD("decodeVoiceRadioTechnology: Invoked with incorrect RadioState");
-            return -1;
-    }
-}
-
-static int
-decodeCdmaSubscriptionSource (RIL_RadioState radioState) {
-    switch (radioState) {
-        case RADIO_STATE_SIM_NOT_READY:
-        case RADIO_STATE_SIM_LOCKED_OR_ABSENT:
-        case RADIO_STATE_SIM_READY:
-        case RADIO_STATE_RUIM_NOT_READY:
-        case RADIO_STATE_RUIM_READY:
-        case RADIO_STATE_RUIM_LOCKED_OR_ABSENT:
-            return CDMA_SUBSCRIPTION_SOURCE_RUIM_SIM;
-
-        case RADIO_STATE_NV_NOT_READY:
-        case RADIO_STATE_NV_READY:
-            return CDMA_SUBSCRIPTION_SOURCE_NV;
-
-        default:
-            RLOGD("decodeCdmaSubscriptionSource: Invoked with incorrect RadioState");
-            return -1;
-    }
-}
-
-static int
-decodeSimStatus (RIL_RadioState radioState) {
-   switch (radioState) {
-       case RADIO_STATE_SIM_NOT_READY:
-       case RADIO_STATE_RUIM_NOT_READY:
-       case RADIO_STATE_NV_NOT_READY:
-       case RADIO_STATE_NV_READY:
-           return -1;
-       case RADIO_STATE_SIM_LOCKED_OR_ABSENT:
-       case RADIO_STATE_SIM_READY:
-       case RADIO_STATE_RUIM_READY:
-       case RADIO_STATE_RUIM_LOCKED_OR_ABSENT:
-           return radioState;
-       default:
-           RLOGD("decodeSimStatus: Invoked with incorrect RadioState");
-           return -1;
-   }
-}
-
-static bool is3gpp2(int radioTech) {
-    switch (radioTech) {
-        case RADIO_TECH_IS95A:
-        case RADIO_TECH_IS95B:
-        case RADIO_TECH_1xRTT:
-        case RADIO_TECH_EVDO_0:
-        case RADIO_TECH_EVDO_A:
-        case RADIO_TECH_EVDO_B:
-        case RADIO_TECH_EHRPD:
-            return true;
-        default:
-            return false;
-    }
-}
-
-/* If RIL sends SIM states or RUIM states, store the voice radio
- * technology and subscription source information so that they can be
- * returned when telephony framework requests them
- */
-static RIL_RadioState
-processRadioState(RIL_RadioState newRadioState, RIL_SOCKET_ID socket_id) {
-
-    if((newRadioState > RADIO_STATE_UNAVAILABLE) && (newRadioState < RADIO_STATE_ON)) {
-        int newVoiceRadioTech;
-        int newCdmaSubscriptionSource;
-        int newSimStatus;
-
-        /* This is old RIL. Decode Subscription source and Voice Radio Technology
-           from Radio State and send change notifications if there has been a change */
-        newVoiceRadioTech = decodeVoiceRadioTechnology(newRadioState);
-        if(newVoiceRadioTech != voiceRadioTech) {
-            voiceRadioTech = newVoiceRadioTech;
-            RIL_UNSOL_RESPONSE(RIL_UNSOL_VOICE_RADIO_TECH_CHANGED,
-                        &voiceRadioTech, sizeof(voiceRadioTech), socket_id);
-        }
-        if(is3gpp2(newVoiceRadioTech)) {
-            newCdmaSubscriptionSource = decodeCdmaSubscriptionSource(newRadioState);
-            if(newCdmaSubscriptionSource != cdmaSubscriptionSource) {
-                cdmaSubscriptionSource = newCdmaSubscriptionSource;
-                RIL_UNSOL_RESPONSE(RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED,
-                        &cdmaSubscriptionSource, sizeof(cdmaSubscriptionSource), socket_id);
-            }
-        }
-        newSimStatus = decodeSimStatus(newRadioState);
-        if(newSimStatus != simRuimStatus) {
-            simRuimStatus = newSimStatus;
-            RIL_UNSOL_RESPONSE(RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED, NULL, 0, socket_id);
-        }
-
-        /* Send RADIO_ON to telephony */
-        newRadioState = RADIO_STATE_ON;
-    }
-
-    return newRadioState;
-}
-
-
 #if defined(ANDROID_MULTI_SIM)
 extern "C"
 void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
@@ -5218,10 +5020,9 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     // some things get more payload
     switch(unsolResponse) {
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
-            newState = processRadioState(CALL_ONSTATEREQUEST(soc_id), soc_id);
+            newState = CALL_ONSTATEREQUEST(soc_id);
             p.writeInt32(newState);
-            appendPrintBuf("%s {%s}", printBuf,
-                radioStateToString(CALL_ONSTATEREQUEST(soc_id)));
+            appendPrintBuf("%s {%s}", printBuf, radioStateToString(newState));
         break;
 
 
@@ -5426,14 +5227,6 @@ radioStateToString(RIL_RadioState s) {
     switch(s) {
         case RADIO_STATE_OFF: return "RADIO_OFF";
         case RADIO_STATE_UNAVAILABLE: return "RADIO_UNAVAILABLE";
-        case RADIO_STATE_SIM_NOT_READY: return "RADIO_SIM_NOT_READY";
-        case RADIO_STATE_SIM_LOCKED_OR_ABSENT: return "RADIO_SIM_LOCKED_OR_ABSENT";
-        case RADIO_STATE_SIM_READY: return "RADIO_SIM_READY";
-        case RADIO_STATE_RUIM_NOT_READY:return"RADIO_RUIM_NOT_READY";
-        case RADIO_STATE_RUIM_READY:return"RADIO_RUIM_READY";
-        case RADIO_STATE_RUIM_LOCKED_OR_ABSENT:return"RADIO_RUIM_LOCKED_OR_ABSENT";
-        case RADIO_STATE_NV_NOT_READY:return"RADIO_NV_NOT_READY";
-        case RADIO_STATE_NV_READY:return"RADIO_NV_READY";
         case RADIO_STATE_ON:return"RADIO_ON";
         default: return "<unknown state>";
     }
