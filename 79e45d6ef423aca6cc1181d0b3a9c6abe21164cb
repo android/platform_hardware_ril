@@ -1,0 +1,9 @@
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+1: Sanket Padawe <sanketpadawe@google.com>
+Code-Review+2: Pankaj Kanwar <pkanwar@google.com>
+Verified+1: Pankaj Kanwar <pkanwar@google.com>
+Submitted-by: Pankaj Kanwar <pkanwar@google.com>
+Submitted-at: Thu, 13 Oct 2016 02:13:30 +0000
+Reviewed-on: https://android-review.googlesource.com/288263
+Project: platform/hardware/ril
+Branch: refs/heads/master
