@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb285bc8_d9dd9f54",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5906,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2016-11-04T23:47:46Z",
+      "side": 1,
+      "message": "Does this really need to be exposed as part of the interface?\n\nWhat are the semantics for it that implementors or users need to be aware of?",
+      "range": {
+        "startLine": 5906,
+        "startChar": 5,
+        "endLine": 5906,
+        "endChar": 21
+      },
+      "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb285bc8_99fa07c8",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 802,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2016-11-04T23:47:46Z",
+      "side": 1,
+      "message": "This only works for single-daemon multi-sim, whereas Qualcomm\u0027s is multiple daemon impl. Could you add a version of registerService that takes the sim id, which is passed based on whether a command-line argument is provided? (i.e. -c X)",
+      "range": {
+        "startLine": 802,
+        "startChar": 4,
+        "endLine": 802,
+        "endChar": 40
+      },
+      "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
