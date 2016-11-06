@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ebc99f45_c54f9e7c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5906,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-06T19:53:10Z",
+      "side": 1,
+      "message": "This doesn\u0027t need to be exposed. It just needs to be called in rild since the HIDL service runs in it. I will clean it up and try to keep it within rild.c\n\nBut that said ril.h isn\u0027t really the interface anymore. This is only for backward compatibility. Eventually rild.c, ril.cpp, hidl service all need to be part of vendor ril, with IRadio.hal as the interface.",
+      "parentUuid": "cb285bc8_d9dd9f54",
+      "range": {
+        "startLine": 5906,
+        "startChar": 5,
+        "endLine": 5906,
+        "endChar": 21
+      },
+      "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb285bc8_99fa07c8",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2016-11-04T23:47:46Z",
       "side": 1,
       "message": "This only works for single-daemon multi-sim, whereas Qualcomm\u0027s is multiple daemon impl. Could you add a version of registerService that takes the sim id, which is passed based on whether a command-line argument is provided? (i.e. -c X)",
+      "range": {
+        "startLine": 802,
+        "startChar": 4,
+        "endLine": 802,
+        "endChar": 40
+      },
+      "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ebc99f45_656eeae6",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 802,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-06T19:53:10Z",
+      "side": 1,
+      "message": "Sure, will add that and will need you to review it.\nSo are there multiple rilds? I will check the mk files for it. Each rild will have a service running in that case.",
+      "parentUuid": "cb285bc8_99fa07c8",
       "range": {
         "startLine": 802,
         "startChar": 4,
