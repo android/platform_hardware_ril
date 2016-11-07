@@ -93,6 +93,30 @@
       "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ebc99f45_4042bcab",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 802,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2016-11-07T04:51:50Z",
+      "side": 1,
+      "message": "Yes, there are multiple rild instances. It is the exact same binary, but a different command line argument is passed in the init service stanza (the aforementioned -c X arguments). And yes, I would expect each rild to run a different service. The service name would be based on the client id (-c X, again)",
+      "parentUuid": "ebc99f45_656eeae6",
+      "range": {
+        "startLine": 802,
+        "startChar": 4,
+        "endLine": 802,
+        "endChar": 40
+      },
+      "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
