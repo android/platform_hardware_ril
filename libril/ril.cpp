@@ -1720,6 +1720,7 @@ static void dispatchVoiceRadioTech(Parcel& p, RequestInfo *pRI) {
 
     if ((RADIO_STATE_UNAVAILABLE == state) || (RADIO_STATE_OFF == state)) {
         RIL_onRequestComplete(pRI, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+        return;
     }
 
     // RILs that support RADIO_STATE_ON should support this request.
@@ -1747,6 +1748,7 @@ static void dispatchCdmaSubscriptionSource(Parcel& p, RequestInfo *pRI) {
 
     if ((RADIO_STATE_UNAVAILABLE == state) || (RADIO_STATE_OFF == state)) {
         RIL_onRequestComplete(pRI, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+        return;
     }
 
     // RILs that support RADIO_STATE_ON should support this request.
