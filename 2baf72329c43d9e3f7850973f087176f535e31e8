@@ -1,0 +1,10 @@
+Autosubmit+1: Naveen Kalla <mrnaveen@google.com>
+Code-Review+2: Robert Greenwalt <rgreenwalt@google.com>
+Code-Review+1: Edward Diaz <edwarddiaz704@gmail.com>
+Verified+1: Robert Greenwalt <rgreenwalt@google.com>
+Presubmit-Verified-1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Naveen Kalla <mrnaveen@google.com>
+Submitted-at: Wed, 09 Nov 2016 01:05:27 +0000
+Reviewed-on: https://android-review.googlesource.com/290897
+Project: platform/hardware/ril
+Branch: refs/heads/master
