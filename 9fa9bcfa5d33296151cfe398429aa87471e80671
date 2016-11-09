@@ -117,6 +117,30 @@
       "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4b770b47_511a1630",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 802,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-09T20:00:08Z",
+      "side": 1,
+      "message": "Let me know if patch set 5 looks ok.",
+      "parentUuid": "ebc99f45_4042bcab",
+      "range": {
+        "startLine": 802,
+        "startChar": 4,
+        "endLine": 802,
+        "endChar": 40
+      },
+      "revId": "9fa9bcfa5d33296151cfe398429aa87471e80671",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
