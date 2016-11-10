@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4b770b47_44db27d1",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 4964,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2016-11-10T19:14:04Z",
+      "side": 1,
+      "message": "Would it be better to call radio::iccCardStatusResponse(slotId, responseType, token, e, response, responselen); here itself ? Do we need extra function call \n1)Passing socket id, responseType, error to responseFunction may lead conditions to be added to differentiate ril calls in functions like responseInts which are called by multiple RIL commands. We can have only 1 switch case in this function to call different functions as per different RIL command.\n2)Changing arguments of responseXYZ would not be required in that case. We can probably eliminate them.\n3)Currently we are changing responseFunction defined in UnsolResponseInfo even though it doesn\u0027t use parameters like error or serial no.",
+      "range": {
+        "startLine": 4963,
+        "startChar": 12,
+        "endLine": 4964,
+        "endChar": 72
+      },
+      "revId": "26bc8ff8f441e9f70e5932804ae70479c705f635",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
