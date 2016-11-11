@@ -22,6 +22,30 @@
       "revId": "26bc8ff8f441e9f70e5932804ae70479c705f635",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb935fd8_f344ab91",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 4964,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-11T22:17:40Z",
+      "side": 1,
+      "message": "We can directly change the responseFunctions for both solicited and unsolicited. However, the prototype needs to be what I have currently so that they can be shared for commands that are not done yet. Later the prototype can be cleaned and parcel and other parameters may not need to be passed in.",
+      "parentUuid": "4b770b47_44db27d1",
+      "range": {
+        "startLine": 4963,
+        "startChar": 12,
+        "endLine": 4964,
+        "endChar": 72
+      },
+      "revId": "26bc8ff8f441e9f70e5932804ae70479c705f635",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
