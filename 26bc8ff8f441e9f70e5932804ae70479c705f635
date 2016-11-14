@@ -46,6 +46,30 @@
       "revId": "26bc8ff8f441e9f70e5932804ae70479c705f635",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb935fd8_22a5d69e",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 4964,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2016-11-14T19:20:50Z",
+      "side": 1,
+      "message": "What i was saying is not to call responseFunction at all. Instead call function inside service directly.\nWe can talk offline if you are saying something else which I am missing.",
+      "parentUuid": "eb935fd8_f344ab91",
+      "range": {
+        "startLine": 4963,
+        "startChar": 12,
+        "endLine": 4964,
+        "endChar": 72
+      },
+      "revId": "26bc8ff8f441e9f70e5932804ae70479c705f635",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
