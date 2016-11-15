@@ -70,6 +70,30 @@
       "revId": "26bc8ff8f441e9f70e5932804ae70479c705f635",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "503c1cf2_21ce2546",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 4964,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-15T17:25:23Z",
+      "side": 1,
+      "message": "Using function pointers is better than a big switch case. We can discuss it further offline.",
+      "parentUuid": "eb935fd8_22a5d69e",
+      "range": {
+        "startLine": 4963,
+        "startChar": 12,
+        "endLine": 4964,
+        "endChar": 72
+      },
+      "revId": "26bc8ff8f441e9f70e5932804ae70479c705f635",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
