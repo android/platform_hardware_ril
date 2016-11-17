@@ -66,6 +66,7 @@ extern "C" {
  *
  * RIL_VERSION = 13 : This version includes new wakelock semantics and as the first
  *                    strongly versioned version it enforces structure use.
+ * RIL_VERSION = 15 : New commands added: RIL_REQUEST_DATA_ATTACH
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -5090,6 +5091,20 @@ typedef struct {
  * SUCCESS
  * RADIO_NOT_AVAILABLE
  */
+
+/**
+ * RIL_REQUEST_DATA_ATTACH
+ *
+ * Request the modem to register on data networks.
+ *
+ * "data" is null
+ * "response" is null
+ *
+ * Valid errors:
+ * SUCCESS
+ * RADIO_NOT_AVAILABLE
+ */
+#define RIL_REQUEST_DATA_ATTACH 138
 
 #define RIL_RESPONSE_ACKNOWLEDGEMENT 800
 
