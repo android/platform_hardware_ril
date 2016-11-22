@@ -1,0 +1,182 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7014c0d4_2c67ebfd",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 4846,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "move out of if",
+      "range": {
+        "startLine": 4846,
+        "startChar": 14,
+        "endLine": 4846,
+        "endChar": 24
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7014c0d4_4c7b3f93",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 4864,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "temp field to indicate if a function has been migrated so you don\u0027t need a big if or switch?",
+      "range": {
+        "startLine": 4864,
+        "startChar": 26,
+        "endLine": 4864,
+        "endChar": 39
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7014c0d4_6c5de333",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 4883,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7014c0d4_8c2cf7aa",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 5034,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "move this out of the if?",
+      "range": {
+        "startLine": 5034,
+        "startChar": 10,
+        "endLine": 5034,
+        "endChar": 20
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7014c0d4_8c53972f",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 5086,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "switch (unsolResponse) with default using sendResponse",
+      "range": {
+        "startLine": 5086,
+        "startChar": 4,
+        "endLine": 5086,
+        "endChar": 6
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7014c0d4_0c6ea7de",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 5089,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "set ret to something?",
+      "range": {
+        "startLine": 5089,
+        "startChar": 8,
+        "endLine": 5089,
+        "endChar": 13
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7014c0d4_ccfaef02",
+        "filename": "libril/ril_internal.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "do you plan on putting more stuff in this file?\n\nSince we don\u0027t plan to maintain ril.cpp, I wonder if splitting out utils like this is really needed?",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 15
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7014c0d4_6c0163e5",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 856,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-22T23:47:04Z",
+      "side": 1,
+      "message": "defined const?  Do we have single-threading assumptions?",
+      "range": {
+        "startLine": 856,
+        "startChar": 73,
+        "endLine": 856,
+        "endChar": 74
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
