@@ -463,6 +463,9 @@ static void requestOrSendDataCallList(RIL_Token *t)
          p_cur = p_cur->p_next)
         n++;
 
+    if (n == 0)
+      return;
+
     RIL_Data_Call_Response_v11 *responses =
         alloca(n * sizeof(RIL_Data_Call_Response_v11));
 
@@ -707,6 +710,9 @@ static void requestGetCurrentCalls(void *data __unused, size_t datalen __unused,
     ) {
         countCalls++;
     }
+
+    if (countCalls == 0)
+      return;
 
     /* yes, there's an array of pointers and then an array of structures */
 
