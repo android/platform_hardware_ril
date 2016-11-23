@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "b07d5855_4220320d",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 4846,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-23T06:11:48Z",
+      "side": 1,
+      "message": "Based on current changes? Why?",
+      "parentUuid": "7014c0d4_2c67ebfd",
+      "range": {
+        "startLine": 4846,
+        "startChar": 14,
+        "endLine": 4846,
+        "endChar": 24
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7014c0d4_4c7b3f93",
         "filename": "libril/ril.cpp",
         "patchSetId": 6
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "b07d5855_e21866f1",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 4864,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-23T06:11:48Z",
+      "side": 1,
+      "message": "Yes, eventually each req will have its own responseFunction so this won\u0027t be needed.",
+      "parentUuid": "7014c0d4_4c7b3f93",
+      "range": {
+        "startLine": 4864,
+        "startChar": 26,
+        "endLine": 4864,
+        "endChar": 39
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7014c0d4_6c5de333",
         "filename": "libril/ril.cpp",
         "patchSetId": 6
@@ -59,6 +107,24 @@
       "writtenOn": "2016-11-22T23:47:04Z",
       "side": 1,
       "message": "whitespace",
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b07d5855_822a3aeb",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 4883,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-23T06:11:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7014c0d4_6c5de333",
       "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -111,6 +177,30 @@
     },
     {
       "key": {
+        "uuid": "b07d5855_625b76a0",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 5086,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-23T06:11:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7014c0d4_8c53972f",
+      "range": {
+        "startLine": 5086,
+        "startChar": 4,
+        "endLine": 5086,
+        "endChar": 6
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7014c0d4_0c6ea7de",
         "filename": "libril/ril.cpp",
         "patchSetId": 6
@@ -122,6 +212,30 @@
       "writtenOn": "2016-11-22T23:47:04Z",
       "side": 1,
       "message": "set ret to something?",
+      "range": {
+        "startLine": 5089,
+        "startChar": 8,
+        "endLine": 5089,
+        "endChar": 13
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b07d5855_424e72df",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 5089,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-23T06:11:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7014c0d4_0c6ea7de",
       "range": {
         "startLine": 5089,
         "startChar": 8,
@@ -157,6 +271,30 @@
     },
     {
       "key": {
+        "uuid": "b07d5855_c248c2d0",
+        "filename": "libril/ril_internal.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-23T06:11:48Z",
+      "side": 1,
+      "message": "I am not sure why I did this. Will get rid of this file.",
+      "parentUuid": "7014c0d4_ccfaef02",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 15
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7014c0d4_6c0163e5",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 6
@@ -168,6 +306,30 @@
       "writtenOn": "2016-11-22T23:47:04Z",
       "side": 1,
       "message": "defined const?  Do we have single-threading assumptions?",
+      "range": {
+        "startLine": 856,
+        "startChar": 73,
+        "endLine": 856,
+        "endChar": 74
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b07d5855_02438ab0",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 856,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2016-11-23T06:11:48Z",
+      "side": 1,
+      "message": "No single-threading assumptions for the services so far.",
+      "parentUuid": "7014c0d4_6c0163e5",
       "range": {
         "startLine": 856,
         "startChar": 73,
