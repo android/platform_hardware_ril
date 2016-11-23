@@ -1,0 +1,10 @@
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+1: Alex Naidis <alex.naidis@linux.com>
+Code-Review+2: Robert Greenwalt <rgreenwalt@google.com>
+Verified+1: Robert Greenwalt <rgreenwalt@google.com>
+Autosubmit+1: Robert Greenwalt <rgreenwalt@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Wed, 23 Nov 2016 03:13:41 +0000
+Reviewed-on: https://android-review.googlesource.com/301161
+Project: platform/hardware/ril
+Branch: refs/heads/master
