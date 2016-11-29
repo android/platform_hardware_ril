@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "f01d104e_7f2ce1a9",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 4846,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-11-29T23:13:17Z",
+      "side": 1,
+      "message": "you\u0027re adding a local var which holds the specifics, so\n\nif () {\n  responseType \u003d x;\n} else {\n  responseType \u003d y;\n}\np.writeInt32(responseType);",
+      "parentUuid": "b07d5855_4220320d",
+      "range": {
+        "startLine": 4846,
+        "startChar": 14,
+        "endLine": 4846,
+        "endChar": 24
+      },
+      "revId": "5f4872fd4dbb7df8afc00ca63c6689a5aa034071",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7014c0d4_4c7b3f93",
         "filename": "libril/ril.cpp",
         "patchSetId": 6
