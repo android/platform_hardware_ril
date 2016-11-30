@@ -104,6 +104,22 @@ class RilSapSocket : public RilSocket {
         void onCommandsSocketClosed(void);
 
         /**
+         * Dispatches the request to the lower layers.
+         * It calls the on request function.
+         *
+         * @param The request message.
+         */
+        void dispatchRequest(MsgHeader *request);
+
+        /**
+         * Class method to get the socket from the socket list.
+         *
+         * @param Socket id.
+         * @return the sap socket.
+         */
+        static RilSapSocket* getSocketById(RIL_SOCKET_ID socketId);
+
+        /**
          * Datatype to handle the socket list.
          */
         typedef struct RilSapSocketList {
@@ -144,14 +160,6 @@ class RilSapSocket : public RilSocket {
          */
         void onUnsolicitedResponse(int unsolResponse,
         void *data, size_t datalen);
-
-        /**
-         * Class method to get the socket from the socket list.
-         *
-         * @param Socket id.
-         * @return the sap socket.
-         */
-        static RilSapSocket* getSocketById(RIL_SOCKET_ID socketId);
 
         /**
          * Method to send response to SAP. It does an atomic write operation on the
@@ -206,14 +214,6 @@ class RilSapSocket : public RilSocket {
         RilSapSocket(const char *socketName,
         RIL_SOCKET_ID socketId,
         RIL_RadioFunctions *inputUimFuncs);
-
-        /**
-         * Dispatches the request to the lower layers.
-         * It calls the on request function.
-         *
-         * @param The request message.
-         */
-        void dispatchRequest(MsgHeader *request);
 
         /**
          * Class method that selects the socket on which the onRequestComplete
