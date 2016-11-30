@@ -34,17 +34,18 @@ extern "C" void *ril_socket_process_requests_loop(void *arg);
  * </ul>
  */
 class RilSocket {
+    public:
+        /**
+         * Socket id.
+         */
+        RIL_SOCKET_ID id;
+
     protected:
 
         /**
          * Socket name.
          */
         const char* name;
-
-        /**
-         * Socket id.
-         */
-        RIL_SOCKET_ID id;
 
        /**
         * Listen socket file descriptor.

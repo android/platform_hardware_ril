@@ -8,7 +8,8 @@ LOCAL_SRC_FILES:= \
     ril_event.cpp\
     RilSocket.cpp \
     RilSapSocket.cpp \
-    ril_service.cpp
+    ril_service.cpp \
+    sap_service.cpp
 
 LOCAL_SHARED_LIBRARIES := \
     liblog \
@@ -18,7 +19,8 @@ LOCAL_SHARED_LIBRARIES := \
     libhardware_legacy \
     librilutils \
     android.hardware.radio@1.0 \
-    libhidl  \
+    libhidlbase  \
+    libhidltransport \
     libhwbinder
 
 LOCAL_STATIC_LIBRARIES := \
