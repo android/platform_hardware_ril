@@ -47,6 +47,7 @@
 #include <cutils/properties.h>
 #include <RilSapSocket.h>
 #include <ril_service.h>
+#include <sap_service.h>
 
 extern "C" void
 RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responselen);
@@ -4685,6 +4686,11 @@ RIL_register_socket (RIL_RadioFunctions *(*Init)(const struct RIL_Env *, int, ch
                 RilSapSocket::initSapSocket("sap_uim_socket4", UimFuncs);
 #endif
         }
+
+        RLOGI("SAPHIDL calling registerService");
+        sap::registerService(UimFuncs, s_commands);
+        RLOGI("SAPHIDL called registerService");
+
     }
 }
 

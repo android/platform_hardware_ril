@@ -25,6 +25,7 @@
 #include <utils/Log.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <sap_service.h>
 
 static RilSapSocket::RilSapSocketList *head = NULL;
 
@@ -318,7 +319,7 @@ void RilSapSocket::onRequestComplete(RIL_Token t, RIL_Errno e, void *response,
 
         RLOGE("Token:%d, MessageId:%d", hdr->token, hdr->id);
 
-        sendResponse(&rsp);
+        sap::processResponse(&rsp, this);
         free(rsp.payload);
     }
 
