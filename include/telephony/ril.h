@@ -1278,6 +1278,17 @@ typedef struct {
 } RIL_CellIdentityTdscdma;
 
 typedef struct {
+  RIL_CellInfoType  cellInfoType;   /* cell type for selecting from union CellInfo */
+  union {
+    RIL_CellIdentityGsm_v12 cellIdentityGsm;
+    RIL_CellIdentityWcdma_v12 cellIdentityWcdma;
+    RIL_CellIdentityLte_v12 cellIdentityLte;
+    RIL_CellIdentityTdscdma cellIdentityTdscdma;
+    RIL_CellIdentityCdma cellIdentityCdma;
+  };
+}RIL_CellIdentity_v12;
+
+typedef struct {
   RIL_CellIdentityGsm   cellIdentityGsm;
   RIL_GW_SignalStrength signalStrengthGsm;
 } RIL_CellInfoGsm;
@@ -2178,52 +2189,22 @@ typedef struct {
  *             14 - Same as 4, but indicates that emergency calls
  *                  are enabled.
  *
- * ((const char **)response)[1] is LAC if registered on a GSM/WCDMA system or
- *                              NULL if not.Valid LAC are 0x0000 - 0xffff
- * ((const char **)response)[2] is CID if registered on a * GSM/WCDMA or
- *                              NULL if not.
- *                                 Valid CID are 0x00000000 - 0xffffffff
- *                                    In GSM, CID is Cell ID (see TS 27.007)
- *                                            in 16 bits
- *                                    In UMTS, CID is UMTS Cell Identity
- *                                             (see TS 25.331) in 28 bits
- * ((const char **)response)[3] indicates the available voice radio technology,
+ * ((const char **)response)[1] indicates the available voice radio technology,
  *                              valid values as defined by RIL_RadioTechnology.
- * ((const char **)response)[4] is Base Station ID if registered on a CDMA
- *                              system or NULL if not.  Base Station ID in
- *                              decimal format
- * ((const char **)response)[5] is Base Station latitude if registered on a
- *                              CDMA system or NULL if not. Base Station
- *                              latitude is a decimal number as specified in
- *                              3GPP2 C.S0005-A v6.0. It is represented in
- *                              units of 0.25 seconds and ranges from -1296000
- *                              to 1296000, both values inclusive (corresponding
- *                              to a range of -90 to +90 degrees).
- * ((const char **)response)[6] is Base Station longitude if registered on a
- *                              CDMA system or NULL if not. Base Station
- *                              longitude is a decimal number as specified in
- *                              3GPP2 C.S0005-A v6.0. It is represented in
- *                              units of 0.25 seconds and ranges from -2592000
- *                              to 2592000, both values inclusive (corresponding
- *                              to a range of -180 to +180 degrees).
- * ((const char **)response)[7] is concurrent services support indicator if
+ * ((const char **)response)[2] is concurrent services support indicator if
  *                              registered on a CDMA system 0-1.
  *                                   0 - Concurrent services not supported,
  *                                   1 - Concurrent services supported
- * ((const char **)response)[8] is System ID if registered on a CDMA system or
- *                              NULL if not. Valid System ID are 0 - 32767
- * ((const char **)response)[9] is Network ID if registered on a CDMA system or
- *                              NULL if not. Valid System ID are 0 - 65535
- * ((const char **)response)[10] is the TSB-58 Roaming Indicator if registered
+ * ((const char **)response)[3] is the TSB-58 Roaming Indicator if registered
  *                               on a CDMA or EVDO system or NULL if not. Valid values
  *                               are 0-255.
- * ((const char **)response)[11] indicates whether the current system is in the
+ * ((const char **)response)[4] indicates whether the current system is in the
  *                               PRL if registered on a CDMA or EVDO system or NULL if
  *                               not. 0=not in the PRL, 1=in the PRL
- * ((const char **)response)[12] is the default Roaming Indicator from the PRL,
+ * ((const char **)response)[5] is the default Roaming Indicator from the PRL,
  *                               if registered on a CDMA or EVDO system or NULL if not.
  *                               Valid values are 0-255.
- * ((const char **)response)[13] if registration state is 3 (Registration
+ * ((const char **)response)[6] if registration state is 3 (Registration
  *                               denied) this is an enumerated reason why
  *                               registration was denied.  See 3GPP TS 24.008,
  *                               10.5.3.6 and Annex G.
@@ -2261,10 +2242,12 @@ typedef struct {
  *                               100 - Conditional IE error
  *                               101 - Message not compatible with protocol state
  *                               111 - Protocol error, unspecified
- * ((const char **)response)[14] is the Primary Scrambling Code of the current
- *                               cell as described in TS 25.331, in hexadecimal
- *                               format, or NULL if unknown or not registered
- *                               to a UMTS network.
+ *
+ * ((const char **)response)[7] RIL_CellIdentity_v12 structure containing all available
+ *                               identification information regarding the currently camped cell.
+ *                               If registration state is neither 0 (unregistered) or 4,
+ *                               (unknown), then all fields must be valid. If registration state
+ *                               is 0 or 4 then this field shall be NULL.
  *
  * Please note that registration state 4 ("unknown") is treated
  * as "out of service" in the Android telephony system
@@ -2288,11 +2271,9 @@ typedef struct {
  * "data" is NULL
  * "response" is a "char **"
  * ((const char **)response)[0] is registration state 0-5 from TS 27.007 10.1.20 AT+CGREG
- * ((const char **)response)[1] is LAC if registered or NULL if not
- * ((const char **)response)[2] is CID if registered or NULL if not
- * ((const char **)response)[3] indicates the available data radio technology,
+ * ((const char **)response)[1] indicates the available data radio technology,
  *                              valid values as defined by RIL_RadioTechnology.
- * ((const char **)response)[4] if registration state is 3 (Registration
+ * ((const char **)response)[2] if registration state is 3 (Registration
  *                               denied) this is an enumerated reason why
  *                               registration was denied.  See 3GPP TS 24.008,
  *                               Annex G.6 "Additonal cause codes for GMM".
@@ -2303,21 +2284,14 @@ typedef struct {
  *      14 == GPRS services not allowed in this PLMN
  *      16 == MSC temporarily not reachable
  *      40 == No PDP context activated
- * ((const char **)response)[5] The maximum number of simultaneous Data Calls that can be
+ * ((const char **)response)[3] The maximum number of simultaneous Data Calls that can be
  *                              established using RIL_REQUEST_SETUP_DATA_CALL.
  *
- * The values at offsets 6..10 are optional LTE location information in decimal.
- * If a value is unknown that value may be NULL. If all values are NULL,
- * none need to be present.
- *  ((const char **)response)[6] is TAC, a 16-bit Tracking Area Code.
- *  ((const char **)response)[7] is CID, a 0-503 Physical Cell Identifier.
- *  ((const char **)response)[8] is ECI, a 28-bit E-UTRAN Cell Identifier.
- *  ((const char **)response)[9] is CSGID, a 27-bit Closed Subscriber Group Identity.
- *  ((const char **)response)[10] is TADV, a 6-bit timing advance value.
- *
- * LAC and CID are in hexadecimal format.
- * valid LAC are 0x0000 - 0xffff
- * valid CID are 0x00000000 - 0x0fffffff
+ * ((const char **)response)[4] RIL_CellIdentity_v12 structure containing all available
+ *                               identification information regarding the currently camped cell.
+ *                               If registration state is neither 0 (unregistered) or 4,
+ *                               (unknown), then all fields must be valid. If registration state
+ *                               is 0 or 4 then this field shall be NULL.
  *
  * Please note that registration state 4 ("unknown") is treated
  * as "out of service" in the Android telephony system
