@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "adffbf6a_95b2c696",
+        "filename": "reference-ril/reference-ril.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2016-12-01T00:02:06Z",
+      "side": 1,
+      "message": "I don\u0027t think this is correct - it won\u0027t send the AT command at 509 or do any of the onRequestComplete stuff",
+      "range": {
+        "startLine": 467,
+        "startChar": 6,
+        "endLine": 467,
+        "endChar": 12
+      },
+      "revId": "2b413412fd4baa4c5f95557596143fcbd37a8456",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
