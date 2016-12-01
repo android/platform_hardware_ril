@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "adffbf6a_582375cc",
+        "filename": "libril/Android.mk",
+        "patchSetId": 9
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1120458
+      },
+      "writtenOn": "2016-12-01T01:17:49Z",
+      "side": 1,
+      "message": "yeah, you\u0027ll have to update this as well\nlibhidl -\u003e libhidlbase, libhidltransport",
+      "range": {
+        "startLine": 21,
+        "startChar": 4,
+        "endLine": 21,
+        "endChar": 11
+      },
+      "revId": "f6d39ea923230faca2758b29461f9b223007ab37",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
