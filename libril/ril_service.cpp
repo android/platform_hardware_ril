@@ -2590,6 +2590,255 @@ int radio::getSignalStrengthResponse(android::Parcel &p, int slotId, int request
     return 0;
 }
 
+RIL_CellInfoType getCellInfoTypeRadioTechnology(char *rat) {
+    if (rat == NULL) {
+        return RIL_CELL_INFO_TYPE_NONE;
+    }
+
+    int radioTech = atoi(rat);
+
+    switch(radioTech) {
+
+        case RADIO_TECH_GPRS:
+        case RADIO_TECH_EDGE:
+        case RADIO_TECH_GSM: {
+            return RIL_CELL_INFO_TYPE_GSM;
+        }
+
+        case RADIO_TECH_UMTS:
+        case RADIO_TECH_HSDPA:
+        case RADIO_TECH_HSUPA:
+        case RADIO_TECH_HSPA:
+        case RADIO_TECH_HSPAP: {
+            return RIL_CELL_INFO_TYPE_WCDMA;
+        }
+
+        case RADIO_TECH_IS95A:
+        case RADIO_TECH_IS95B:
+        case RADIO_TECH_1xRTT:
+        case RADIO_TECH_EVDO_0:
+        case RADIO_TECH_EVDO_A:
+        case RADIO_TECH_EVDO_B:
+        case RADIO_TECH_EHRPD: {
+            return RIL_CELL_INFO_TYPE_CDMA;
+        }
+
+        case RADIO_TECH_LTE:
+        case RADIO_TECH_LTE_CA: {
+            return RIL_CELL_INFO_TYPE_LTE;
+        }
+
+        case RADIO_TECH_TD_SCDMA: {
+            return RIL_CELL_INFO_TYPE_TD_SCDMA;
+        }
+
+        default: {
+            break;
+        }
+    }
+
+    return RIL_CELL_INFO_TYPE_NONE;
+
+}
+
+void fillCellIdentityResponse(CellIdentity &cellIdentity, RIL_CellIdentity_v16 &rilCellIdentity) {
+
+    cellIdentity.cellIdentityGsm.resize(0);
+    cellIdentity.cellIdentityWcdma.resize(0);
+    cellIdentity.cellIdentityCdma.resize(0);
+    cellIdentity.cellIdentityTdscdma.resize(0);
+    cellIdentity.cellIdentityLte.resize(0);
+    cellIdentity.cellInfoType = (CellInfoType)rilCellIdentity.cellInfoType;
+    switch(rilCellIdentity.cellInfoType) {
+
+        case RIL_CELL_INFO_TYPE_GSM: {
+            cellIdentity.cellIdentityGsm.resize(1);
+            cellIdentity.cellIdentityGsm[0].mcc =
+                    std::to_string(rilCellIdentity.cellIdentityGsm.mcc);
+            cellIdentity.cellIdentityGsm[0].mnc =
+                    std::to_string(rilCellIdentity.cellIdentityGsm.mnc);
+            cellIdentity.cellIdentityGsm[0].lac = rilCellIdentity.cellIdentityGsm.lac;
+            cellIdentity.cellIdentityGsm[0].cid = rilCellIdentity.cellIdentityGsm.cid;
+            cellIdentity.cellIdentityGsm[0].arfcn = rilCellIdentity.cellIdentityGsm.arfcn;
+            cellIdentity.cellIdentityGsm[0].bsic = rilCellIdentity.cellIdentityGsm.bsic;
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_WCDMA: {
+            cellIdentity.cellIdentityWcdma.resize(1);
+            cellIdentity.cellIdentityWcdma[0].mcc =
+                    std::to_string(rilCellIdentity.cellIdentityWcdma.mcc);
+            cellIdentity.cellIdentityWcdma[0].mnc =
+                    std::to_string(rilCellIdentity.cellIdentityWcdma.mnc);
+            cellIdentity.cellIdentityWcdma[0].lac = rilCellIdentity.cellIdentityWcdma.lac;
+            cellIdentity.cellIdentityWcdma[0].cid = rilCellIdentity.cellIdentityWcdma.cid;
+            cellIdentity.cellIdentityWcdma[0].psc = rilCellIdentity.cellIdentityWcdma.psc;
+            cellIdentity.cellIdentityWcdma[0].uarfcn = rilCellIdentity.cellIdentityWcdma.uarfcn;
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_CDMA: {
+            cellIdentity.cellIdentityCdma.resize(1);
+            cellIdentity.cellIdentityCdma[0].networkId = rilCellIdentity.cellIdentityCdma.networkId;
+            cellIdentity.cellIdentityCdma[0].systemId = rilCellIdentity.cellIdentityCdma.systemId;
+            cellIdentity.cellIdentityCdma[0].baseStationId =
+                    rilCellIdentity.cellIdentityCdma.basestationId;
+            cellIdentity.cellIdentityCdma[0].longitude = rilCellIdentity.cellIdentityCdma.longitude;
+            cellIdentity.cellIdentityCdma[0].latitude = rilCellIdentity.cellIdentityCdma.latitude;
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_LTE: {
+            cellIdentity.cellIdentityLte.resize(1);
+            cellIdentity.cellIdentityLte[0].mcc =
+                    std::to_string(rilCellIdentity.cellIdentityLte.mcc);
+            cellIdentity.cellIdentityLte[0].mnc =
+                    std::to_string(rilCellIdentity.cellIdentityLte.mnc);
+            cellIdentity.cellIdentityLte[0].ci = rilCellIdentity.cellIdentityLte.ci;
+            cellIdentity.cellIdentityLte[0].pci = rilCellIdentity.cellIdentityLte.pci;
+            cellIdentity.cellIdentityLte[0].tac = rilCellIdentity.cellIdentityLte.tac;
+            cellIdentity.cellIdentityLte[0].earfcn = rilCellIdentity.cellIdentityLte.earfcn;
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_TD_SCDMA: {
+            cellIdentity.cellIdentityTdscdma.resize(1);
+            cellIdentity.cellIdentityTdscdma[0].mcc =
+                    std::to_string(rilCellIdentity.cellIdentityTdscdma.mcc);
+            cellIdentity.cellIdentityTdscdma[0].mnc =
+                    std::to_string(rilCellIdentity.cellIdentityTdscdma.mnc);
+            cellIdentity.cellIdentityTdscdma[0].lac = rilCellIdentity.cellIdentityTdscdma.lac;
+            cellIdentity.cellIdentityTdscdma[0].cid = rilCellIdentity.cellIdentityTdscdma.cid;
+            cellIdentity.cellIdentityTdscdma[0].cpid = rilCellIdentity.cellIdentityTdscdma.cpid;
+            break;
+        }
+
+        default: {
+            break;
+        }
+    }
+}
+
+int convertResponseStringEntryToInt(char **response, int index, int numStrings) {
+    if ((response != NULL) &&  (numStrings > index) && (response[index] != NULL)) {
+        return atoi(response[index]);
+    }
+
+    return -1;
+}
+
+void fillCellIdentityFromVoiceRegStateResponseString(CellIdentity &cellIdentity,
+        int numStrings, char** response) {
+
+    RIL_CellIdentity_v16 rilCellIdentity;
+    int32_t *tmp = (int32_t*)&rilCellIdentity;
+
+    for (unsigned long i = 0; i < sizeof(RIL_CellIdentity_v16)/sizeof(int32_t); i++) {
+        tmp[i] = -1;
+    }
+
+    rilCellIdentity.cellInfoType = getCellInfoTypeRadioTechnology(response[3]);
+    switch(rilCellIdentity.cellInfoType) {
+
+        case RIL_CELL_INFO_TYPE_GSM: {
+            rilCellIdentity.cellIdentityGsm.lac =
+                    convertResponseStringEntryToInt(response, 1, numStrings);
+            rilCellIdentity.cellIdentityGsm.cid =
+                    convertResponseStringEntryToInt(response, 2, numStrings);
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_WCDMA: {
+            rilCellIdentity.cellIdentityWcdma.lac =
+                    convertResponseStringEntryToInt(response, 1, numStrings);
+            rilCellIdentity.cellIdentityWcdma.cid =
+                    convertResponseStringEntryToInt(response, 2, numStrings);
+            rilCellIdentity.cellIdentityWcdma.psc =
+                    convertResponseStringEntryToInt(response, 14, numStrings);
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_TD_SCDMA:{
+            rilCellIdentity.cellIdentityTdscdma.lac =
+                    convertResponseStringEntryToInt(response, 1, numStrings);
+            rilCellIdentity.cellIdentityTdscdma.cid =
+                    convertResponseStringEntryToInt(response, 2, numStrings);
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_CDMA:{
+            rilCellIdentity.cellIdentityCdma.basestationId =
+                    convertResponseStringEntryToInt(response, 4, numStrings);
+            rilCellIdentity.cellIdentityCdma.longitude =
+                    convertResponseStringEntryToInt(response, 5, numStrings);
+            rilCellIdentity.cellIdentityCdma.latitude =
+                    convertResponseStringEntryToInt(response, 6, numStrings);
+            rilCellIdentity.cellIdentityCdma.systemId =
+                    convertResponseStringEntryToInt(response, 8, numStrings);
+            rilCellIdentity.cellIdentityCdma.networkId =
+                    convertResponseStringEntryToInt(response, 9, numStrings);
+            break;
+        }
+
+        default: {
+            break;
+        }
+    }
+
+    fillCellIdentityResponse(cellIdentity, rilCellIdentity);
+}
+
+void fillCellIdentityFromDataRegStateResponseString(CellIdentity &cellIdentity,
+        int numStrings, char** response) {
+
+    RIL_CellIdentity_v16 rilCellIdentity;
+    int32_t *tmp = (int32_t*)&rilCellIdentity;
+
+    for (unsigned long i = 0; i < sizeof(RIL_CellIdentity_v16)/sizeof(int32_t); i++) {
+        tmp[i] = -1;
+    }
+
+    rilCellIdentity.cellInfoType = getCellInfoTypeRadioTechnology(response[3]);
+    switch(rilCellIdentity.cellInfoType) {
+        case RIL_CELL_INFO_TYPE_GSM: {
+            rilCellIdentity.cellIdentityGsm.lac =
+                    convertResponseStringEntryToInt(response, 1, numStrings);
+            rilCellIdentity.cellIdentityGsm.cid =
+                    convertResponseStringEntryToInt(response, 2, numStrings);
+            break;
+        }
+        case RIL_CELL_INFO_TYPE_WCDMA: {
+            rilCellIdentity.cellIdentityWcdma.lac =
+                    convertResponseStringEntryToInt(response, 1, numStrings);
+            rilCellIdentity.cellIdentityWcdma.cid =
+                    convertResponseStringEntryToInt(response, 2, numStrings);
+            break;
+        }
+        case RIL_CELL_INFO_TYPE_TD_SCDMA:{
+            rilCellIdentity.cellIdentityTdscdma.lac =
+                    convertResponseStringEntryToInt(response, 1, numStrings);
+            rilCellIdentity.cellIdentityTdscdma.cid =
+                    convertResponseStringEntryToInt(response, 2, numStrings);
+            break;
+        }
+        case RIL_CELL_INFO_TYPE_LTE: {
+            rilCellIdentity.cellIdentityLte.tac =
+                    convertResponseStringEntryToInt(response, 6, numStrings);
+            rilCellIdentity.cellIdentityLte.pci =
+                    convertResponseStringEntryToInt(response, 7, numStrings);
+            rilCellIdentity.cellIdentityLte.ci =
+                    convertResponseStringEntryToInt(response, 8, numStrings);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    fillCellIdentityResponse(cellIdentity, rilCellIdentity);
+}
+
+
 int radio::getVoiceRegistrationStateResponse(android::Parcel &p, int slotId, int requestNumber,
                                             int responseType, int serial, RIL_Errno e,
                                             void *response, size_t responseLen) {
@@ -2600,29 +2849,44 @@ int radio::getVoiceRegistrationStateResponse(android::Parcel &p, int slotId, int
         populateResponseInfo(responseInfo, serial, responseType, e);
 
         VoiceRegStateResult voiceRegResponse = {};
-
         int numStrings = responseLen / sizeof(char *);
-
-        if (response == NULL || numStrings != 15) {
-            RLOGE("radio::getVoiceRegistrationStateResponse Invalid response: NULL");
-            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        if (response == NULL) {
+               RLOGE("radio::getVoiceRegistrationStateResponse Invalid response: NULL");
+               if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        }
+        if (s_vendorFunctions->version <= 14) {
+            if (numStrings != 15) {
+                RLOGE("radio::getVoiceRegistrationStateResponse Invalid response: NULL");
+                if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+            } else {
+                char **resp = (char **) response;
+                voiceRegResponse.regState = (RegState) ATOI_NULL_HANDLED_DEF(resp[0], 4);
+                voiceRegResponse.rat = ATOI_NULL_HANDLED(resp[3]);
+                voiceRegResponse.cssSupported = ATOI_NULL_HANDLED_DEF(resp[7], 0);
+                voiceRegResponse.roamingIndicator = ATOI_NULL_HANDLED(resp[10]);
+                voiceRegResponse.systemIsInPrl = ATOI_NULL_HANDLED_DEF(resp[11], 0);
+                voiceRegResponse.defaultRoamingIndicator = ATOI_NULL_HANDLED_DEF(resp[12], 0);
+                voiceRegResponse.reasonForDenial = ATOI_NULL_HANDLED_DEF(resp[13], 0);
+                fillCellIdentityFromVoiceRegStateResponseString(voiceRegResponse.cellIdentity,
+                        numStrings, resp);
+            }
         } else {
-            char **resp = (char **) response;
-            voiceRegResponse.regState = (RegState) ATOI_NULL_HANDLED_DEF(resp[0], 4);
-            voiceRegResponse.lac = ATOI_NULL_HANDLED(resp[1]);
-            voiceRegResponse.cid = ATOI_NULL_HANDLED(resp[2]);
-            voiceRegResponse.rat = ATOI_NULL_HANDLED(resp[3]);
-            voiceRegResponse.baseStationId = ATOI_NULL_HANDLED(resp[4]);
-            voiceRegResponse.baseStationLatitude = ATOI_NULL_HANDLED_DEF(resp[5], INT_MAX);
-            voiceRegResponse.baseStationLongitude = ATOI_NULL_HANDLED_DEF(resp[6], INT_MAX);
-            voiceRegResponse.cssSupported = ATOI_NULL_HANDLED_DEF(resp[7], 0);
-            voiceRegResponse.systemId = ATOI_NULL_HANDLED_DEF(resp[8], 0);
-            voiceRegResponse.networkId = ATOI_NULL_HANDLED_DEF(resp[9], 0);
-            voiceRegResponse.roamingIndicator = ATOI_NULL_HANDLED(resp[10]);
-            voiceRegResponse.systemIsInPrl = ATOI_NULL_HANDLED_DEF(resp[11], 0);
-            voiceRegResponse.defaultRoamingIndicator = ATOI_NULL_HANDLED_DEF(resp[12], 0);
-            voiceRegResponse.reasonForDenial = ATOI_NULL_HANDLED_DEF(resp[13], 0);
-            voiceRegResponse.psc = ATOI_NULL_HANDLED(resp[14]);
+            RIL_VoiceRegistrationStateResponse *voiceRegState =
+                    (RIL_VoiceRegistrationStateResponse *)response;
+
+            if (responseLen != sizeof(RIL_VoiceRegistrationStateResponse)) {
+                RLOGE("radio::getVoiceRegistrationStateResponse Invalid response: NULL");
+                if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+            } else {
+                voiceRegResponse.regState = (RegState) voiceRegState->regState;
+                voiceRegResponse.rat = voiceRegState->rat;;
+                voiceRegResponse.cssSupported = voiceRegState->cssSupported;
+                voiceRegResponse.roamingIndicator = voiceRegState->roamingIndicator;
+                voiceRegResponse.systemIsInPrl = voiceRegState->systemIsInPrl;
+                voiceRegResponse.defaultRoamingIndicator = voiceRegState->defaultRoamingIndicator;
+                voiceRegResponse.reasonForDenial = voiceRegState->reasonForDenial;
+                fillCellIdentityResponse(voiceRegResponse.cellIdentity, voiceRegState->cellIdentity);
+            }
         }
 
         Return<void> retStatus =
@@ -2646,25 +2910,39 @@ int radio::getDataRegistrationStateResponse(android::Parcel &p, int slotId, int 
         RadioResponseInfo responseInfo = {};
         populateResponseInfo(responseInfo, serial, responseType, e);
         DataRegStateResult dataRegResponse = {};
-        int numStrings = responseLen / sizeof(char *);
-        if (response == NULL || (numStrings != 6 && numStrings != 11)) {
+        if (response == NULL) {
             RLOGE("radio::getDataRegistrationStateResponse Invalid response: NULL");
             if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
-        } else {
-            char **resp = (char **) response;
-            dataRegResponse.regState = (RegState) ATOI_NULL_HANDLED_DEF(resp[0], 4);
-            dataRegResponse.lac =  ATOI_NULL_HANDLED(resp[1]);
-            dataRegResponse.cid =  ATOI_NULL_HANDLED(resp[2]);
-            dataRegResponse.rat =  ATOI_NULL_HANDLED_DEF(resp[3], 0);
-            dataRegResponse.reasonDataDenied =  ATOI_NULL_HANDLED(resp[4]);
-            dataRegResponse.maxDataCalls =  ATOI_NULL_HANDLED_DEF(resp[5], 1);
-            if (numStrings == 11) {
-                dataRegResponse.tac = ATOI_NULL_HANDLED(resp[6]);
-                dataRegResponse.phyCid = ATOI_NULL_HANDLED(resp[7]);
-                dataRegResponse.eci = ATOI_NULL_HANDLED(resp[8]);
-                dataRegResponse.csgid = ATOI_NULL_HANDLED(resp[9]);
-                dataRegResponse.tadv = ATOI_NULL_HANDLED(resp[10]);
+        }
+
+        if (s_vendorFunctions->version <= 14) {
+            int numStrings = responseLen / sizeof(char *);
+            if ((numStrings != 6) && (numStrings != 11)) {
+                RLOGE("radio::getDataRegistrationStateResponse Invalid response: NULL");
+                if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+            } else {
+                char **resp = (char **) response;
+                dataRegResponse.regState = (RegState) ATOI_NULL_HANDLED_DEF(resp[0], 4);
+                dataRegResponse.rat =  ATOI_NULL_HANDLED_DEF(resp[3], 0);
+                dataRegResponse.reasonDataDenied =  ATOI_NULL_HANDLED(resp[4]);
+                dataRegResponse.maxDataCalls =  ATOI_NULL_HANDLED_DEF(resp[5], 1);
+                fillCellIdentityFromDataRegStateResponseString(dataRegResponse.cellIdentity,
+                        numStrings, resp);
             }
+        } else {
+                RIL_DataRegistrationStateResponse *dataRegState =
+                        (RIL_DataRegistrationStateResponse *)response;
+
+                if (responseLen != sizeof(RIL_DataRegistrationStateResponse)) {
+                    RLOGE("radio::getDataRegistrationStateResponse Invalid response: NULL");
+                    if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+                } else {
+                    dataRegResponse.regState = (RegState) dataRegState->regState;
+                    dataRegResponse.rat = dataRegState->rat;;
+                    dataRegResponse.reasonDataDenied = dataRegState->reasonDataDenied;
+                    dataRegResponse.maxDataCalls = dataRegState->maxDataCalls;
+                    fillCellIdentityResponse(dataRegResponse.cellIdentity, dataRegState->cellIdentity);
+                }
         }
 
         Return<void> retStatus =
@@ -6313,6 +6591,9 @@ void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<Ce
                         rillCellInfo->CellInfo.tdscdma.cellIdentityTdscdma.cpid;
                 cellInfoTdscdma->signalStrengthTdscdma.rscp =
                         rillCellInfo->CellInfo.tdscdma.signalStrengthTdscdma.rscp;
+                break;
+            }
+            default: {
                 break;
             }
         }
