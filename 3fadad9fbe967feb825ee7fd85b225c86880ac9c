@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ad109fcf_94acc96a",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 5386,
+      "author": {
+        "id": 1032276
+      },
+      "writtenOn": "2016-12-05T15:24:31Z",
+      "side": 1,
+      "message": "Do you still want the RIL_* here? Or is RIL_RESPONSE_ACKNOWLEDGEMENT special?",
+      "range": {
+        "startLine": 5386,
+        "startChar": 51,
+        "endLine": 5386,
+        "endChar": 55
+      },
+      "revId": "3fadad9fbe967feb825ee7fd85b225c86880ac9c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
