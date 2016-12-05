@@ -22,6 +22,30 @@
       "revId": "3fadad9fbe967feb825ee7fd85b225c86880ac9c",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ad109fcf_a5f315bd",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 5386,
+      "author": {
+        "id": 1020863
+      },
+      "writtenOn": "2016-12-05T21:58:24Z",
+      "side": 1,
+      "message": "Well, I suppose this is at your discretion. How invasive would you like me to be? I could also updated the strings for requests GET/SET_RADIO_CAPABILITY and unsol HARDWARE_CONFIG_CHANGED. AFAICT, requestToString() is just used for logging, so I would be happy to perform a more complete cleanup if it would be welcomed.",
+      "parentUuid": "ad109fcf_94acc96a",
+      "range": {
+        "startLine": 5386,
+        "startChar": 51,
+        "endLine": 5386,
+        "endChar": 55
+      },
+      "revId": "3fadad9fbe967feb825ee7fd85b225c86880ac9c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
