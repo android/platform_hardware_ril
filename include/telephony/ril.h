@@ -4654,6 +4654,20 @@ typedef struct {
  * RIL_REQUEST_SET_INITIAL_ATTACH_APN
  *
  * Set an apn to initial attach network
+ * 
+ * "data" is a const char **
+ * ((const char **)data)[0] is the APN to connect if radio technology is LTE
+ * ((const char **)data)[1] is the connection type to request must be one of the
+ *                          PDP_type values in TS 27.007 section 10.1.1.
+ *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
+ * ((const char **)data)[2] is the PAP / CHAP auth type. Values:
+ *                          0 => PAP and CHAP is never performed.
+ *                          1 => PAP may be performed; CHAP is never performed.
+ *                          2 => CHAP may be performed; PAP is never performed.
+ *                          3 => PAP / CHAP may be performed - baseband dependent.
+ * ((const char **)data)[3] is the username for APN, or NULL
+ * ((const char **)data)[4] is the password for APN, or NULL
+ *
  * "response" is NULL
  *
  * Valid errors:
