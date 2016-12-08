@@ -66,6 +66,9 @@ extern "C" {
  *
  * RIL_VERSION = 13 : This version includes new wakelock semantics and as the first
  *                    strongly versioned version it enforces structure use.
+ * RIL_VERSION = 15 : The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
+ *                    RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
+ *
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -1657,6 +1660,61 @@ typedef struct {
     int enabled;
 } RIL_DataProfileInfo;
 
+typedef struct {
+    /* the APN to connect to */
+    char* apn;
+    /** one of the PDP_type values in TS 27.007 section 10.1.1.
+     * For example, "IP", "IPV6", "IPV4V6", or "PPP".
+     */
+    char* protocol;
+    /** authentication protocol used for this PDP context
+     * (None: 0, PAP: 1, CHAP: 2, PAP&CHAP: 3)
+     */
+    int authType;
+    /* the username for APN, or NULL */
+    char* user;
+    /* the password for APN, or NULL */
+    char* password;
+    /* the profile type, TYPE_COMMON-0, TYPE_3GPP-1, TYPE_3GPP2-2 */
+    int type;
+    /* the period in seconds to limit the maximum connections */
+    int maxConnsTime;
+    /* the maximum connections during maxConnsTime */
+    int maxConns;
+    /** the required wait time in seconds after a successful UE initiated
+     * disconnect of a given PDN connection before the device can send
+     * a new PDN connection request for that given PDN
+     */
+    int waitTime;
+    /* true to enable the profile, 0 to disable, 1 to enable */
+    int enabled;
+    /* supported APN types bitmask. See RIL_ApnTypes for the value of each bit. */
+    int supportedTypesBitmask;
+    /* the proxy address */
+    char *proxy;
+    /* the port of the proxy */
+    char *port;
+    /* the MMS proxy address */
+    char *mmsProxy;
+    /* the port of MMS proxy */
+    char *mmsPort;
+    /** one of the PDP_type values in TS 27.007 section 10.1.1 used on roaming network.
+     * For example, "IP", "IPV6", "IPV4V6", or "PPP".
+     */
+    char *roamingProtocol;
+    /** The bearer bitmask. See RIL_RadioAccessFamily for the value of each bit. */
+    int bearerBitmask;
+    /** maximum transmission unit (MTU) size in bytes */
+    int mtu;
+    /** the MVNO type: possible values are "imsi", "gid", "spn" */
+    char *mvnoType;
+    /** MVNO match data. For example, SPN: A MOBILE, BEN NL, ...
+      * IMSI: 302720x94, 2060188, ...
+      * GID: 4E, 33, ...
+      */
+    char *mvnoMatchData;
+} RIL_DataProfileInfo_v15;
+
 /* Tx Power Levels */
 #define RIL_NUM_TX_POWER_LEVELS     5
 
@@ -1685,6 +1743,23 @@ typedef struct {
    * the transmitter is inactive */
   uint32_t rx_mode_time_ms;
 } RIL_ActivityStatsInfo;
+
+typedef enum {
+  RIL_APN_TYPE_UNKNOWN      = 0x0,          // Unknown
+  RIL_APN_TYPE_DEFAULT      = 0x1,          // APN type for default data traffic
+  RIL_APN_TYPE_MMS          = 0x2,          // APN type for MMS traffic
+  RIL_APN_TYPE_SUPL         = 0x4,          // APN type for SUPL assisted GPS
+  RIL_APN_TYPE_DUN          = 0x8,          // APN type for DUN traffic
+  RIL_APN_TYPE_HIPRI        = 0x10,         // APN type for HiPri traffic
+  RIL_APN_TYPE_FOTA         = 0x20,         // APN type for FOTA
+  RIL_APN_TYPE_IMS          = 0x40,         // APN type for IMS
+  RIL_APN_TYPE_CBS          = 0x80,         // APN type for CBS
+  RIL_APN_TYPE_IA           = 0x100,        // APN type for IA Initial Attach APN
+  RIL_APN_TYPE_EMERGENCY    = 0x200,        // APN type for Emergency PDN. This is not an IA apn,
+                                            // but is used for access to carrier services in an
+                                            // emergency call situation.
+  RIL_APN_TYPE_ALL          = 0xFFFFFFFF    // All APN types
+} RIL_ApnTypes;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -2517,7 +2592,9 @@ typedef struct {
  * "data" is a const char **
  * ((const char **)data)[0] Radio technology to use: 0-CDMA, 1-GSM/UMTS, 2...
  *                          for values above 2 this is RIL_RadioTechnology + 2.
- * ((const char **)data)[1] is a RIL_DataProfile (support is optional)
+ * ((const char **)data)[1] is a bitmask of APN type in decimal string format. The
+ *                          bit mask will encapsulate the following values:
+ *                          ia,vzw800,mms,agps,supl,hipri,fota,dun,ims,default.
  * ((const char **)data)[2] is the APN to connect to if radio technology is GSM/UMTS. This APN will
  *                          override the one in the profile. NULL indicates no APN overrride.
  * ((const char **)data)[3] is the username for APN, or NULL
@@ -2527,10 +2604,35 @@ typedef struct {
  *                          1 => PAP may be performed; CHAP is never performed.
  *                          2 => CHAP may be performed; PAP is never performed.
  *                          3 => PAP / CHAP may be performed - baseband dependent.
- * ((const char **)data)[6] is the connection type to request must be one of the
+ * ((const char **)data)[6] is the non-roaming/home connection type to request. Must be one of the
  *                          PDP_type values in TS 27.007 section 10.1.1.
  *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
- * ((const char **)data)[7] Optional connection property parameters, format to be defined.
+ * ((const char **)data)[7] is the proxy address.
+ * ((const char **)data)[8] is the port of the proxy.
+ * ((const char **)data)[9] is the MMS proxy address.
+ * ((const char **)data)[10] is the port of the MMS proxy.
+ * ((const char **)data)[11] is the roaming connection type to request. Must be one of the
+ *                           PDP_type values in TS 27.007 section 10.1.1.
+ *                           For example, "IP", "IPV6", "IPV4V6", or "PPP".
+ * ((const char **)data)[12] is the bearer bitmask in decimal string format. Each bit represents a
+ *                           RAT in ServiceState. 0 or NULL indicates all RATs.
+ * ((const char **)data)[13] is the boolean apn setting to be set in modem. "1" indicates the APN
+ *                           was sent to the modem through RIL_REQUEST_SET_DATA_PROFILE, "0" or NULL
+ *                           indicates the APN was not sent to the modem.
+ * ((const char **)data)[14] is the max connections of this apn.
+ * ((const char **)data)[15] is the wait time for retry of the apn in seconds.
+ * ((const char **)data)[16] is the time to limit max connection for the apn in seconds.
+ * ((const char **)data)[17] is the mtu size in bytes of the mobile interface to which
+ *                           the apn is connected.
+ * ((const char **)data)[18] is the MVNO type:
+ *                           possible values are "imsi", "gid", "spn".
+ * ((const char **)data)[19] is the MVNO match data.Use the following examples.
+ *                           SPN: A MOBILE, BEN NL, ...
+ *                           IMSI: 302720x94, 2060188, ...
+ *                           GID: 4E, 33, ...
+ * ((const char **)data)[20] is the boolean string indicating data roaming is allowed or not. "1"
+ *                           indicates data roaming is enabled by the user, "0" indicates not
+ *                           enabled.
  *
  * "response" is a RIL_Data_Call_Response_v11
  *
@@ -5792,6 +5894,28 @@ typedef struct {
     char *username;
     char *password;
 } RIL_InitialAttachApn;
+
+typedef struct {
+    char *apn;
+    char *protocol;
+    int authtype;
+    char *username;
+    char *password;
+    int supportedTypesBitmask;
+    char *proxy;
+    char *port;
+    char *mmsProxy;
+    char *mmsPort;
+    char *roamingProtocol;
+    int bearerBitmask;
+    int modemCognitive;
+    int maxConns;
+    int waitTime;
+    int maxConnsTime;
+    int mtu;
+    char *mvnoType;
+    char *mvnoMatchData;
+} RIL_InitialAttachApn_v15;
 
 typedef struct {
     int authContext;            /* P2 value of authentication command, see P2 parameter in
