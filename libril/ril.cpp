@@ -1666,76 +1666,218 @@ invalid:
 // IPv6 and dual-stack PDP contexts. When dealing with a previous version of
 // RIL, remove the parameter from the request.
 static void dispatchDataCall(Parcel& p, RequestInfo *pRI) {
-    // In RIL v3, REQUEST_SETUP_DATA_CALL takes 6 parameters.
-    const int numParamsRilV3 = 6;
-
     // The first bytes of the RIL parcel contain the request number and the
     // serial number - see processCommandBuffer(). Copy them over too.
     int pos = p.dataPosition();
 
     int numParams = p.readInt32();
-    if (s_callbacks.version < 4 && numParams > numParamsRilV3) {
-      Parcel p2;
-      p2.appendFrom(&p, 0, pos);
-      p2.writeInt32(numParamsRilV3);
-      for(int i = 0; i < numParamsRilV3; i++) {
+
+    if (s_callbacks.version >= 4 && s_callbacks.version <= 14) {
+        const int numParamsRilV14 = 7;
+        Parcel p2;
+        p2.appendFrom(&p, 0, pos);
+        // Write the param number
+        p2.writeInt32(numParamsRilV14);
+
+        // Write RAT
         p2.writeString16(p.readString16());
-      }
-      p2.setDataPosition(pos);
-      dispatchStrings(p2, pRI);
+        // Write profile id
+        p2.writeString16(p.readString16());
+        // Skip APN type bitmask
+        p.readString16();
+
+        // Write the rest 5 params
+        for (int i = 0; i < 5; i++) {
+            p2.writeString16(p.readString16());
+        }
+        p2.setDataPosition(pos);
+        dispatchStrings(p2, pRI);
+    } else if (s_callbacks.version >= 15) {
+        Parcel p2;
+        p2.appendFrom(&p, 0, pos);
+        // Write the param number. Subtract 1 because we are not sending profile id with v15.
+        p2.writeInt32(numParams - 1);
+        // Write radio technology
+        p2.writeString16(p.readString16());
+        // Skip profile id
+        p.readString16();
+        // Write the rest of params
+        for (int i = 0; i < numParams - 2; i++) {
+            p2.writeString16(p.readString16());
+        }
+        p2.setDataPosition(pos);
+        dispatchStrings(p2, pRI);
     } else {
-      p.setDataPosition(pos);
-      dispatchStrings(p, pRI);
+        RLOGE("Unsuppoted RIL version %d, min version expected 4", s_callbacks.version);
+        RIL_onRequestComplete(pRI, RIL_E_REQUEST_NOT_SUPPORTED, NULL, 0);
+        return;
     }
 }
 
 static void dispatchSetInitialAttachApn(Parcel &p, RequestInfo *pRI)
 {
-    RIL_InitialAttachApn pf;
-    int32_t  t;
-    status_t status;
+    if (s_callbacks.version <= 14) {
+        RIL_InitialAttachApn pf;
 
-    memset(&pf, 0, sizeof(pf));
+        int32_t t;
+        status_t status;
 
-    pf.apn = strdupReadString(p);
-    pf.protocol = strdupReadString(p);
+        memset(&pf, 0, sizeof(pf));
 
-    status = p.readInt32(&t);
-    pf.authtype = (int) t;
+        pf.apn = strdupReadString(p);
+        pf.protocol = strdupReadString(p);
 
-    pf.username = strdupReadString(p);
-    pf.password = strdupReadString(p);
+        status = p.readInt32(&t);
+        pf.authtype = (int) t;
 
-    startRequest;
-    appendPrintBuf("%sapn=%s, protocol=%s, authtype=%d, username=%s, password=%s",
-            printBuf, pf.apn, pf.protocol, pf.authtype, pf.username, pf.password);
-    closeRequest;
-    printRequest(pRI->token, pRI->pCI->requestNumber);
+        pf.username = strdupReadString(p);
+        pf.password = strdupReadString(p);
 
-    if (status != NO_ERROR) {
-        goto invalid;
+        startRequest;
+        appendPrintBuf("%sapn=%s, protocol=%s, authtype=%d, username=%s, password=%s",
+                printBuf, pf.apn, pf.protocol, pf.authtype, pf.username, pf.password);
+        closeRequest;
+        printRequest(pRI->token, pRI->pCI->requestNumber);
+
+        if (status != NO_ERROR) {
+            invalidCommandBlock(pRI);
+        } else {
+            CALL_ONREQUEST(pRI->pCI->requestNumber, &pf, sizeof(pf), pRI, pRI->socket_id);
+        }
+
+#ifdef MEMSET_FREED
+        memsetString(pf.apn);
+        memsetString(pf.protocol);
+        memsetString(pf.username);
+        memsetString(pf.password);
+#endif
+        free(pf.apn);
+        free(pf.protocol);
+        free(pf.username);
+        free(pf.password);
+
+#ifdef MEMSET_FREED
+        memset(&pf, 0, sizeof(pf));
+#endif
+    } else {
+        RIL_InitialAttachApn_v15 pf15;
+
+        int32_t t;
+        status_t status;
+
+        memset(&pf15, 0, sizeof(pf15));
+
+        pf15.apn = strdupReadString(p);
+        pf15.protocol = strdupReadString(p);
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.authtype = (int) t;
+
+        pf15.username = strdupReadString(p);
+        pf15.password = strdupReadString(p);
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.supportedTypesBitmask = (int) t;
+
+        pf15.proxy = strdupReadString(p);
+        pf15.port = strdupReadString(p);
+        pf15.mmsProxy = strdupReadString(p);
+        pf15.mmsPort = strdupReadString(p);
+        pf15.roamingProtocol = strdupReadString(p);
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.bearerBitmask = (int) t;
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.modemCognitive = (int) t;
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.maxConns = (int) t;
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.waitTime = (int) t;
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.maxConnsTime = (int) t;
+
+        status = p.readInt32(&t);
+        if (status != NO_ERROR) {
+            goto cleanup;
+        }
+        pf15.mtu = (int) t;
+
+        pf15.mvnoType = strdupReadString(p);
+        pf15.mvnoMatchData = strdupReadString(p);
+
+        startRequest;
+        appendPrintBuf("%sapn=%s, protocol=%s, authtype=%d, username=%s, password=%s, proxy=%s, "
+                "supportedTypesBitmask=%d, proxy=%s, port=%s, mmsProxy=%s, mmsPort=%s, "
+                "roamingProtocol=%s, bearerBitmask=%d, modemCognitive=%d, "
+                "maxConns=%d, waitTime=%d, maxConnsTime=%d, mtu%d, mvnoType=%s, mvnoMatchData=%s",
+                printBuf, pf15.apn, pf15.protocol, pf15.authtype, pf15.username, pf15.password,
+                pf15.proxy, pf15.supportedTypesBitmask, pf15.proxy, pf15.mmsProxy, pf15.mmsPort,
+                pf15.roamingProtocol, pf15.bearerBitmask, pf15.modemCognitive,
+                pf15.maxConns, pf15.waitTime, pf15.maxConnsTime, pf15.mtu, pf15.mvnoType,
+                pf15.mvnoMatchData);
+        closeRequest;
+        printRequest(pRI->token, pRI->pCI->requestNumber);
+
+        CALL_ONREQUEST(pRI->pCI->requestNumber, &pf15, sizeof(pf15), pRI, pRI->socket_id);
+
+cleanup:
+        if (status != NO_ERROR) {
+            invalidCommandBlock(pRI);
+        }
+#ifdef MEMSET_FREED
+        memsetString(pf15.apn);
+        memsetString(pf15.protocol);
+        memsetString(pf15.username);
+        memsetString(pf15.password);
+        memsetString(pf15.proxy);
+        memsetString(pf15.port);
+        memsetString(pf15.mmsProxy);
+        memsetString(pf15.mmsPort);
+        memsetString(pf15.roamingProtocol);
+        memsetString(pf15.mvnoType);
+        memsetString(pf15.mvnoMatchData);
+#endif
+        free(pf15.apn);
+        free(pf15.protocol);
+        free(pf15.username);
+        free(pf15.password);
+        free(pf15.proxy);
+        free(pf15.port);
+        free(pf15.mmsProxy);
+        free(pf15.mmsPort);
+        free(pf15.roamingProtocol);
+        free(pf15.mvnoType);
+        free(pf15.mvnoMatchData);        
+#ifdef MEMSET_FREED
+        memset(&pf15, 0, sizeof(pf15));
+#endif
     }
-    CALL_ONREQUEST(pRI->pCI->requestNumber, &pf, sizeof(pf), pRI, pRI->socket_id);
 
-#ifdef MEMSET_FREED
-    memsetString(pf.apn);
-    memsetString(pf.protocol);
-    memsetString(pf.username);
-    memsetString(pf.password);
-#endif
-
-    free(pf.apn);
-    free(pf.protocol);
-    free(pf.username);
-    free(pf.password);
-
-#ifdef MEMSET_FREED
-    memset(&pf, 0, sizeof(pf));
-#endif
-
-    return;
-invalid:
-    invalidCommandBlock(pRI);
     return;
 }
 
@@ -1911,20 +2053,24 @@ static void dispatchDataProfile(Parcel &p, RequestInfo *pRI) {
     status_t status;
     int32_t num;
 
-    status = p.readInt32(&num);
-    if (status != NO_ERROR || num < 0) {
-        goto invalid;
-    }
+    if (s_callbacks.version <= 14) {
+        RIL_DataProfileInfo *dataProfiles;
+        RIL_DataProfileInfo **dataProfilePtrs;
 
-    {
-        RIL_DataProfileInfo *dataProfiles =
+        status = p.readInt32(&num);
+        if (status != NO_ERROR || num < 0) {
+            invalidCommandBlock(pRI);
+            return;
+        }
+
+        dataProfiles =
                 (RIL_DataProfileInfo *)calloc(num, sizeof(RIL_DataProfileInfo));
         if (dataProfiles == NULL) {
             RLOGE("Memory allocation failed for request %s",
                     requestToString(pRI->pCI->requestNumber));
             return;
         }
-        RIL_DataProfileInfo **dataProfilePtrs =
+        dataProfilePtrs =
                 (RIL_DataProfileInfo **)calloc(num, sizeof(RIL_DataProfileInfo *));
         if (dataProfilePtrs == NULL) {
             RLOGE("Memory allocation failed for request %s",
@@ -1938,32 +2084,68 @@ static void dispatchDataProfile(Parcel &p, RequestInfo *pRI) {
             dataProfilePtrs[i] = &dataProfiles[i];
 
             status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup1;
+            }
             dataProfiles[i].profileId = (int) t;
 
             dataProfiles[i].apn = strdupReadString(p);
             dataProfiles[i].protocol = strdupReadString(p);
+
             status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup1;
+            }
             dataProfiles[i].authType = (int) t;
 
             dataProfiles[i].user = strdupReadString(p);
             dataProfiles[i].password = strdupReadString(p);
 
             status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup1;
+            }
             dataProfiles[i].type = (int) t;
 
             status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup1;
+            }
             dataProfiles[i].maxConnsTime = (int) t;
+
             status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup1;
+            }
             dataProfiles[i].maxConns = (int) t;
+
             status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup1;
+            }
             dataProfiles[i].waitTime = (int) t;
 
             status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup1;
+            }
             dataProfiles[i].enabled = (int) t;
 
-            appendPrintBuf("%s [%d: profileId=%d, apn =%s, protocol =%s, authType =%d, \
-                  user =%s, password =%s, type =%d, maxConnsTime =%d, maxConns =%d, \
-                  waitTime =%d, enabled =%d]", printBuf, i, dataProfiles[i].profileId,
+            // Skip those fields added after v15
+            p.readInt32(&t);        // supportedTypesBitmask
+            strdupReadString(p);    // proxy
+            strdupReadString(p);    // port
+            strdupReadString(p);    // mmsProxy
+            strdupReadString(p);    // mmsPort
+            strdupReadString(p);    // roamingProtocol
+            p.readInt32(&t);        // bearerBitmask
+            p.readInt32(&t);        // mtu
+            strdupReadString(p);    // mvnoType
+            strdupReadString(p);    // mvnoMatchData
+
+            appendPrintBuf("%s [%d: profileId=%d, apn =%s, protocol=%s, authType=%d, "
+                  "user=%s, password =%s, type =%d, maxConnsTime=%d, maxConns =%d, "
+                  "waitTime=%d, enabled =%d]", printBuf, i, dataProfiles[i].profileId,
                   dataProfiles[i].apn, dataProfiles[i].protocol, dataProfiles[i].authType,
                   dataProfiles[i].user, dataProfiles[i].password, dataProfiles[i].type,
                   dataProfiles[i].maxConnsTime, dataProfiles[i].maxConns,
@@ -1972,15 +2154,28 @@ static void dispatchDataProfile(Parcel &p, RequestInfo *pRI) {
         closeRequest;
         printRequest(pRI->token, pRI->pCI->requestNumber);
 
-        if (status != NO_ERROR) {
-            free(dataProfiles);
-            free(dataProfilePtrs);
-            goto invalid;
-        }
         CALL_ONREQUEST(pRI->pCI->requestNumber,
                               dataProfilePtrs,
                               num * sizeof(RIL_DataProfileInfo *),
                               pRI, pRI->socket_id);
+cleanup1:
+        if (status != NO_ERROR) {
+            invalidCommandBlock(pRI);
+        }
+
+        for (int i = 0 ; i < num ; i++ ) {
+            dataProfilePtrs[i] = &dataProfiles[i];
+#ifdef MEMSET_FREED
+            memsetString(dataProfiles[i].apn);
+            memsetString(dataProfiles[i].protocol);
+            memsetString(dataProfiles[i].user);
+            memsetString(dataProfiles[i].password);
+#endif
+            free(dataProfiles[i].apn);
+            free(dataProfiles[i].protocol);
+            free(dataProfiles[i].user);
+            free(dataProfiles[i].password);
+        }
 
 #ifdef MEMSET_FREED
         memset(dataProfiles, 0, num * sizeof(RIL_DataProfileInfo));
@@ -1988,12 +2183,174 @@ static void dispatchDataProfile(Parcel &p, RequestInfo *pRI) {
 #endif
         free(dataProfiles);
         free(dataProfilePtrs);
+    } else {
+        RIL_DataProfileInfo_v15 *dataProfiles;
+        RIL_DataProfileInfo_v15 **dataProfilePtrs;
+
+        status = p.readInt32(&num);
+        if (status != NO_ERROR || num < 0) {
+            invalidCommandBlock(pRI);
+            return;
+        }
+
+        dataProfiles =
+                (RIL_DataProfileInfo_v15 *)calloc(num, sizeof(RIL_DataProfileInfo_v15));
+        if (dataProfiles == NULL) {
+            RLOGE("Memory allocation failed for request %s",
+                    requestToString(pRI->pCI->requestNumber));
+            return;
+        }
+        dataProfilePtrs =
+                (RIL_DataProfileInfo_v15 **)calloc(num, sizeof(RIL_DataProfileInfo_v15 *));
+        if (dataProfilePtrs == NULL) {
+            RLOGE("Memory allocation failed for request %s",
+                    requestToString(pRI->pCI->requestNumber));
+            free(dataProfiles);
+            return;
+        }
+
+        startRequest;
+        for (int i = 0 ; i < num ; i++ ) {
+            dataProfilePtrs[i] = &dataProfiles[i];
+
+            // Skip profile id, which we deprecate in v15.
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+
+            dataProfiles[i].apn = strdupReadString(p);
+            dataProfiles[i].protocol = strdupReadString(p);
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].authType = (int) t;
+
+            dataProfiles[i].user = strdupReadString(p);
+            dataProfiles[i].password = strdupReadString(p);
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].type = (int) t;
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].maxConnsTime = (int) t;
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].maxConns = (int) t;
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].waitTime = (int) t;
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].enabled = (int) t;
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].supportedTypesBitmask = (int) t;
+
+            dataProfiles[i].proxy = strdupReadString(p);
+            dataProfiles[i].port = strdupReadString(p);
+            dataProfiles[i].mmsProxy = strdupReadString(p);
+            dataProfiles[i].mmsPort = strdupReadString(p);
+            dataProfiles[i].roamingProtocol = strdupReadString(p);
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].bearerBitmask = (int) t;
+
+            status = p.readInt32(&t);
+            if (status != NO_ERROR) {
+                goto cleanup2;
+            }
+            dataProfiles[i].mtu = (int) t;
+
+            dataProfiles[i].mvnoType = strdupReadString(p);
+            dataProfiles[i].mvnoMatchData = strdupReadString(p);
+
+            appendPrintBuf("%s [%d: apn=%s, protocol=%s, authType=%d, "
+                  "user=%s, password=%s, type=%d, maxConnsTime=%d, maxConns=%d, "
+                  "waitTime=%d, enabled=%d, supportedTypesBitmask=%d, proxy=%s, port=%s, "
+                  "mmsProxy=%s, mmsPort=%s, roamingProtocol=%s, bearerBitmask=%d, "
+                  "mtu=%d, mvnoType=%s, mvnoMatchData=%s]",
+                  printBuf, i,
+                  dataProfiles[i].apn, dataProfiles[i].protocol, dataProfiles[i].authType,
+                  dataProfiles[i].user, dataProfiles[i].password, dataProfiles[i].type,
+                  dataProfiles[i].maxConnsTime, dataProfiles[i].maxConns,
+                  dataProfiles[i].waitTime, dataProfiles[i].enabled,
+                  dataProfiles[i].supportedTypesBitmask, dataProfiles[i].proxy,
+                  dataProfiles[i].port, dataProfiles[i].mmsProxy, dataProfiles[i].mmsPort,
+                  dataProfiles[i].roamingProtocol, dataProfiles[i].bearerBitmask,
+                  dataProfiles[i].mtu, dataProfiles[i].mvnoType, dataProfiles[i].mvnoMatchData);
+        }
+        closeRequest;
+        printRequest(pRI->token, pRI->pCI->requestNumber);
+
+        CALL_ONREQUEST(pRI->pCI->requestNumber,
+                              dataProfilePtrs,
+                              num * sizeof(RIL_DataProfileInfo_v15 *),
+                              pRI, pRI->socket_id);
+cleanup2:
+        if (status != NO_ERROR) {
+            invalidCommandBlock(pRI);
+        }
+
+        for (int i = 0 ; i < num ; i++ ) {
+            dataProfilePtrs[i] = &dataProfiles[i];
+#ifdef MEMSET_FREED
+            memsetString(dataProfiles[i].apn);
+            memsetString(dataProfiles[i].protocol);
+            memsetString(dataProfiles[i].user);
+            memsetString(dataProfiles[i].password);
+            memsetString(dataProfiles[i].proxy);
+            memsetString(dataProfiles[i].port);
+            memsetString(dataProfiles[i].mmsProxy);
+            memsetString(dataProfiles[i].mmsPort);
+            memsetString(dataProfiles[i].roamingProtocol);
+            memsetString(dataProfiles[i].mvnoType);
+            memsetString(dataProfiles[i].mvnoMatchData);
+#endif
+            free(dataProfiles[i].apn);
+            free(dataProfiles[i].protocol);
+            free(dataProfiles[i].user);
+            free(dataProfiles[i].password);
+            free(dataProfiles[i].proxy);
+            free(dataProfiles[i].port);
+            free(dataProfiles[i].mmsProxy);
+            free(dataProfiles[i].mmsPort);
+            free(dataProfiles[i].roamingProtocol);
+            free(dataProfiles[i].mvnoType);
+            free(dataProfiles[i].mvnoMatchData);
+        }
+
+#ifdef MEMSET_FREED
+        memset(dataProfiles, 0, num * sizeof(RIL_DataProfileInfo_v15));
+        memset(dataProfilePtrs, 0, num * sizeof(RIL_DataProfileInfo_v15 *));
+#endif
+        free(dataProfiles);
+        free(dataProfilePtrs);
     }
 
-    return;
-
-invalid:
-    invalidCommandBlock(pRI);
     return;
 }
 
