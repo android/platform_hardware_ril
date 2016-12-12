@@ -1,0 +1,9 @@
+Verified+1: Mark Salyzyn <salyzyn@google.com>
+Presubmit-Verified-1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Mark Salyzyn <salyzyn@google.com>
+Autosubmit+1: Mark Salyzyn <salyzyn@google.com>
+Submitted-by: Mark Salyzyn <salyzyn@google.com>
+Submitted-at: Mon, 12 Dec 2016 21:39:55 +0000
+Reviewed-on: https://android-review.googlesource.com/146024
+Project: platform/hardware/ril
+Branch: refs/heads/master
