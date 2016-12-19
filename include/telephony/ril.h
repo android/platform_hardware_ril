@@ -4667,6 +4667,9 @@ typedef struct {
 /**
  * RIL_REQUEST_IMS_REGISTRATION_STATE
  *
+ * The message is DEPRECATED and shall be removed in a future release;
+ * instead, provide IMS registration status via an IMS Service.
+ *
  * Request current IMS registration state
  *
  * "data" is NULL
@@ -5676,6 +5679,9 @@ typedef struct {
 
 /**
  * RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED
+ *
+ * The message is DEPRECATED and shall be removed in a future release;
+ * instead, provide IMS registration status via an IMS Service.
  *
  * Called when IMS registration state has changed
  *
