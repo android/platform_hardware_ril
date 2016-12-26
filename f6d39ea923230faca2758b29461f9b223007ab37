@@ -46,6 +46,29 @@
       "revId": "f6d39ea923230faca2758b29461f9b223007ab37",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "778bdae0_a638728c",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1005135
+      },
+      "writtenOn": "2016-12-26T12:17:45Z",
+      "side": 1,
+      "message": "Calling the onRequest directly would result the binder thread to be blocked if the vendor ril implementation is blocking call. It would be nice if the onRequest is called in a separate thread.",
+      "range": {
+        "startLine": 415,
+        "startChar": 17,
+        "endLine": 415,
+        "endChar": 26
+      },
+      "revId": "f6d39ea923230faca2758b29461f9b223007ab37",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
