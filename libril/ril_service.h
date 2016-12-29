@@ -100,6 +100,34 @@ int simStatusChangedInd(android::Parcel &p, int slotId, int requestNumber, int i
 int cdmaNewSmsInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
                   int token, RIL_Errno e, void *response, size_t responselen);
 
+int newBroadcastSmsInd(android::Parcel &p, int slotId, int requestNumber,
+                       int indicationType, int token, RIL_Errno e, void *response,
+                       size_t responselen);
+
+int cdmaRuimSmsStorageFullInd(android::Parcel &p, int slotId, int requestNumber,
+                              int indicationType, int token, RIL_Errno e, void *response,
+                              size_t responselen);
+
+int restrictedStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                              int indicationType, int token, RIL_Errno e, void *response,
+                              size_t responselen);
+
+int enterEmergencyCallbackModeInd(android::Parcel &p, int slotId, int requestNumber,
+                                  int indicationType, int token, RIL_Errno e, void *response,
+                                  size_t responselen);
+
+int cdmaCallWaitingInd(android::Parcel &p, int slotId, int requestNumber,
+                       int indicationType, int token, RIL_Errno e, void *response,
+                       size_t responselen);
+
+int cdmaOtaProvisionStatusInd(android::Parcel &p, int slotId, int requestNumber,
+                              int indicationType, int token, RIL_Errno e, void *response,
+                              size_t responselen);
+
+int cdmaInfoRecInd(android::Parcel &p, int slotId, int requestNumber,
+                   int indicationType, int token, RIL_Errno e, void *response,
+                   size_t responselen);
+
 }   // namespace radio
 
 #endif  // RIL_SERVICE_H

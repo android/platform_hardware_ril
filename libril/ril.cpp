@@ -5295,6 +5295,13 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
         case RIL_UNSOL_CALL_RING:
         case RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED:
         case RIL_UNSOL_RESPONSE_CDMA_NEW_SMS:
+        case RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS:
+        case RIL_UNSOL_CDMA_RUIM_SMS_STORAGE_FULL:
+        case RIL_UNSOL_RESTRICTED_STATE_CHANGED:
+        case RIL_UNSOL_ENTER_EMERGENCY_CALLBACK_MODE:
+        case RIL_UNSOL_CDMA_CALL_WAITING:
+        case RIL_UNSOL_CDMA_OTA_PROVISION_STATUS:
+        case RIL_UNSOL_CDMA_INFO_REC:
             // do nothing
             break;
         default:

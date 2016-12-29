@@ -1664,6 +1664,294 @@ int radio::cdmaNewSmsInd(android::Parcel &p, int slotId, int requestNumber, int 
     return 0;
 }
 
+int radio::newBroadcastSmsInd(android::Parcel &p, int slotId, int requestNumber,
+                              int indicationType, int token, RIL_Errno e, void *response,
+                              size_t responseLen) {
+    if (radioService[slotId]->mRadioIndication != NULL) {
+        if (response == NULL || responseLen == 0) {
+            RLOGE("radio::newBroadcastSmsInd: invalid response");
+            return 0;
+        }
+
+        hidl_vec<uint8_t> data;
+        data.setToExternal((uint8_t *) response, responseLen);
+        RLOGD("radio::newBroadcastSmsInd");
+        radioService[slotId]->mRadioIndication->newBroadcastSms(
+                convertIntToRadioIndicationType(indicationType), data);
+    } else {
+        RLOGE("radio::newBroadcastSmsInd: radioService[%d]->mRadioIndication == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::cdmaRuimSmsStorageFullInd(android::Parcel &p, int slotId, int requestNumber,
+                                     int indicationType, int token, RIL_Errno e, void *response,
+                                     size_t responseLen) {
+    if (radioService[slotId]->mRadioIndication != NULL) {
+        RLOGD("radio::cdmaRuimSmsStorageFullInd");
+        radioService[slotId]->mRadioIndication->cdmaRuimSmsStorageFull(
+                convertIntToRadioIndicationType(indicationType));
+    } else {
+        RLOGE("radio::cdmaRuimSmsStorageFullInd: radioService[%d]->mRadioIndication == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
+int radio::restrictedStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                                     int indicationType, int token, RIL_Errno e, void *response,
+                                     size_t responseLen) {
+    if (radioService[slotId]->mRadioIndication != NULL) {
+        if (response == NULL || responseLen != sizeof(int)) {
+            RLOGE("radio::restrictedStateChangedInd: invalid response");
+            return 0;
+        }
+        int32_t state = ((int32_t *) response)[0];
+        RLOGD("radio::restrictedStateChangedInd: state %d", state);
+        radioService[slotId]->mRadioIndication->restrictedStateChanged(
+                convertIntToRadioIndicationType(indicationType), (PhoneRestrictedState) state);
+    } else {
+        RLOGE("radio::restrictedStateChangedInd: radioService[%d]->mRadioIndication == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
+int radio::enterEmergencyCallbackModeInd(android::Parcel &p, int slotId, int requestNumber,
+                                         int indicationType, int token, RIL_Errno e, void *response,
+                                         size_t responseLen) {
+    if (radioService[slotId]->mRadioIndication != NULL) {
+        RLOGD("radio::enterEmergencyCallbackModeInd");
+        radioService[slotId]->mRadioIndication->enterEmergencyCallbackMode(
+                convertIntToRadioIndicationType(indicationType));
+    } else {
+        RLOGE("radio::enterEmergencyCallbackModeInd: radioService[%d]->mRadioIndication == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
+int radio::cdmaCallWaitingInd(android::Parcel &p, int slotId, int requestNumber,
+                              int indicationType, int token, RIL_Errno e, void *response,
+                              size_t responseLen) {
+    if (radioService[slotId]->mRadioIndication != NULL) {
+        if (response == NULL || responseLen != sizeof(RIL_CDMA_CallWaiting_v6)) {
+            RLOGE("radio::cdmaCallWaitingInd: invalid response");
+            return 0;
+        }
+
+        CdmaCallWaiting callWaitingRecord;
+        RIL_CDMA_CallWaiting_v6 *callWaitingRil = ((RIL_CDMA_CallWaiting_v6 *) response);
+        callWaitingRecord.number = convertCharPtrToHidlString(callWaitingRil->number);
+        callWaitingRecord.numberPresentation =
+                (CdmaCallWaitingNumberPresentation) callWaitingRil->numberPresentation;
+        callWaitingRecord.name = convertCharPtrToHidlString(callWaitingRil->name);
+        convertRilCdmaSignalInfoRecordToHal(&callWaitingRil->signalInfoRecord,
+                callWaitingRecord.signalInfoRecord);
+        callWaitingRecord.numbertype = (CdmaCallWaitingNumberType) callWaitingRil->number_type;
+        callWaitingRecord.numberPlan = (CdmaCallWaitingNumberPlan) callWaitingRil->number_plan;
+
+        RLOGD("radio::cdmaCallWaitingInd");
+        radioService[slotId]->mRadioIndication->cdmaCallWaiting(
+                convertIntToRadioIndicationType(indicationType), callWaitingRecord);
+    } else {
+        RLOGE("radio::cdmaCallWaitingInd: radioService[%d]->mRadioIndication == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::cdmaOtaProvisionStatusInd(android::Parcel &p, int slotId, int requestNumber,
+                                     int indicationType, int token, RIL_Errno e, void *response,
+                                     size_t responseLen) {
+    if (radioService[slotId]->mRadioIndication != NULL) {
+        if (response == NULL || responseLen != sizeof(int)) {
+            RLOGE("radio::cdmaOtaProvisionStatusInd: invalid response");
+            return 0;
+        }
+        int32_t status = ((int32_t *) response)[0];
+        RLOGD("radio::cdmaOtaProvisionStatusInd: status %d", status);
+        radioService[slotId]->mRadioIndication->cdmaOtaProvisionStatus(
+                convertIntToRadioIndicationType(indicationType), (CdmaOtaProvisionStatus) status);
+    } else {
+        RLOGE("radio::cdmaOtaProvisionStatusInd: radioService[%d]->mRadioIndication == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
+int radio::cdmaInfoRecInd(android::Parcel &p, int slotId, int requestNumber,
+                          int indicationType, int token, RIL_Errno e, void *response,
+                          size_t responseLen) {
+    if (radioService[slotId]->mRadioIndication != NULL) {
+        if (response == NULL || responseLen != sizeof(RIL_CDMA_InformationRecords)) {
+            RLOGE("radio::cdmaInfoRecInd: invalid response");
+            return 0;
+        }
+
+        CdmaInformationRecords records;
+        RIL_CDMA_InformationRecords *recordsRil = (RIL_CDMA_InformationRecords *) response;
+
+        char* string8 = NULL;
+        int num = MIN(recordsRil->numberOfInfoRecs, RIL_CDMA_MAX_NUMBER_OF_INFO_RECS);
+        if (recordsRil->numberOfInfoRecs > RIL_CDMA_MAX_NUMBER_OF_INFO_RECS) {
+            RLOGE("radio::cdmaInfoRecInd: received %d recs which is more than %d, dropping \
+                    additional ones",
+                    recordsRil->numberOfInfoRecs,
+                    RIL_CDMA_MAX_NUMBER_OF_INFO_RECS);
+        }
+        records.infoRec.resize(num);
+        for (int i = 0 ; i < num ; i++) {
+            CdmaInformationRecord *record = &records.infoRec[i];
+            RIL_CDMA_InformationRecord *infoRec = &recordsRil->infoRec[i];
+            record->name = (CdmaInfoRecName) infoRec->name;
+            switch (infoRec->name) {
+                case RIL_CDMA_DISPLAY_INFO_REC:
+                case RIL_CDMA_EXTENDED_DISPLAY_INFO_REC: {
+                    if (infoRec->rec.display.alpha_len > CDMA_ALPHA_INFO_BUFFER_LENGTH) {
+                        RLOGE("radio::cdmaInfoRecInd: invalid display info response length %d \
+                                expected not more than %d", (int) infoRec->rec.display.alpha_len,
+                                CDMA_ALPHA_INFO_BUFFER_LENGTH);
+                        return 0;
+                    }
+                    string8 = (char*) malloc((infoRec->rec.display.alpha_len + 1) * sizeof(char));
+                    if (string8 == NULL) {
+                        RLOGE("radio::cdmaInfoRecInd: Memory allocation failed for \
+                                responseCdmaInformationRecords");
+                        return 0;
+                    }
+                    memcpy(string8, infoRec->rec.display.alpha_buf, infoRec->rec.display.alpha_len);
+                    string8[(int)infoRec->rec.display.alpha_len] = '\0';
+
+                    record->display.resize(1);
+                    record->display[0].alphaBuf = string8;
+                    free(string8);
+                    string8 = NULL;
+                    break;
+                }
+
+                case RIL_CDMA_CALLED_PARTY_NUMBER_INFO_REC:
+                case RIL_CDMA_CALLING_PARTY_NUMBER_INFO_REC:
+                case RIL_CDMA_CONNECTED_NUMBER_INFO_REC: {
+                    if (infoRec->rec.number.len > CDMA_NUMBER_INFO_BUFFER_LENGTH) {
+                        RLOGE("radio::cdmaInfoRecInd: invalid display info response length %d \
+                                expected not more than %d", (int) infoRec->rec.number.len,
+                                CDMA_NUMBER_INFO_BUFFER_LENGTH);
+                        return 0;
+                    }
+                    string8 = (char*) malloc((infoRec->rec.number.len + 1) * sizeof(char));
+                    if (string8 == NULL) {
+                        RLOGE("radio::cdmaInfoRecInd: Memory allocation failed for \
+                                responseCdmaInformationRecords");
+                        return 0;
+                    }
+                    memcpy(string8, infoRec->rec.number.buf, infoRec->rec.number.len);
+                    string8[(int)infoRec->rec.number.len] = '\0';
+
+                    record->number.resize(1);
+                    record->number[0].number = string8;
+                    free(string8);
+                    string8 = NULL;
+                    record->number[0].numberType = infoRec->rec.number.number_type;
+                    record->number[0].numberPlan = infoRec->rec.number.number_plan;
+                    record->number[0].pi = infoRec->rec.number.pi;
+                    record->number[0].si = infoRec->rec.number.si;
+                    break;
+                }
+
+                case RIL_CDMA_SIGNAL_INFO_REC: {
+                    record->signal.resize(1);
+                    record->signal[0].isPresent = infoRec->rec.signal.isPresent;
+                    record->signal[0].signalType = infoRec->rec.signal.signalType;
+                    record->signal[0].alertPitch = infoRec->rec.signal.alertPitch;
+                    record->signal[0].signal = infoRec->rec.signal.signal;
+                    break;
+                }
+
+                case RIL_CDMA_REDIRECTING_NUMBER_INFO_REC: {
+                    if (infoRec->rec.redir.redirectingNumber.len >
+                                                  CDMA_NUMBER_INFO_BUFFER_LENGTH) {
+                        RLOGE("radio::cdmaInfoRecInd: invalid display info response length %d \
+                                expected not more than %d\n",
+                                (int)infoRec->rec.redir.redirectingNumber.len,
+                                CDMA_NUMBER_INFO_BUFFER_LENGTH);
+                        return 0;
+                    }
+                    string8 = (char*) malloc((infoRec->rec.redir.redirectingNumber.len + 1) *
+                            sizeof(char));
+                    if (string8 == NULL) {
+                        RLOGE("radio::cdmaInfoRecInd: Memory allocation failed for \
+                                responseCdmaInformationRecords");
+                        return 0;
+                    }
+                    memcpy(string8, infoRec->rec.redir.redirectingNumber.buf,
+                            infoRec->rec.redir.redirectingNumber.len);
+                    string8[(int)infoRec->rec.redir.redirectingNumber.len] = '\0';
+
+                    record->redir.resize(1);
+                    record->redir[0].redirectingNumber.number = string8;
+                    free(string8);
+                    string8 = NULL;
+                    record->redir[0].redirectingNumber.numberType =
+                            infoRec->rec.redir.redirectingNumber.number_type;
+                    record->redir[0].redirectingNumber.numberPlan =
+                            infoRec->rec.redir.redirectingNumber.number_plan;
+                    record->redir[0].redirectingNumber.pi = infoRec->rec.redir.redirectingNumber.pi;
+                    record->redir[0].redirectingNumber.si = infoRec->rec.redir.redirectingNumber.si;
+                    record->redir[0].redirectingReason =
+                            (CdmaRedirectingReason) infoRec->rec.redir.redirectingReason;
+                    break;
+                }
+
+                case RIL_CDMA_LINE_CONTROL_INFO_REC: {
+                    record->lineCtrl.resize(1);
+                    record->lineCtrl[0].lineCtrlPolarityIncluded =
+                            infoRec->rec.lineCtrl.lineCtrlPolarityIncluded;
+                    record->lineCtrl[0].lineCtrlToggle = infoRec->rec.lineCtrl.lineCtrlToggle;
+                    record->lineCtrl[0].lineCtrlReverse = infoRec->rec.lineCtrl.lineCtrlReverse;
+                    record->lineCtrl[0].lineCtrlPowerDenial =
+                            infoRec->rec.lineCtrl.lineCtrlPowerDenial;
+                    break;
+                }
+
+                case RIL_CDMA_T53_CLIR_INFO_REC: {
+                    record->clir.resize(1);
+                    record->clir[0].cause = infoRec->rec.clir.cause;
+                    break;
+                }
+
+                case RIL_CDMA_T53_AUDIO_CONTROL_INFO_REC: {
+                    record->audioCtrl.resize(1);
+                    record->audioCtrl[0].upLink = infoRec->rec.audioCtrl.upLink;
+                    record->audioCtrl[0].downLink = infoRec->rec.audioCtrl.downLink;
+                    break;
+                }
+
+                case RIL_CDMA_T53_RELEASE_INFO_REC:
+                    RLOGE("radio::cdmaInfoRecInd: RIL_CDMA_T53_RELEASE_INFO_REC: INVALID");
+                    return 0;
+
+                default:
+                    RLOGE("radio::cdmaInfoRecInd: Incorrect name value");
+                    return 0;
+            }
+        }
+
+        RLOGD("radio::cdmaInfoRecInd");
+        radioService[slotId]->mRadioIndication->cdmaInfoRec(
+                convertIntToRadioIndicationType(indicationType), records);
+    } else {
+        RLOGE("radio::cdmaInfoRecInd: radioService[%d]->mRadioIndication == NULL", slotId);
+    }
+
+    return 0;
+}
+
 void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands) {
     using namespace android::hardware;
     int simCount = 1;
