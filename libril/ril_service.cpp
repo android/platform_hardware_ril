@@ -416,6 +416,8 @@ struct RadioImpl : public IRadio {
 
     Return<void> setIndicationFilter(int32_t serial, int32_t indicationFilter);
 
+    Return<void> setSimCardPower(int32_t serial, bool powerUp);
+
     Return<void> responseAcknowledgement();
 
     void checkReturnStatus(Return<void>& ret);
@@ -589,7 +591,7 @@ bool dispatchInts(int serial, int slotId, int request, int countInts, ...) {
 
     android::Parcel p;   // TODO: should delete this after translation of all commands is complete
 
-    int *pInts = (int *)calloc(countInts, sizeof(int));
+    int *pInts = (int *) calloc(countInts, sizeof(int));
     if (pInts == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
         pRI->pCI->responseFunction(p, (int) pRI->socket_id, request,
@@ -2036,6 +2038,12 @@ Return<void> RadioImpl::setAllowedCarriers(int32_t serial, bool allAllowed,
 Return<void> RadioImpl::getAllowedCarriers(int32_t serial) {
     RLOGD("RadioImpl::getAllowedCarriers: serial %d", serial);
     dispatchVoid(serial, mSlotId, RIL_REQUEST_GET_CARRIER_RESTRICTIONS);
+    return Void();
+}
+
+Return<void> RadioImpl::setSimCardPower(int32_t serial, bool powerUp) {
+    RLOGD("RadioImpl::setSimCardPower: serial %d", serial);
+    dispatchInts(serial, mSlotId, RIL_REQUEST_SET_SIM_CARD_POWER, 1, BOOL_TO_INT(powerUp));
     return Void();
 }
 
@@ -5090,6 +5098,24 @@ int radio::getAllowedCarriersResponse(android::Parcel &p, int slotId, int reques
     } else {
         RLOGE("radio::getAllowedCarriersResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
+    }
+
+    return 0;
+}
+
+int radio::setSimCardPowerResponse(android::Parcel &p, int slotId, int requestNumber,
+                                   int responseType, int serial, RIL_Errno e,
+                                   void *response, size_t responseLen) {
+    RLOGD("radio::setSimCardPowerResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<void> retStatus
+                = radioService[slotId]->mRadioResponse->setSimCardPowerResponse(responseInfo);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::setSimCardPowerResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
 
     return 0;

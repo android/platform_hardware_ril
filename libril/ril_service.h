@@ -527,6 +527,9 @@ int setAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber
 int getAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
+int setSimCardPowerResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responselen);
 
 void acknowledgeRequest(int slotId, int serial);
 
