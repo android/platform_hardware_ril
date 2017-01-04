@@ -5186,6 +5186,29 @@ typedef struct {
  */
 #define RIL_REQUEST_GET_CARRIER_RESTRICTIONS 137
 
+ /**
+  * RIL_REQUEST_SIM_CARD_POWER
+  *
+  * Toggle SIM card power up and down
+  * This will generate RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
+  * state changes as a sim is removed (POWER DOWN) or
+  * inserted (POWER UP) and the callee will invoke
+  * RIL_REQUEST_GET_SIM_STATUS on the main thread.
+  * When the SIM card is powered down, the ability to detect the
+  * physical removal and insertion of the SIM is also disabled.
+  *
+  * "data" is int *
+  * ((int *)data)[0] is > 0 for "SIM POWER UP"
+  * ((int *)data)[0] is == 0 for "SIM POWER DOWN"
+  *
+  * "response" is NULL
+  *
+  * Valid errors:
+  *  SUCCESS
+  *  RADIO_NOT_AVAILABLE
+  *  GENERIC_FAILURE
+  */
+#define RIL_REQUEST_SIM_CARD_POWER 138
 /***********************************************************************/
 
 /**
