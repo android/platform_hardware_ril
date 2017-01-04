@@ -71,6 +71,7 @@ extern "C" {
  *                    New commands added: RIL_REQUEST_SET_CARRIER_RESTRICTIONS,
  *                    RIL_REQUEST_SET_CARRIER_RESTRICTIONS and
  *                    RIL_UNSOL_PCO_DATA
+ * RIL_VERSION = 15 : New commands added: RIL_REQUEST_SIM_CARD_POWER
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -5186,6 +5187,30 @@ typedef struct {
  */
 #define RIL_REQUEST_GET_CARRIER_RESTRICTIONS 137
 
+ /**
+  * RIL_REQUEST_SET_SIM_CARD_POWER
+  *
+  * Set SIM card power up or down
+  *
+  * Request is equivalent to inserting and removing the card, with
+  * an additional effect where the ability to detect card removal/insertion
+  * is disabled when the SIM card is powered down.
+  *
+  * This will generate RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
+  * as if the SIM had been inserted or removed.
+  *
+  * "data" is int *
+  * ((int *)data)[0] is > 0 for "SIM POWER UP"
+  * ((int *)data)[0] is == 0 for "SIM POWER DOWN"
+  *
+  * "response" is NULL
+  *
+  * Valid errors:
+  *  SUCCESS
+  *  RADIO_NOT_AVAILABLE
+  *  GENERIC_FAILURE
+  */
+#define RIL_REQUEST_SET_SIM_CARD_POWER 140
 /***********************************************************************/
 
 /**
