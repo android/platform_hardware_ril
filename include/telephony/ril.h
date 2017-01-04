@@ -70,13 +70,14 @@ extern "C" {
  * RIL_VERSION = 14 : New data structures are added, namely RIL_CarrierMatchType,
  *                    RIL_Carrier, RIL_CarrierRestrictions and RIL_PCO_Data.
  *                    New commands added: RIL_REQUEST_SET_CARRIER_RESTRICTIONS,
- *                    RIL_REQUEST_SET_CARRIER_RESTRICTIONS and
- *                    RIL_UNSOL_PCO_DATA
+ *                    RIL_REQUEST_SET_CARRIER_RESTRICTIONS and RIL_UNSOL_PCO_DATA.
  *
- * RIL_VERSION = 15 : The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
+ * RIL_VERSION = 15 : New commands added:
+ *                    RIL_REQUEST_SEND_DEVICE_STATE,
+ *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER,
+ *                    RIL_REQUEST_SET_SIM_CARD_POWER
+ *                    The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
  *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
- *                    New commands added: RIL_REQUEST_SEND_DEVICE_STATE,
- *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -5366,6 +5367,32 @@ typedef enum {
  */
 #define RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER 139
 
+ /**
+  * RIL_REQUEST_SET_SIM_CARD_POWER
+  *
+  * Set SIM card power up or down
+  *
+  * Request is equivalent to inserting and removing the card, with
+  * an additional effect where the ability to detect card removal/insertion
+  * is disabled when the SIM card is powered down.
+  *
+  * This will generate RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
+  * as if the SIM had been inserted or removed.
+  *
+  * "data" is int *
+  * ((int *)data)[0] is 1 for "SIM POWER UP"
+  * ((int *)data)[0] is 0 for "SIM POWER DOWN"
+  *
+  * "response" is NULL
+  *
+  * Valid errors:
+  *  SUCCESS
+  *  RADIO_NOT_AVAILABLE
+  *  REQUEST_NOT_SUPPORTED
+  *  SIM_ABSENT
+  *  INVALID_ARGUMENTS
+  */
+#define RIL_REQUEST_SET_SIM_CARD_POWER 140
 /***********************************************************************/
 
 /**
