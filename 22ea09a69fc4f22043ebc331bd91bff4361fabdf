@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7e3a6ee_45c4274f",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-07T00:54:52Z",
+      "side": 1,
+      "message": "since we have to inc the ril version, this is probably v13",
+      "range": {
+        "startLine": 1289,
+        "startChar": 1,
+        "endLine": 1289,
+        "endChar": 21
+      },
+      "revId": "22ea09a69fc4f22043ebc331bd91bff4361fabdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
