@@ -291,8 +291,6 @@ static void grabPartialWakeLock();
 void releaseWakeLock();
 static void wakeTimeoutCallback(void *);
 
-static bool isServiceTypeCfQuery(RIL_SsServiceType serType, RIL_SsRequestType reqType);
-
 static bool isDebuggable();
 
 #ifdef RIL_SHLIB
@@ -3654,85 +3652,6 @@ static int responseRadioCapability(Parcel &p, int slotId, int requestNumber, int
     return 0;
 }
 
-static int responseSSData(Parcel &p, int slotId, int requestNumber, int responseType, int token,
-        RIL_Errno e, void *response, size_t responselen) {
-    RLOGD("In responseSSData");
-    int num;
-
-    if (response == NULL && responselen != 0) {
-        RLOGE("invalid response length was %d expected %d",
-                (int)responselen, (int)sizeof (RIL_SIM_IO_Response));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (responselen != sizeof(RIL_StkCcUnsolSsResponse)) {
-        RLOGE("invalid response length %d, expected %d",
-               (int)responselen, (int)sizeof(RIL_StkCcUnsolSsResponse));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    startResponse;
-    RIL_StkCcUnsolSsResponse *p_cur = (RIL_StkCcUnsolSsResponse *) response;
-    p.writeInt32(p_cur->serviceType);
-    p.writeInt32(p_cur->requestType);
-    p.writeInt32(p_cur->teleserviceType);
-    p.writeInt32(p_cur->serviceClass);
-    p.writeInt32(p_cur->result);
-
-    if (isServiceTypeCfQuery(p_cur->serviceType, p_cur->requestType)) {
-        RLOGD("responseSSData CF type, num of Cf elements %d", p_cur->cfData.numValidIndexes);
-        if (p_cur->cfData.numValidIndexes > NUM_SERVICE_CLASSES) {
-            RLOGE("numValidIndexes is greater than max value %d, "
-                  "truncating it to max value", NUM_SERVICE_CLASSES);
-            p_cur->cfData.numValidIndexes = NUM_SERVICE_CLASSES;
-        }
-        /* number of call info's */
-        p.writeInt32(p_cur->cfData.numValidIndexes);
-
-        for (int i = 0; i < p_cur->cfData.numValidIndexes; i++) {
-             RIL_CallForwardInfo cf = p_cur->cfData.cfInfo[i];
-
-             p.writeInt32(cf.status);
-             p.writeInt32(cf.reason);
-             p.writeInt32(cf.serviceClass);
-             p.writeInt32(cf.toa);
-             writeStringToParcel(p, cf.number);
-             p.writeInt32(cf.timeSeconds);
-             appendPrintBuf("%s[%s,reason=%d,cls=%d,toa=%d,%s,tout=%d],", printBuf,
-                 (cf.status==1)?"enable":"disable", cf.reason, cf.serviceClass, cf.toa,
-                  (char*)cf.number, cf.timeSeconds);
-             RLOGD("Data: %d,reason=%d,cls=%d,toa=%d,num=%s,tout=%d],", cf.status,
-                  cf.reason, cf.serviceClass, cf.toa, (char*)cf.number, cf.timeSeconds);
-        }
-    } else {
-        p.writeInt32 (SS_INFO_MAX);
-
-        /* each int*/
-        for (int i = 0; i < SS_INFO_MAX; i++) {
-             appendPrintBuf("%s%d,", printBuf, p_cur->ssInfo[i]);
-             RLOGD("Data: %d",p_cur->ssInfo[i]);
-             p.writeInt32(p_cur->ssInfo[i]);
-        }
-    }
-    removeLastChar;
-    closeResponse;
-
-    return 0;
-}
-
-static bool isServiceTypeCfQuery(RIL_SsServiceType serType, RIL_SsRequestType reqType) {
-    if ((reqType == SS_INTERROGATION) &&
-        (serType == SS_CFU ||
-         serType == SS_CF_BUSY ||
-         serType == SS_CF_NO_REPLY ||
-         serType == SS_CF_NOT_REACHABLE ||
-         serType == SS_CF_ALL ||
-         serType == SS_CF_ALL_CONDITIONAL)) {
-        return true;
-    }
-    return false;
-}
-
 static void triggerEvLoop() {
     int ret;
     if (!pthread_equal(pthread_self(), s_tid_dispatch)) {
@@ -5201,14 +5120,6 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
             break;
     }
 
-    // Mark the time this was received, doing this
-    // after grabing the wakelock incase getting
-    // the elapsedRealTime might cause us to goto
-    // sleep.
-    if (unsolResponse == RIL_UNSOL_NITZ_TIME_RECEIVED) {
-        timeReceived = elapsedRealtime();
-    }
-
     appendPrintBuf("[UNSL]< %s", requestToString(unsolResponse));
 
     Parcel p;
@@ -5219,8 +5130,6 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     } else {
         responseType = RESPONSE_UNSOLICITED;
     }
-    p.writeInt32 (responseType);
-    p.writeInt32 (unsolResponse);
 
     ret = s_unsolResponses[unsolResponseIndex].responseFunction(
             p, (int) soc_id, unsolResponse, responseType, 0, RIL_E_SUCCESS, const_cast<void*>(data),
@@ -5234,19 +5143,8 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     switch(unsolResponse) {
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
             newState = CALL_ONSTATEREQUEST(soc_id);
-            p.writeInt32(newState);
             appendPrintBuf("%s {%s}", printBuf, radioStateToString(newState));
-        break;
-
-
-        case RIL_UNSOL_NITZ_TIME_RECEIVED:
-            // Store the time that this was received so the
-            // handler of this message can account for
-            // the time it takes to arrive and process. In
-            // particular the system has been known to sleep
-            // before this message can be processed.
-            p.writeInt64(timeReceived);
-        break;
+            break;
     }
 
     if (s_callbacks.version < 13) {
@@ -5274,38 +5172,6 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     switch (unsolResponse) {
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
             radio::radioStateChangedInd(soc_id, responseType, newState);
-            break;
-        // following are converted to HAL and are handled by responseFunction() above.
-        // todo: Once all unsols are converted this switch and sendResponse() below will be removed
-        case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED:
-        case RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED:
-        case RIL_UNSOL_RESPONSE_NEW_SMS:
-        case RIL_UNSOL_RESPONSE_NEW_SMS_STATUS_REPORT:
-        case RIL_UNSOL_RESPONSE_NEW_SMS_ON_SIM:
-        case RIL_UNSOL_ON_USSD:
-        case RIL_UNSOL_NITZ_TIME_RECEIVED:
-        case RIL_UNSOL_DATA_CALL_LIST_CHANGED:
-        case RIL_UNSOL_SUPP_SVC_NOTIFICATION:
-        case RIL_UNSOL_STK_SESSION_END:
-        case RIL_UNSOL_STK_PROACTIVE_COMMAND:
-        case RIL_UNSOL_STK_EVENT_NOTIFY:
-        case RIL_UNSOL_STK_CALL_SETUP:
-        case RIL_UNSOL_SIM_SMS_STORAGE_FULL:
-        case RIL_UNSOL_SIM_REFRESH:
-        case RIL_UNSOL_CALL_RING:
-        case RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED:
-        case RIL_UNSOL_RESPONSE_CDMA_NEW_SMS:
-        case RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS:
-        case RIL_UNSOL_CDMA_RUIM_SMS_STORAGE_FULL:
-        case RIL_UNSOL_RESTRICTED_STATE_CHANGED:
-        case RIL_UNSOL_ENTER_EMERGENCY_CALLBACK_MODE:
-        case RIL_UNSOL_CDMA_CALL_WAITING:
-        case RIL_UNSOL_CDMA_OTA_PROVISION_STATUS:
-        case RIL_UNSOL_CDMA_INFO_REC:
-            // do nothing
-            break;
-        default:
-            ret = sendResponse(p, soc_id);
             break;
     }
 

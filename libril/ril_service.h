@@ -67,6 +67,10 @@ int onUssdInd(android::Parcel &p, int slotId, int requestNumber, int indicationT
 int nitzTimeReceivedInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
                         int token, RIL_Errno e, void *response, size_t responselen);
 
+int currentSignalStrengthInd(android::Parcel &p, int slotId, int requestNumber,
+                             int indicationType, int token, RIL_Errno e,
+                             void *response, size_t responselen);
+
 int dataCallListChangedInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
                            int token, RIL_Errno e, void *response, size_t responselen);
 
@@ -127,6 +131,82 @@ int cdmaOtaProvisionStatusInd(android::Parcel &p, int slotId, int requestNumber,
 int cdmaInfoRecInd(android::Parcel &p, int slotId, int requestNumber,
                    int indicationType, int token, RIL_Errno e, void *response,
                    size_t responselen);
+
+int oemHookRawInd(android::Parcel &p, int slotId, int requestNumber,
+                  int indicationType, int token, RIL_Errno e, void *response,
+                  size_t responselen);
+
+int indicateRingbackToneInd(android::Parcel &p, int slotId, int requestNumber,
+                            int indicationType, int token, RIL_Errno e, void *response,
+                            size_t responselen);
+
+int resendIncallMuteInd(android::Parcel &p, int slotId, int requestNumber,
+                        int indicationType, int token, RIL_Errno e, void *response,
+                        size_t responselen);
+
+int cdmaSubscriptionSourceChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                                     int indicationType, int token, RIL_Errno e,
+                                     void *response, size_t responselen);
+
+int cdmaPrlChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                      int indicationType, int token, RIL_Errno e, void *response,
+                      size_t responselen);
+
+int exitEmergencyCallbackModeInd(android::Parcel &p, int slotId, int requestNumber,
+                                 int indicationType, int token, RIL_Errno e, void *response,
+                                 size_t responselen);
+
+int rilConnectedInd(android::Parcel &p, int slotId, int requestNumber,
+                    int indicationType, int token, RIL_Errno e, void *response,
+                    size_t responselen);
+
+int voiceRadioTechChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                             int indicationType, int token, RIL_Errno e, void *response,
+                             size_t responselen);
+
+int cellInfoListInd(android::Parcel &p, int slotId, int requestNumber,
+                    int indicationType, int token, RIL_Errno e, void *response,
+                    size_t responselen);
+
+int imsNetworkStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                              int indicationType, int token, RIL_Errno e, void *response,
+                              size_t responselen);
+
+int subscriptionStatusChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                                 int indicationType, int token, RIL_Errno e, void *response,
+                                 size_t responselen);
+
+int srvccStateNotifyInd(android::Parcel &p, int slotId, int requestNumber,
+                        int indicationType, int token, RIL_Errno e, void *response,
+                        size_t responselen);
+
+int hardwareConfigChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                             int indicationType, int token, RIL_Errno e, void *response,
+                             size_t responselen);
+
+int radioCapabilityIndicationInd(android::Parcel &p, int slotId, int requestNumber,
+                                 int indicationType, int token, RIL_Errno e, void *response,
+                                 size_t responselen);
+
+int onSupplementaryServiceIndicationInd(android::Parcel &p, int slotId, int requestNumber,
+                                        int indicationType, int token, RIL_Errno e,
+                                        void *response, size_t responselen);
+
+int stkCallControlAlphaNotifyInd(android::Parcel &p, int slotId, int requestNumber,
+                                 int indicationType, int token, RIL_Errno e, void *response,
+                                 size_t responselen);
+
+int lceDataInd(android::Parcel &p, int slotId, int requestNumber,
+               int indicationType, int token, RIL_Errno e, void *response,
+               size_t responselen);
+
+int pcoDataInd(android::Parcel &p, int slotId, int requestNumber,
+               int indicationType, int token, RIL_Errno e, void *response,
+               size_t responselen);
+
+int modemResetInd(android::Parcel &p, int slotId, int requestNumber,
+                  int indicationType, int token, RIL_Errno e, void *response,
+                  size_t responselen);
 
 }   // namespace radio
 
