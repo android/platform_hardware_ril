@@ -66,11 +66,17 @@ extern "C" {
  *
  * RIL_VERSION = 13 : This version includes new wakelock semantics and as the first
  *                    strongly versioned version it enforces structure use.
+ *
  * RIL_VERSION = 14 : New data structures are added, namely RIL_CarrierMatchType,
  *                    RIL_Carrier, RIL_CarrierRestrictions and RIL_PCO_Data.
  *                    New commands added: RIL_REQUEST_SET_CARRIER_RESTRICTIONS,
  *                    RIL_REQUEST_SET_CARRIER_RESTRICTIONS and
  *                    RIL_UNSOL_PCO_DATA
+ *
+ * RIL_VERSION = 15 : The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
+ *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
+ *                    New commands added: RIL_REQUEST_SEND_DEVICE_STATE,
+ *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -1699,6 +1705,56 @@ typedef struct {
     int enabled;
 } RIL_DataProfileInfo;
 
+typedef struct {
+    /* id of the data profile */
+    int profileId;
+    /* the APN to connect to */
+    char* apn;
+    /** one of the PDP_type values in TS 27.007 section 10.1.1.
+     * For example, "IP", "IPV6", "IPV4V6", or "PPP".
+     */
+    char* protocol;
+    /** one of the PDP_type values in TS 27.007 section 10.1.1 used on roaming network.
+     * For example, "IP", "IPV6", "IPV4V6", or "PPP".
+     */
+    char *roamingProtocol;
+    /** authentication protocol used for this PDP context
+     * (None: 0, PAP: 1, CHAP: 2, PAP&CHAP: 3)
+     */
+    int authType;
+    /* the username for APN, or NULL */
+    char* user;
+    /* the password for APN, or NULL */
+    char* password;
+    /* the profile type, TYPE_COMMON-0, TYPE_3GPP-1, TYPE_3GPP2-2 */
+    int type;
+    /* the period in seconds to limit the maximum connections */
+    int maxConnsTime;
+    /* the maximum connections during maxConnsTime */
+    int maxConns;
+    /** the required wait time in seconds after a successful UE initiated
+     * disconnect of a given PDN connection before the device can send
+     * a new PDN connection request for that given PDN
+     */
+    int waitTime;
+    /* true to enable the profile, 0 to disable, 1 to enable */
+    int enabled;
+    /* supported APN types bitmask. See RIL_ApnTypes for the value of each bit. */
+    int supportedTypesBitmask;
+    /** the bearer bitmask. See RIL_RadioAccessFamily for the value of each bit. */
+    int bearerBitmask;
+    /** maximum transmission unit (MTU) size in bytes */
+    int mtu;
+    /** the MVNO type: possible values are "imsi", "gid", "spn" */
+    char *mvnoType;
+    /** MVNO match data. Can be anything defined by the carrier. For example,
+     *        SPN like: "A MOBILE", "BEN NL", etc...
+     *        IMSI like: "302720x94", "2060188", etc...
+     *        GID like: "4E", "33", etc...
+     */
+    char *mvnoMatchData;
+} RIL_DataProfileInfo_v15;
+
 /* Tx Power Levels */
 #define RIL_NUM_TX_POWER_LEVELS     5
 
@@ -1727,6 +1783,65 @@ typedef struct {
    * the transmitter is inactive */
   uint32_t rx_mode_time_ms;
 } RIL_ActivityStatsInfo;
+
+typedef enum {
+    RIL_APN_TYPE_UNKNOWN      = 0x0,          // Unknown
+    RIL_APN_TYPE_DEFAULT      = 0x1,          // APN type for default data traffic
+    RIL_APN_TYPE_MMS          = 0x2,          // APN type for MMS traffic
+    RIL_APN_TYPE_SUPL         = 0x4,          // APN type for SUPL assisted GPS
+    RIL_APN_TYPE_DUN          = 0x8,          // APN type for DUN traffic
+    RIL_APN_TYPE_HIPRI        = 0x10,         // APN type for HiPri traffic
+    RIL_APN_TYPE_FOTA         = 0x20,         // APN type for FOTA
+    RIL_APN_TYPE_IMS          = 0x40,         // APN type for IMS
+    RIL_APN_TYPE_CBS          = 0x80,         // APN type for CBS
+    RIL_APN_TYPE_IA           = 0x100,        // APN type for IA Initial Attach APN
+    RIL_APN_TYPE_EMERGENCY    = 0x200,        // APN type for Emergency PDN. This is not an IA apn,
+                                              // but is used for access to carrier services in an
+                                              // emergency call situation.
+    RIL_APN_TYPE_ALL          = 0xFFFFFFFF    // All APN types
+} RIL_ApnTypes;
+
+typedef enum {
+    RIL_DST_POWER_SAVE_MODE,        // Device power save mode (provided by PowerManager)
+                                    // Non-zero value indicates the device is in power save mode.
+    RIL_DST_CHARGING_STATE,         // Device charging state (provided by BatteryManager)
+                                    // Non-zero value indicates the device is charging.
+    RIL_DST_LOW_DATA_EXPECTED       // Low data expected mode. Non-zero value indicates low data
+                                    // traffic is expected, for example, when the device is idle
+                                    // (e.g. not doing tethering in the background). Note
+                                    // this doesn't mean no data is expected.
+} RIL_DeviceStateType;
+
+typedef enum {
+    RIL_UR_SIGNAL_STRENGTH            = 0x01, // When this bit is set, modem should always send the
+                                              // signal strength update through
+                                              // RIL_UNSOL_SIGNAL_STRENGTH, otherwise suppress it.
+    RIL_UR_FULL_NETWORK_STATE         = 0x02, // When this bit is set, modem should always send
+                                              // RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED
+                                              // when any field in
+                                              // RIL_REQUEST_VOICE_REGISTRATION_STATE or
+                                              // RIL_REQUEST_DATA_REGISTRATION_STATE changes. When
+                                              // this bit is not set, modem should suppress
+                                              // RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED
+                                              // only when insignificant fields change
+                                              // (e.g. cell info).
+                                              // Modem should continue sending
+                                              // RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED
+                                              // when significant fields are updated even when this
+                                              // bit is not set. The following fields are
+                                              // considered significant, registration state and
+                                              // radio technology.
+    RIL_UR_DATA_CALL_DORMANCY_CHANGED = 0x04  // When this bit is set, modem should send the data
+                                              // call list changed unsolicited response
+                                              // RIL_UNSOL_DATA_CALL_LIST_CHANGED whenever any
+                                              // field in RIL_Data_Call_Response changes.
+                                              // Otherwise modem should suppress the unsolicited
+                                              // response when the only changed field is 'active'
+                                              // (for data dormancy). For all other fields change,
+                                              // modem should continue sending
+                                              // RIL_UNSOL_DATA_CALL_LIST_CHANGED regardless this
+                                              // bit is set or not.
+} RIL_UnsolicitedResponseFilter;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -2569,10 +2684,30 @@ typedef struct {
  *                          1 => PAP may be performed; CHAP is never performed.
  *                          2 => CHAP may be performed; PAP is never performed.
  *                          3 => PAP / CHAP may be performed - baseband dependent.
- * ((const char **)data)[6] is the connection type to request must be one of the
+ * ((const char **)data)[6] is the non-roaming/home connection type to request. Must be one of the
  *                          PDP_type values in TS 27.007 section 10.1.1.
  *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
- * ((const char **)data)[7] Optional connection property parameters, format to be defined.
+ * ((const char **)data)[7] is the roaming connection type to request. Must be one of the
+ *                          PDP_type values in TS 27.007 section 10.1.1.
+ *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
+ * ((const char **)data)[8] is the bitmask of APN type in decimal string format. The
+ *                          bitmask will encapsulate the following values:
+ *                          ia,mms,agps,supl,hipri,fota,dun,ims,default.
+ * ((const char **)data)[9] is the bearer bitmask in decimal string format. Each bit is a
+ *                          RIL_RadioAccessFamily. "0" or NULL indicates all RATs.
+ * ((const char **)data)[10] is the boolean in string format indicating the APN setting was
+ *                           sent to the modem through RIL_REQUEST_SET_DATA_PROFILE earlier.
+ * ((const char **)data)[11] is the mtu size in bytes of the mobile interface to which
+ *                           the apn is connected.
+ * ((const char **)data)[12] is the MVNO type:
+ *                           possible values are "imsi", "gid", "spn".
+ * ((const char **)data)[13] is MVNO match data in string. Can be anything defined by the carrier.
+ *                           For example,
+ *                           SPN like: "A MOBILE", "BEN NL", etc...
+ *                           IMSI like: "302720x94", "2060188", etc...
+ *                           GID like: "4E", "33", etc...
+ * ((const char **)data)[14] is the boolean string indicating data roaming is allowed or not. "1"
+ *                           indicates data roaming is enabled by the user, "0" indicates disabled.
  *
  * "response" is a RIL_Data_Call_Response_v11
  *
@@ -3488,13 +3623,17 @@ typedef struct {
 #define RIL_REQUEST_OEM_HOOK_STRINGS 60
 
 /**
- * RIL_REQUEST_SCREEN_STATE
+ * RIL_REQUEST_SCREEN_STATE - DEPRECATED
  *
  * Indicates the current state of the screen.  When the screen is off, the
  * RIL should notify the baseband to suppress certain notifications (eg,
  * signal strength and changes in LAC/CID or BID/SID/NID/latitude/longitude)
  * in an effort to conserve power.  These notifications should resume when the
  * screen is on.
+ *
+ * Note this request is deprecated. Use RIL_REQUEST_SEND_DEVICE_STATE to report the device state
+ * to the modem and use RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER to turn on/off unsolicited
+ * response from the modem in different scenarios.
  *
  * "data" is int *
  * ((int *)data)[0] is == 1 for "Screen On"
@@ -4248,7 +4387,7 @@ typedef struct {
  *
  * Set CDMA Broadcast SMS config
  *
- * "data" is an const RIL_CDMA_BroadcastSmsConfigInfo **
+ * "data" is a const RIL_CDMA_BroadcastSmsConfigInfo **
  * "datalen" is count * sizeof(const RIL_CDMA_BroadcastSmsConfigInfo *)
  *
  * "response" is NULL
@@ -5005,7 +5144,7 @@ typedef struct {
  *
  * Set data profile in modem
  * Modem should erase existed profiles from framework, and apply new profiles
- * "data" is an const RIL_DataProfileInfo **
+ * "data" is a const RIL_DataProfileInfo **
  * "datalen" is count * sizeof(const RIL_DataProfileInfo *)
  * "response" is NULL
  *
@@ -5186,6 +5325,46 @@ typedef struct {
  *  RIL_E_REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_GET_CARRIER_RESTRICTIONS 137
+
+/**
+ * RIL_REQUEST_SEND_DEVICE_STATE
+ *
+ * Send the updated device state.
+ * Modem can perform power saving based on the provided device state.
+ * "data" is const int *
+ * ((const int*)data)[0] A RIL_DeviceStateType that specifies the device state type.
+ * ((const int*)data)[1] Specifies the state. See RIL_DeviceStateType for the definition of each
+ *                       type.
+ *
+ * "datalen" is count * sizeof(const RIL_DeviceState *)
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ */
+#define RIL_REQUEST_SEND_DEVICE_STATE 138
+
+/**
+ * RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER
+ *
+ * Set the unsolicited response filter
+ * This is used to prevent unnecessary application processor
+ * wake up for power saving purposes by suppressing the
+ * unsolicited responses in certain scenarios.
+ *
+ * "data" is an int *
+ *
+ * ((int *)data)[0] is a 32-bit bitmask of RIL_UnsolicitedResponseFilter
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  INVALID_ARGUMENTS (e.g. the requested filter doesn't exist)
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ */
+#define RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER 139
 
 /***********************************************************************/
 
@@ -5922,12 +6101,39 @@ typedef struct {
 } RIL_RadioFunctions;
 
 typedef struct {
-    char *apn;
-    char *protocol;
-    int authtype;
-    char *username;
-    char *password;
+    char *apn;                  /* the APN to connect to */
+    char *protocol;             /* one of the PDP_type values in TS 27.007 section 10.1.1 used on
+                                   roaming network. For example, "IP", "IPV6", "IPV4V6", or "PPP".*/
+    int authtype;               /* authentication protocol used for this PDP context
+                                   (None: 0, PAP: 1, CHAP: 2, PAP&CHAP: 3) */
+    char *username;             /* the username for APN, or NULL */
+    char *password;             /* the password for APN, or NULL */
 } RIL_InitialAttachApn;
+
+typedef struct {
+    char *apn;                  /* the APN to connect to */
+    char *protocol;             /* one of the PDP_type values in TS 27.007 section 10.1.1 used on
+                                   home network. For example, "IP", "IPV6", "IPV4V6", or "PPP". */
+    char *roamingProtocol;      /* one of the PDP_type values in TS 27.007 section 10.1.1 used on
+                                   roaming network. For example, "IP", "IPV6", "IPV4V6", or "PPP".*/
+    int authtype;               /* authentication protocol used for this PDP context
+                                   (None: 0, PAP: 1, CHAP: 2, PAP&CHAP: 3) */
+    char *username;             /* the username for APN, or NULL */
+    char *password;             /* the password for APN, or NULL */
+    int supportedTypesBitmask;  /* supported APN types bitmask. See RIL_ApnTypes for the value of
+                                   each bit. */
+    int bearerBitmask;          /* the bearer bitmask. See RIL_RadioAccessFamily for the value of
+                                   each bit. */
+    int modemCognitive;         /* indicating the APN setting was sent to the modem through
+                                   setDataProfile earlier. */
+    int mtu;                    /* maximum transmission unit (MTU) size in bytes */
+    char *mvnoType;             /* the MVNO type: possible values are "imsi", "gid", "spn" */
+    char *mvnoMatchData;        /* MVNO match data. Can be anything defined by the carrier.
+                                   For example,
+                                     SPN like: "A MOBILE", "BEN NL", etc...
+                                     IMSI like: "302720x94", "2060188", etc...
+                                     GID like: "4E", "33", etc... */
+} RIL_InitialAttachApn_v15;
 
 typedef struct {
     int authContext;            /* P2 value of authentication command, see P2 parameter in
@@ -5939,16 +6145,16 @@ typedef struct {
 } RIL_SimAuthentication;
 
 typedef struct {
-    int cid;             /* Context ID, uniquely identifies this call */
-    char *bearer_proto;  /* One of the PDP_type values in TS 27.007 section 10.1.1.
-                            For example, "IP", "IPV6", "IPV4V6" */
-    int pco_id;          /* The protocol ID for this box.  Note that only IDs from
-                            FF00H - FFFFH are accepted.  If more than one is included
-                            from the network, multiple calls should be made to send all
-                            of them. */
-    int contents_length; /* The number of octets in the contents. */
-    char *contents;      /* Carrier-defined content.  It is binary, opaque and
-                            loosely defined in LTE Layer 3 spec 24.008 */
+    int cid;                    /* Context ID, uniquely identifies this call */
+    char *bearer_proto;         /* One of the PDP_type values in TS 27.007 section 10.1.1.
+                                   For example, "IP", "IPV6", "IPV4V6". */
+    int pco_id;                 /* The protocol ID for this box.  Note that only IDs from
+                                   FF00H - FFFFH are accepted.  If more than one is included
+                                   from the network, multiple calls should be made to send all
+                                   of them. */
+    int contents_length;        /* The number of octets in the contents. */
+    char *contents;             /* Carrier-defined content.  It is binary, opaque and
+                                   loosely defined in LTE Layer 3 spec 24.008 */
 } RIL_PCO_Data;
 
 #ifdef RIL_SHLIB
