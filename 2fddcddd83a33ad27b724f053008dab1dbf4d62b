@@ -1,0 +1,257 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e3e9cd6a_ac86ec3c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1695,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "why removed?",
+      "range": {
+        "startLine": 1695,
+        "startChar": 8,
+        "endLine": 1695,
+        "endChar": 20
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_8c8b2846",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1697,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "why removed?",
+      "range": {
+        "startLine": 1697,
+        "startChar": 8,
+        "endLine": 1697,
+        "endChar": 16
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_4c85202e",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1702,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "why removed?",
+      "range": {
+        "startLine": 1702,
+        "startChar": 8,
+        "endLine": 1702,
+        "endChar": 16
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_0c1ef82c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1713,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "proto and roaming proto should probably be adjacent",
+      "range": {
+        "startLine": 1713,
+        "startChar": 10,
+        "endLine": 1713,
+        "endChar": 18
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_4cd88029",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1727,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "RIL_ApnTypes?",
+      "range": {
+        "startLine": 1727,
+        "startChar": 4,
+        "endLine": 1727,
+        "endChar": 7
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_8c3208c6",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1743,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "why no proxy/port?  If modem is doing http traffic it may need that.\n\nwhy no apn types (default/mms/etc)\n\nid would be useful for associating changes with a record",
+      "range": {
+        "startLine": 1743,
+        "startChar": 2,
+        "endLine": 1743,
+        "endChar": 25
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_9f38ec41",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1798,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "I\u0027m not sure about this.\n\nCharging or AC seems like a fine signal.\nThe only other signal is dontExpectTraffic: it is set when the screen goes off and we don\u0027t have other traffic sources (ie, tether or android-auto.\n\nWhat is idle vs interactive?  I think that\u0027s too much detail and too high frequency.\n\nWhat is power save mode?  I think charging may let them tune for performance a bit, but what\u0027s this mode for?  Maybe turn it on when battery saver goes on?  Hmm - that may make sense.",
+      "range": {
+        "startLine": 1791,
+        "startChar": 0,
+        "endLine": 1798,
+        "endChar": 18
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_3f37a04f",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1806,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "this needs tight definition.",
+      "range": {
+        "startLine": 1806,
+        "startChar": 55,
+        "endLine": 1806,
+        "endChar": 81
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_ff2818eb",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1815,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 1815,
+        "startChar": 65,
+        "endLine": 1815,
+        "endChar": 83
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_9fafcc3f",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1817,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "when would we not want this?",
+      "range": {
+        "startLine": 1817,
+        "startChar": 4,
+        "endLine": 1817,
+        "endChar": 33
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e9cd6a_3f5a0063",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6086,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-10T22:29:36Z",
+      "side": 1,
+      "message": "Can we reuse the DataProfile struct you defined above?",
+      "range": {
+        "startLine": 6074,
+        "startChar": 0,
+        "endLine": 6086,
+        "endChar": 27
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
