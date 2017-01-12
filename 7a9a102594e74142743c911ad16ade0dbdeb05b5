@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3d8490b_62dc9627",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 5194,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-12T19:39:18Z",
+      "side": 1,
+      "message": "Please add a comment that this should generate the same unsol state changes as a sim being removed (POWER DOWN) or inserted (POWER UP).  It would be even better to list that sequence.",
+      "range": {
+        "startLine": 5192,
+        "startChar": 4,
+        "endLine": 5194,
+        "endChar": 54
+      },
+      "revId": "7a9a102594e74142743c911ad16ade0dbdeb05b5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
