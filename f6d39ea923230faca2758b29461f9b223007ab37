@@ -69,6 +69,52 @@
       "revId": "f6d39ea923230faca2758b29461f9b223007ab37",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b7d8f2b0_539c6e42",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 805,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2017-01-13T07:38:00Z",
+      "side": 1,
+      "message": "It seems unnecessary to transfer again. Can use response and put to iccCardStatusResponse.",
+      "range": {
+        "startLine": 785,
+        "startChar": 12,
+        "endLine": 805,
+        "endChar": 13
+      },
+      "revId": "f6d39ea923230faca2758b29461f9b223007ab37",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b7d8f2b0_b3b96ab0",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 808,
+      "author": {
+        "id": 1039969
+      },
+      "writtenOn": "2017-01-13T07:38:00Z",
+      "side": 1,
+      "message": "Could use response directly.",
+      "range": {
+        "startLine": 808,
+        "startChar": 81,
+        "endLine": 808,
+        "endChar": 91
+      },
+      "revId": "f6d39ea923230faca2758b29461f9b223007ab37",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
