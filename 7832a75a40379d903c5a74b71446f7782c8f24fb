@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3d8490b_d993f578",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5194,
+      "author": {
+        "id": 1134734
+      },
+      "writtenOn": "2017-01-13T01:39:22Z",
+      "side": 1,
+      "message": "Need to add transition states for POWER DOWN and POWER UP.",
+      "range": {
+        "startLine": 5194,
+        "startChar": 10,
+        "endLine": 5194,
+        "endChar": 17
+      },
+      "revId": "7832a75a40379d903c5a74b71446f7782c8f24fb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
