@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "63915dce_8416caff",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1803,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-18T18:41:15Z",
+      "side": 1,
+      "message": "drop \"in\"",
+      "range": {
+        "startLine": 1803,
+        "startChar": 61,
+        "endLine": 1803,
+        "endChar": 63
+      },
+      "revId": "c49d056f232b2195e95f0a61c339e148166fc8d4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63915dce_47fbe450",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1825,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-18T18:41:15Z",
+      "side": 1,
+      "message": "Does this look ok to modem folks?",
+      "range": {
+        "startLine": 1825,
+        "startChar": 60,
+        "endLine": 1825,
+        "endChar": 98
+      },
+      "revId": "c49d056f232b2195e95f0a61c339e148166fc8d4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
