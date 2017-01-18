@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "63915dce_47c044dd",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1808,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-18T18:48:25Z",
+      "side": 1,
+      "message": "should this be a bitmap so they can be mixed and mingled?",
+      "range": {
+        "startLine": 1808,
+        "startChar": 3,
+        "endLine": 1808,
+        "endChar": 17
+      },
+      "revId": "f885e43cd7434b5dc2fb4fecffd82ef3d660aa30",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
