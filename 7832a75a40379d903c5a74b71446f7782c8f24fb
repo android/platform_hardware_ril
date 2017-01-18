@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "0847de68_2681f824",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5192,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-18T22:54:33Z",
+      "side": 1,
+      "message": "Set SIM card power up or down.",
+      "range": {
+        "startLine": 5192,
+        "startChar": 4,
+        "endLine": 5192,
+        "endChar": 10
+      },
+      "revId": "7832a75a40379d903c5a74b71446f7782c8f24fb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3d8490b_d993f578",
         "filename": "include/telephony/ril.h",
         "patchSetId": 4
@@ -41,6 +64,52 @@
         "startChar": 10,
         "endLine": 5194,
         "endChar": 17
+      },
+      "revId": "7832a75a40379d903c5a74b71446f7782c8f24fb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0847de68_a694c863",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5196,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-18T22:54:33Z",
+      "side": 1,
+      "message": "This seems like an implementation detail - particularly the thread comment.  I don\u0027t think the thread bit should be here.",
+      "range": {
+        "startLine": 5195,
+        "startChar": 28,
+        "endLine": 5196,
+        "endChar": 50
+      },
+      "revId": "7832a75a40379d903c5a74b71446f7782c8f24fb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0847de68_463194c2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5198,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-18T22:54:33Z",
+      "side": 1,
+      "message": "good point.",
+      "range": {
+        "startLine": 5198,
+        "startChar": 5,
+        "endLine": 5198,
+        "endChar": 63
       },
       "revId": "7832a75a40379d903c5a74b71446f7782c8f24fb",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
