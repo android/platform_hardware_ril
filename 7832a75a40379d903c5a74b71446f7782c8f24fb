@@ -22,6 +22,29 @@
       "revId": "7832a75a40379d903c5a74b71446f7782c8f24fb",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63915dce_ad1809a6",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5211,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T20:51:43Z",
+      "side": 1,
+      "message": "Can you use 140 for this? 138 and 139 are used by other two new requests.",
+      "range": {
+        "startLine": 5211,
+        "startChar": 35,
+        "endLine": 5211,
+        "endChar": 38
+      },
+      "revId": "7832a75a40379d903c5a74b71446f7782c8f24fb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
