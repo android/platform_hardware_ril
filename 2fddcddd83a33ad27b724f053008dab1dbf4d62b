@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "63915dce_64853ef3",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1695,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3e9cd6a_ac86ec3c",
+      "range": {
+        "startLine": 1695,
+        "startChar": 8,
+        "endLine": 1695,
+        "endChar": 20
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e3e9cd6a_8c8b2846",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-01-10T22:29:36Z",
       "side": 1,
       "message": "why removed?",
+      "range": {
+        "startLine": 1697,
+        "startChar": 8,
+        "endLine": 1697,
+        "endChar": 16
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63915dce_84824aea",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1697,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3e9cd6a_8c8b2846",
       "range": {
         "startLine": 1697,
         "startChar": 8,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "63915dce_a48d861c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1702,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3e9cd6a_4c85202e",
+      "range": {
+        "startLine": 1702,
+        "startChar": 8,
+        "endLine": 1702,
+        "endChar": 16
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e3e9cd6a_0c1ef82c",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -82,6 +154,30 @@
       "writtenOn": "2017-01-10T22:29:36Z",
       "side": 1,
       "message": "proto and roaming proto should probably be adjacent",
+      "range": {
+        "startLine": 1713,
+        "startChar": 10,
+        "endLine": 1713,
+        "endChar": 18
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63915dce_04db9aff",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1713,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3e9cd6a_0c1ef82c",
       "range": {
         "startLine": 1713,
         "startChar": 10,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "63915dce_84c7aa1a",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1727,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "This is a bitmask. So the value won\u0027t be one of the RIL_ApnTypes.",
+      "parentUuid": "e3e9cd6a_4cd88029",
+      "range": {
+        "startLine": 1727,
+        "startChar": 4,
+        "endLine": 1727,
+        "endChar": 7
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e3e9cd6a_8c3208c6",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -128,6 +248,30 @@
       "writtenOn": "2017-01-10T22:29:36Z",
       "side": 1,
       "message": "why no proxy/port?  If modem is doing http traffic it may need that.\n\nwhy no apn types (default/mms/etc)\n\nid would be useful for associating changes with a record",
+      "range": {
+        "startLine": 1743,
+        "startChar": 2,
+        "endLine": 1743,
+        "endChar": 25
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63915dce_e40ceeb6",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1743,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "discussed offline and decided not to put it in at this time.",
+      "parentUuid": "e3e9cd6a_8c3208c6",
       "range": {
         "startLine": 1743,
         "startChar": 2,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "63915dce_e4314e5b",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1798,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3e9cd6a_9f38ec41",
+      "range": {
+        "startLine": 1791,
+        "startChar": 0,
+        "endLine": 1798,
+        "endChar": 18
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e3e9cd6a_3f37a04f",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -174,6 +342,30 @@
       "writtenOn": "2017-01-10T22:29:36Z",
       "side": 1,
       "message": "this needs tight definition.",
+      "range": {
+        "startLine": 1806,
+        "startChar": 55,
+        "endLine": 1806,
+        "endChar": 81
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63915dce_c4a8d220",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1806,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3e9cd6a_3f37a04f",
       "range": {
         "startLine": 1806,
         "startChar": 55,
@@ -209,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "63915dce_e49dcefb",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1815,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3e9cd6a_ff2818eb",
+      "range": {
+        "startLine": 1815,
+        "startChar": 65,
+        "endLine": 1815,
+        "endChar": 83
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e3e9cd6a_9fafcc3f",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -232,6 +448,30 @@
     },
     {
       "key": {
+        "uuid": "63915dce_64cd3e14",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1817,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "One of the vendor mentioned that based on prior experience, the AP could wake up a lot by this when the modem comes out of dormancy. We can leave it here and decide to set it to 1 or 0 later.",
+      "parentUuid": "e3e9cd6a_9fafcc3f",
+      "range": {
+        "startLine": 1817,
+        "startChar": 4,
+        "endLine": 1817,
+        "endChar": 33
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e3e9cd6a_3f5a0063",
         "filename": "include/telephony/ril.h",
         "patchSetId": 3
@@ -243,6 +483,30 @@
       "writtenOn": "2017-01-10T22:29:36Z",
       "side": 1,
       "message": "Can we reuse the DataProfile struct you defined above?",
+      "range": {
+        "startLine": 6074,
+        "startChar": 0,
+        "endLine": 6086,
+        "endChar": 27
+      },
+      "revId": "2fddcddd83a33ad27b724f053008dab1dbf4d62b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63915dce_e454ee37",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6086,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-18T17:46:04Z",
+      "side": 1,
+      "message": "I think they have different fields and better keep the same convention since we already have RIL_InitialAttachApn.",
+      "parentUuid": "e3e9cd6a_3f5a0063",
       "range": {
         "startLine": 6074,
         "startChar": 0,
