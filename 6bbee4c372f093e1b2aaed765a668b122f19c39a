@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0847de68_c631dbc4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 5200,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-23T20:01:48Z",
+      "side": 1,
+      "message": "as if the SIM had been inserted or removed.",
+      "range": {
+        "startLine": 5199,
+        "startChar": 61,
+        "endLine": 5200,
+        "endChar": 27
+      },
+      "revId": "6bbee4c372f093e1b2aaed765a668b122f19c39a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
