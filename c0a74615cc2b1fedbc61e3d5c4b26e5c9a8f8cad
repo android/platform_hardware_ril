@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "db8003f5_3333c313",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 5191,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-24T21:53:22Z",
+      "side": 1,
+      "message": "Maybe we should name it RIL_REQUEST_SET_SIM_CARD_POWER so it can be consistent with the method name used by HIDL. Method name should start with a \u0027verb\u0027. https://google.github.io/styleguide/javaguide.html#s5.2-specific-identifier-names (5.2.3)",
+      "range": {
+        "startLine": 5191,
+        "startChar": 4,
+        "endLine": 5191,
+        "endChar": 30
+      },
+      "revId": "c0a74615cc2b1fedbc61e3d5c4b26e5c9a8f8cad",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
