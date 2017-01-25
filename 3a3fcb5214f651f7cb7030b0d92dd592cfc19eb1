@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4587139a_e6ca0599",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1807,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2017-01-25T01:22:44Z",
+      "side": 1,
+      "message": "How will this be computed? Will individual client sessions/requests considered to provide this info?\n\nAlso, will there be any smoothing, or will it be possible to receive multiple requests rapidly depending on client activity?\n\nIf sessions will be considered, will also server sessions be considered? (e.g. what if an app creates a tcp socket, how would you determine whether low/high traffic is expected)",
+      "range": {
+        "startLine": 1807,
+        "startChar": 8,
+        "endLine": 1807,
+        "endChar": 32
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aa122309_3b353918",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1816,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2017-01-25T01:22:44Z",
+      "side": 1,
+      "message": "I really think we would benefit for more granularity than on/off for the indications. \n\nIn the case of network state, the \u0027significant fields\u0027 have clear potential to increase the granularity, but other fields might also be important. One App\u0027s significant field might be another\u0027s insignificant.\n\nAlso, I can see how both applications and the framework could benefit from configuring deltas in signal strength (e.g. don\u0027t wake up AP unless SS increases by a delta placing SS in pas a certain \u0027quality\u0027 threshold.)",
+      "range": {
+        "startLine": 1816,
+        "startChar": 4,
+        "endLine": 1816,
+        "endChar": 29
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd7599a5_98fbf978",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1828,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2017-01-25T01:22:44Z",
+      "side": 1,
+      "message": "I don\u0027t think our intention was to ever completely disable data call list.\n\nSince this would be replacing the SCREEN_STATE request, our intention was to mimic the behavior that was triggered when the SCREEN_STATE was received. In particular, for DATA_CALL_LIST, we would report a change only when the when the RAT has changed. So, in the case of a hand-off, say, from LTE to UMTS, you should still expect to receive the indication.\n\nIf that is also your understanding, it is ok, but I think it should be clarified in the comments.\n\nNiraj, please comment on this further if necessary",
+      "range": {
+        "startLine": 1828,
+        "startChar": 4,
+        "endLine": 1828,
+        "endChar": 33
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "52e0eafe_ae0f42a4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 3613,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2017-01-25T01:22:44Z",
+      "side": 1,
+      "message": "Maybe this should be marked as deprecated?",
+      "range": {
+        "startLine": 3613,
+        "startChar": 3,
+        "endLine": 3613,
+        "endChar": 27
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "284de4c1_42d580db",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 5325,
+      "author": {
+        "id": 1010140
+      },
+      "writtenOn": "2017-01-25T01:22:44Z",
+      "side": 1,
+      "message": "Do we really need this?\n\nI thought the intention was to allow for the telephony framework to have control over how and when indications are received, rather than leaving it up to the implementors to decide what optimizations to apply.\n\nThis is a like SCREEN_STATE is back in disguise :)\n\nIf the intention is that this be used for optimizations not related to indications, it should clearly be stated in the comments.",
+      "range": {
+        "startLine": 5325,
+        "startChar": 8,
+        "endLine": 5325,
+        "endChar": 32
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
