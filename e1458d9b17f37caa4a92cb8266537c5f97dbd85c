@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ac56247_415471fd",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1731,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-26T00:28:15Z",
+      "side": 1,
+      "message": "reference to ISO 7816-4",
+      "range": {
+        "startLine": 1731,
+        "startChar": 22,
+        "endLine": 1731,
+        "endChar": 31
+      },
+      "revId": "e1458d9b17f37caa4a92cb8266537c5f97dbd85c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c33299a4_1f6f1180",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1732,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-26T00:28:15Z",
+      "side": 1,
+      "message": "swap the order to match OpenMobileAPI?",
+      "range": {
+        "startLine": 1732,
+        "startChar": 11,
+        "endLine": 1732,
+        "endChar": 17
+      },
+      "revId": "e1458d9b17f37caa4a92cb8266537c5f97dbd85c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c758c962_e6fe47e2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 4776,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-26T00:28:15Z",
+      "side": 1,
+      "message": "update this to reference new struct?",
+      "range": {
+        "startLine": 4776,
+        "startChar": 4,
+        "endLine": 4776,
+        "endChar": 47
+      },
+      "revId": "e1458d9b17f37caa4a92cb8266537c5f97dbd85c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aaf07a3c_cb39ce9a",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2167,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-26T00:28:15Z",
+      "side": 1,
+      "message": "need to check s_callbacks.version - setting P2 is unsupported prior to the 15.  Need to do things the old way if less than 15.",
+      "range": {
+        "startLine": 2167,
+        "startChar": 12,
+        "endLine": 2167,
+        "endChar": 37
+      },
+      "revId": "e1458d9b17f37caa4a92cb8266537c5f97dbd85c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eaff26f3_a086cb9e",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2181,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-26T00:28:15Z",
+      "side": 1,
+      "message": "should check status before strdup so we don\u0027t get mem to free but error out here.",
+      "range": {
+        "startLine": 2181,
+        "startChar": 8,
+        "endLine": 2181,
+        "endChar": 14
+      },
+      "revId": "e1458d9b17f37caa4a92cb8266537c5f97dbd85c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c59feac_9614df52",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2186,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-26T00:28:15Z",
+      "side": 1,
+      "message": "more places where you list p2 before aid (backward from Sim alliance spec",
+      "revId": "e1458d9b17f37caa4a92cb8266537c5f97dbd85c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
