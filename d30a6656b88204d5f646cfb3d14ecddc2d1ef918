@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "767a1142_6eab7c18",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5204,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-27T21:59:44Z",
+      "side": 1,
+      "message": "Also will we have anything else other than up and down? I am thinking to use a boolean for this in the new HIDL file.",
+      "range": {
+        "startLine": 5203,
+        "startChar": 0,
+        "endLine": 5204,
+        "endChar": 49
+      },
+      "revId": "d30a6656b88204d5f646cfb3d14ecddc2d1ef918",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8bed2de8_d08f3317",
         "filename": "include/telephony/ril.h",
         "patchSetId": 8
