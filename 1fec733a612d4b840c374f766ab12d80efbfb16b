@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "64657a27_d2757087",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 2172,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-27T20:24:20Z",
+      "side": 1,
+      "message": "I don\u0027t think this is correct.\n\nYou will always receive the two variables now but if \u003c 15 the vendor impl you\u0027re calling will only want one.  dispatchStrings will see 2 strings and try to call the vendor impl passing two strings.\n\nWe should instead read the two params below and then have two different CALL cases (selected by version) which either passes the new struct or passes just the aidPtr.",
+      "range": {
+        "startLine": 2172,
+        "startChar": 0,
+        "endLine": 2172,
+        "endChar": 32
+      },
+      "revId": "1fec733a612d4b840c374f766ab12d80efbfb16b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
