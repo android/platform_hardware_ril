@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8bed2de8_d08f3317",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5211,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-27T00:16:54Z",
+      "side": 1,
+      "message": "We found modem uses too many GENERIC_FAILURE, which doesn\u0027t help debugging at all. Please update with all possible failures that modem can support. For example, REQUEST_NOT_SUPPORTED, SIM_ABSENT, INVALID_ARGUMENTS, etc....",
+      "range": {
+        "startLine": 5211,
+        "startChar": 5,
+        "endLine": 5211,
+        "endChar": 20
+      },
+      "revId": "d30a6656b88204d5f646cfb3d14ecddc2d1ef918",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
