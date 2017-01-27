@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "f2fa3656_a4a2d25f",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1807,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-27T21:36:40Z",
+      "side": 1,
+      "message": "For now we only intend to replace the existing misleading screen on/off API. We might add more complicated logic in the future.\n\nAt this point, if the screen is off, and there is no remote display, android auto, tethering ongoing, we will set this bit.",
+      "range": {
+        "startLine": 1807,
+        "startChar": 8,
+        "endLine": 1807,
+        "endChar": 32
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "aa122309_3b353918",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -36,6 +59,29 @@
       "writtenOn": "2017-01-25T01:22:44Z",
       "side": 1,
       "message": "I really think we would benefit for more granularity than on/off for the indications. \n\nIn the case of network state, the \u0027significant fields\u0027 have clear potential to increase the granularity, but other fields might also be important. One App\u0027s significant field might be another\u0027s insignificant.\n\nAlso, I can see how both applications and the framework could benefit from configuring deltas in signal strength (e.g. don\u0027t wake up AP unless SS increases by a delta placing SS in pas a certain \u0027quality\u0027 threshold.)",
+      "range": {
+        "startLine": 1816,
+        "startChar": 4,
+        "endLine": 1816,
+        "endChar": 29
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a8ac6457_546f4120",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1816,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-27T21:36:40Z",
+      "side": 1,
+      "message": "Thanks for your comment. But this might be over complicated and probably will not buy us much at this moment. We are not planing to fine tune the fields based on which apps are running for now. If there is need in the future, we can consider that.\n\nRegarding the signal strength, right now the framework doesn\u0027t configure the threshold, maybe vendor RIL does. If there is need in the future, we can bring them up to the framework layer as NetworkAgent already supported those methods.",
       "range": {
         "startLine": 1816,
         "startChar": 4,
@@ -71,6 +117,29 @@
     },
     {
       "key": {
+        "uuid": "cff43289_a735d5aa",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 1828,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-27T21:36:40Z",
+      "side": 1,
+      "message": "This is a very good point. Please let us know which fields in data call list will always trigger this indication regardless of the bit is set or not.",
+      "range": {
+        "startLine": 1828,
+        "startChar": 4,
+        "endLine": 1828,
+        "endChar": 33
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "52e0eafe_ae0f42a4",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -94,6 +163,29 @@
     },
     {
       "key": {
+        "uuid": "35b1b81d_1af72732",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 3613,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-27T21:36:40Z",
+      "side": 1,
+      "message": "Done",
+      "range": {
+        "startLine": 3613,
+        "startChar": 3,
+        "endLine": 3613,
+        "endChar": 27
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "284de4c1_42d580db",
         "filename": "include/telephony/ril.h",
         "patchSetId": 12
@@ -105,6 +197,29 @@
       "writtenOn": "2017-01-25T01:22:44Z",
       "side": 1,
       "message": "Do we really need this?\n\nI thought the intention was to allow for the telephony framework to have control over how and when indications are received, rather than leaving it up to the implementors to decide what optimizations to apply.\n\nThis is a like SCREEN_STATE is back in disguise :)\n\nIf the intention is that this be used for optimizations not related to indications, it should clearly be stated in the comments.",
+      "range": {
+        "startLine": 5325,
+        "startChar": 8,
+        "endLine": 5325,
+        "endChar": 32
+      },
+      "revId": "3a3fcb5214f651f7cb7030b0d92dd592cfc19eb1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2840f46a_dc72bf29",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 5325,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-27T21:36:40Z",
+      "side": 1,
+      "message": "There are still some needs from modem vendors to perform their own proprietary power saving strategies. The framework doesn\u0027t want to control everything. so we decided only separating the indication part out from this. And instead of providing the misleading screen state, we added more granularity into this API.",
       "range": {
         "startLine": 5325,
         "startChar": 8,
