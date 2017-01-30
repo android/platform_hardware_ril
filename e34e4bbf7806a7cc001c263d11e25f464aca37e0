@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "55253bf4_3a5953e3",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 1743,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-01-30T22:07:12Z",
+      "side": 1,
+      "message": "why double ** on some and single * on others?",
+      "range": {
+        "startLine": 1743,
+        "startChar": 4,
+        "endLine": 1743,
+        "endChar": 7
+      },
+      "revId": "e34e4bbf7806a7cc001c263d11e25f464aca37e0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
