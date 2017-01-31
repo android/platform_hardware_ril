@@ -63,6 +63,23 @@
       "revId": "22ea09a69fc4f22043ebc331bd91bff4361fabdf",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fcb9105f_8b3c3381",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 2246,
+      "author": {
+        "id": 1060151
+      },
+      "writtenOn": "2017-01-31T18:07:53Z",
+      "side": 1,
+      "message": "You are probably right in that the pointer type should be const RIL_CellIdentity_v12**, but I don\u0027t see why this would impact anything else. This message isn\u0027t serialized anyway in the traditional sense... it\u0027s struct of pointers (each of fixed size). There should be no problem mixing and matching pointer types.",
+      "revId": "22ea09a69fc4f22043ebc331bd91bff4361fabdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
