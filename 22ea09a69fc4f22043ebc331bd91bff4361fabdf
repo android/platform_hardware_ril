@@ -46,6 +46,23 @@
       "revId": "22ea09a69fc4f22043ebc331bd91bff4361fabdf",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0bbb9c2_838401dd",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 2246,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-01-31T05:02:43Z",
+      "side": 1,
+      "message": "Char** won\u0027t work. You will have to have proper structure here. Which means we no longer can have the char** array for responses and the backward compatibility also becomes difficult. Do we really need to rearrange this response?",
+      "revId": "22ea09a69fc4f22043ebc331bd91bff4361fabdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
