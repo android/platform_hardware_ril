@@ -66,6 +66,24 @@ static pthread_rwlock_t radioServiceRwlock4 = PTHREAD_RWLOCK_INITIALIZER;
 #endif
 #endif
 
+void convertRilHardwareConfigListToHal(void *response, size_t responseLen,
+        hidl_vec<HardwareConfig>& records);
+
+void convertRilRadioCapabilityToHal(void *response, size_t responseLen, RadioCapability& rc);
+
+void convertRilLceDataInfoToHal(void *response, size_t responseLen, LceDataInfo& lce);
+
+void convertRilSignalStrengthToHal(void *response, size_t responseLen,
+        SignalStrength& signalStrength);
+
+void convertRilDataCallToHal(RIL_Data_Call_Response_v11 *dcResponse,
+        SetupDataCallResult& dcResult);
+
+void convertRilDataCallListToHal(void *response, size_t responseLen,
+        hidl_vec<SetupDataCallResult>& dcResultList);
+
+void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<CellInfo>& records);
+
 struct RadioImpl : public IRadio {
     int32_t mSlotId;
     // counter used for synchronization. It is incremented every time mRadioResponse or
@@ -2496,6 +2514,34 @@ int radio::getLastCallFailCauseResponse(android::Parcel &p, int slotId, int requ
     return 0;
 }
 
+int radio::getSignalStrengthResponse(android::Parcel &p, int slotId, int requestNumber,
+                                     int responseType, int serial, RIL_Errno e,
+                                     void *response, size_t responseLen) {
+    RLOGD("radio::getSignalStrengthResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        SignalStrength signalStrength;
+        memset(&signalStrength, 0, sizeof(SignalStrength));
+        if (response == NULL || responseLen != sizeof(RIL_SignalStrength_v10)) {
+            RLOGE("radio::getSignalStrengthResponse: Invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            convertRilSignalStrengthToHal(response, responseLen, signalStrength);
+        }
+
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->getSignalStrengthResponse(
+                responseInfo, signalStrength);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::getSignalStrengthResponse: radioService[%d]->mRadioResponse == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
 int radio::getVoiceRegistrationStateResponse(android::Parcel &p, int slotId, int requestNumber,
                                             int responseType, int serial, RIL_Errno e,
                                             void *response, size_t responseLen) {
@@ -2709,6 +2755,34 @@ int radio::sendSMSExpectMoreResponse(android::Parcel &p, int slotId, int request
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("radio::sendSMSExpectMoreResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::setupDataCallResponse(android::Parcel &p, int slotId, int requestNumber,
+                                 int responseType, int serial, RIL_Errno e, void *response,
+                                 size_t responseLen) {
+    RLOGD("radio::setupDataCallResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        populateResponseInfo(responseInfo, serial, responseType, e);
+
+        SetupDataCallResult result;
+        if (response == NULL || responseLen != sizeof(RIL_Data_Call_Response_v11)) {
+            RLOGE("radio::setupDataCallResponse: Invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+            memset(&result, 0, sizeof(SetupDataCallResult));
+        } else {
+            convertRilDataCallToHal((RIL_Data_Call_Response_v11 *) response, result);
+        }
+
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->setupDataCallResponse(
+                responseInfo, result);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::setupDataCallResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
 
     return 0;
@@ -3312,6 +3386,33 @@ int radio::getClipResponse(android::Parcel &p, int slotId, int requestNumber,
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("radio::getClipResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::getDataCallListResponse(android::Parcel &p, int slotId, int requestNumber,
+                                   int responseType, int serial, RIL_Errno e,
+                                   void *response, size_t responseLen) {
+    RLOGD("radio::getDataCallListResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        populateResponseInfo(responseInfo, serial, responseType, e);
+
+        hidl_vec<SetupDataCallResult> ret;
+        if (response == NULL || responseLen % sizeof(RIL_Data_Call_Response_v11) != 0) {
+            RLOGE("radio::getDataCallListResponse: invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            convertRilDataCallListToHal(response, responseLen, ret);
+        }
+
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->getDataCallListResponse(
+                responseInfo, ret);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::getDataCallListResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
 
     return 0;
@@ -4316,6 +4417,34 @@ int radio::getVoiceRadioTechnologyResponse(android::Parcel &p, int slotId, int r
     return 0;
 }
 
+int radio::getCellInfoListResponse(android::Parcel &p, int slotId,
+                                   int requestNumber, int responseType,
+                                   int serial, RIL_Errno e, void *response,
+                                   size_t responseLen) {
+    RLOGD("radio::getCellInfoListResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        populateResponseInfo(responseInfo, serial, responseType, e);
+
+        hidl_vec<CellInfo> ret;
+        if (response == NULL || responseLen % sizeof(RIL_CellInfo_v12) != 0) {
+            RLOGE("radio::getCellInfoListResponse: Invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            convertRilCellInfoListToHal(response, responseLen, ret);
+        }
+
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->getCellInfoListResponse(
+                responseInfo, ret);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::getCellInfoListResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
 int radio::setCellInfoListRateResponse(android::Parcel &p, int slotId,
                                        int requestNumber, int responseType,
                                        int serial, RIL_Errno e, void *response,
@@ -4614,6 +4743,33 @@ int radio::setDataAllowedResponse(android::Parcel &p, int slotId, int requestNum
     return 0;
 }
 
+int radio::getHardwareConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+                                     int responseType, int serial, RIL_Errno e,
+                                     void *response, size_t responseLen) {
+    RLOGD("radio::getHardwareConfigResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        populateResponseInfo(responseInfo, serial, responseType, e);
+
+        hidl_vec<HardwareConfig> result;
+        if (response == NULL || responseLen % sizeof(RIL_HardwareConfig) != 0) {
+            RLOGE("radio::hardwareConfigChangedInd: invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            convertRilHardwareConfigListToHal(response, responseLen, result);
+        }
+
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->getHardwareConfigResponse(
+                responseInfo, result);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::getHardwareConfigResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
 int radio::requestIccSimAuthenticationResponse(android::Parcel &p, int slotId, int requestNumber,
                                                int responseType, int serial, RIL_Errno e,
                                                void *response, size_t responseLen) {
@@ -4672,6 +4828,59 @@ int radio::requestShutdownResponse(android::Parcel &p, int slotId, int requestNu
     return 0;
 }
 
+void responseRadioCapability(RadioResponseInfo& responseInfo, int serial,
+        int responseType, RIL_Errno e, void *response, size_t responseLen, RadioCapability& rc) {
+    populateResponseInfo(responseInfo, serial, responseType, e);
+
+    if (response == NULL || responseLen != sizeof(RadioCapability)) {
+        RLOGE("responseRadioCapability: Invalid response");
+        if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        memset(&rc, 0, sizeof(RadioCapability));
+    } else {
+        convertRilRadioCapabilityToHal(response, responseLen, rc);
+    }
+}
+
+int radio::getRadioCapabilityResponse(android::Parcel &p, int slotId, int requestNumber,
+                                     int responseType, int serial, RIL_Errno e,
+                                     void *response, size_t responseLen) {
+    RLOGD("radio::getRadioCapabilityResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        RadioCapability result;
+        responseRadioCapability(responseInfo, serial, responseType, e, response, responseLen,
+                result);
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->getRadioCapabilityResponse(
+                responseInfo, result);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::getRadioCapabilityResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::setRadioCapabilityResponse(android::Parcel &p, int slotId, int requestNumber,
+                                     int responseType, int serial, RIL_Errno e,
+                                     void *response, size_t responseLen) {
+    RLOGD("radio::setRadioCapabilityResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        RadioCapability result;
+        responseRadioCapability(responseInfo, serial, responseType, e, response, responseLen,
+                result);
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->setRadioCapabilityResponse(
+                responseInfo, result);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::setRadioCapabilityResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
 LceStatusInfo responseLceStatusInfo(RadioResponseInfo& responseInfo, int serial, int responseType,
                                     RIL_Errno e, void *response, size_t responseLen) {
     populateResponseInfo(responseInfo, serial, responseType, e);
@@ -4725,6 +4934,34 @@ int radio::stopLceServiceResponse(android::Parcel &p, int slotId, int requestNum
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("radio::stopLceServiceResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::pullLceDataResponse(android::Parcel &p, int slotId, int requestNumber,
+                               int responseType, int serial, RIL_Errno e,
+                               void *response, size_t responseLen) {
+    RLOGD("radio::pullLceDataResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        populateResponseInfo(responseInfo, serial, responseType, e);
+
+        LceDataInfo result;
+        if (response == NULL || responseLen != sizeof(RIL_LceDataInfo)) {
+            RLOGE("radio::pullLceDataResponse: Invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+            memset(&result, 0, sizeof(RIL_LceDataInfo));
+        } else {
+            convertRilLceDataInfoToHal(response, responseLen, result);
+        }
+
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->pullLceDataResponse(
+                responseInfo, result);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::pullLceDataResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
 
     return 0;
