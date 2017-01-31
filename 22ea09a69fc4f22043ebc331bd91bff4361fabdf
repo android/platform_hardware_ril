@@ -49,6 +49,29 @@
     },
     {
       "key": {
+        "uuid": "3e301377_7fa7441c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-01-31T18:10:52Z",
+      "side": 1,
+      "message": "for O it\u0027s v15.",
+      "range": {
+        "startLine": 1289,
+        "startChar": 1,
+        "endLine": 1289,
+        "endChar": 21
+      },
+      "revId": "22ea09a69fc4f22043ebc331bd91bff4361fabdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e0bbb9c2_838401dd",
         "filename": "include/telephony/ril.h",
         "patchSetId": 2
