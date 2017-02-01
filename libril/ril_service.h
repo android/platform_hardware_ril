@@ -394,6 +394,10 @@ int reportSmsMemoryStatusResponse(android::Parcel &p, int slotId, int requestNum
                                  int responseType, int serial, RIL_Errno e,
                                  void *response, size_t responselen);
 
+int reportStkServiceIsRunningResponse(android::Parcel &p, int slotId, int requestNumber,
+                                      int responseType, int serial, RIL_Errno e,
+                                      void *response, size_t responseLen);
+
 int getCdmaSubscriptionSourceResponse(android::Parcel &p, int slotId, int requestNumber,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);

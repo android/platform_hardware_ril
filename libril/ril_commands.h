@@ -117,7 +117,7 @@
     {RIL_REQUEST_GET_SMSC_ADDRESS, dispatchVoid, radio::getSmscAddressResponse},
     {RIL_REQUEST_SET_SMSC_ADDRESS, dispatchString, radio::setSmscAddressResponse},
     {RIL_REQUEST_REPORT_SMS_MEMORY_STATUS, dispatchInts, radio::reportSmsMemoryStatusResponse},
-    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, responseVoid},
+    {RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, dispatchVoid, radio::reportStkServiceIsRunningResponse},
     {RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE, dispatchVoid, radio::getCdmaSubscriptionSourceResponse},
     {RIL_REQUEST_ISIM_AUTHENTICATION, dispatchString, radio::requestIsimAuthenticationResponse},
     {RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU, dispatchStrings, radio::acknowledgeIncomingGsmSmsWithPduResponse},

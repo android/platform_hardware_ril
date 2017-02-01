@@ -4327,6 +4327,25 @@ int radio::reportSmsMemoryStatusResponse(android::Parcel &p, int slotId, int req
     return 0;
 }
 
+int radio::reportStkServiceIsRunningResponse(android::Parcel &p, int slotId, int requestNumber,
+                                             int responseType, int serial, RIL_Errno e,
+                                             void *response, size_t responseLen) {
+    RLOGD("radio::reportStkServiceIsRunningResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo;
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<void> retStatus = radioService[slotId]->mRadioResponse->
+                reportStkServiceIsRunningResponse(responseInfo);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::reportStkServiceIsRunningResponse: radioService[%d]->mRadioResponse == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
 int radio::getCdmaSubscriptionSourceResponse(android::Parcel &p, int slotId, int requestNumber,
                                             int responseType, int serial, RIL_Errno e,
                                             void *response, size_t responseLen) {
