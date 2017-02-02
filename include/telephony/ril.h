@@ -173,6 +173,7 @@ typedef enum {
                                                    is currently in use */
     RIL_E_ABORTED = 65,                         /* Operation aborted */
     RIL_E_INVALID_RESPONSE = 66,                /* Invalid response sent by vendor code */
+    RIL_E_SIM_STATUS_UNKNOWN = 67,              /* SIM status is unknown */
     // OEM specific error codes. To be used by OEM when they don't want to reveal
     // specific error codes which would be replaced by Generic failure.
     RIL_E_OEM_ERROR_1 = 501,
@@ -1738,7 +1739,10 @@ typedef struct {
  * "response" is const RIL_CardStatus_v6 *
  *
  * Valid errors:
- *  Must never fail
+ *  RIL_E_SIM_STATUS_UNKNOWN can be sent when modem or vendor ril
+ *  is unaware of sim state.
+ *  once RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED is received RIL_E_SIM_STATUS_UNKNOWN is not
+ *  expected unless there is a modem or vendor ril reset.
  */
 #define RIL_REQUEST_GET_SIM_STATUS 1
 
