@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3079e541_b0d198c5",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5204,
+      "author": {
+        "id": 1134734
+      },
+      "writtenOn": "2017-02-08T20:41:10Z",
+      "side": 1,
+      "message": "No, right now those are the only two values. However, it may be best to avoid boolean, so that we can expand it in future, if there is a need.\nIf we use boolean, we would be stuck.",
+      "parentUuid": "767a1142_6eab7c18",
+      "range": {
+        "startLine": 5203,
+        "startChar": 0,
+        "endLine": 5204,
+        "endChar": 49
+      },
+      "revId": "d30a6656b88204d5f646cfb3d14ecddc2d1ef918",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8bed2de8_d08f3317",
         "filename": "include/telephony/ril.h",
         "patchSetId": 8
