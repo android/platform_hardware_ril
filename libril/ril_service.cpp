@@ -1471,6 +1471,7 @@ int radio::nitzTimeReceivedInd(android::Parcel &p, int slotId, int requestNumber
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("radio::nitzTimeReceivedInd: radioService[%d]->mRadioIndication == NULL", slotId);
+        return -1;
     }
 
     return 0;
