@@ -88,6 +88,10 @@ int getLastCallFailCauseResponse(android::Parcel &p, int slotId, int requestNumb
                                 int responseType, int serial, RIL_Errno e, void *response,
                                 size_t responselen);
 
+int getSignalStrengthResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responseLen);
+
 int getVoiceRegistrationStateResponse(android::Parcel &p, int slotId, int requestNumber,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
@@ -115,6 +119,10 @@ int sendSmsResponse(android::Parcel &p, int slotId, int requestNumber,
 int sendSMSExpectMoreResponse(android::Parcel &p, int slotId, int requestNumber,
                              int responseType, int serial, RIL_Errno e, void *response,
                              size_t responselen);
+
+int setupDataCallResponse(android::Parcel &p, int slotId, int requestNumber,
+                          int responseType, int serial, RIL_Errno e, void *response,
+                          size_t responseLen);
 
 int iccIOForAppResponse(android::Parcel &p, int slotId, int requestNumber,
                        int responseType, int serial, RIL_Errno e, void *response,
@@ -217,6 +225,10 @@ int getMuteResponse(android::Parcel &p, int slotId, int requestNumber,
 int getClipResponse(android::Parcel &p, int slotId, int requestNumber,
                    int responseType, int serial, RIL_Errno e, void *response,
                    size_t responselen);
+
+int getDataCallListResponse(android::Parcel &p, int slotId, int requestNumber,
+                            int responseType, int serial, RIL_Errno e,
+                            void *response, size_t responseLen);
 
 int sendOemRilRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
                                     int responseType, int serial, RIL_Errno e, void *response,
@@ -402,6 +414,11 @@ int getVoiceRadioTechnologyResponse(android::Parcel &p, int slotId, int requestN
                                    int responseType, int serial, RIL_Errno e,
                                    void *response, size_t responselen);
 
+int getCellInfoListResponse(android::Parcel &p, int slotId,
+                            int requestNumber, int responseType,
+                            int serial, RIL_Errno e, void *response,
+                            size_t responseLen);
+
 int setCellInfoListRateResponse(android::Parcel &p, int slotId, int requestNumber,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responselen);
@@ -459,6 +476,10 @@ int setDataAllowedResponse(android::Parcel &p, int slotId, int requestNumber,
                           int responseType, int serial, RIL_Errno e,
                           void *response, size_t responselen);
 
+int getHardwareConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responseLen);
+
 int requestIccSimAuthenticationResponse(android::Parcel &p, int slotId, int requestNumber,
                                        int responseType, int serial, RIL_Errno e,
                                        void *response, size_t responselen);
@@ -471,6 +492,14 @@ int requestShutdownResponse(android::Parcel &p, int slotId, int requestNumber,
                            int responseType, int serial, RIL_Errno e,
                            void *response, size_t responselen);
 
+int getRadioCapabilityResponse(android::Parcel &p, int slotId, int requestNumber,
+                               int responseType, int serial, RIL_Errno e,
+                               void *response, size_t responseLen);
+
+int setRadioCapabilityResponse(android::Parcel &p, int slotId, int requestNumber,
+                               int responseType, int serial, RIL_Errno e,
+                               void *response, size_t responseLen);
+
 int startLceServiceResponse(android::Parcel &p, int slotId, int requestNumber,
                            int responseType, int serial, RIL_Errno e,
                            void *response, size_t responselen);
@@ -478,6 +507,10 @@ int startLceServiceResponse(android::Parcel &p, int slotId, int requestNumber,
 int stopLceServiceResponse(android::Parcel &p, int slotId, int requestNumber,
                           int responseType, int serial, RIL_Errno e,
                           void *response, size_t responselen);
+
+int pullLceDataResponse(android::Parcel &p, int slotId, int requestNumber,
+                        int responseType, int serial, RIL_Errno e,
+                        void *response, size_t responseLen);
 
 int getModemActivityInfoResponse(android::Parcel &p, int slotId, int requestNumber,
                                 int responseType, int serial, RIL_Errno e,
@@ -491,8 +524,8 @@ int getAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
-
 void acknowledgeRequest(int slotId, int serial);
+
 void radioStateChangedInd(int slotId, int indicationType, RIL_RadioState radioState);
 
 int callStateChangedInd(android::Parcel &p, int slotId, int requestNumber, int indType, int token,

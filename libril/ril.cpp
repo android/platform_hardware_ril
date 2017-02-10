@@ -4517,15 +4517,10 @@ RIL_onRequestAck(RIL_Token t) {
         // to hidl supported apis. They are left out as they use common functions used by
         // unsolicited commands present in other CL
         int cmdId = pRI->pCI->requestNumber;
-        if(cmdId != RIL_REQUEST_SIGNAL_STRENGTH && cmdId != RIL_REQUEST_SETUP_DATA_CALL
-                && cmdId != RIL_REQUEST_DATA_CALL_LIST && cmdId != RIL_REQUEST_OEM_HOOK_RAW
-                && cmdId != RIL_REQUEST_GET_CELL_INFO_LIST
+        if(cmdId != RIL_REQUEST_SETUP_DATA_CALL
+                && cmdId != RIL_REQUEST_OEM_HOOK_RAW
                 && cmdId != RIL_REQUEST_SET_INITIAL_ATTACH_APN
-                && cmdId != RIL_REQUEST_SET_DATA_PROFILE
-                && cmdId != RIL_REQUEST_GET_HARDWARE_CONFIG
-                && cmdId != RIL_REQUEST_GET_RADIO_CAPABILITY
-                && cmdId != RIL_REQUEST_SET_RADIO_CAPABILITY
-                && cmdId != RIL_REQUEST_PULL_LCEDATA) {
+                && cmdId != RIL_REQUEST_SET_DATA_PROFILE) {
             pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(
                     (int) socket_id);
             int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
@@ -4599,15 +4594,10 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
 
         bool hidlized = false;
         int cmdId = pRI->pCI->requestNumber;
-        if(cmdId != RIL_REQUEST_SIGNAL_STRENGTH && cmdId != RIL_REQUEST_SETUP_DATA_CALL
-                && cmdId != RIL_REQUEST_DATA_CALL_LIST && cmdId != RIL_REQUEST_OEM_HOOK_RAW
-                && cmdId != RIL_REQUEST_GET_CELL_INFO_LIST
+        if(cmdId != RIL_REQUEST_SETUP_DATA_CALL
+                && cmdId != RIL_REQUEST_OEM_HOOK_RAW
                 && cmdId != RIL_REQUEST_SET_INITIAL_ATTACH_APN
-                && cmdId != RIL_REQUEST_SET_DATA_PROFILE
-                && cmdId != RIL_REQUEST_GET_HARDWARE_CONFIG
-                && cmdId != RIL_REQUEST_GET_RADIO_CAPABILITY
-                && cmdId != RIL_REQUEST_SET_RADIO_CAPABILITY
-                && cmdId != RIL_REQUEST_PULL_LCEDATA) {
+                && cmdId != RIL_REQUEST_SET_DATA_PROFILE) {
             hidlized = true;
         }
 
