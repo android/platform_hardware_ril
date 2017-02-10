@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "48203cdb_4c6a7fd9",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1468,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-10T22:27:41Z",
+      "side": 1,
+      "message": "Is this correct?  What does this do?",
+      "range": {
+        "startLine": 1468,
+        "startChar": 71,
+        "endLine": 1468,
+        "endChar": 77
+      },
+      "revId": "100ac9b090cae05a95ef18afdb8aa602ae57c6d0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8bf5b254_279bb1eb",
+        "filename": "libril/sap_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-10T22:27:41Z",
+      "side": 1,
+      "message": "log the unknown msgId",
+      "range": {
+        "startLine": 162,
+        "startChar": 12,
+        "endLine": 162,
+        "endChar": 18
+      },
+      "revId": "100ac9b090cae05a95ef18afdb8aa602ae57c6d0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
