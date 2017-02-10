@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a9bbaf85_4e86697a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1468,
+      "author": {
+        "id": 1105075
+      },
+      "writtenOn": "2017-02-10T22:37:28Z",
+      "side": 1,
+      "message": "this is for int64_t per C99",
+      "parentUuid": "48203cdb_4c6a7fd9",
+      "range": {
+        "startLine": 1468,
+        "startChar": 71,
+        "endLine": 1468,
+        "endChar": 77
+      },
+      "revId": "100ac9b090cae05a95ef18afdb8aa602ae57c6d0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8bf5b254_279bb1eb",
         "filename": "libril/sap_service.cpp",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-02-10T22:27:41Z",
       "side": 1,
       "message": "log the unknown msgId",
+      "range": {
+        "startLine": 162,
+        "startChar": 12,
+        "endLine": 162,
+        "endChar": 18
+      },
+      "revId": "100ac9b090cae05a95ef18afdb8aa602ae57c6d0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "65b1dc2a_5363f26f",
+        "filename": "libril/sap_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1105075
+      },
+      "writtenOn": "2017-02-10T22:37:28Z",
+      "side": 1,
+      "message": "This is already in internal ag/1864360/\nShall we add logging in next CL to avoid merge conflict?",
+      "parentUuid": "8bf5b254_279bb1eb",
       "range": {
         "startLine": 162,
         "startChar": 12,
