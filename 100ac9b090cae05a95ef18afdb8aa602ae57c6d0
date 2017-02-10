@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "56c01080_7cca2e2d",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1468,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-10T22:54:53Z",
+      "side": 1,
+      "message": "Ugly and we all hate it, but ok..",
+      "parentUuid": "a9bbaf85_4e86697a",
+      "range": {
+        "startLine": 1468,
+        "startChar": 71,
+        "endLine": 1468,
+        "endChar": 77
+      },
+      "revId": "100ac9b090cae05a95ef18afdb8aa602ae57c6d0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8bf5b254_279bb1eb",
         "filename": "libril/sap_service.cpp",
         "patchSetId": 1
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "This is already in internal ag/1864360/\nShall we add logging in next CL to avoid merge conflict?",
       "parentUuid": "8bf5b254_279bb1eb",
+      "range": {
+        "startLine": 162,
+        "startChar": 12,
+        "endLine": 162,
+        "endChar": 18
+      },
+      "revId": "100ac9b090cae05a95ef18afdb8aa602ae57c6d0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f41a47ef_584b2e1f",
+        "filename": "libril/sap_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-10T22:54:53Z",
+      "side": 1,
+      "message": "nevermind.  You\u0027re no worse than what we had before and keeping this as a warning-only CL is probably best.",
+      "parentUuid": "65b1dc2a_5363f26f",
       "range": {
         "startLine": 162,
         "startChar": 12,
