@@ -4517,10 +4517,7 @@ RIL_onRequestAck(RIL_Token t) {
         // to hidl supported apis. They are left out as they use common functions used by
         // unsolicited commands present in other CL
         int cmdId = pRI->pCI->requestNumber;
-        if(cmdId != RIL_REQUEST_SETUP_DATA_CALL
-                && cmdId != RIL_REQUEST_OEM_HOOK_RAW
-                && cmdId != RIL_REQUEST_SET_INITIAL_ATTACH_APN
-                && cmdId != RIL_REQUEST_SET_DATA_PROFILE) {
+        if(cmdId != RIL_REQUEST_OEM_HOOK_RAW) {
             pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(
                     (int) socket_id);
             int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
@@ -4594,10 +4591,7 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
 
         bool hidlized = false;
         int cmdId = pRI->pCI->requestNumber;
-        if(cmdId != RIL_REQUEST_SETUP_DATA_CALL
-                && cmdId != RIL_REQUEST_OEM_HOOK_RAW
-                && cmdId != RIL_REQUEST_SET_INITIAL_ATTACH_APN
-                && cmdId != RIL_REQUEST_SET_DATA_PROFILE) {
+        if(cmdId != RIL_REQUEST_OEM_HOOK_RAW) {
             hidlized = true;
         }
 
