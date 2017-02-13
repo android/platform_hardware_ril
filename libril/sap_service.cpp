@@ -69,7 +69,19 @@ struct SapImpl : public ISap {
     Return<void> addPayloadAndDispatchRequest(MsgHeader *msg, uint16_t reqLen, uint8_t *reqPtr);
 
     void sendFailedResponse(MsgId msgId, int32_t token, int numPointers, ...);
+
+    void checkReturnStatus(Return<void>& ret);
 };
+
+void SapImpl::checkReturnStatus(Return<void>& ret) {
+    if (ret.isOk() == false) {
+        RLOGE("checkReturnStatus: unable to call response/indication callback");
+        // Remote process (SapRilReceiver.java) hosting the callback must be dead. Reset the
+        // callback object; there's no other recovery to be done here. When the client process is
+        // back up, it will call setCallback()
+        sapCallback = NULL;
+    }
+}
 
 Return<void> SapImpl::setCallback(const ::android::sp<ISapCallback>& sapCallbackParam) {
     RLOGD("SapImpl::setCallback for slotId %d", slotId);
@@ -122,45 +134,50 @@ void SapImpl::sendFailedResponse(MsgId msgId, int32_t token, int numPointers, ..
         if (ptr) free(ptr);
     }
     va_end(ap);
+    Return<void> retStatus;
     switch(msgId) {
         case MsgId_RIL_SIM_SAP_CONNECT:
-            sapCallback->connectResponse(token, SapConnectRsp::CONNECT_FAILURE, 0);
-            return;
+            retStatus = sapCallback->connectResponse(token, SapConnectRsp::CONNECT_FAILURE, 0);
+            break;
 
         case MsgId_RIL_SIM_SAP_DISCONNECT:
-            sapCallback->disconnectResponse(token);
-            return;
+            retStatus = sapCallback->disconnectResponse(token);
+            break;
 
         case MsgId_RIL_SIM_SAP_APDU: {
             hidl_vec<uint8_t> apduRsp;
-            sapCallback->apduResponse(token, SapResultCode::GENERIC_FAILURE, apduRsp);
-            return;
+            retStatus = sapCallback->apduResponse(token, SapResultCode::GENERIC_FAILURE, apduRsp);
+            break;
         }
 
         case MsgId_RIL_SIM_SAP_TRANSFER_ATR: {
             hidl_vec<uint8_t> atr;
-            sapCallback->transferAtrResponse(token, SapResultCode::GENERIC_FAILURE, atr);
-            return;
+            retStatus = sapCallback->transferAtrResponse(token, SapResultCode::GENERIC_FAILURE,
+                    atr);
+            break;
         }
 
         case MsgId_RIL_SIM_SAP_POWER:
-            sapCallback->powerResponse(token, SapResultCode::GENERIC_FAILURE);
-            return;
+            retStatus = sapCallback->powerResponse(token, SapResultCode::GENERIC_FAILURE);
+            break;
 
         case MsgId_RIL_SIM_SAP_RESET_SIM:
-            sapCallback->resetSimResponse(token, SapResultCode::GENERIC_FAILURE);
-            return;
+            retStatus = sapCallback->resetSimResponse(token, SapResultCode::GENERIC_FAILURE);
+            break;
 
         case MsgId_RIL_SIM_SAP_TRANSFER_CARD_READER_STATUS:
-            sapCallback->transferCardReaderStatusResponse(token, SapResultCode::GENERIC_FAILURE, 0);
-            return;
+            retStatus = sapCallback->transferCardReaderStatusResponse(token,
+                    SapResultCode::GENERIC_FAILURE, 0);
+            break;
 
         case MsgId_RIL_SIM_SAP_SET_TRANSFER_PROTOCOL:
-            sapCallback->transferProtocolResponse(token, SapResultCode::NOT_SUPPORTED);
-            return;
+            retStatus = sapCallback->transferProtocolResponse(token, SapResultCode::NOT_SUPPORTED);
+            break;
+
         default:
             return;
     }
+    sapService[slotId]->checkReturnStatus(retStatus);
 }
 
 Return<void> SapImpl::connectReq(int32_t token, int32_t maxMsgSize) {
@@ -313,8 +330,8 @@ Return<void> SapImpl::transferAtrReq(int32_t token) {
 
     size_t encodedSize = 0;
     if (!pb_get_encoded_size(&encodedSize, RIL_SIM_SAP_TRANSFER_ATR_REQ_fields, &req)) {
-        RLOGE("SapImpl::transferAtrReq: Error getting encoded size for \
-                RIL_SIM_SAP_TRANSFER_ATR_REQ");
+        RLOGE("SapImpl::transferAtrReq: Error getting encoded size for "
+                "RIL_SIM_SAP_TRANSFER_ATR_REQ");
         sendFailedResponse(MsgId_RIL_SIM_SAP_TRANSFER_ATR, token, 1, msg);
         return Status::fromStatusT(android::NO_MEMORY);
     }
@@ -439,8 +456,8 @@ Return<void> SapImpl::transferCardReaderStatusReq(int32_t token) {
     size_t encodedSize = 0;
     if (!pb_get_encoded_size(&encodedSize, RIL_SIM_SAP_TRANSFER_CARD_READER_STATUS_REQ_fields,
             &req)) {
-        RLOGE("SapImpl::transferCardReaderStatusReq: Error getting encoded size for \
-                RIL_SIM_SAP_TRANSFER_CARD_READER_STATUS_REQ");
+        RLOGE("SapImpl::transferCardReaderStatusReq: Error getting encoded size for "
+                "RIL_SIM_SAP_TRANSFER_CARD_READER_STATUS_REQ");
         sendFailedResponse(MsgId_RIL_SIM_SAP_TRANSFER_CARD_READER_STATUS, token, 1, msg);
         return Status::fromStatusT(android::NO_MEMORY);
     }
@@ -483,8 +500,8 @@ Return<void> SapImpl::setTransferProtocolReq(int32_t token, SapTransferProtocol 
 
     size_t encodedSize = 0;
     if (!pb_get_encoded_size(&encodedSize, RIL_SIM_SAP_SET_TRANSFER_PROTOCOL_REQ_fields, &req)) {
-        RLOGE("SapImpl::setTransferProtocolReq: Error getting encoded size for \
-                RIL_SIM_SAP_SET_TRANSFER_PROTOCOL_REQ");
+        RLOGE("SapImpl::setTransferProtocolReq: Error getting encoded size for "
+                "RIL_SIM_SAP_SET_TRANSFER_PROTOCOL_REQ");
         sendFailedResponse(MsgId_RIL_SIM_SAP_SET_TRANSFER_PROTOCOL, token, 1, msg);
         return Status::fromStatusT(android::NO_MEMORY);
     }
@@ -760,6 +777,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
     RLOGD("processResponse: sapCallback != NULL; msgId = %d; msgType = %d",
             msgId, msgType);
 
+    Return<void> retStatus;
     switch (msgId) {
         case MsgId_RIL_SIM_SAP_CONNECT: {
             RIL_SIM_SAP_CONNECT_RSP *connectRsp = (RIL_SIM_SAP_CONNECT_RSP *)messagePtr;
@@ -767,7 +785,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
                     rsp->token,
                     connectRsp->response,
                     connectRsp->max_message_size);
-            sapImpl->sapCallback->connectResponse(rsp->token,
+            retStatus = sapImpl->sapCallback->connectResponse(rsp->token,
                     (SapConnectRsp)connectRsp->response,
                     connectRsp->max_message_size);
             break;
@@ -776,13 +794,13 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
         case MsgId_RIL_SIM_SAP_DISCONNECT:
             if (msgType == MsgType_RESPONSE) {
                 RLOGD("processResponse: calling sapCallback->disconnectResponse %d", rsp->token);
-                sapImpl->sapCallback->disconnectResponse(rsp->token);
+                retStatus = sapImpl->sapCallback->disconnectResponse(rsp->token);
             } else {
                 RIL_SIM_SAP_DISCONNECT_IND *disconnectInd =
                         (RIL_SIM_SAP_DISCONNECT_IND *)messagePtr;
                 RLOGD("processResponse: calling sapCallback->disconnectIndication %d %d",
                         rsp->token, disconnectInd->disconnectType);
-                sapImpl->sapCallback->disconnectIndication(rsp->token,
+                retStatus = sapImpl->sapCallback->disconnectIndication(rsp->token,
                         (SapDisconnectType)disconnectInd->disconnectType);
             }
             break;
@@ -796,7 +814,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
             if (apduRsp->apduResponse != NULL && apduRsp->apduResponse->size > 0) {
                 apduRspVec.setToExternal(apduRsp->apduResponse->bytes, apduRsp->apduResponse->size);
             }
-            sapImpl->sapCallback->apduResponse(rsp->token, apduResponse, apduRspVec);
+            retStatus = sapImpl->sapCallback->apduResponse(rsp->token, apduResponse, apduRspVec);
             break;
         }
 
@@ -812,7 +830,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
                 transferAtrRspVec.setToExternal(transferAtrRsp->atr->bytes,
                         transferAtrRsp->atr->size);
             }
-            sapImpl->sapCallback->transferAtrResponse(rsp->token, transferAtrResponse,
+            retStatus = sapImpl->sapCallback->transferAtrResponse(rsp->token, transferAtrResponse,
                     transferAtrRspVec);
             break;
         }
@@ -822,7 +840,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
                     ((RIL_SIM_SAP_POWER_RSP *)messagePtr)->response);
             RLOGD("processResponse: calling sapCallback->powerResponse %d %d",
                     rsp->token, powerResponse);
-            sapImpl->sapCallback->powerResponse(rsp->token, powerResponse);
+            retStatus = sapImpl->sapCallback->powerResponse(rsp->token, powerResponse);
             break;
         }
 
@@ -831,7 +849,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
                     ((RIL_SIM_SAP_RESET_SIM_RSP *)messagePtr)->response);
             RLOGD("processResponse: calling sapCallback->resetSimResponse %d %d",
                     rsp->token, resetSimResponse);
-            sapImpl->sapCallback->resetSimResponse(rsp->token, resetSimResponse);
+            retStatus = sapImpl->sapCallback->resetSimResponse(rsp->token, resetSimResponse);
             break;
         }
 
@@ -839,7 +857,8 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
             RIL_SIM_SAP_STATUS_IND *statusInd = (RIL_SIM_SAP_STATUS_IND *)messagePtr;
             RLOGD("processResponse: calling sapCallback->statusIndication %d %d",
                     rsp->token, statusInd->statusChange);
-            sapImpl->sapCallback->statusIndication(rsp->token, (SapStatus)statusInd->statusChange);
+            retStatus = sapImpl->sapCallback->statusIndication(rsp->token,
+                    (SapStatus)statusInd->statusChange);
             break;
         }
 
@@ -853,7 +872,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
                     rsp->token,
                     transferCardReaderStatusResponse,
                     transferStatusRsp->CardReaderStatus);
-            sapImpl->sapCallback->transferCardReaderStatusResponse(rsp->token,
+            retStatus = sapImpl->sapCallback->transferCardReaderStatusResponse(rsp->token,
                     transferCardReaderStatusResponse,
                     transferStatusRsp->CardReaderStatus);
             break;
@@ -861,7 +880,7 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
 
         case MsgId_RIL_SIM_SAP_ERROR_RESP: {
             RLOGD("processResponse: calling sapCallback->errorResponse %d", rsp->token);
-            sapImpl->sapCallback->errorResponse(rsp->token);
+            retStatus = sapImpl->sapCallback->errorResponse(rsp->token);
             break;
         }
 
@@ -875,13 +894,15 @@ void processResponse(MsgHeader *rsp, RilSapSocket *sapSocket, MsgType msgType) {
             }
             RLOGD("processResponse: calling sapCallback->transferProtocolResponse %d %d",
                     rsp->token, setTransferProtocolResponse);
-            sapImpl->sapCallback->transferProtocolResponse(rsp->token, setTransferProtocolResponse);
+            retStatus = sapImpl->sapCallback->transferProtocolResponse(rsp->token,
+                    setTransferProtocolResponse);
             break;
         }
 
         default:
-            break;
+            return;
     }
+    sapImpl->checkReturnStatus(retStatus);
 }
 
 void sap::processResponse(MsgHeader *rsp, RilSapSocket *sapSocket) {
