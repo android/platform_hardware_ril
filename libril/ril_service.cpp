@@ -428,12 +428,19 @@ void memsetAndFreeStrings(int numPointers, ...) {
         char *ptr = va_arg(ap, char *);
         if (ptr) {
 #ifdef MEMSET_FREED
-            memsetString (ptr);
+            // TODO: Should pass in the maximum length of the string
+            memsetString(ptr);
 #endif
             free(ptr);
         }
     }
     va_end(ap);
+}
+
+void sendErrorResponse(RequestInfo *pRI, RIL_Errno err) {
+    android::Parcel p; // TODO: should delete this after translation of all commands is complete
+    pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
+            (int) RadioResponseType::SOLICITED, pRI->token, err, NULL, 0);
 }
 
 /**
@@ -450,9 +457,7 @@ bool copyHidlStringToRil(char **dest, const hidl_string &src, RequestInfo *pRI) 
     *dest = (char *) calloc(len + 1, sizeof(char));
     if (*dest == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(pRI->pCI->requestNumber));
-        android::Parcel p; // TODO: should delete this after translation of all commands is complete
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_NO_MEMORY, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_NO_MEMORY);
         return false;
     }
     strncpy(*dest, src, len + 1);
@@ -501,12 +506,10 @@ bool dispatchStrings(int serial, int slotId, int request, int countStrings, ...)
     }
 
     char **pStrings;
-    android::Parcel p;   // TODO: should delete this after translation of all commands is complete
     pStrings = (char **)calloc(countStrings, sizeof(char *));
     if (pStrings == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, request,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_NO_MEMORY, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_NO_MEMORY);
         return false;
     }
     va_list ap;
@@ -547,12 +550,10 @@ bool dispatchStrings(int serial, int slotId, int request, const hidl_vec<hidl_st
 
     int countStrings = data.size();
     char **pStrings;
-    android::Parcel p;   // TODO: should delete this after translation of all commands is complete
     pStrings = (char **)calloc(countStrings, sizeof(char *));
     if (pStrings == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, request,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_NO_MEMORY, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_NO_MEMORY);
         return false;
     }
 
@@ -587,13 +588,10 @@ bool dispatchInts(int serial, int slotId, int request, int countInts, ...) {
         return false;
     }
 
-    android::Parcel p;   // TODO: should delete this after translation of all commands is complete
-
     int *pInts = (int *)calloc(countInts, sizeof(int));
     if (pInts == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, request,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_NO_MEMORY, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_NO_MEMORY);
         return false;
     }
     va_list ap;
@@ -944,15 +942,63 @@ Return<void> RadioImpl::sendSMSExpectMore(int32_t serial, const GsmSmsMessage& m
     return Void();
 }
 
-Return<void> RadioImpl::setupDataCall(int32_t serial,
-                                      RadioTechnology radioTechnology,
-                                      const DataProfileInfo& profileInfo,
-                                      bool modemCognitive,
-                                      bool roamingAllowed) {
+const char *convertMvnoTypeToString(MvnoType type) {
+    switch (type) {
+        case MvnoType::IMSI: return "imsi";
+        case MvnoType::GID: return "gid";
+        case MvnoType::SPN: return "spn";
+        default: return NULL;
+    }
+}
+
+Return<void> RadioImpl::setupDataCall(int32_t serial, RadioTechnology radioTechnology,
+        const DataProfileInfo& dataProfileInfo, bool modemCognitive, bool roamingAllowed) {
+
     RLOGD("RadioImpl::setupDataCall: serial %d", serial);
 
-    // todo: dispatch request
-
+    if (s_vendorFunctions->version >= 4 && s_vendorFunctions->version <= 14) {
+        dispatchStrings(serial, mSlotId, RIL_REQUEST_SETUP_DATA_CALL, 7,
+            std::to_string((int) radioTechnology + 2).c_str(),
+            std::to_string((int) dataProfileInfo.profileId).c_str(),
+            dataProfileInfo.apn.c_str(),
+            dataProfileInfo.user.c_str(),
+            dataProfileInfo.password.c_str(),
+            std::to_string((int) dataProfileInfo.authType).c_str(),
+            dataProfileInfo.protocol.c_str());
+    } else if (s_vendorFunctions->version >= 15) {
+        const char *mvnoTypeStr = convertMvnoTypeToString(dataProfileInfo.mvnoType);
+        if (mvnoTypeStr == NULL) {
+            RequestInfo *pRI = android::addRequestToList(serial, mSlotId,
+                    RIL_REQUEST_SETUP_DATA_CALL);
+            if (pRI != NULL) {
+                sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+            }
+            return Void();
+        }
+        dispatchStrings(serial, mSlotId, RIL_REQUEST_SETUP_DATA_CALL, 15,
+            std::to_string((int) radioTechnology + 2).c_str(),
+            std::to_string((int) dataProfileInfo.profileId).c_str(),
+            dataProfileInfo.apn.c_str(),
+            dataProfileInfo.user.c_str(),
+            dataProfileInfo.password.c_str(),
+            std::to_string((int) dataProfileInfo.authType).c_str(),
+            dataProfileInfo.protocol.c_str(),
+            dataProfileInfo.roamingProtocol.c_str(),
+            std::to_string(dataProfileInfo.supportedApnTypesBitmap).c_str(),
+            std::to_string(dataProfileInfo.bearerBitmap).c_str(),
+            BOOL_TO_INT(modemCognitive),
+            std::to_string(dataProfileInfo.mtu).c_str(),
+            mvnoTypeStr,
+            dataProfileInfo.mvnoMatchData.c_str(),
+            BOOL_TO_INT(roamingAllowed));
+    } else {
+        RLOGE("Unsupported RIL version %d, min version expected 4", s_vendorFunctions->version);
+        RequestInfo *pRI = android::addRequestToList(serial, mSlotId,
+                RIL_REQUEST_SETUP_DATA_CALL);
+        if (pRI != NULL) {
+            sendErrorResponse(pRI, RIL_E_REQUEST_NOT_SUPPORTED);
+        }
+    }
     return Void();
 }
 
@@ -1619,11 +1665,66 @@ Return<void> RadioImpl::setInitialAttachApn(int32_t serial, const DataProfileInf
         return Void();
     }
 
-    RIL_InitialAttachApn pf;
-    memset(&pf, 0, sizeof(pf));
+    if (s_vendorFunctions->version <= 14) {
+        RIL_InitialAttachApn iaa = {};
 
-    // todo: populate pf
-    s_vendorFunctions->onRequest(pRI->pCI->requestNumber, &pf, sizeof(pf), pRI);
+        if (!copyHidlStringToRil(&iaa.apn, dataProfileInfo.apn, pRI)) {
+            return Void();
+        }
+        if (!copyHidlStringToRil(&iaa.protocol, dataProfileInfo.protocol, pRI)) {
+            return Void();
+        }
+        iaa.authtype = (int) dataProfileInfo.authType;
+        if (!copyHidlStringToRil(&iaa.username, dataProfileInfo.user, pRI)) {
+            return Void();
+        }
+        if (!copyHidlStringToRil(&iaa.password, dataProfileInfo.password, pRI)) {
+            return Void();
+        }
+
+        s_vendorFunctions->onRequest(RIL_REQUEST_SET_INITIAL_ATTACH_APN, &iaa, sizeof(iaa), pRI);
+
+        memsetAndFreeStrings(4, iaa.apn, iaa.protocol, iaa.username, iaa.password);
+    } else {
+        RIL_InitialAttachApn_v15 iaa = {};
+
+        if (!copyHidlStringToRil(&iaa.apn, dataProfileInfo.apn, pRI)) {
+            return Void();
+        }
+        if (!copyHidlStringToRil(&iaa.protocol, dataProfileInfo.protocol, pRI)) {
+            return Void();
+        }
+        if (!copyHidlStringToRil(&iaa.roamingProtocol, dataProfileInfo.roamingProtocol, pRI)) {
+            return Void();
+        }
+        iaa.authtype = (int) dataProfileInfo.authType;
+        if (!copyHidlStringToRil(&iaa.username, dataProfileInfo.user, pRI)) {
+            return Void();
+        }
+        if (!copyHidlStringToRil(&iaa.password, dataProfileInfo.password, pRI)) {
+            return Void();
+        }
+        iaa.supportedTypesBitmask = dataProfileInfo.supportedApnTypesBitmap;
+        iaa.bearerBitmask = dataProfileInfo.bearerBitmap;
+        iaa.modemCognitive = BOOL_TO_INT(modemCognitive);
+        iaa.mtu = dataProfileInfo.mtu;
+
+        // Note that there is no need for memory allocation/free.
+        iaa.mvnoType = (char *) convertMvnoTypeToString(dataProfileInfo.mvnoType);
+        if (iaa.mvnoType == NULL) {
+            sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+            return Void();
+        }
+
+        if (!copyHidlStringToRil(&iaa.mvnoMatchData, dataProfileInfo.mvnoMatchData, pRI)) {
+            return Void();
+        }
+
+        s_vendorFunctions->onRequest(RIL_REQUEST_SET_INITIAL_ATTACH_APN, &iaa, sizeof(iaa), pRI);
+
+        memsetAndFreeStrings(6, iaa.apn, iaa.protocol, iaa.roamingProtocol, iaa.username,
+                iaa.password, iaa.mvnoMatchData);
+    }
 
     return Void();
 }
@@ -1646,9 +1747,7 @@ bool dispatchImsGsmSms(const ImsSmsMessage& message, RequestInfo *pRI) {
 
     if (message.gsmMessage.size() != 1) {
         RLOGE("dispatchImsGsmSms: Invalid len %s", requestToString(pRI->pCI->requestNumber));
-        android::Parcel p;
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_INVALID_ARGUMENTS, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
         return false;
     }
 
@@ -1656,9 +1755,7 @@ bool dispatchImsGsmSms(const ImsSmsMessage& message, RequestInfo *pRI) {
     if (pStrings == NULL) {
         RLOGE("dispatchImsGsmSms: Memory allocation failed for request %s",
                 requestToString(pRI->pCI->requestNumber));
-        android::Parcel p;
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_NO_MEMORY, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_NO_MEMORY);
         return false;
     }
 
@@ -1701,9 +1798,7 @@ bool dispatchImsCdmaSms(const ImsSmsMessage& message, RequestInfo *pRI) {
 
     if (message.cdmaMessage.size() != 1) {
         RLOGE("dispatchImsCdmaSms: Invalid len %s", requestToString(pRI->pCI->requestNumber));
-        android::Parcel p;
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_INVALID_ARGUMENTS, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
         return false;
     }
 
@@ -1736,9 +1831,7 @@ Return<void> RadioImpl::sendImsSms(int32_t serial, const ImsSmsMessage& message)
     } else {
         RLOGE("RadioImpl::sendImsSms: Invalid radio tech %s",
                 requestToString(pRI->pCI->requestNumber));
-        android::Parcel p;
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_INVALID_ARGUMENTS, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
     }
     return Void();
 }
@@ -1878,18 +1971,34 @@ Return<void> RadioImpl::requestIccSimAuthentication(int32_t serial, int32_t auth
 }
 
 /**
- * dataProfilePtrs are contained in dataProfiles (dataProfilePtrs[i] = &dataProfiles[i])
+ * @param numProfiles number of data profile
+ * @param dataProfiles the pointer to the actual data profiles. The acceptable type is
+          RIL_DataProfileInfo or RIL_DataProfileInfo_v15.
+ * @param dataProfilePtrs the pointer to the pointers that point to each data profile structure
+ * @param numfields number of string style member in the data profile structure
+ * @param ... the variadic parameters are pointers to each string style member
  **/
-void freeSetDataProfileData(int num, RIL_DataProfileInfo *dataProfiles,
-                            RIL_DataProfileInfo **dataProfilePtrs, int freeNumProfiles) {
-    for (int i = 0; i < freeNumProfiles; i++) {
-        memsetAndFreeStrings(4, dataProfiles[i].apn, dataProfiles[i].protocol, dataProfiles[i].user,
-                dataProfiles[i].password);
+template <typename T>
+void freeSetDataProfileData(int numProfiles, T *dataProfiles, T **dataProfilePtrs,
+                            int numfields, ...) {
+    va_list args;
+    va_start(args, numfields);
+
+    for (int i = 0; i < numfields; i++) {
+        char *T::*ptr = va_arg(args, char *T::*);
+        for (int j = 0; j < numProfiles; j++) {
+#ifdef MEMSET_FREED
+            memsetString(dataProfiles[j].*ptr);
+#endif
+            free(dataProfiles[j].*ptr);
+        }
     }
 
+    va_end(args);
+
 #ifdef MEMSET_FREED
-    memset(dataProfiles, 0, num * sizeof(RIL_DataProfileInfo));
-    memset(dataProfilePtrs, 0, num * sizeof(RIL_DataProfileInfo *));
+    memset(dataProfiles, 0, numProfiles * sizeof(T));
+    memset(dataProfilePtrs, 0, numProfiles * sizeof(T *));
 #endif
     free(dataProfiles);
     free(dataProfilePtrs);
@@ -1902,7 +2011,152 @@ Return<void> RadioImpl::setDataProfile(int32_t serial, const hidl_vec<DataProfil
         return Void();
     }
 
-    // todo - dispatch request
+    size_t num = profiles.size();
+    bool success = false;
+
+    if (s_vendorFunctions->version <= 14) {
+
+        RIL_DataProfileInfo *dataProfiles =
+            (RIL_DataProfileInfo *) calloc(num, sizeof(RIL_DataProfileInfo));
+
+        if (dataProfiles == NULL) {
+            RLOGE("Memory allocation failed for request %s",
+                    requestToString(pRI->pCI->requestNumber));
+            sendErrorResponse(pRI, RIL_E_NO_MEMORY);
+            return Void();
+        }
+
+        RIL_DataProfileInfo **dataProfilePtrs =
+            (RIL_DataProfileInfo **) calloc(num, sizeof(RIL_DataProfileInfo *));
+        if (dataProfilePtrs == NULL) {
+            RLOGE("Memory allocation failed for request %s",
+                    requestToString(pRI->pCI->requestNumber));
+            free(dataProfiles);
+            sendErrorResponse(pRI, RIL_E_NO_MEMORY);
+            return Void();
+        }
+
+        for (size_t i = 0; i < num; i++) {
+            dataProfilePtrs[i] = &dataProfiles[i];
+
+            success = copyHidlStringToRil(&dataProfiles[i].apn, profiles[i].apn, pRI);
+            if (success && !copyHidlStringToRil(&dataProfiles[i].protocol, profiles[i].protocol,
+                    pRI)) {
+                success = false;
+            }
+
+            if (success && !copyHidlStringToRil(&dataProfiles[i].user, profiles[i].user, pRI)) {
+                success = false;
+            }
+            if (success && !copyHidlStringToRil(&dataProfiles[i].password, profiles[i].password,
+                    pRI)) {
+                success = false;
+            }
+
+            if (!success) {
+                freeSetDataProfileData(num, dataProfiles, dataProfilePtrs, 4,
+                    &RIL_DataProfileInfo::apn, &RIL_DataProfileInfo::protocol,
+                    &RIL_DataProfileInfo::user, &RIL_DataProfileInfo::password);
+                return Void();
+            }
+
+            dataProfiles[i].profileId = (RIL_DataProfile) profiles[i].profileId;
+            dataProfiles[i].authType = (int) profiles[i].authType;
+            dataProfiles[i].type = (int) profiles[i].type;
+            dataProfiles[i].maxConnsTime = profiles[i].maxConnsTime;
+            dataProfiles[i].maxConns = profiles[i].maxConns;
+            dataProfiles[i].waitTime = profiles[i].waitTime;
+            dataProfiles[i].enabled = BOOL_TO_INT(profiles[i].enabled);
+        }
+
+        s_vendorFunctions->onRequest(RIL_REQUEST_SET_DATA_PROFILE, dataProfilePtrs,
+                num * sizeof(RIL_DataProfileInfo *), pRI);
+
+        freeSetDataProfileData(num, dataProfiles, dataProfilePtrs, 4,
+                &RIL_DataProfileInfo::apn, &RIL_DataProfileInfo::protocol,
+                &RIL_DataProfileInfo::user, &RIL_DataProfileInfo::password);
+    } else {
+        RIL_DataProfileInfo_v15 *dataProfiles =
+            (RIL_DataProfileInfo_v15 *) calloc(num, sizeof(RIL_DataProfileInfo_v15));
+
+        if (dataProfiles == NULL) {
+            RLOGE("Memory allocation failed for request %s",
+                    requestToString(pRI->pCI->requestNumber));
+            sendErrorResponse(pRI, RIL_E_NO_MEMORY);
+            return Void();
+        }
+
+        RIL_DataProfileInfo_v15 **dataProfilePtrs =
+            (RIL_DataProfileInfo_v15 **) calloc(num, sizeof(RIL_DataProfileInfo_v15 *));
+        if (dataProfilePtrs == NULL) {
+            RLOGE("Memory allocation failed for request %s",
+                    requestToString(pRI->pCI->requestNumber));
+            free(dataProfiles);
+            sendErrorResponse(pRI, RIL_E_NO_MEMORY);
+            return Void();
+        }
+
+        for (size_t i = 0; i < num; i++) {
+            dataProfilePtrs[i] = &dataProfiles[i];
+
+            success = copyHidlStringToRil(&dataProfiles[i].apn, profiles[i].apn, pRI);
+            if (success && !copyHidlStringToRil(&dataProfiles[i].protocol, profiles[i].protocol,
+                    pRI)) {
+                success = false;
+            }
+            if (success && !copyHidlStringToRil(&dataProfiles[i].roamingProtocol,
+                    profiles[i].roamingProtocol, pRI)) {
+                success = false;
+            }
+            if (success && !copyHidlStringToRil(&dataProfiles[i].user, profiles[i].user, pRI)) {
+                success = false;
+            }
+            if (success && !copyHidlStringToRil(&dataProfiles[i].password, profiles[i].password,
+                    pRI)) {
+                success = false;
+            }
+
+            if (success && !copyHidlStringToRil(&dataProfiles[i].mvnoMatchData,
+                    profiles[i].mvnoMatchData, pRI)) {
+                success = false;
+            }
+
+            if (success) {
+                dataProfiles[i].mvnoType = (char *) convertMvnoTypeToString(profiles[i].mvnoType);
+                if (dataProfiles[i].mvnoType == NULL) {
+                    sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+                    success = false;
+                }
+            }
+
+            if (!success) {
+                freeSetDataProfileData(num, dataProfiles, dataProfilePtrs, 6,
+                    &RIL_DataProfileInfo_v15::apn, &RIL_DataProfileInfo_v15::protocol,
+                    &RIL_DataProfileInfo_v15::roamingProtocol, &RIL_DataProfileInfo_v15::user,
+                    &RIL_DataProfileInfo_v15::password, &RIL_DataProfileInfo_v15::mvnoMatchData);
+                return Void();
+            }
+
+            dataProfiles[i].profileId = (RIL_DataProfile) profiles[i].profileId;
+            dataProfiles[i].authType = (int) profiles[i].authType;
+            dataProfiles[i].type = (int) profiles[i].type;
+            dataProfiles[i].maxConnsTime = profiles[i].maxConnsTime;
+            dataProfiles[i].maxConns = profiles[i].maxConns;
+            dataProfiles[i].waitTime = profiles[i].waitTime;
+            dataProfiles[i].enabled = BOOL_TO_INT(profiles[i].enabled);
+            dataProfiles[i].supportedTypesBitmask = profiles[i].supportedApnTypesBitmap;
+            dataProfiles[i].bearerBitmask = profiles[i].bearerBitmap;
+            dataProfiles[i].mtu = profiles[i].mtu;
+        }
+
+        s_vendorFunctions->onRequest(RIL_REQUEST_SET_DATA_PROFILE, dataProfilePtrs,
+                num * sizeof(RIL_DataProfileInfo_v15 *), pRI);
+
+        freeSetDataProfileData(num, dataProfiles, dataProfilePtrs, 6,
+                &RIL_DataProfileInfo_v15::apn, &RIL_DataProfileInfo_v15::protocol,
+                &RIL_DataProfileInfo_v15::roamingProtocol, &RIL_DataProfileInfo_v15::user,
+                &RIL_DataProfileInfo_v15::password, &RIL_DataProfileInfo_v15::mvnoMatchData);
+    }
 
     return Void();
 }
@@ -1984,9 +2238,7 @@ Return<void> RadioImpl::setAllowedCarriers(int32_t serial, bool allAllowed,
     if (allowedCarriers == NULL) {
         RLOGE("RadioImpl::setAllowedCarriers: Memory allocation failed for request %s",
                 requestToString(pRI->pCI->requestNumber));
-        android::Parcel p;
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_NO_MEMORY, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_NO_MEMORY);
         return Void();
     }
     cr.allowed_carriers = allowedCarriers;
@@ -1996,9 +2248,7 @@ Return<void> RadioImpl::setAllowedCarriers(int32_t serial, bool allAllowed,
     if (excludedCarriers == NULL) {
         RLOGE("RadioImpl::setAllowedCarriers: Memory allocation failed for request %s",
                 requestToString(pRI->pCI->requestNumber));
-        android::Parcel p;
-        pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
-                (int) RadioResponseType::SOLICITED, pRI->token, RIL_E_NO_MEMORY, NULL, 0);
+        sendErrorResponse(pRI, RIL_E_NO_MEMORY);
 #ifdef MEMSET_FREED
         memset(allowedCarriers, 0, cr.len_allowed_carriers * sizeof(RIL_Carrier));
 #endif
