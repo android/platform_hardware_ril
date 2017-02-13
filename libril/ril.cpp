@@ -234,10 +234,6 @@ static int responseCallList(Parcel &p, int slotId, int requestNumber, int respon
         RIL_Errno e, void *response, size_t responselen);
 static int responseSMS(Parcel &p, int slotId, int requestNumber, int responseType, int token,
         RIL_Errno e, void *response, size_t responselen);
-static int responseDataCallList(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen);
-static int responseSetupDataCall(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen);
 static int responseRaw(Parcel &p, int slotId, int requestNumber, int responseType, int token,
         RIL_Errno e, void *response, size_t responselen);
 static int responseSsn(Parcel &p, int slotId, int requestNumber, int responseType, int token,
@@ -2394,241 +2390,6 @@ static int responseVoid(Parcel &p, int slotId, int requestNumber, int responseTy
     return 0;
 }
 
-static int responseDataCallListV4(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen) {
-    if (response == NULL && responselen != 0) {
-        RLOGE("invalid response: NULL");
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (responselen % sizeof(RIL_Data_Call_Response_v4) != 0) {
-        RLOGE("responseDataCallListV4: invalid response length %d expected multiple of %d",
-                (int)responselen, (int)sizeof(RIL_Data_Call_Response_v4));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    // Write version
-    p.writeInt32(4);
-
-    int num = responselen / sizeof(RIL_Data_Call_Response_v4);
-    p.writeInt32(num);
-
-    RIL_Data_Call_Response_v4 *p_cur = (RIL_Data_Call_Response_v4 *) response;
-    startResponse;
-    int i;
-    for (i = 0; i < num; i++) {
-        p.writeInt32(p_cur[i].cid);
-        p.writeInt32(p_cur[i].active);
-        writeStringToParcel(p, p_cur[i].type);
-        // apn is not used, so don't send.
-        writeStringToParcel(p, p_cur[i].address);
-        appendPrintBuf("%s[cid=%d,%s,%s,%s],", printBuf,
-            p_cur[i].cid,
-            (p_cur[i].active==0)?"down":"up",
-            (char*)p_cur[i].type,
-            (char*)p_cur[i].address);
-    }
-    removeLastChar;
-    closeResponse;
-
-    return 0;
-}
-
-static int responseDataCallListV6(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen) {
-    if (response == NULL && responselen != 0) {
-        RLOGE("invalid response: NULL");
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (responselen % sizeof(RIL_Data_Call_Response_v6) != 0) {
-        RLOGE("responseDataCallListV6: invalid response length %d expected multiple of %d",
-                (int)responselen, (int)sizeof(RIL_Data_Call_Response_v6));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    // Write version
-    p.writeInt32(6);
-
-    int num = responselen / sizeof(RIL_Data_Call_Response_v6);
-    p.writeInt32(num);
-
-    RIL_Data_Call_Response_v6 *p_cur = (RIL_Data_Call_Response_v6 *) response;
-    startResponse;
-    int i;
-    for (i = 0; i < num; i++) {
-        p.writeInt32((int)p_cur[i].status);
-        p.writeInt32(p_cur[i].suggestedRetryTime);
-        p.writeInt32(p_cur[i].cid);
-        p.writeInt32(p_cur[i].active);
-        writeStringToParcel(p, p_cur[i].type);
-        writeStringToParcel(p, p_cur[i].ifname);
-        writeStringToParcel(p, p_cur[i].addresses);
-        writeStringToParcel(p, p_cur[i].dnses);
-        writeStringToParcel(p, p_cur[i].gateways);
-        appendPrintBuf("%s[status=%d,retry=%d,cid=%d,%s,%s,%s,%s,%s,%s],", printBuf,
-            p_cur[i].status,
-            p_cur[i].suggestedRetryTime,
-            p_cur[i].cid,
-            (p_cur[i].active==0)?"down":"up",
-            (char*)p_cur[i].type,
-            (char*)p_cur[i].ifname,
-            (char*)p_cur[i].addresses,
-            (char*)p_cur[i].dnses,
-            (char*)p_cur[i].gateways);
-    }
-    removeLastChar;
-    closeResponse;
-
-    return 0;
-}
-
-static int responseDataCallListV9(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen) {
-    if (response == NULL && responselen != 0) {
-        RLOGE("invalid response: NULL");
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (responselen % sizeof(RIL_Data_Call_Response_v9) != 0) {
-        RLOGE("responseDataCallListV9: invalid response length %d expected multiple of %d",
-                (int)responselen, (int)sizeof(RIL_Data_Call_Response_v9));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    // Write version
-    p.writeInt32(10);
-
-    int num = responselen / sizeof(RIL_Data_Call_Response_v9);
-    p.writeInt32(num);
-
-    RIL_Data_Call_Response_v9 *p_cur = (RIL_Data_Call_Response_v9 *) response;
-    startResponse;
-    int i;
-    for (i = 0; i < num; i++) {
-        p.writeInt32((int)p_cur[i].status);
-        p.writeInt32(p_cur[i].suggestedRetryTime);
-        p.writeInt32(p_cur[i].cid);
-        p.writeInt32(p_cur[i].active);
-        writeStringToParcel(p, p_cur[i].type);
-        writeStringToParcel(p, p_cur[i].ifname);
-        writeStringToParcel(p, p_cur[i].addresses);
-        writeStringToParcel(p, p_cur[i].dnses);
-        writeStringToParcel(p, p_cur[i].gateways);
-        writeStringToParcel(p, p_cur[i].pcscf);
-        appendPrintBuf("%s[status=%d,retry=%d,cid=%d,%s,%s,%s,%s,%s,%s,%s],", printBuf,
-            p_cur[i].status,
-            p_cur[i].suggestedRetryTime,
-            p_cur[i].cid,
-            (p_cur[i].active==0)?"down":"up",
-            (char*)p_cur[i].type,
-            (char*)p_cur[i].ifname,
-            (char*)p_cur[i].addresses,
-            (char*)p_cur[i].dnses,
-            (char*)p_cur[i].gateways,
-            (char*)p_cur[i].pcscf);
-    }
-    removeLastChar;
-    closeResponse;
-
-    return 0;
-}
-
-static int responseDataCallListV11(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen) {
-    if (response == NULL && responselen != 0) {
-                RLOGE("invalid response: NULL");
-                return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    if (responselen % sizeof(RIL_Data_Call_Response_v11) != 0) {
-        RLOGE("invalid response length %d expected multiple of %d",
-        (int)responselen, (int)sizeof(RIL_Data_Call_Response_v11));
-        return RIL_ERRNO_INVALID_RESPONSE;
-    }
-
-    // Write version
-    p.writeInt32(11);
-
-    int num = responselen / sizeof(RIL_Data_Call_Response_v11);
-    p.writeInt32(num);
-
-    RIL_Data_Call_Response_v11 *p_cur = (RIL_Data_Call_Response_v11 *) response;
-    startResponse;
-    int i;
-    for (i = 0; i < num; i++) {
-        p.writeInt32((int)p_cur[i].status);
-        p.writeInt32(p_cur[i].suggestedRetryTime);
-        p.writeInt32(p_cur[i].cid);
-        p.writeInt32(p_cur[i].active);
-        writeStringToParcel(p, p_cur[i].type);
-        writeStringToParcel(p, p_cur[i].ifname);
-        writeStringToParcel(p, p_cur[i].addresses);
-        writeStringToParcel(p, p_cur[i].dnses);
-        writeStringToParcel(p, p_cur[i].gateways);
-        writeStringToParcel(p, p_cur[i].pcscf);
-        p.writeInt32(p_cur[i].mtu);
-        appendPrintBuf("%s[status=%d,retry=%d,cid=%d,%s,%s,%s,%s,%s,%s,%s,mtu=%d],", printBuf,
-        p_cur[i].status,
-        p_cur[i].suggestedRetryTime,
-        p_cur[i].cid,
-        (p_cur[i].active==0)?"down":"up",
-        (char*)p_cur[i].type,
-        (char*)p_cur[i].ifname,
-        (char*)p_cur[i].addresses,
-        (char*)p_cur[i].dnses,
-        (char*)p_cur[i].gateways,
-        (char*)p_cur[i].pcscf,
-        p_cur[i].mtu);
-    }
-    removeLastChar;
-    closeResponse;
-
-    return 0;
-}
-
-static int responseDataCallList(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen) {
-    if (s_callbacks.version <= LAST_IMPRECISE_RIL_VERSION) {
-        if (s_callbacks.version < 5) {
-            RLOGD("responseDataCallList: v4");
-            return responseDataCallListV4(p, slotId, requestNumber, responseType, token, e,
-                    response, responselen);
-        } else if (responselen % sizeof(RIL_Data_Call_Response_v6) == 0) {
-            return responseDataCallListV6(p, slotId, requestNumber, responseType, token, e,
-                    response, responselen);
-        } else if (responselen % sizeof(RIL_Data_Call_Response_v9) == 0) {
-            return responseDataCallListV9(p, slotId, requestNumber, responseType, token, e,
-                    response, responselen);
-        } else {
-            return responseDataCallListV11(p, slotId, requestNumber, responseType, token, e,
-                    response, responselen);
-        }
-    } else { // RIL version >= 13
-        if (responselen % sizeof(RIL_Data_Call_Response_v11) != 0) {
-            RLOGE("Data structure expected is RIL_Data_Call_Response_v11");
-            if (!isDebuggable()) {
-                return RIL_ERRNO_INVALID_RESPONSE;
-            } else {
-                assert(0);
-            }
-        }
-        return responseDataCallListV11(p, slotId, requestNumber, responseType, token, e, response,
-                responselen);
-    }
-}
-
-static int responseSetupDataCall(Parcel &p, int slotId, int requestNumber, int responseType,
-        int token, RIL_Errno e, void *response, size_t responselen) {
-    if (s_callbacks.version < 5) {
-        return responseStringsWithVersion(s_callbacks.version, p, slotId, requestNumber,
-                responseType, token, e, response, responselen);
-    } else {
-        return responseDataCallList(p, slotId, requestNumber, responseType, token, e, response,
-                responselen);
-    }
-}
-
 static int responseRaw(Parcel &p, int slotId, int requestNumber, int responseType, int token,
         RIL_Errno e, void *response, size_t responselen) {
     if (response == NULL && responselen != 0) {
@@ -4508,36 +4269,15 @@ RIL_onRequestAck(RIL_Token t) {
     appendPrintBuf("Ack [%04d]< %s", pRI->token, requestToString(pRI->pCI->requestNumber));
 
     if (pRI->cancelled == 0) {
-        Parcel p;
+        pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(
+                (int) socket_id);
+        int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
+        assert(rwlockRet == 0);
 
-        p.writeInt32 (RESPONSE_SOLICITED_ACK);
-        p.writeInt32 (pRI->token);
+        radio::acknowledgeRequest((int) socket_id, pRI->token);
 
-        // TODO : Below block of if condition will go away once below commands are converted
-        // to hidl supported apis. They are left out as they use common functions used by
-        // unsolicited commands present in other CL
-        int cmdId = pRI->pCI->requestNumber;
-        if(cmdId != RIL_REQUEST_SETUP_DATA_CALL
-                && cmdId != RIL_REQUEST_SET_INITIAL_ATTACH_APN
-                && cmdId != RIL_REQUEST_SET_DATA_PROFILE) {
-            pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(
-                    (int) socket_id);
-            int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
-            assert(rwlockRet == 0);
-
-            radio::acknowledgeRequest((int) socket_id, pRI->token);
-
-            rwlockRet = pthread_rwlock_unlock(radioServiceRwlockPtr);
-            assert(rwlockRet == 0);
-
-            return;
-        }
-
-        if (fd < 0) {
-            RLOGD ("RIL onRequestAck: Command channel closed");
-        }
-
-        sendResponse(p, socket_id);
+        rwlockRet = pthread_rwlock_unlock(radioServiceRwlockPtr);
+        assert(rwlockRet == 0);
     }
 }
 extern "C" void
@@ -4566,7 +4306,8 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
         // response does not go back up the command socket
         RLOGD("C[locl]< %s", requestToString(pRI->pCI->requestNumber));
 
-        goto done;
+        free(pRI);
+        return;
     }
 
     appendPrintBuf("[%04d]< %s",
@@ -4591,52 +4332,19 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
 
         p.writeInt32 (e);
 
-        bool hidlized = false;
-        int cmdId = pRI->pCI->requestNumber;
-        if(cmdId != RIL_REQUEST_SETUP_DATA_CALL
-                && cmdId != RIL_REQUEST_SET_INITIAL_ATTACH_APN
-                && cmdId != RIL_REQUEST_SET_DATA_PROFILE) {
-            hidlized = true;
-        }
+        // there is a response payload, no matter success or not.
+        RLOGE ("Calling responseFunction() for token %d", pRI->token);
 
-        if (response != NULL || hidlized) {
-            // there is a response payload, no matter success or not.
-            RLOGE ("Calling responseFunction() for token %d", pRI->token);
+        pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock((int) socket_id);
+        int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
+        assert(rwlockRet == 0);
 
-            pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock((int) socket_id);
-            int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
-            assert(rwlockRet == 0);
+        ret = pRI->pCI->responseFunction(p, (int) socket_id, pRI->pCI->requestNumber,
+                responseType, pRI->token, e, response, responselen);
 
-            ret = pRI->pCI->responseFunction(p, (int) socket_id, pRI->pCI->requestNumber,
-                    responseType, pRI->token, e, response, responselen);
-
-            rwlockRet = pthread_rwlock_unlock(radioServiceRwlockPtr);
-            assert(rwlockRet == 0);
-
-            if (hidlized)  {
-                free(pRI);
-                return;
-            }
-
-            /* if an error occurred, rewind and mark it */
-            if (ret != 0) {
-                RLOGE ("responseFunction error, ret %d", ret);
-                p.setDataPosition(errorOffset);
-                p.writeInt32 (ret);
-            }
-        }
-
-        if (e != RIL_E_SUCCESS) {
-            appendPrintBuf("%s fails by %s", printBuf, failCauseToString(e));
-        }
-
-        if (fd < 0) {
-            RLOGD ("RIL_onRequestComplete: Command channel closed");
-        }
-        sendResponse(p, socket_id);
+        rwlockRet = pthread_rwlock_unlock(radioServiceRwlockPtr);
+        assert(rwlockRet == 0);
     }
-
-done:
     free(pRI);
 }
 
