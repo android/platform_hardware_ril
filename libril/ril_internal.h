@@ -26,6 +26,11 @@ namespace android {
 #define SOCKET3_NAME_RIL "rild3"
 #define SOCKET4_NAME_RIL "rild4"
 
+#define OEM_HOOK_SERVICE_NAME "oemhook"
+#define OEM_HOOK2_SERVICE_NAME "oemhook2"
+#define OEM_HOOK3_SERVICE_NAME "oemhook3"
+#define OEM_HOOK4_SERVICE_NAME "oemhook4"
+
 /* Constants for response types */
 #define RESPONSE_SOLICITED 0
 #define RESPONSE_UNSOLICITED 1
