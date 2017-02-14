@@ -15,6 +15,7 @@
  */
 
 #include <android/hardware/radio/1.0/IRadio.h>
+#include <android/hardware/radio/deprecated/1.0/IOemHook.h>
 
 #include <hwbinder/IPCThreadState.h>
 #include <hwbinder/ProcessState.h>
@@ -26,6 +27,7 @@
 #define INVALID_HEX_CHAR 16
 
 using namespace android::hardware::radio::V1_0;
+using namespace android::hardware::radio::deprecated::V1_0;
 using ::android::hardware::configureRpcThreadpool;
 using ::android::hardware::joinRpcThreadpool;
 using ::android::hardware::Return;
@@ -47,11 +49,18 @@ RIL_RadioFunctions *s_vendorFunctions = NULL;
 static CommandInfo *s_commands;
 
 struct RadioImpl;
+struct OemHookImpl;
 
 #if (SIM_COUNT >= 2)
 sp<RadioImpl> radioService[SIM_COUNT];
+sp<OemHookImpl> oemHookService[SIM_COUNT];
+// counter used for synchronization. It is incremented every time response callbacks are updated.
+volatile int32_t mCounter[SIM_COUNT];
 #else
 sp<RadioImpl> radioService[1];
+sp<OemHookImpl> oemHookService[1];
+// counter used for synchronization. It is incremented every time response callbacks are updated.
+volatile int32_t mCounter[1];
 #endif
 
 static pthread_rwlock_t radioServiceRwlock = PTHREAD_RWLOCK_INITIALIZER;
@@ -86,9 +95,6 @@ void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<Ce
 
 struct RadioImpl : public IRadio {
     int32_t mSlotId;
-    // counter used for synchronization. It is incremented every time mRadioResponse or
-    // mRadioIndication value is updated.
-    volatile int32_t mCounter;
     sp<IRadioResponse> mRadioResponse;
     sp<IRadioIndication> mRadioIndication;
 
@@ -236,12 +242,6 @@ struct RadioImpl : public IRadio {
     Return<void> getClip(int32_t serial);
 
     Return<void> getDataCallList(int32_t serial);
-
-    Return<void> sendOemRadioRequestRaw(int32_t serial,
-            const ::android::hardware::hidl_vec<uint8_t>& data);
-
-    Return<void> sendOemRadioRequestStrings(int32_t serial,
-            const ::android::hardware::hidl_vec<::android::hardware::hidl_string>& data);
 
     Return<void> sendScreenState(int32_t serial, bool enable);
 
@@ -421,6 +421,22 @@ struct RadioImpl : public IRadio {
     Return<void> responseAcknowledgement();
 
     void checkReturnStatus(Return<void>& ret);
+};
+
+struct OemHookImpl : public IOemHook {
+    int32_t mSlotId;
+    sp<IOemHookResponse> mOemHookResponse;
+    sp<IOemHookIndication> mOemHookIndication;
+
+    Return<void> setResponseFunctions(
+            const ::android::sp<IOemHookResponse>& oemHookResponse,
+            const ::android::sp<IOemHookIndication>& oemHookIndication);
+
+    Return<void> sendRequestRaw(int32_t serial,
+            const ::android::hardware::hidl_vec<uint8_t>& data);
+
+    Return<void> sendRequestStrings(int32_t serial,
+            const ::android::hardware::hidl_vec<::android::hardware::hidl_string>& data);
 };
 
 void memsetAndFreeStrings(int numPointers, ...) {
@@ -681,9 +697,9 @@ bool dispatchIccApdu(int serial, int slotId, int request, const SimApdu& message
     return true;
 }
 
-void RadioImpl::checkReturnStatus(Return<void>& ret) {
+void checkReturnStatus(int32_t slotId, Return<void>& ret) {
     if (ret.isOk() == false) {
-        RLOGE("RadioImpl::checkReturnStatus: unable to call response/indication callback");
+        RLOGE("checkReturnStatus: unable to call response/indication callback");
         // Remote process hosting the callbacks must be dead. Reset the callback objects;
         // there's no other recovery to be done here. When the client process is back up, it will
         // call setResponseFunctions()
@@ -691,8 +707,8 @@ void RadioImpl::checkReturnStatus(Return<void>& ret) {
         // Caller should already hold rdlock, release that first
         // note the current counter to avoid overwriting updates made by another thread before
         // write lock is acquired.
-        int counter = mCounter;
-        pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(mSlotId);
+        int counter = mCounter[slotId];
+        pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(slotId);
         int ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
         assert(ret == 0);
 
@@ -701,12 +717,14 @@ void RadioImpl::checkReturnStatus(Return<void>& ret) {
         assert(ret == 0);
 
         // make sure the counter value has not changed
-        if (counter == mCounter) {
-            mRadioResponse = NULL;
-            mRadioIndication = NULL;
-            mCounter++;
+        if (counter == mCounter[slotId]) {
+            radioService[slotId]->mRadioResponse = NULL;
+            radioService[slotId]->mRadioIndication = NULL;
+            oemHookService[slotId]->mOemHookResponse = NULL;
+            oemHookService[slotId]->mOemHookIndication = NULL;
+            mCounter[slotId]++;
         } else {
-            RLOGE("RadioImpl::checkReturnStatus: not resetting responseFunctions as they likely"
+            RLOGE("checkReturnStatus: not resetting responseFunctions as they likely "
                     "got updated on another thread");
         }
 
@@ -720,6 +738,10 @@ void RadioImpl::checkReturnStatus(Return<void>& ret) {
     }
 }
 
+void RadioImpl::checkReturnStatus(Return<void>& ret) {
+    ::checkReturnStatus(mSlotId, ret);
+}
+
 Return<void> RadioImpl::setResponseFunctions(
         const ::android::sp<IRadioResponse>& radioResponseParam,
         const ::android::sp<IRadioIndication>& radioIndicationParam) {
@@ -731,7 +753,7 @@ Return<void> RadioImpl::setResponseFunctions(
 
     mRadioResponse = radioResponseParam;
     mRadioIndication = radioIndicationParam;
-    mCounter++;
+    mCounter[mSlotId]++;
 
     ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
     assert(ret == 0);
@@ -1172,19 +1194,6 @@ Return<void> RadioImpl::getClip(int32_t serial) {
 Return<void> RadioImpl::getDataCallList(int32_t serial) {
     RLOGD("RadioImpl::getDataCallList: serial %d", serial);
     dispatchVoid(serial, mSlotId, RIL_REQUEST_DATA_CALL_LIST);
-    return Void();
-}
-
-Return<void> RadioImpl::sendOemRadioRequestRaw(int32_t serial, const hidl_vec<uint8_t>& data) {
-    RLOGD("RadioImpl::sendOemRadioRequestRaw: serial %d", serial);
-    dispatchRaw(serial, mSlotId, RIL_REQUEST_OEM_HOOK_RAW, data);
-    return Void();
-}
-
-Return<void> RadioImpl::sendOemRadioRequestStrings(int32_t serial,
-        const hidl_vec<hidl_string>& data) {
-    RLOGD("RadioImpl::sendOemRadioRequestStrings: serial %d", serial);
-    dispatchStrings(serial, mSlotId, RIL_REQUEST_OEM_HOOK_STRINGS, data);
     return Void();
 }
 
@@ -2053,6 +2062,38 @@ Return<void> RadioImpl::setIndicationFilter(int32_t serial, int32_t indicationFi
 
 Return<void> RadioImpl::responseAcknowledgement() {
     android::releaseWakeLock();
+    return Void();
+}
+
+Return<void> OemHookImpl::setResponseFunctions(
+        const ::android::sp<IOemHookResponse>& oemHookResponseParam,
+        const ::android::sp<IOemHookIndication>& oemHookIndicationParam) {
+    RLOGD("OemHookImpl::setResponseFunctions");
+
+    pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(mSlotId);
+    int ret = pthread_rwlock_wrlock(radioServiceRwlockPtr);
+    assert(ret == 0);
+
+    mOemHookResponse = oemHookResponseParam;
+    mOemHookIndication = oemHookIndicationParam;
+    mCounter[mSlotId]++;
+
+    ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
+    assert(ret == 0);
+
+    return Void();
+}
+
+Return<void> OemHookImpl::sendRequestRaw(int32_t serial, const hidl_vec<uint8_t>& data) {
+    RLOGD("OemHookImpl::sendRequestRaw: serial %d", serial);
+    dispatchRaw(serial, mSlotId, RIL_REQUEST_OEM_HOOK_RAW, data);
+    return Void();
+}
+
+Return<void> OemHookImpl::sendRequestStrings(int32_t serial,
+        const hidl_vec<hidl_string>& data) {
+    RLOGD("OemHookImpl::sendRequestStrings: serial %d", serial);
+    dispatchStrings(serial, mSlotId, RIL_REQUEST_OEM_HOOK_STRINGS, data);
     return Void();
 }
 
@@ -3425,39 +3466,6 @@ int radio::getDataCallListResponse(android::Parcel &p, int slotId, int requestNu
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("radio::getDataCallListResponse: radioService[%d]->mRadioResponse == NULL", slotId);
-    }
-
-    return 0;
-}
-
-int radio::sendOemRilRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
-                                           int responseType, int serial, RIL_Errno e,
-                                           void *response, size_t responseLen) {
-    RLOGD("radio::sendOemRilRequestStringsResponse: serial %d", serial);
-
-    if (radioService[slotId]->mRadioResponse != NULL) {
-        RadioResponseInfo responseInfo = {};
-        populateResponseInfo(responseInfo, serial, responseType, e);
-        hidl_vec<hidl_string> data;
-
-        if (response == NULL || responseLen % sizeof(char *) != 0) {
-            RLOGE("radio::sendOemRilRequestStringsResponse Invalid response: NULL");
-            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
-        } else {
-            char **resp = (char **) response;
-            int numStrings = responseLen / sizeof(char *);
-            data.resize(numStrings);
-            for (int i = 0; i < numStrings; i++) {
-                data[i] = convertCharPtrToHidlString(resp[i]);
-            }
-        }
-        Return<void> retStatus
-                = radioService[slotId]->mRadioResponse->sendOemRilRequestStringsResponse(
-                responseInfo, data);
-        radioService[slotId]->checkReturnStatus(retStatus);
-    } else {
-        RLOGE("radio::sendOemRilRequestStringsResponse: radioService[%d]->mRadioResponse == NULL",
-                slotId);
     }
 
     return 0;
@@ -5121,6 +5129,66 @@ int radio::setSimCardPowerResponse(android::Parcel &p, int slotId, int requestNu
     return 0;
 }
 
+int radio::sendRequestRawResponse(android::Parcel &p, int slotId, int requestNumber,
+                                  int responseType, int serial, RIL_Errno e,
+                                  void *response, size_t responseLen) {
+   RLOGD("radio::sendRequestRawResponse: serial %d", serial);
+
+    if (oemHookService[slotId]->mOemHookResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        hidl_vec<uint8_t> data;
+
+        if (response == NULL) {
+            RLOGE("radio::sendRequestRawResponse: Invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            data.setToExternal((uint8_t *) response, responseLen);
+        }
+        Return<void> retStatus = oemHookService[slotId]->mOemHookResponse->
+                sendRequestRawResponse(responseInfo, data);
+        checkReturnStatus(slotId, retStatus);
+    } else {
+        RLOGE("radio::sendRequestRawResponse: oemHookService[%d]->mOemHookResponse == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
+int radio::sendRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
+                                      int responseType, int serial, RIL_Errno e,
+                                      void *response, size_t responseLen) {
+    RLOGD("radio::sendRequestStringsResponse: serial %d", serial);
+
+    if (oemHookService[slotId]->mOemHookResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        hidl_vec<hidl_string> data;
+
+        if (response == NULL || responseLen % sizeof(char *) != 0) {
+            RLOGE("radio::sendRequestStringsResponse Invalid response: NULL");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            char **resp = (char **) response;
+            int numStrings = responseLen / sizeof(char *);
+            data.resize(numStrings);
+            for (int i = 0; i < numStrings; i++) {
+                data[i] = convertCharPtrToHidlString(resp[i]);
+            }
+        }
+        Return<void> retStatus
+                = oemHookService[slotId]->mOemHookResponse->sendRequestStringsResponse(
+                responseInfo, data);
+        checkReturnStatus(slotId, retStatus);
+    } else {
+        RLOGE("radio::sendRequestStringsResponse: oemHookService[%d]->mOemHookResponse == "
+                "NULL", slotId);
+    }
+
+    return 0;
+}
+
 // Radio Indication functions
 
 RadioIndicationType convertIntToRadioIndicationType(int indicationType) {
@@ -5981,28 +6049,6 @@ int radio::cdmaInfoRecInd(android::Parcel &p, int slotId, int requestNumber,
     return 0;
 }
 
-int radio::oemHookRawInd(android::Parcel &p, int slotId, int requestNumber,
-                         int indicationType, int token, RIL_Errno e, void *response,
-                         size_t responseLen) {
-    if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndication != NULL) {
-        if (response == NULL || responseLen == 0) {
-            RLOGE("radio::oemHookRawInd: invalid response");
-            return 0;
-        }
-
-        hidl_vec<uint8_t> data;
-        data.setToExternal((uint8_t *) response, responseLen);
-        RLOGD("radio::oemHookRawInd");
-        Return<void> retStatus = radioService[slotId]->mRadioIndication->oemHookRaw(
-                convertIntToRadioIndicationType(indicationType), data);
-        radioService[slotId]->checkReturnStatus(retStatus);
-    } else {
-        RLOGE("radio::oemHookRawInd: radioService[%d]->mRadioIndication == NULL", slotId);
-    }
-
-    return 0;
-}
-
 int radio::indicateRingbackToneInd(android::Parcel &p, int slotId, int requestNumber,
                                    int indicationType, int token, RIL_Errno e, void *response,
                                    size_t responseLen) {
@@ -6626,10 +6672,32 @@ int radio::modemResetInd(android::Parcel &p, int slotId, int requestNumber,
     return 0;
 }
 
+int radio::oemHookRawInd(android::Parcel &p, int slotId, int requestNumber,
+                         int indicationType, int token, RIL_Errno e, void *response,
+                         size_t responseLen) {
+    if (oemHookService[slotId] != NULL && oemHookService[slotId]->mOemHookIndication != NULL) {
+        if (response == NULL || responseLen == 0) {
+            RLOGE("radio::oemHookRawInd: invalid response");
+            return 0;
+        }
+
+        hidl_vec<uint8_t> data;
+        data.setToExternal((uint8_t *) response, responseLen);
+        RLOGD("radio::oemHookRawInd");
+        Return<void> retStatus = oemHookService[slotId]->mOemHookIndication->oemHookRaw(
+                convertIntToRadioIndicationType(indicationType), data);
+        checkReturnStatus(slotId, retStatus);
+    } else {
+        RLOGE("radio::oemHookRawInd: oemHookService[%d]->mOemHookIndication == NULL", slotId);
+    }
+
+    return 0;
+}
+
 void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands) {
     using namespace android::hardware;
     int simCount = 1;
-    char *serviceNames[] = {
+    const char *serviceNames[] = {
             android::RIL_getRilSocketName()
             #if (SIM_COUNT >= 2)
             , SOCKET2_NAME_RIL
@@ -6637,6 +6705,19 @@ void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands
             , SOCKET3_NAME_RIL
             #if (SIM_COUNT >= 4)
             , SOCKET4_NAME_RIL
+            #endif
+            #endif
+            #endif
+            };
+
+    const char *oemHookServiceNames[] = {
+            OEM_HOOK_SERVICE_NAME
+            #if (SIM_COUNT >= 2)
+            , OEM_HOOK2_SERVICE_NAME
+            #if (SIM_COUNT >= 3)
+            , OEM_HOOK3_SERVICE_NAME
+            #if (SIM_COUNT >= 4)
+            , OEM_HOOK4_SERVICE_NAME
             #endif
             #endif
             #endif
@@ -6654,8 +6735,11 @@ void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands
 
         radioService[i] = new RadioImpl;
         radioService[i]->mSlotId = i;
+        oemHookService[i] = new OemHookImpl;
+        oemHookService[i]->mSlotId = i;
         RLOGD("radio::registerService: starting IRadio %s", serviceNames[i]);
         android::status_t status = radioService[i]->registerAsService(serviceNames[i]);
+        status = oemHookService[i]->registerAsService(oemHookServiceNames[i]);
 
         ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
         assert(ret == 0);

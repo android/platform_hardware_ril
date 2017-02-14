@@ -230,10 +230,6 @@ int getDataCallListResponse(android::Parcel &p, int slotId, int requestNumber,
                             int responseType, int serial, RIL_Errno e,
                             void *response, size_t responseLen);
 
-int sendOemRilRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
-                                    int responseType, int serial, RIL_Errno e, void *response,
-                                    size_t responselen);
-
 int sendScreenStateResponse(android::Parcel &p, int slotId, int requestNumber,
                            int responseType, int serial, RIL_Errno e, void *response,
                            size_t responselen);
@@ -697,6 +693,14 @@ int pcoDataInd(android::Parcel &p, int slotId, int requestNumber,
 int modemResetInd(android::Parcel &p, int slotId, int requestNumber,
                   int indicationType, int token, RIL_Errno e, void *response,
                   size_t responselen);
+
+int sendRequestRawResponse(android::Parcel &p, int slotId, int requestNumber,
+                           int responseType, int serial, RIL_Errno e,
+                           void *response, size_t responseLen);
+
+int sendRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
+                               int responseType, int serial, RIL_Errno e,
+                               void *response, size_t responseLen);
 
 pthread_rwlock_t * getRadioServiceRwlock(int slotId);
 
