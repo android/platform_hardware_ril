@@ -15,6 +15,7 @@
  */
 
 #include <android/hardware/radio/1.0/IRadio.h>
+#include <android/hardware/radio/1.0/IOemHook.h>
 
 #include <hwbinder/IPCThreadState.h>
 #include <hwbinder/ProcessState.h>
@@ -47,11 +48,18 @@ RIL_RadioFunctions *s_vendorFunctions = NULL;
 static CommandInfo *s_commands;
 
 struct RadioImpl;
+struct OemHookImpl;
 
 #if (SIM_COUNT >= 2)
 sp<RadioImpl> radioService[SIM_COUNT];
+sp<OemHookImpl> oemHookService[SIM_COUNT];
+// counter used for synchronization. It is incremented every time response callbacks are updated.
+volatile int32_t mCounter[SIM_COUNT];
 #else
 sp<RadioImpl> radioService[1];
+sp<OemHookImpl> oemHookService[1];
+// counter used for synchronization. It is incremented every time response callbacks are updated.
+volatile int32_t mCounter[1];
 #endif
 
 static pthread_rwlock_t radioServiceRwlock = PTHREAD_RWLOCK_INITIALIZER;
@@ -86,9 +94,6 @@ void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<Ce
 
 struct RadioImpl : public IRadio {
     int32_t mSlotId;
-    // counter used for synchronization. It is incremented every time mRadioResponse or
-    // mRadioIndication value is updated.
-    volatile int32_t mCounter;
     sp<IRadioResponse> mRadioResponse;
     sp<IRadioIndication> mRadioIndication;
 
@@ -236,12 +241,6 @@ struct RadioImpl : public IRadio {
     Return<void> getClip(int32_t serial);
 
     Return<void> getDataCallList(int32_t serial);
-
-    Return<void> sendOemRadioRequestRaw(int32_t serial,
-            const ::android::hardware::hidl_vec<uint8_t>& data);
-
-    Return<void> sendOemRadioRequestStrings(int32_t serial,
-            const ::android::hardware::hidl_vec<::android::hardware::hidl_string>& data);
 
     Return<void> sendScreenState(int32_t serial, bool enable);
 
@@ -418,7 +417,23 @@ struct RadioImpl : public IRadio {
 
     Return<void> responseAcknowledgement();
 
-    void checkReturnStatus(Return<void>& ret);
+    void checkReturnStatus(int32_t slotId, Return<void>& ret);
+};
+
+struct OemHookImpl : public IOemHook {
+    int32_t mSlotId;
+    sp<IOemHookResponse> mOemHookResponse;
+    sp<IOemHookIndication> mOemHookIndication;
+
+    Return<void> setResponseFunctions(
+            const ::android::sp<IOemHookResponse>& oemHookResponse,
+            const ::android::sp<IOemHookIndication>& oemHookIndication);
+
+    Return<void> sendRequestRaw(int32_t serial,
+            const ::android::hardware::hidl_vec<uint8_t>& data);
+
+    Return<void> sendRequestStrings(int32_t serial,
+            const ::android::hardware::hidl_vec<::android::hardware::hidl_string>& data);
 };
 
 void memsetAndFreeStrings(int numPointers, ...) {
@@ -679,9 +694,9 @@ bool dispatchIccApdu(int serial, int slotId, int request, const SimApdu& message
     return true;
 }
 
-void RadioImpl::checkReturnStatus(Return<void>& ret) {
+void checkReturnStatus(int32_t slotId, Return<void>& ret) {
     if (ret.isOk() == false) {
-        RLOGE("RadioImpl::checkReturnStatus: unable to call response/indication callback");
+        RLOGE("checkReturnStatus: unable to call response/indication callback");
         // Remote process hosting the callbacks must be dead. Reset the callback objects;
         // there's no other recovery to be done here. When the client process is back up, it will
         // call setResponseFunctions()
@@ -689,8 +704,8 @@ void RadioImpl::checkReturnStatus(Return<void>& ret) {
         // Caller should already hold rdlock, release that first
         // note the current counter to avoid overwriting updates made by another thread before
         // write lock is acquired.
-        int counter = mCounter;
-        pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(mSlotId);
+        int counter = mCounter[slotId];
+        pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(slotId);
         int ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
         assert(ret == 0);
 
@@ -699,12 +714,14 @@ void RadioImpl::checkReturnStatus(Return<void>& ret) {
         assert(ret == 0);
 
         // make sure the counter value has not changed
-        if (counter == mCounter) {
-            mRadioResponse = NULL;
-            mRadioIndication = NULL;
-            mCounter++;
+        if (counter == mCounter[slotId]) {
+            radioService[slotId]->mRadioResponse = NULL;
+            radioService[slotId]->mRadioIndication = NULL;
+            oemHookService[slotId]->mOemHookResponse = NULL;
+            oemHookService[slotId]->mOemHookIndication = NULL;
+            mCounter[slotId]++;
         } else {
-            RLOGE("RadioImpl::checkReturnStatus: not resetting responseFunctions as they likely"
+            RLOGE("checkReturnStatus: not resetting responseFunctions as they likely "
                     "got updated on another thread");
         }
 
@@ -718,6 +735,10 @@ void RadioImpl::checkReturnStatus(Return<void>& ret) {
     }
 }
 
+void RadioImpl::checkReturnStatus(int32_t slotId, Return<void>& ret) {
+    ::checkReturnStatus(slotId, ret);
+}
+
 Return<void> RadioImpl::setResponseFunctions(
         const ::android::sp<IRadioResponse>& radioResponseParam,
         const ::android::sp<IRadioIndication>& radioIndicationParam) {
@@ -729,7 +750,7 @@ Return<void> RadioImpl::setResponseFunctions(
 
     mRadioResponse = radioResponseParam;
     mRadioIndication = radioIndicationParam;
-    mCounter++;
+    mCounter[mSlotId]++;
 
     ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
     assert(ret == 0);
@@ -1170,19 +1191,6 @@ Return<void> RadioImpl::getClip(int32_t serial) {
 Return<void> RadioImpl::getDataCallList(int32_t serial) {
     RLOGD("RadioImpl::getDataCallList: serial %d", serial);
     dispatchVoid(serial, mSlotId, RIL_REQUEST_DATA_CALL_LIST);
-    return Void();
-}
-
-Return<void> RadioImpl::sendOemRadioRequestRaw(int32_t serial, const hidl_vec<uint8_t>& data) {
-    RLOGD("RadioImpl::sendOemRadioRequestRaw: serial %d", serial);
-    dispatchRaw(serial, mSlotId, RIL_REQUEST_OEM_HOOK_RAW, data);
-    return Void();
-}
-
-Return<void> RadioImpl::sendOemRadioRequestStrings(int32_t serial,
-        const hidl_vec<hidl_string>& data) {
-    RLOGD("RadioImpl::sendOemRadioRequestStrings: serial %d", serial);
-    dispatchStrings(serial, mSlotId, RIL_REQUEST_OEM_HOOK_STRINGS, data);
     return Void();
 }
 
@@ -2048,6 +2056,38 @@ Return<void> RadioImpl::responseAcknowledgement() {
     return Void();
 }
 
+Return<void> OemHookImpl::setResponseFunctions(
+        const ::android::sp<IOemHookResponse>& oemHookResponseParam,
+        const ::android::sp<IOemHookIndication>& oemHookIndicationParam) {
+    RLOGD("OemHookImpl::setResponseFunctions");
+
+    pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(mSlotId);
+    int ret = pthread_rwlock_wrlock(radioServiceRwlockPtr);
+    assert(ret == 0);
+
+    mOemHookResponse = oemHookResponseParam;
+    mOemHookIndication = oemHookIndicationParam;
+    mCounter[mSlotId]++;
+
+    ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
+    assert(ret == 0);
+
+    return Void();
+}
+
+Return<void> OemHookImpl::sendRequestRaw(int32_t serial, const hidl_vec<uint8_t>& data) {
+    RLOGD("OemHookImpl::sendRequestRaw: serial %d", serial);
+    dispatchRaw(serial, mSlotId, RIL_REQUEST_OEM_HOOK_RAW, data);
+    return Void();
+}
+
+Return<void> OemHookImpl::sendRequestStrings(int32_t serial,
+        const hidl_vec<hidl_string>& data) {
+    RLOGD("OemHookImpl::sendRequestStrings: serial %d", serial);
+    dispatchStrings(serial, mSlotId, RIL_REQUEST_OEM_HOOK_STRINGS, data);
+    return Void();
+}
+
 /***************************************************************************************************
  * RESPONSE FUNCTIONS
  * Functions above are used for requests going from framework to vendor code. The ones below are
@@ -2057,7 +2097,7 @@ Return<void> RadioImpl::responseAcknowledgement() {
 void radio::acknowledgeRequest(int slotId, int serial) {
     if (radioService[slotId]->mRadioResponse != NULL) {
         Return<void> retStatus = radioService[slotId]->mRadioResponse->acknowledgeRequest(serial);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::acknowledgeRequest: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2129,7 +2169,7 @@ int radio::getIccCardStatusResponse(android::Parcel &p, int slotId, int requestN
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 getIccCardStatusResponse(responseInfo, cardStatus);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getIccCardStatusResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2147,7 +2187,7 @@ int radio::supplyIccPinForAppResponse(android::Parcel &p, int slotId, int reques
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 supplyIccPinForAppResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::supplyIccPinForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2166,7 +2206,7 @@ int radio::supplyIccPukForAppResponse(android::Parcel &p, int slotId, int reques
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->supplyIccPukForAppResponse(
                 responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::supplyIccPukForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2185,7 +2225,7 @@ int radio::supplyIccPin2ForAppResponse(android::Parcel &p, int slotId, int reque
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 supplyIccPin2ForAppResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::supplyIccPin2ForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2204,7 +2244,7 @@ int radio::supplyIccPuk2ForAppResponse(android::Parcel &p, int slotId, int reque
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 supplyIccPuk2ForAppResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::supplyIccPuk2ForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2223,7 +2263,7 @@ int radio::changeIccPinForAppResponse(android::Parcel &p, int slotId, int reques
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 changeIccPinForAppResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::changeIccPinForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2242,7 +2282,7 @@ int radio::changeIccPin2ForAppResponse(android::Parcel &p, int slotId, int reque
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 changeIccPin2ForAppResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::changeIccPin2ForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2261,7 +2301,7 @@ int radio::supplyNetworkDepersonalizationResponse(android::Parcel &p, int slotId
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 supplyNetworkDepersonalizationResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::supplyNetworkDepersonalizationResponse: radioService[%d]->mRadioResponse == "
                 "NULL", slotId);
@@ -2316,7 +2356,7 @@ int radio::getCurrentCallsResponse(android::Parcel &p, int slotId, int requestNu
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 getCurrentCallsResponse(responseInfo, calls);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getCurrentCallsResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2333,7 +2373,7 @@ int radio::dialResponse(android::Parcel &p, int slotId, int requestNumber,
         RadioResponseInfo responseInfo = {};
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->dialResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::dialResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2351,7 +2391,7 @@ int radio::getIMSIForAppResponse(android::Parcel &p, int slotId, int requestNumb
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getIMSIForAppResponse(
                 responseInfo, convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getIMSIForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2370,7 +2410,7 @@ int radio::hangupConnectionResponse(android::Parcel &p, int slotId, int requestN
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->hangupConnectionResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::hangupConnectionResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2390,7 +2430,7 @@ int radio::hangupWaitingOrBackgroundResponse(android::Parcel &p, int slotId, int
         Return<void> retStatus =
                 radioService[slotId]->mRadioResponse->hangupWaitingOrBackgroundResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::hangupWaitingOrBackgroundResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2411,7 +2451,7 @@ int radio::hangupForegroundResumeBackgroundResponse(android::Parcel &p, int slot
         Return<void> retStatus =
                 radioService[slotId]->mRadioResponse->hangupWaitingOrBackgroundResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::hangupWaitingOrBackgroundResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2432,7 +2472,7 @@ int radio::switchWaitingOrHoldingAndActiveResponse(android::Parcel &p, int slotI
         Return<void> retStatus =
                 radioService[slotId]->mRadioResponse->switchWaitingOrHoldingAndActiveResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::switchWaitingOrHoldingAndActiveResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -2450,7 +2490,7 @@ int radio::conferenceResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->conferenceResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::conferenceResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2468,7 +2508,7 @@ int radio::rejectCallResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->rejectCallResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::rejectCallResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2505,7 +2545,7 @@ int radio::getLastCallFailCauseResponse(android::Parcel &p, int slotId, int requ
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getLastCallFailCauseResponse(
                 responseInfo, info);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getLastCallFailCauseResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2532,7 +2572,7 @@ int radio::getSignalStrengthResponse(android::Parcel &p, int slotId, int request
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getSignalStrengthResponse(
                 responseInfo, signalStrength);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getSignalStrengthResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2579,7 +2619,7 @@ int radio::getVoiceRegistrationStateResponse(android::Parcel &p, int slotId, int
         Return<void> retStatus =
                 radioService[slotId]->mRadioResponse->getVoiceRegistrationStateResponse(
                 responseInfo, voiceRegResponse);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getVoiceRegistrationStateResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2621,7 +2661,7 @@ int radio::getDataRegistrationStateResponse(android::Parcel &p, int slotId, int 
         Return<void> retStatus =
                 radioService[slotId]->mRadioResponse->getDataRegistrationStateResponse(responseInfo,
                 dataRegResponse);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getDataRegistrationStateResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2654,7 +2694,7 @@ int radio::getOperatorResponse(android::Parcel &p, int slotId, int requestNumber
         }
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getOperatorResponse(
                 responseInfo, longName, shortName, numeric);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getOperatorResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2673,7 +2713,7 @@ int radio::setRadioPowerResponse(android::Parcel &p, int slotId, int requestNumb
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->setRadioPowerResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setRadioPowerResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2692,7 +2732,7 @@ int radio::sendDtmfResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->sendDtmfResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendDtmfResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2731,7 +2771,7 @@ int radio::sendSmsResponse(android::Parcel &p, int slotId, int requestNumber,
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->sendSmsResponse(responseInfo,
                 result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendSmsResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2751,7 +2791,7 @@ int radio::sendSMSExpectMoreResponse(android::Parcel &p, int slotId, int request
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->sendSMSExpectMoreResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendSMSExpectMoreResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2784,7 +2824,7 @@ int radio::setupDataCallResponse(android::Parcel &p, int slotId, int requestNumb
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->setupDataCallResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setupDataCallResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2822,7 +2862,7 @@ int radio::iccIOForAppResponse(android::Parcel &p, int slotId, int requestNumber
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->iccIOForAppResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::iccIOForAppResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2840,7 +2880,7 @@ int radio::sendUssdResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->sendUssdResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendUssdResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2859,7 +2899,7 @@ int radio::cancelPendingUssdResponse(android::Parcel &p, int slotId, int request
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->cancelPendingUssdResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cancelPendingUssdResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2888,7 +2928,7 @@ int radio::getClirResponse(android::Parcel &p, int slotId, int requestNumber,
         }
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getClirResponse(responseInfo,
                 n, m);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getClirResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2906,7 +2946,7 @@ int radio::setClirResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->setClirResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setClirResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2943,7 +2983,7 @@ int radio::getCallForwardStatusResponse(android::Parcel &p, int slotId, int requ
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getCallForwardStatusResponse(
                 responseInfo, callForwardInfos);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getCallForwardStatusResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -2962,7 +3002,7 @@ int radio::setCallForwardResponse(android::Parcel &p, int slotId, int requestNum
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->setCallForwardResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setCallForwardResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -2991,7 +3031,7 @@ int radio::getCallWaitingResponse(android::Parcel &p, int slotId, int requestNum
         }
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getClirResponse(responseInfo,
                 enable, serviceClass);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getCallWaitingResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3009,7 +3049,7 @@ int radio::setCallWaitingResponse(android::Parcel &p, int slotId, int requestNum
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->setCallWaitingResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setCallWaitingResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3028,7 +3068,7 @@ int radio::acknowledgeLastIncomingGsmSmsResponse(android::Parcel &p, int slotId,
         Return<void> retStatus =
                 radioService[slotId]->mRadioResponse->acknowledgeLastIncomingGsmSmsResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::acknowledgeLastIncomingGsmSmsResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -3047,7 +3087,7 @@ int radio::acceptCallResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->acceptCallResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::acceptCallResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3066,7 +3106,7 @@ int radio::deactivateDataCallResponse(android::Parcel &p, int slotId, int reques
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->deactivateDataCallResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::deactivateDataCallResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3085,7 +3125,7 @@ int radio::getFacilityLockForAppResponse(android::Parcel &p, int slotId, int req
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 getFacilityLockForAppResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getFacilityLockForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3105,7 +3145,7 @@ int radio::setFacilityLockForAppResponse(android::Parcel &p, int slotId, int req
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setFacilityLockForAppResponse(responseInfo,
                 ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setFacilityLockForAppResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3124,7 +3164,7 @@ int radio::setBarringPasswordResponse(android::Parcel &p, int slotId, int reques
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setBarringPasswordResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setBarringPasswordResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3154,7 +3194,7 @@ int radio::getNetworkSelectionModeResponse(android::Parcel &p, int slotId, int r
                 = radioService[slotId]->mRadioResponse->getNetworkSelectionModeResponse(
                 responseInfo,
                 manual);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getNetworkSelectionModeResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3175,7 +3215,7 @@ int radio::setNetworkSelectionModeAutomaticResponse(android::Parcel &p, int slot
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setNetworkSelectionModeAutomaticResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setNetworkSelectionModeAutomaticResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -3195,7 +3235,7 @@ int radio::setNetworkSelectionModeManualResponse(android::Parcel &p, int slotId,
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setNetworkSelectionModeManualResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::acceptCallResponse: radioService[%d]->setNetworkSelectionModeManualResponse "
                 "== NULL", slotId);
@@ -3249,7 +3289,7 @@ int radio::getAvailableNetworksResponse(android::Parcel &p, int slotId, int requ
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getAvailableNetworksResponse(responseInfo,
                 networks);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getAvailableNetworksResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3268,7 +3308,7 @@ int radio::startDtmfResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->startDtmfResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::startDtmfResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3286,7 +3326,7 @@ int radio::stopDtmfResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->stopDtmfResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::stopDtmfResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3305,7 +3345,7 @@ int radio::getBasebandVersionResponse(android::Parcel &p, int slotId, int reques
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getBasebandVersionResponse(responseInfo,
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getBasebandVersionResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3323,7 +3363,7 @@ int radio::separateConnectionResponse(android::Parcel &p, int slotId, int reques
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->separateConnectionResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::separateConnectionResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3342,7 +3382,7 @@ int radio::setMuteResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setMuteResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setMuteResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3369,7 +3409,7 @@ int radio::getMuteResponse(android::Parcel &p, int slotId, int requestNumber,
         }
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getMuteResponse(responseInfo,
                 enable);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getMuteResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3387,7 +3427,7 @@ int radio::getClipResponse(android::Parcel &p, int slotId, int requestNumber,
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getClipResponse(responseInfo,
                 (ClipStatus) ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getClipResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3414,42 +3454,9 @@ int radio::getDataCallListResponse(android::Parcel &p, int slotId, int requestNu
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getDataCallListResponse(
                 responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getDataCallListResponse: radioService[%d]->mRadioResponse == NULL", slotId);
-    }
-
-    return 0;
-}
-
-int radio::sendOemRilRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
-                                           int responseType, int serial, RIL_Errno e,
-                                           void *response, size_t responseLen) {
-    RLOGD("radio::sendOemRilRequestStringsResponse: serial %d", serial);
-
-    if (radioService[slotId]->mRadioResponse != NULL) {
-        RadioResponseInfo responseInfo = {};
-        populateResponseInfo(responseInfo, serial, responseType, e);
-        hidl_vec<hidl_string> data;
-
-        if (response == NULL || responseLen % sizeof(char *) != 0) {
-            RLOGE("radio::sendOemRilRequestStringsResponse Invalid response: NULL");
-            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
-        } else {
-            char **resp = (char **) response;
-            int numStrings = responseLen / sizeof(char *);
-            data.resize(numStrings);
-            for (int i = 0; i < numStrings; i++) {
-                data[i] = convertCharPtrToHidlString(resp[i]);
-            }
-        }
-        Return<void> retStatus
-                = radioService[slotId]->mRadioResponse->sendOemRilRequestStringsResponse(
-                responseInfo, data);
-        radioService[slotId]->checkReturnStatus(retStatus);
-    } else {
-        RLOGE("radio::sendOemRilRequestStringsResponse: radioService[%d]->mRadioResponse == NULL",
-                slotId);
     }
 
     return 0;
@@ -3465,7 +3472,7 @@ int radio::sendScreenStateResponse(android::Parcel &p, int slotId, int requestNu
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendScreenStateResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendScreenStateResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3484,7 +3491,7 @@ int radio::setSuppServiceNotificationsResponse(android::Parcel &p, int slotId, i
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setSuppServiceNotificationsResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setSuppServiceNotificationsResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -3503,7 +3510,7 @@ int radio::deleteSmsOnSimResponse(android::Parcel &p, int slotId, int requestNum
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->deleteSmsOnSimResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::deleteSmsOnSimResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3521,7 +3528,7 @@ int radio::setBandModeResponse(android::Parcel &p, int slotId, int requestNumber
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setBandModeResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setBandModeResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3539,7 +3546,7 @@ int radio::writeSmsToSimResponse(android::Parcel &p, int slotId, int requestNumb
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->writeSmsToSimResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::writeSmsToSimResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3570,7 +3577,7 @@ int radio::getAvailableBandModesResponse(android::Parcel &p, int slotId, int req
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getAvailableBandModesResponse(responseInfo,
                 modes);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getAvailableBandModesResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3590,7 +3597,7 @@ int radio::sendEnvelopeResponse(android::Parcel &p, int slotId, int requestNumbe
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendEnvelopeResponse(responseInfo,
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendEnvelopeResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3609,7 +3616,7 @@ int radio::sendTerminalResponseToSimResponse(android::Parcel &p, int slotId, int
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendTerminalResponseToSimResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendTerminalResponseToSimResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3630,7 +3637,7 @@ int radio::handleStkCallSetupRequestFromSimResponse(android::Parcel &p, int slot
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->handleStkCallSetupRequestFromSimResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::handleStkCallSetupRequestFromSimResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -3649,7 +3656,7 @@ int radio::explicitCallTransferResponse(android::Parcel &p, int slotId, int requ
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->explicitCallTransferResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::explicitCallTransferResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3669,7 +3676,7 @@ int radio::setPreferredNetworkTypeResponse(android::Parcel &p, int slotId, int r
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setPreferredNetworkTypeResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setPreferredNetworkTypeResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3690,7 +3697,7 @@ int radio::getPreferredNetworkTypeResponse(android::Parcel &p, int slotId, int r
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getPreferredNetworkTypeResponse(
                 responseInfo, (PreferredNetworkType) ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getPreferredNetworkTypeResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3725,7 +3732,7 @@ int radio::getNeighboringCidsResponse(android::Parcel &p, int slotId, int reques
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getNeighboringCidsResponse(responseInfo,
                 cells);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getNeighboringCidsResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3744,7 +3751,7 @@ int radio::setLocationUpdatesResponse(android::Parcel &p, int slotId, int reques
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setLocationUpdatesResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setLocationUpdatesResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3764,7 +3771,7 @@ int radio::setCdmaSubscriptionSourceResponse(android::Parcel &p, int slotId, int
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setCdmaSubscriptionSourceResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setCdmaSubscriptionSourceResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3784,7 +3791,7 @@ int radio::setCdmaRoamingPreferenceResponse(android::Parcel &p, int slotId, int 
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setCdmaRoamingPreferenceResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setCdmaRoamingPreferenceResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3804,7 +3811,7 @@ int radio::getCdmaRoamingPreferenceResponse(android::Parcel &p, int slotId, int 
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getCdmaRoamingPreferenceResponse(
                 responseInfo, (CdmaRoamingType) ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getCdmaRoamingPreferenceResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3823,7 +3830,7 @@ int radio::setTTYModeResponse(android::Parcel &p, int slotId, int requestNumber,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setTTYModeResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setTTYModeResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3842,7 +3849,7 @@ int radio::getTTYModeResponse(android::Parcel &p, int slotId, int requestNumber,
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getTTYModeResponse(responseInfo,
                 (TtyMode) ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getTTYModeResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3861,7 +3868,7 @@ int radio::setPreferredVoicePrivacyResponse(android::Parcel &p, int slotId, int 
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setPreferredVoicePrivacyResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setPreferredVoicePrivacyResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3890,7 +3897,7 @@ int radio::getPreferredVoicePrivacyResponse(android::Parcel &p, int slotId, int 
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getPreferredVoicePrivacyResponse(
                 responseInfo, enable);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getPreferredVoicePrivacyResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3909,7 +3916,7 @@ int radio::sendCDMAFeatureCodeResponse(android::Parcel &p, int slotId, int reque
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendCDMAFeatureCodeResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendCDMAFeatureCodeResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -3928,7 +3935,7 @@ int radio::sendBurstDtmfResponse(android::Parcel &p, int slotId, int requestNumb
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendBurstDtmfResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendBurstDtmfResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3948,7 +3955,7 @@ int radio::sendCdmaSmsResponse(android::Parcel &p, int slotId, int requestNumber
 
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendCdmaSmsResponse(responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendCdmaSmsResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -3967,7 +3974,7 @@ int radio::acknowledgeLastIncomingCdmaSmsResponse(android::Parcel &p, int slotId
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->acknowledgeLastIncomingCdmaSmsResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::acknowledgeLastIncomingCdmaSmsResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -4006,7 +4013,7 @@ int radio::getGsmBroadcastConfigResponse(android::Parcel &p, int slotId, int req
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getGsmBroadcastConfigResponse(responseInfo,
                 configs);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getGsmBroadcastConfigResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4025,7 +4032,7 @@ int radio::setGsmBroadcastConfigResponse(android::Parcel &p, int slotId, int req
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setGsmBroadcastConfigResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setGsmBroadcastConfigResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4045,7 +4052,7 @@ int radio::setGsmBroadcastActivationResponse(android::Parcel &p, int slotId, int
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setGsmBroadcastActivationResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setGsmBroadcastActivationResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4082,7 +4089,7 @@ int radio::getCdmaBroadcastConfigResponse(android::Parcel &p, int slotId, int re
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getCdmaBroadcastConfigResponse(responseInfo,
                 configs);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getCdmaBroadcastConfigResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4102,7 +4109,7 @@ int radio::setCdmaBroadcastConfigResponse(android::Parcel &p, int slotId, int re
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setCdmaBroadcastConfigResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setCdmaBroadcastConfigResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4122,7 +4129,7 @@ int radio::setCdmaBroadcastActivationResponse(android::Parcel &p, int slotId, in
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setCdmaBroadcastActivationResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setCdmaBroadcastActivationResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4148,7 +4155,7 @@ int radio::getCDMASubscriptionResponse(android::Parcel &p, int slotId, int reque
             Return<void> retStatus
                     = radioService[slotId]->mRadioResponse->getCDMASubscriptionResponse(
                     responseInfo, emptyString, emptyString, emptyString, emptyString, emptyString);
-            radioService[slotId]->checkReturnStatus(retStatus);
+            radioService[slotId]->checkReturnStatus(slotId, retStatus);
         } else {
             char **resp = (char **) response;
             Return<void> retStatus
@@ -4159,7 +4166,7 @@ int radio::getCDMASubscriptionResponse(android::Parcel &p, int slotId, int reque
                     convertCharPtrToHidlString(resp[2]),
                     convertCharPtrToHidlString(resp[3]),
                     convertCharPtrToHidlString(resp[4]));
-            radioService[slotId]->checkReturnStatus(retStatus);
+            radioService[slotId]->checkReturnStatus(slotId, retStatus);
         }
     } else {
         RLOGE("radio::getCDMASubscriptionResponse: radioService[%d]->mRadioResponse == NULL",
@@ -4179,7 +4186,7 @@ int radio::writeSmsToRuimResponse(android::Parcel &p, int slotId, int requestNum
         int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->writeSmsToRuimResponse(responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::writeSmsToRuimResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4197,7 +4204,7 @@ int radio::deleteSmsOnRuimResponse(android::Parcel &p, int slotId, int requestNu
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->deleteSmsOnRuimResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::deleteSmsOnRuimResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4222,7 +4229,7 @@ int radio::getDeviceIdentityResponse(android::Parcel &p, int slotId, int request
             Return<void> retStatus
                     = radioService[slotId]->mRadioResponse->getDeviceIdentityResponse(responseInfo,
                     emptyString, emptyString, emptyString, emptyString);
-            radioService[slotId]->checkReturnStatus(retStatus);
+            radioService[slotId]->checkReturnStatus(slotId, retStatus);
         } else {
             char **resp = (char **) response;
             Return<void> retStatus
@@ -4231,7 +4238,7 @@ int radio::getDeviceIdentityResponse(android::Parcel &p, int slotId, int request
                     convertCharPtrToHidlString(resp[1]),
                     convertCharPtrToHidlString(resp[2]),
                     convertCharPtrToHidlString(resp[3]));
-            radioService[slotId]->checkReturnStatus(retStatus);
+            radioService[slotId]->checkReturnStatus(slotId, retStatus);
         }
     } else {
         RLOGE("radio::getDeviceIdentityResponse: radioService[%d]->mRadioResponse == NULL",
@@ -4252,7 +4259,7 @@ int radio::exitEmergencyCallbackModeResponse(android::Parcel &p, int slotId, int
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->exitEmergencyCallbackModeResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::exitEmergencyCallbackModeResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4272,7 +4279,7 @@ int radio::getSmscAddressResponse(android::Parcel &p, int slotId, int requestNum
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getSmscAddressResponse(responseInfo,
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getSmscAddressResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4290,7 +4297,7 @@ int radio::setSmscAddressResponse(android::Parcel &p, int slotId, int requestNum
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setSmscAddressResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setSmscAddressResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4308,7 +4315,7 @@ int radio::reportSmsMemoryStatusResponse(android::Parcel &p, int slotId, int req
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->reportSmsMemoryStatusResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::reportSmsMemoryStatusResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4327,7 +4334,7 @@ int radio::reportStkServiceIsRunningResponse(android::Parcel &p, int slotId, int
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->
                 reportStkServiceIsRunningResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::reportStkServiceIsRunningResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4347,7 +4354,7 @@ int radio::getCdmaSubscriptionSourceResponse(android::Parcel &p, int slotId, int
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getCdmaSubscriptionSourceResponse(
                 responseInfo, (CdmaSubscriptionSource) ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getCdmaSubscriptionSourceResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4368,7 +4375,7 @@ int radio::requestIsimAuthenticationResponse(android::Parcel &p, int slotId, int
                 = radioService[slotId]->mRadioResponse->requestIsimAuthenticationResponse(
                 responseInfo,
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::requestIsimAuthenticationResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4389,7 +4396,7 @@ int radio::acknowledgeIncomingGsmSmsWithPduResponse(android::Parcel &p, int slot
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->acknowledgeIncomingGsmSmsWithPduResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::acknowledgeIncomingGsmSmsWithPduResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -4411,7 +4418,7 @@ int radio::sendEnvelopeWithStatusResponse(android::Parcel &p, int slotId, int re
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendEnvelopeWithStatusResponse(responseInfo,
                 result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendEnvelopeWithStatusResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4431,7 +4438,7 @@ int radio::getVoiceRadioTechnologyResponse(android::Parcel &p, int slotId, int r
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getVoiceRadioTechnologyResponse(
                 responseInfo, (RadioTechnology) ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getVoiceRadioTechnologyResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4460,7 +4467,7 @@ int radio::getCellInfoListResponse(android::Parcel &p, int slotId,
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getCellInfoListResponse(
                 responseInfo, ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getCellInfoListResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4479,7 +4486,7 @@ int radio::setCellInfoListRateResponse(android::Parcel &p, int slotId,
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setCellInfoListRateResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setCellInfoListRateResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4498,7 +4505,7 @@ int radio::setInitialAttachApnResponse(android::Parcel &p, int slotId, int reque
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setInitialAttachApnResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setInitialAttachApnResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4529,7 +4536,7 @@ int radio::getImsRegistrationStateResponse(android::Parcel &p, int slotId, int r
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getImsRegistrationStateResponse(
                 responseInfo, isRegistered, (RadioTechnologyFamily) ratFamily);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getImsRegistrationStateResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4550,7 +4557,7 @@ int radio::sendImsSmsResponse(android::Parcel &p, int slotId, int requestNumber,
 
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->sendImsSmsResponse(responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::sendSmsResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4571,7 +4578,7 @@ int radio::iccTransmitApduBasicChannelResponse(android::Parcel &p, int slotId, i
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->iccTransmitApduBasicChannelResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::iccTransmitApduBasicChannelResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -4605,7 +4612,7 @@ int radio::iccOpenLogicalChannelResponse(android::Parcel &p, int slotId, int req
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->iccOpenLogicalChannelResponse(responseInfo,
                 channelId, selectResponse);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::iccOpenLogicalChannelResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4625,7 +4632,7 @@ int radio::iccCloseLogicalChannelResponse(android::Parcel &p, int slotId, int re
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->iccCloseLogicalChannelResponse(
                 responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::iccCloseLogicalChannelResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4647,7 +4654,7 @@ int radio::iccTransmitApduLogicalChannelResponse(android::Parcel &p, int slotId,
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->iccTransmitApduLogicalChannelResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::iccTransmitApduLogicalChannelResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -4667,7 +4674,7 @@ int radio::nvReadItemResponse(android::Parcel &p, int slotId, int requestNumber,
         Return<void> retStatus = radioService[slotId]->mRadioResponse->nvReadItemResponse(
                 responseInfo,
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::nvReadItemResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4685,7 +4692,7 @@ int radio::nvWriteItemResponse(android::Parcel &p, int slotId, int requestNumber
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->nvWriteItemResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::nvWriteItemResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4703,7 +4710,7 @@ int radio::nvWriteCdmaPrlResponse(android::Parcel &p, int slotId, int requestNum
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->nvWriteCdmaPrlResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::nvWriteCdmaPrlResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4721,7 +4728,7 @@ int radio::nvResetConfigResponse(android::Parcel &p, int slotId, int requestNumb
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->nvResetConfigResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::nvResetConfigResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4739,7 +4746,7 @@ int radio::setUiccSubscriptionResponse(android::Parcel &p, int slotId, int reque
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setUiccSubscriptionResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setUiccSubscriptionResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -4758,7 +4765,7 @@ int radio::setDataAllowedResponse(android::Parcel &p, int slotId, int requestNum
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setDataAllowedResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setDataAllowedResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4785,7 +4792,7 @@ int radio::getHardwareConfigResponse(android::Parcel &p, int slotId, int request
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getHardwareConfigResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getHardwareConfigResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4806,7 +4813,7 @@ int radio::requestIccSimAuthenticationResponse(android::Parcel &p, int slotId, i
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->requestIccSimAuthenticationResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::requestIccSimAuthenticationResponse: radioService[%d]->mRadioResponse "
                 "== NULL", slotId);
@@ -4825,7 +4832,7 @@ int radio::setDataProfileResponse(android::Parcel &p, int slotId, int requestNum
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setDataProfileResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setDataProfileResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4843,7 +4850,7 @@ int radio::requestShutdownResponse(android::Parcel &p, int slotId, int requestNu
         populateResponseInfo(responseInfo, serial, responseType, e);
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->requestShutdownResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::requestShutdownResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4876,7 +4883,7 @@ int radio::getRadioCapabilityResponse(android::Parcel &p, int slotId, int reques
                 result);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getRadioCapabilityResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getRadioCapabilityResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4896,7 +4903,7 @@ int radio::setRadioCapabilityResponse(android::Parcel &p, int slotId, int reques
                 result);
         Return<void> retStatus = radioService[slotId]->mRadioResponse->setRadioCapabilityResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setRadioCapabilityResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4933,7 +4940,7 @@ int radio::startLceServiceResponse(android::Parcel &p, int slotId, int requestNu
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->startLceServiceResponse(responseInfo,
                 result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::startLceServiceResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4954,7 +4961,7 @@ int radio::stopLceServiceResponse(android::Parcel &p, int slotId, int requestNum
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->stopLceServiceResponse(responseInfo,
                 result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::stopLceServiceResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -4981,7 +4988,7 @@ int radio::pullLceDataResponse(android::Parcel &p, int slotId, int requestNumber
 
         Return<void> retStatus = radioService[slotId]->mRadioResponse->pullLceDataResponse(
                 responseInfo, result);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::pullLceDataResponse: radioService[%d]->mRadioResponse == NULL", slotId);
     }
@@ -5014,7 +5021,7 @@ int radio::getModemActivityInfoResponse(android::Parcel &p, int slotId, int requ
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getModemActivityInfoResponse(responseInfo,
                 info);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getModemActivityInfoResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -5034,7 +5041,7 @@ int radio::setAllowedCarriersResponse(android::Parcel &p, int slotId, int reques
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->setAllowedCarriersResponse(responseInfo,
                 ret);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::setAllowedCarriersResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -5086,7 +5093,7 @@ int radio::getAllowedCarriersResponse(android::Parcel &p, int slotId, int reques
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getAllowedCarriersResponse(responseInfo,
                 allAllowed, carrierInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::getAllowedCarriersResponse: radioService[%d]->mRadioResponse == NULL",
                 slotId);
@@ -5107,7 +5114,7 @@ void radio::radioStateChangedInd(int slotId, int indicationType, RIL_RadioState 
         RLOGD("radio::radioStateChangedInd: radioState %d", radioState);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->radioStateChanged(
                 convertIntToRadioIndicationType(indicationType), (RadioState) radioState);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::radioStateChangedInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5120,7 +5127,7 @@ int radio::callStateChangedInd(android::Parcel &p, int slotId, int requestNumber
         RLOGD("radio::callStateChangedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->callStateChanged(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::callStateChangedInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5135,7 +5142,7 @@ int radio::networkStateChangedInd(android::Parcel &p, int slotId, int requestNum
         RLOGD("radio::networkStateChangedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->networkStateChanged(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::networkStateChangedInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -5199,7 +5206,7 @@ int radio::newSmsInd(android::Parcel &p, int slotId, int requestNumber, int indi
         RLOGD("radio::newSmsInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->newSms(
                 convertIntToRadioIndicationType(indicationType), pdu);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
         free(bytes);
     } else {
         RLOGE("radio::newSmsInd: radioService[%d]->mRadioIndication == NULL", slotId);
@@ -5228,7 +5235,7 @@ int radio::newSmsStatusReportInd(android::Parcel &p, int slotId, int requestNumb
         RLOGD("radio::newSmsStatusReportInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->newSmsStatusReport(
                 convertIntToRadioIndicationType(indicationType), pdu);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
         free(bytes);
     } else {
         RLOGE("radio::newSmsStatusReportInd: radioService[%d]->mRadioIndication == NULL", slotId);
@@ -5248,7 +5255,7 @@ int radio::newSmsOnSimInd(android::Parcel &p, int slotId, int requestNumber, int
         RLOGD("radio::newSmsOnSimInd: slotIndex %d", recordNumber);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->newSmsOnSim(
                 convertIntToRadioIndicationType(indicationType), recordNumber);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::newSmsOnSimInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5270,7 +5277,7 @@ int radio::onUssdInd(android::Parcel &p, int slotId, int requestNumber, int indi
         RLOGD("radio::onUssdInd: mode %s", mode);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->onUssd(
                 convertIntToRadioIndicationType(indicationType), modeType, msg);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::onUssdInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5292,7 +5299,7 @@ int radio::nitzTimeReceivedInd(android::Parcel &p, int slotId, int requestNumber
                 timeReceived);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->nitzTimeReceived(
                 convertIntToRadioIndicationType(indicationType), nitzTime, timeReceived);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::nitzTimeReceivedInd: radioService[%d]->mRadioIndication == NULL", slotId);
         return -1;
@@ -5359,7 +5366,7 @@ int radio::currentSignalStrengthInd(android::Parcel &p, int slotId, int requestN
         RLOGD("radio::currentSignalStrengthInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->currentSignalStrength(
                 convertIntToRadioIndicationType(indicationType), signalStrength);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::currentSignalStrengthInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -5407,7 +5414,7 @@ int radio::dataCallListChangedInd(android::Parcel &p, int slotId, int requestNum
         RLOGD("radio::dataCallListChangedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->dataCallListChanged(
                 convertIntToRadioIndicationType(indicationType), dcList);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::dataCallListChangedInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5435,7 +5442,7 @@ int radio::suppSvcNotifyInd(android::Parcel &p, int slotId, int requestNumber, i
                 suppSvc.isMT, suppSvc.code, suppSvc.index, suppSvc.type);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->suppSvcNotify(
                 convertIntToRadioIndicationType(indicationType), suppSvc);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::suppSvcNotifyInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5449,7 +5456,7 @@ int radio::stkSessionEndInd(android::Parcel &p, int slotId, int requestNumber, i
         RLOGD("radio::stkSessionEndInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->stkSessionEnd(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::stkSessionEndInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5469,7 +5476,7 @@ int radio::stkProactiveCommandInd(android::Parcel &p, int slotId, int requestNum
         Return<void> retStatus = radioService[slotId]->mRadioIndication->stkProactiveCommand(
                 convertIntToRadioIndicationType(indicationType),
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::stkProactiveCommandInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5488,7 +5495,7 @@ int radio::stkEventNotifyInd(android::Parcel &p, int slotId, int requestNumber, 
         Return<void> retStatus = radioService[slotId]->mRadioIndication->stkEventNotify(
                 convertIntToRadioIndicationType(indicationType),
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::stkEventNotifyInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5507,7 +5514,7 @@ int radio::stkCallSetupInd(android::Parcel &p, int slotId, int requestNumber, in
         RLOGD("radio::stkCallSetupInd: timeout %d", timeout);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->stkCallSetup(
                 convertIntToRadioIndicationType(indicationType), timeout);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::stkCallSetupInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5522,7 +5529,7 @@ int radio::simSmsStorageFullInd(android::Parcel &p, int slotId, int requestNumbe
         RLOGD("radio::simSmsStorageFullInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->simSmsStorageFull(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::simSmsStorageFullInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5548,7 +5555,7 @@ int radio::simRefreshInd(android::Parcel &p, int slotId, int requestNumber, int 
         RLOGD("radio::simRefreshInd: type %d efId %d", refreshResult.type, refreshResult.efId);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->simRefresh(
                 convertIntToRadioIndicationType(indicationType), refreshResult);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::simRefreshInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5583,7 +5590,7 @@ int radio::callRingInd(android::Parcel &p, int slotId, int requestNumber, int in
         RLOGD("radio::callRingInd: isGsm %d", isGsm);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->callRing(
                 convertIntToRadioIndicationType(indicationType), isGsm, record);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::callRingInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5598,7 +5605,7 @@ int radio::simStatusChangedInd(android::Parcel &p, int slotId, int requestNumber
         RLOGD("radio::simStatusChangedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->simStatusChanged(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::simStatusChangedInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5644,7 +5651,7 @@ int radio::cdmaNewSmsInd(android::Parcel &p, int slotId, int requestNumber, int 
         RLOGD("radio::cdmaNewSmsInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->cdmaNewSms(
                 convertIntToRadioIndicationType(indicationType), msg);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cdmaNewSmsInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5666,7 +5673,7 @@ int radio::newBroadcastSmsInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::newBroadcastSmsInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->newBroadcastSms(
                 convertIntToRadioIndicationType(indicationType), data);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::newBroadcastSmsInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5681,7 +5688,7 @@ int radio::cdmaRuimSmsStorageFullInd(android::Parcel &p, int slotId, int request
         RLOGD("radio::cdmaRuimSmsStorageFullInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->cdmaRuimSmsStorageFull(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cdmaRuimSmsStorageFullInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -5702,7 +5709,7 @@ int radio::restrictedStateChangedInd(android::Parcel &p, int slotId, int request
         RLOGD("radio::restrictedStateChangedInd: state %d", state);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->restrictedStateChanged(
                 convertIntToRadioIndicationType(indicationType), (PhoneRestrictedState) state);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::restrictedStateChangedInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -5718,7 +5725,7 @@ int radio::enterEmergencyCallbackModeInd(android::Parcel &p, int slotId, int req
         RLOGD("radio::enterEmergencyCallbackModeInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->enterEmergencyCallbackMode(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::enterEmergencyCallbackModeInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -5750,7 +5757,7 @@ int radio::cdmaCallWaitingInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::cdmaCallWaitingInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->cdmaCallWaiting(
                 convertIntToRadioIndicationType(indicationType), callWaitingRecord);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cdmaCallWaitingInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5770,7 +5777,7 @@ int radio::cdmaOtaProvisionStatusInd(android::Parcel &p, int slotId, int request
         RLOGD("radio::cdmaOtaProvisionStatusInd: status %d", status);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->cdmaOtaProvisionStatus(
                 convertIntToRadioIndicationType(indicationType), (CdmaOtaProvisionStatus) status);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cdmaOtaProvisionStatusInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -5947,7 +5954,7 @@ int radio::cdmaInfoRecInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::cdmaInfoRecInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->cdmaInfoRec(
                 convertIntToRadioIndicationType(indicationType), records);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cdmaInfoRecInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -5958,7 +5965,7 @@ int radio::cdmaInfoRecInd(android::Parcel &p, int slotId, int requestNumber,
 int radio::oemHookRawInd(android::Parcel &p, int slotId, int requestNumber,
                          int indicationType, int token, RIL_Errno e, void *response,
                          size_t responseLen) {
-    if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndication != NULL) {
+    if (oemHookService[slotId] != NULL && oemHookService[slotId]->mOemHookIndication != NULL) {
         if (response == NULL || responseLen == 0) {
             RLOGE("radio::oemHookRawInd: invalid response");
             return 0;
@@ -5967,11 +5974,11 @@ int radio::oemHookRawInd(android::Parcel &p, int slotId, int requestNumber,
         hidl_vec<uint8_t> data;
         data.setToExternal((uint8_t *) response, responseLen);
         RLOGD("radio::oemHookRawInd");
-        Return<void> retStatus = radioService[slotId]->mRadioIndication->oemHookRaw(
+        Return<void> retStatus = oemHookService[slotId]->mOemHookIndication->oemHookRaw(
                 convertIntToRadioIndicationType(indicationType), data);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        checkReturnStatus(slotId, retStatus);
     } else {
-        RLOGE("radio::oemHookRawInd: radioService[%d]->mRadioIndication == NULL", slotId);
+        RLOGE("radio::oemHookRawInd: oemHookService[%d]->mOemHookIndication == NULL", slotId);
     }
 
     return 0;
@@ -5989,7 +5996,7 @@ int radio::indicateRingbackToneInd(android::Parcel &p, int slotId, int requestNu
         RLOGD("radio::indicateRingbackToneInd: start %d", start);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->indicateRingbackTone(
                 convertIntToRadioIndicationType(indicationType), start);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::indicateRingbackToneInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6004,7 +6011,7 @@ int radio::resendIncallMuteInd(android::Parcel &p, int slotId, int requestNumber
         RLOGD("radio::resendIncallMuteInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->resendIncallMute(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::resendIncallMuteInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6025,7 +6032,7 @@ int radio::cdmaSubscriptionSourceChangedInd(android::Parcel &p, int slotId, int 
         Return<void> retStatus = radioService[slotId]->mRadioIndication->
                 cdmaSubscriptionSourceChanged(convertIntToRadioIndicationType(indicationType),
                 (CdmaSubscriptionSource) cdmaSource);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cdmaSubscriptionSourceChangedInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6046,7 +6053,7 @@ int radio::cdmaPrlChangedInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::cdmaPrlChangedInd: version %d", version);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->cdmaPrlChanged(
                 convertIntToRadioIndicationType(indicationType), version);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cdmaPrlChangedInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6061,7 +6068,7 @@ int radio::exitEmergencyCallbackModeInd(android::Parcel &p, int slotId, int requ
         RLOGD("radio::exitEmergencyCallbackModeInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->exitEmergencyCallbackMode(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::exitEmergencyCallbackModeInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6077,7 +6084,7 @@ int radio::rilConnectedInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::rilConnectedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->rilConnected(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::rilConnectedInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6097,7 +6104,7 @@ int radio::voiceRadioTechChangedInd(android::Parcel &p, int slotId, int requestN
         RLOGD("radio::voiceRadioTechChangedInd: rat %d", rat);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->voiceRadioTechChanged(
                 convertIntToRadioIndicationType(indicationType), (RadioTechnology) rat);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::voiceRadioTechChangedInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6263,7 +6270,7 @@ int radio::cellInfoListInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::cellInfoListInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->cellInfoList(
                 convertIntToRadioIndicationType(indicationType), records);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::cellInfoListInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6278,7 +6285,7 @@ int radio::imsNetworkStateChangedInd(android::Parcel &p, int slotId, int request
         RLOGD("radio::imsNetworkStateChangedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->imsNetworkStateChanged(
                 convertIntToRadioIndicationType(indicationType));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::imsNetworkStateChangedInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6299,7 +6306,7 @@ int radio::subscriptionStatusChangedInd(android::Parcel &p, int slotId, int requ
         RLOGD("radio::subscriptionStatusChangedInd: activate %d", activate);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->subscriptionStatusChanged(
                 convertIntToRadioIndicationType(indicationType), activate);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::subscriptionStatusChangedInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6320,7 +6327,7 @@ int radio::srvccStateNotifyInd(android::Parcel &p, int slotId, int requestNumber
         RLOGD("radio::srvccStateNotifyInd: rat %d", state);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->srvccStateNotify(
                 convertIntToRadioIndicationType(indicationType), (SrvccState) state);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::srvccStateNotifyInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6376,7 +6383,7 @@ int radio::hardwareConfigChangedInd(android::Parcel &p, int slotId, int requestN
         RLOGD("radio::hardwareConfigChangedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->hardwareConfigChanged(
                 convertIntToRadioIndicationType(indicationType), configs);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::hardwareConfigChangedInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6409,7 +6416,7 @@ int radio::radioCapabilityIndicationInd(android::Parcel &p, int slotId, int requ
         RLOGD("radio::radioCapabilityIndicationInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->radioCapabilityIndication(
                 convertIntToRadioIndicationType(indicationType), rc);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::radioCapabilityIndicationInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6494,7 +6501,7 @@ int radio::onSupplementaryServiceIndicationInd(android::Parcel &p, int slotId, i
         Return<void> retStatus = radioService[slotId]->mRadioIndication->
                 onSupplementaryServiceIndication(convertIntToRadioIndicationType(indicationType),
                 ss);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::onSupplementaryServiceIndicationInd: "
                 "radioService[%d]->mRadioIndication == NULL", slotId);
@@ -6515,7 +6522,7 @@ int radio::stkCallControlAlphaNotifyInd(android::Parcel &p, int slotId, int requ
         Return<void> retStatus = radioService[slotId]->mRadioIndication->stkCallControlAlphaNotify(
                 convertIntToRadioIndicationType(indicationType),
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::stkCallControlAlphaNotifyInd: radioService[%d]->mRadioIndication == NULL",
                 slotId);
@@ -6545,7 +6552,7 @@ int radio::lceDataInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::lceDataInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->lceData(
                 convertIntToRadioIndicationType(indicationType), lce);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::lceDataInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6572,7 +6579,7 @@ int radio::pcoDataInd(android::Parcel &p, int slotId, int requestNumber,
         RLOGD("radio::pcoDataInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->pcoData(
                 convertIntToRadioIndicationType(indicationType), pco);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::pcoDataInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
@@ -6592,9 +6599,69 @@ int radio::modemResetInd(android::Parcel &p, int slotId, int requestNumber,
         Return<void> retStatus = radioService[slotId]->mRadioIndication->modemReset(
                 convertIntToRadioIndicationType(indicationType),
                 convertCharPtrToHidlString((char *) response));
-        radioService[slotId]->checkReturnStatus(retStatus);
+        radioService[slotId]->checkReturnStatus(slotId, retStatus);
     } else {
         RLOGE("radio::modemResetInd: radioService[%d]->mRadioIndication == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::sendRequestRawResponse(android::Parcel &p, int slotId, int requestNumber,
+                                  int responseType, int serial, RIL_Errno e,
+                                  void *response, size_t responseLen) {
+   RLOGD("radio::sendRequestRawResponse: serial %d", serial);
+
+    if (oemHookService[slotId]->mOemHookResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        hidl_vec<uint8_t> data;
+
+        if (response == NULL) {
+            RLOGE("radio::sendRequestRawResponse: Invalid response");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            data.setToExternal((uint8_t *) response, responseLen);
+        }
+        Return<void> retStatus = oemHookService[slotId]->mOemHookResponse->
+                sendRequestRawResponse(responseInfo, data);
+        checkReturnStatus(slotId, retStatus);
+    } else {
+        RLOGE("radio::sendRequestRawResponse: oemHookService[%d]->mOemHookResponse == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
+int radio::sendRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
+                                      int responseType, int serial, RIL_Errno e,
+                                      void *response, size_t responseLen) {
+    RLOGD("radio::sendRequestStringsResponse: serial %d", serial);
+
+    if (oemHookService[slotId]->mOemHookResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        hidl_vec<hidl_string> data;
+
+        if (response == NULL || responseLen % sizeof(char *) != 0) {
+            RLOGE("radio::sendRequestStringsResponse Invalid response: NULL");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            char **resp = (char **) response;
+            int numStrings = responseLen / sizeof(char *);
+            data.resize(numStrings);
+            for (int i = 0; i < numStrings; i++) {
+                data[i] = convertCharPtrToHidlString(resp[i]);
+            }
+        }
+        Return<void> retStatus
+                = oemHookService[slotId]->mOemHookResponse->sendRequestStringsResponse(
+                responseInfo, data);
+        checkReturnStatus(slotId, retStatus);
+    } else {
+        RLOGE("radio::sendRequestStringsResponse: oemHookService[%d]->mOemHookResponse == "
+                "NULL", slotId);
     }
 
     return 0;
@@ -6603,7 +6670,7 @@ int radio::modemResetInd(android::Parcel &p, int slotId, int requestNumber,
 void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands) {
     using namespace android::hardware;
     int simCount = 1;
-    char *serviceNames[] = {
+    const char *serviceNames[] = {
             android::RIL_getRilSocketName()
             #if (SIM_COUNT >= 2)
             , SOCKET2_NAME_RIL
@@ -6611,6 +6678,19 @@ void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands
             , SOCKET3_NAME_RIL
             #if (SIM_COUNT >= 4)
             , SOCKET4_NAME_RIL
+            #endif
+            #endif
+            #endif
+            };
+
+    const char *oemHookServiceNames[] = {
+            OEM_HOOK_SERVICE_NAME
+            #if (SIM_COUNT >= 2)
+            , OEM_HOOK2_SERVICE_NAME
+            #if (SIM_COUNT >= 3)
+            , OEM_HOOK3_SERVICE_NAME
+            #if (SIM_COUNT >= 4)
+            , OEM_HOOK4_SERVICE_NAME
             #endif
             #endif
             #endif
@@ -6628,8 +6708,11 @@ void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands
 
         radioService[i] = new RadioImpl;
         radioService[i]->mSlotId = i;
+        oemHookService[i] = new OemHookImpl;
+        oemHookService[i]->mSlotId = i;
         RLOGD("radio::registerService: starting IRadio %s", serviceNames[i]);
         android::status_t status = radioService[i]->registerAsService(serviceNames[i]);
+        status = oemHookService[i]->registerAsService(oemHookServiceNames[i]);
 
         ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
         assert(ret == 0);
