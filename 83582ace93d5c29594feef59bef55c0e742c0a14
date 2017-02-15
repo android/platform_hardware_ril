@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "57a8c6a7_0f994096",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1662,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-02-15T00:38:41Z",
+      "side": 1,
+      "message": "do we need this comment and extra line ? This sets it apart from rest of the code in this file.",
+      "range": {
+        "startLine": 1661,
+        "startChar": 0,
+        "endLine": 1662,
+        "endChar": 14
+      },
+      "revId": "83582ace93d5c29594feef59bef55c0e742c0a14",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd58aa1f_d160178b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2233,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-02-15T00:38:41Z",
+      "side": 1,
+      "message": "you can use function memsetAndFreeStrings() here and other places in the file.",
+      "range": {
+        "startLine": 2228,
+        "startChar": 0,
+        "endLine": 2233,
+        "endChar": 56
+      },
+      "revId": "83582ace93d5c29594feef59bef55c0e742c0a14",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
