@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e249c624_aacb2074",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-15T18:48:09Z",
+      "side": 1,
+      "message": "I am using radio namespace to separate out service related code. The top level interface is still called radio so I believe this is ok.",
+      "parentUuid": "77322790_2019cd78",
+      "range": {
+        "startLine": 76,
+        "startChar": 44,
+        "endLine": 76,
+        "endChar": 49
+      },
+      "revId": "ec6702042fb18c823b06c0fffe63845dbc5edf76",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df1a64cf_f818bc41",
         "filename": "libril/ril_internal.h",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-02-14T02:34:25Z",
       "side": 1,
       "message": "why does the other side only go to 3?",
+      "range": {
+        "startLine": 32,
+        "startChar": 32,
+        "endLine": 32,
+        "endChar": 40
+      },
+      "revId": "ec6702042fb18c823b06c0fffe63845dbc5edf76",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "83d08290_a234793f",
+        "filename": "libril/ril_internal.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-15T18:48:09Z",
+      "side": 1,
+      "message": "just to keep in line with earlier code, otherwise there\u0027s no need for 4, or for that matter even 3 I guess.",
+      "parentUuid": "df1a64cf_f818bc41",
       "range": {
         "startLine": 32,
         "startChar": 32,
