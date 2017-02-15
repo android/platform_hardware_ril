@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0407eb6b_ec98760a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1662,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-02-15T01:06:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57a8c6a7_0f994096",
+      "range": {
+        "startLine": 1661,
+        "startChar": 0,
+        "endLine": 1662,
+        "endChar": 14
+      },
+      "revId": "83582ace93d5c29594feef59bef55c0e742c0a14",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bd58aa1f_d160178b",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-02-15T00:38:41Z",
       "side": 1,
       "message": "you can use function memsetAndFreeStrings() here and other places in the file.",
+      "range": {
+        "startLine": 2228,
+        "startChar": 0,
+        "endLine": 2233,
+        "endChar": 56
+      },
+      "revId": "83582ace93d5c29594feef59bef55c0e742c0a14",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a9ed8090_22b855e6",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2233,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-02-15T01:06:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd58aa1f_d160178b",
       "range": {
         "startLine": 2228,
         "startChar": 0,
