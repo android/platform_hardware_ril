@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bd0b5a89_da9e3955",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-02-15T01:11:58Z",
+      "side": 0,
+      "message": "we can remove this from ril.cpp",
+      "range": {
+        "startLine": 44,
+        "startChar": 52,
+        "endLine": 44,
+        "endChar": 73
+      },
+      "revId": "640e1ddb6d0d7e0f9f33b15228b5334a76869f57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
