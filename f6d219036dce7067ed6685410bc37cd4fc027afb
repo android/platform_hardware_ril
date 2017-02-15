@@ -22,6 +22,30 @@
       "revId": "f6d219036dce7067ed6685410bc37cd4fc027afb",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5efcb1d1_99c404e1",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-15T21:27:39Z",
+      "side": 1,
+      "message": "Do you mean before if? I don\u0027t think we can do that because dispatchStrings() also does this.",
+      "parentUuid": "58df2b93_33a281d0",
+      "range": {
+        "startLine": 996,
+        "startChar": 8,
+        "endLine": 997,
+        "endChar": 45
+      },
+      "revId": "f6d219036dce7067ed6685410bc37cd4fc027afb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
