@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "58df2b93_33a281d0",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-02-15T20:51:07Z",
+      "side": 1,
+      "message": "we can move this to the top of if condition.",
+      "range": {
+        "startLine": 996,
+        "startChar": 8,
+        "endLine": 997,
+        "endChar": 45
+      },
+      "revId": "f6d219036dce7067ed6685410bc37cd4fc027afb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
