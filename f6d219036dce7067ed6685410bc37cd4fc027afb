@@ -46,6 +46,30 @@
       "revId": "f6d219036dce7067ed6685410bc37cd4fc027afb",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d353a9e5_19401939",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-02-15T21:39:02Z",
+      "side": 1,
+      "message": "Discussed offline with Sanket. Just like what you said we should not move this up.",
+      "parentUuid": "5efcb1d1_99c404e1",
+      "range": {
+        "startLine": 996,
+        "startChar": 8,
+        "endLine": 997,
+        "endChar": 45
+      },
+      "revId": "f6d219036dce7067ed6685410bc37cd4fc027afb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
