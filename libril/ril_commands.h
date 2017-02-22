@@ -152,6 +152,6 @@
     {RIL_REQUEST_GET_ACTIVITY_INFO, dispatchVoid, radio::getModemActivityInfoResponse},
     {RIL_REQUEST_SET_CARRIER_RESTRICTIONS, dispatchCarrierRestrictions, radio::setAllowedCarriersResponse},
     {RIL_REQUEST_GET_CARRIER_RESTRICTIONS, dispatchVoid, radio::getAllowedCarriersResponse},
-    {RIL_REQUEST_SEND_DEVICE_STATE, dispatchVoid, NULL},
-    {RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER, dispatchVoid, NULL},
+    {RIL_REQUEST_SEND_DEVICE_STATE, dispatchInts, radio::sendDeviceStateResponse},
+    {RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER, dispatchInts, radio::setIndicationFilterResponse},
     {RIL_REQUEST_SET_SIM_CARD_POWER, dispatchInts, radio::setSimCardPowerResponse},
