@@ -528,6 +528,14 @@ int getAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
+int sendDeviceStateResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responselen);
+
+int setIndicationFilterResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responselen);
+
 int setSimCardPowerResponse(android::Parcel &p, int slotId, int requestNumber,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
