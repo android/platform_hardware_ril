@@ -438,6 +438,12 @@ void memsetAndFreeStrings(int numPointers, ...) {
     va_end(ap);
 }
 
+void sendErrorResponse(RequestInfo *pRI, RIL_Errno err) {
+    android::Parcel p; // TODO: should delete this after translation of all commands is complete
+    pRI->pCI->responseFunction(p, (int) pRI->socket_id, pRI->pCI->requestNumber,
+            (int) RadioResponseType::SOLICITED, pRI->token, err, NULL, 0);
+}
+
 /**
  * Copies over src to dest. If memory allocation fails, responseFunction() is called for the
  * request with error RIL_E_NO_MEMORY.
@@ -1190,6 +1196,12 @@ Return<void> RadioImpl::sendOemRadioRequestStrings(int32_t serial,
 
 Return<void> RadioImpl::sendScreenState(int32_t serial, bool enable) {
     RLOGD("RadioImpl::sendScreenState: serial %d", serial);
+    // The screen state API is deprecated after v15.
+    if (s_vendorFunctions->version >= 15) {
+        RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_SCREEN_STATE);
+        sendErrorResponse(pRI, RIL_E_REQUEST_NOT_SUPPORTED);
+        return Void();
+    }
     dispatchInts(serial, mSlotId, RIL_REQUEST_SCREEN_STATE, 1, BOOL_TO_INT(enable));
     return Void();
 }
@@ -1978,8 +1990,8 @@ Return<void> RadioImpl::setAllowedCarriers(int32_t serial, bool allAllowed,
     }
 
     RIL_CarrierRestrictions cr = {};
-    RIL_Carrier * allowedCarriers = NULL;
-    RIL_Carrier * excludedCarriers = NULL;
+    RIL_Carrier *allowedCarriers = NULL;
+    RIL_Carrier *excludedCarriers = NULL;
 
     cr.len_allowed_carriers = carriers.allowedCarriers.size();
     allowedCarriers = (RIL_Carrier *)calloc(cr.len_allowed_carriers, sizeof(RIL_Carrier));
@@ -2041,15 +2053,37 @@ Return<void> RadioImpl::getAllowedCarriers(int32_t serial) {
     return Void();
 }
 
+Return<void> RadioImpl::sendDeviceState(int32_t serial, DeviceStateType deviceStateType,
+                                        bool state) {
+    RLOGD("RadioImpl::sendDeviceState: serial %d", serial);
+    if (s_vendorFunctions->version < 15) {
+        RequestInfo *pRI = android::addRequestToList(serial, mSlotId,
+                RIL_REQUEST_SEND_DEVICE_STATE);
+        sendErrorResponse(pRI, RIL_E_REQUEST_NOT_SUPPORTED);
+        return Void();
+    }
+    dispatchInts(serial, mSlotId, RIL_REQUEST_SEND_DEVICE_STATE, 2, (int) deviceStateType,
+            BOOL_TO_INT(state));
+    return Void();
+}
+
+Return<void> RadioImpl::setIndicationFilter(int32_t serial, int32_t indicationFilter) {
+    RLOGD("RadioImpl::setIndicationFilter: serial %d", serial);
+    if (s_vendorFunctions->version < 15) {
+        RequestInfo *pRI = android::addRequestToList(serial, mSlotId,
+                RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER);
+        sendErrorResponse(pRI, RIL_E_REQUEST_NOT_SUPPORTED);
+        return Void();
+    }
+    dispatchInts(serial, mSlotId, RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER, 1, indicationFilter);
+    return Void();
+}
+
 Return<void> RadioImpl::setSimCardPower(int32_t serial, bool powerUp) {
     RLOGD("RadioImpl::setSimCardPower: serial %d", serial);
     dispatchInts(serial, mSlotId, RIL_REQUEST_SET_SIM_CARD_POWER, 1, BOOL_TO_INT(powerUp));
     return Void();
 }
-
-Return<void> RadioImpl::sendDeviceState(int32_t serial, DeviceStateType deviceStateType, bool state) {return Status::ok();}
-
-Return<void> RadioImpl::setIndicationFilter(int32_t serial, int32_t indicationFilter) {return Status::ok();}
 
 Return<void> RadioImpl::responseAcknowledgement() {
     android::releaseWakeLock();
@@ -5102,6 +5136,44 @@ int radio::getAllowedCarriersResponse(android::Parcel &p, int slotId, int reques
 
     return 0;
 }
+
+int radio::sendDeviceStateResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responselen) {
+    RLOGD("radio::sendDeviceStateResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<void> retStatus
+                = radioService[slotId]->mRadioResponse->sendDeviceStateResponse(responseInfo);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::sendDeviceStateResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::setIndicationFilterResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responselen) {
+    RLOGD("radio::setIndicationFilterResponse: serial %d", serial);
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<void> retStatus
+                = radioService[slotId]->mRadioResponse->setIndicationFilterResponse(responseInfo);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("radio::setIndicationFilterResponse: radioService[%d]->mRadioResponse == NULL",
+                slotId);
+    }
+
+    return 0;
+}
+
 
 int radio::setSimCardPowerResponse(android::Parcel &p, int slotId, int requestNumber,
                                    int responseType, int serial, RIL_Errno e,
