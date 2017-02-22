@@ -75,7 +75,7 @@
     {RIL_REQUEST_RESET_RADIO, dispatchVoid, responseVoid},
     {RIL_REQUEST_OEM_HOOK_RAW, dispatchRaw, radio::sendRequestRawResponse},
     {RIL_REQUEST_OEM_HOOK_STRINGS, dispatchStrings, radio::sendRequestStringsResponse},
-    {RIL_REQUEST_SCREEN_STATE, dispatchInts, radio::sendScreenStateResponse},
+    {RIL_REQUEST_SCREEN_STATE, dispatchInts, radio::sendDeviceStateResponse},   // Note the response function is different.
     {RIL_REQUEST_SET_SUPP_SVC_NOTIFICATION, dispatchInts, radio::setSuppServiceNotificationsResponse},
     {RIL_REQUEST_WRITE_SMS_TO_SIM, dispatchSmsWrite, radio::writeSmsToSimResponse},
     {RIL_REQUEST_DELETE_SMS_ON_SIM, dispatchInts, radio::deleteSmsOnSimResponse},
@@ -152,6 +152,6 @@
     {RIL_REQUEST_GET_ACTIVITY_INFO, dispatchVoid, radio::getModemActivityInfoResponse},
     {RIL_REQUEST_SET_CARRIER_RESTRICTIONS, dispatchCarrierRestrictions, radio::setAllowedCarriersResponse},
     {RIL_REQUEST_GET_CARRIER_RESTRICTIONS, dispatchVoid, radio::getAllowedCarriersResponse},
-    {RIL_REQUEST_SEND_DEVICE_STATE, dispatchVoid, NULL},
-    {RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER, dispatchVoid, NULL},
+    {RIL_REQUEST_SEND_DEVICE_STATE, dispatchInts, radio::sendDeviceStateResponse},
+    {RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER, dispatchInts, radio::setIndicationFilterResponse},
     {RIL_REQUEST_SET_SIM_CARD_POWER, dispatchInts, radio::setSimCardPowerResponse},
