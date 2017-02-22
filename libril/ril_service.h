@@ -230,10 +230,6 @@ int getDataCallListResponse(android::Parcel &p, int slotId, int requestNumber,
                             int responseType, int serial, RIL_Errno e,
                             void *response, size_t responseLen);
 
-int sendScreenStateResponse(android::Parcel &p, int slotId, int requestNumber,
-                           int responseType, int serial, RIL_Errno e, void *response,
-                           size_t responselen);
-
 int setSuppServiceNotificationsResponse(android::Parcel &p, int slotId, int requestNumber,
                                        int responseType, int serial, RIL_Errno e, void *response,
                                        size_t responselen);
@@ -521,6 +517,14 @@ int setAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber
                               void *response, size_t responselen);
 
 int getAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responselen);
+
+int sendDeviceStateResponse(android::Parcel &p, int slotId, int requestNumber,
+                              int responseType, int serial, RIL_Errno e,
+                              void *response, size_t responselen);
+
+int setIndicationFilterResponse(android::Parcel &p, int slotId, int requestNumber,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
