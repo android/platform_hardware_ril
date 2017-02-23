@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1507942a_0861ff72",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 4344,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-23T21:58:07Z",
+      "side": 1,
+      "message": "get rid of this. hidlized is always true now.",
+      "range": {
+        "startLine": 4336,
+        "startChar": 0,
+        "endLine": 4344,
+        "endChar": 9
+      },
+      "revId": "be5ee678c895c5565bff4d6f63c997dbb3429686",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
