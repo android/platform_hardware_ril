@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "91d0ed77_d500411e",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 4333,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-24T01:00:26Z",
+      "side": 1,
+      "message": "since you are already cleaning up this function, please remove this as well. and the parcel declaration above.",
+      "range": {
+        "startLine": 4328,
+        "startChar": 8,
+        "endLine": 4333,
+        "endChar": 25
+      },
+      "revId": "0b1ba4de64c1f8a412323164ed7b40f6b9b9e234",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
