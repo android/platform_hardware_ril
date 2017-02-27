@@ -45,6 +45,30 @@
       "revId": "251648d67e1e8a3be63e7c079a170b59c25c8b21",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "72b422ef_9e520e3e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 3087,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-02-27T17:49:49Z",
+      "side": 1,
+      "message": "No. But I think we should define it in types.hal in the next CL.",
+      "parentUuid": "495bb198_a33ebfce",
+      "range": {
+        "startLine": 3087,
+        "startChar": 19,
+        "endLine": 3087,
+        "endChar": 25
+      },
+      "revId": "251648d67e1e8a3be63e7c079a170b59c25c8b21",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
