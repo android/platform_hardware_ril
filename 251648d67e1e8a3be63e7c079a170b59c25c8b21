@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af750584_39f18fc3",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 3087,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-02-27T17:44:10Z",
+      "side": 1,
+      "message": "If we fill 0 here (implicitly), we\u0027ll hit runtime exception at the new DataCallResponse.java #85. (Or the old code https://cs.corp.google.com/android/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java?type\u003dcs\u0026q\u003d%22DataCallResponse,+no+ifname%22\u0026l\u003d4873)",
+      "range": {
+        "startLine": 3087,
+        "startChar": 12,
+        "endLine": 3087,
+        "endChar": 72
+      },
+      "revId": "251648d67e1e8a3be63e7c079a170b59c25c8b21",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
