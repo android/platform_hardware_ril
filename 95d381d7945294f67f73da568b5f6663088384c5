@@ -97,6 +97,30 @@
     },
     {
       "key": {
+        "uuid": "3ea8f7fd_46b9c1c1",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2657,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-02-28T20:51:44Z",
+      "side": 1,
+      "message": "but here the mcc is an integer coming from vendor, so this can not be null",
+      "parentUuid": "a7e07d56_6e5a9a38",
+      "range": {
+        "startLine": 2657,
+        "startChar": 20,
+        "endLine": 2657,
+        "endChar": 34
+      },
+      "revId": "95d381d7945294f67f73da568b5f6663088384c5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f014223_1bcb48a4",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 3
