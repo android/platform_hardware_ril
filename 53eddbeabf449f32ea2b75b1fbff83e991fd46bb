@@ -1,0 +1,181 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4788d2c0_4f4fd5f4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "is this needed? version was bumped to 15 for O itself.",
+      "range": {
+        "startLine": 81,
+        "startChar": 3,
+        "endLine": 81,
+        "endChar": 19
+      },
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99d9ca97_1c342158",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "unused?",
+      "range": {
+        "startLine": 49,
+        "startChar": 26,
+        "endLine": 49,
+        "endChar": 37
+      },
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f894c5a_ed9a6625",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2789,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "what about the missing fields? Should they be assigned valid defaults?\nShould this even be called for LTE? Shouldn\u0027t there be no cell info instead?",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "29757992_376737d1",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2831,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "what about the missing fields here? like earfcn for LTE.",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b994785_e793f05d",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2858,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "same comments as below",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0582599_bfd153c8",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2921,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "not needed",
+      "range": {
+        "startLine": 2921,
+        "startChar": 16,
+        "endLine": 2921,
+        "endChar": 36
+      },
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcd52ec0_15b3b1c2",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2934,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "fix indentation",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "36424a47_2d7d2e66",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2942,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "else",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ef5d0416_e083800f",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2947,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:44:31Z",
+      "side": 1,
+      "message": "should be in else",
+      "range": {
+        "startLine": 2919,
+        "startChar": 8,
+        "endLine": 2947,
+        "endChar": 9
+      },
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
