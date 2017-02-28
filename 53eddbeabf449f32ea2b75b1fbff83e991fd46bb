@@ -101,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "977aa8ef_cb95d751",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2789,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-02-28T00:58:45Z",
+      "side": 1,
+      "message": "inside fillCellIdentityFromDataRegStateResponseString, there is a loop to set all to -1.",
+      "parentUuid": "15758849_05e83b0c",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "29757992_376737d1",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
