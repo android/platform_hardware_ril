@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f727e7da_ebae187b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2657,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-02-28T20:30:43Z",
+      "side": 1,
+      "message": "we should use convertCharPtrToHidlString directly (or do something similar) to be on safer side for any string coming from vendor side.",
+      "range": {
+        "startLine": 2657,
+        "startChar": 20,
+        "endLine": 2657,
+        "endChar": 34
+      },
+      "revId": "95d381d7945294f67f73da568b5f6663088384c5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f014223_1bcb48a4",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2797,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-02-28T20:30:43Z",
+      "side": 1,
+      "message": "do we need long here ? it sounds like a lot.",
+      "range": {
+        "startLine": 2797,
+        "startChar": 9,
+        "endLine": 2797,
+        "endChar": 22
+      },
+      "revId": "95d381d7945294f67f73da568b5f6663088384c5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d2f1e7a2_1fbf8c56",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2887,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-02-28T20:30:43Z",
+      "side": 1,
+      "message": "new line",
+      "range": {
+        "startLine": 2887,
+        "startChar": 72,
+        "endLine": 2887,
+        "endChar": 101
+      },
+      "revId": "95d381d7945294f67f73da568b5f6663088384c5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
