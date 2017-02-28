@@ -116,6 +116,30 @@
       "revId": "95d381d7945294f67f73da568b5f6663088384c5",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "559a61f7_704a30d3",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2887,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-02-28T20:47:24Z",
+      "side": 1,
+      "message": "there is no new line here...it is a gerrit display of showing diff",
+      "parentUuid": "d2f1e7a2_1fbf8c56",
+      "range": {
+        "startLine": 2887,
+        "startChar": 72,
+        "endLine": 2887,
+        "endChar": 101
+      },
+      "revId": "95d381d7945294f67f73da568b5f6663088384c5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
