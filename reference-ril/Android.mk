@@ -14,10 +14,12 @@ LOCAL_SRC_FILES:= \
 LOCAL_SHARED_LIBRARIES := \
     liblog libcutils libutils libril librilutils
 
+LOCAL_STATIC_LIBRARIES := libqemu_pipe libbase
+
 # for asprinf
 LOCAL_CFLAGS := -D_GNU_SOURCE
 
-LOCAL_C_INCLUDES :=
+LOCAL_C_INCLUDES := system/core/qemu_pipe/include
 
 ifeq ($(TARGET_DEVICE),sooner)
   LOCAL_CFLAGS += -DUSE_TI_COMMANDS

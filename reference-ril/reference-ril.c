@@ -37,7 +37,7 @@
 #include <cutils/sockets.h>
 #include <termios.h>
 #include <sys/system_properties.h>
-#include <system/qemu_pipe.h>
+#include <qemu_pipe.h>
 
 #include "ril.h"
 
