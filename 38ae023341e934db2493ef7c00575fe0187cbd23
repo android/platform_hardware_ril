@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4ebadb27_21b41f0d",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2798,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T19:51:50Z",
+      "side": 1,
+      "message": "I would rather set the fields explicitly to -1, but I guess this is ok too.",
+      "revId": "38ae023341e934db2493ef7c00575fe0187cbd23",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1138869c_86251460",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2890,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T19:51:50Z",
+      "side": 1,
+      "message": "Should be under else. And same below.",
+      "range": {
+        "startLine": 2857,
+        "startChar": 8,
+        "endLine": 2890,
+        "endChar": 9
+      },
+      "revId": "38ae023341e934db2493ef7c00575fe0187cbd23",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8d5cbb23_c5e55438",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2933,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T19:51:50Z",
+      "side": 1,
+      "message": "Fix indentation",
+      "revId": "38ae023341e934db2493ef7c00575fe0187cbd23",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
