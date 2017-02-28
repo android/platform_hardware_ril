@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6c597070_17af68a8",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1011,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "should these have set values to match the old values and avoid a translation?  IE \nRIL_NOT_REG_AND_NOT_SEACHING\u003d0",
+      "range": {
+        "startLine": 1011,
+        "startChar": 4,
+        "endLine": 1011,
+        "endChar": 33
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "538129cf_55b25d03",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1469,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "it\u0027s an int, please define in terms of int",
+      "range": {
+        "startLine": 1469,
+        "startChar": 46,
+        "endLine": 1469,
+        "endChar": 50
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81098980_10bd722e",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1470,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 1470,
+        "startChar": 45,
+        "endLine": 1470,
+        "endChar": 49
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7cb0ada3_a7f3e8b4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1514,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "long line",
+      "range": {
+        "startLine": 1514,
+        "startChar": 94,
+        "endLine": 1514,
+        "endChar": 101
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f70a8ef2_7e29aba0",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "should this be an enum?",
+      "range": {
+        "startLine": 1484,
+        "startChar": 44,
+        "endLine": 1516,
+        "endChar": 94
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08e83c2a_6bbe09f2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1537,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "enum?",
+      "range": {
+        "startLine": 1531,
+        "startChar": 45,
+        "endLine": 1537,
+        "endChar": 75
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "784ecac8_801a0d4f",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 2861,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "I think this needs translation if the regState enum changes definition",
+      "range": {
+        "startLine": 2861,
+        "startChar": 44,
+        "endLine": 2861,
+        "endChar": 88
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e741b6b_740da4e6",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 2922,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-02-28T23:00:34Z",
+      "side": 1,
+      "message": "may need translation",
+      "range": {
+        "startLine": 2922,
+        "startChar": 54,
+        "endLine": 2922,
+        "endChar": 75
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
