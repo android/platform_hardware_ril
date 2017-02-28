@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "11a92384_ceb39517",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2657,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-02-28T20:41:07Z",
+      "side": 1,
+      "message": "I can check for null here...the api you pointed out uses a specific type hidl_string...I will have to update the type.hal and do retest if I change it now.",
+      "parentUuid": "f727e7da_ebae187b",
+      "range": {
+        "startLine": 2657,
+        "startChar": 20,
+        "endLine": 2657,
+        "endChar": 34
+      },
+      "revId": "95d381d7945294f67f73da568b5f6663088384c5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f014223_1bcb48a4",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 3
