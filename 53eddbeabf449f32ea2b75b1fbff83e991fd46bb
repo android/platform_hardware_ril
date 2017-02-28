@@ -83,6 +83,24 @@
     },
     {
       "key": {
+        "uuid": "15758849_05e83b0c",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2789,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:56:59Z",
+      "side": 1,
+      "message": "where is the init to -1 done?",
+      "parentUuid": "b7f17943_ef0dc817",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "29757992_376737d1",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
@@ -112,6 +130,24 @@
       "side": 1,
       "message": "it will be inited with -1",
       "parentUuid": "29757992_376737d1",
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8ff5b075_48ad61ec",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2831,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:56:59Z",
+      "side": 1,
+      "message": "where?",
+      "parentUuid": "133ac89c_65f304b5",
       "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -170,6 +206,30 @@
       "side": 1,
       "message": "Can you please be specific?",
       "parentUuid": "c0582599_bfd153c8",
+      "range": {
+        "startLine": 2921,
+        "startChar": 16,
+        "endLine": 2921,
+        "endChar": 36
+      },
+      "revId": "53eddbeabf449f32ea2b75b1fbff83e991fd46bb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d7d0269_b6d7c2a1",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2921,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-02-28T00:56:59Z",
+      "side": 1,
+      "message": "\"response \u003d\u003d NULL || \" is not needed (hovering over comment highlights it).",
+      "parentUuid": "3d5748a4_c5611f56",
       "range": {
         "startLine": 2921,
         "startChar": 16,
