@@ -141,6 +141,30 @@
     },
     {
       "key": {
+        "uuid": "fd2598e8_810f6dd2",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-01T00:18:57Z",
+      "side": 1,
+      "message": "I doubt if we can have enum here. If you see, 48 to 63 all have same description which would be difficult to represent in enum.",
+      "parentUuid": "d9ceca3c_04cb18c4",
+      "range": {
+        "startLine": 1484,
+        "startChar": 44,
+        "endLine": 1516,
+        "endChar": 94
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "08e83c2a_6bbe09f2",
         "filename": "include/telephony/ril.h",
         "patchSetId": 6
