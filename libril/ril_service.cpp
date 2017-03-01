@@ -5785,15 +5785,20 @@ RadioIndicationType convertIntToRadioIndicationType(int indicationType) {
             (RadioIndicationType::UNSOLICITED_ACK_EXP);
 }
 
-void radio::radioStateChangedInd(int slotId, int indicationType, RIL_RadioState radioState) {
+int radio::radioStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                                 int indicationType, int token, RIL_Errno e, void *response,
+                                 size_t responseLen) {
     if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndication != NULL) {
+        RadioState radioState = (RadioState) s_vendorFunctions->onStateRequest();
         RLOGD("radio::radioStateChangedInd: radioState %d", radioState);
         Return<void> retStatus = radioService[slotId]->mRadioIndication->radioStateChanged(
-                convertIntToRadioIndicationType(indicationType), (RadioState) radioState);
+                convertIntToRadioIndicationType(indicationType), radioState);
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("radio::radioStateChangedInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
+
+    return 0;
 }
 
 int radio::callStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
@@ -5812,8 +5817,8 @@ int radio::callStateChangedInd(android::Parcel &p, int slotId, int requestNumber
 }
 
 int radio::networkStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
-                                       int indicationType, int token, RIL_Errno e, void *response,
-                                       size_t responseLen) {
+                                  int indicationType, int token, RIL_Errno e, void *response,
+                                  size_t responseLen) {
     if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndication != NULL) {
         RLOGD("radio::networkStateChangedInd");
         Return<void> retStatus = radioService[slotId]->mRadioIndication->networkStateChanged(

@@ -534,7 +534,9 @@ int setSimCardPowerResponse(android::Parcel &p, int slotId, int requestNumber,
 
 void acknowledgeRequest(int slotId, int serial);
 
-void radioStateChangedInd(int slotId, int indicationType, RIL_RadioState radioState);
+int radioStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+                          int indicationType, int token, RIL_Errno e, void *response,
+                          size_t responseLen);
 
 int callStateChangedInd(android::Parcel &p, int slotId, int requestNumber, int indType, int token,
                         RIL_Errno e, void *response, size_t responselen);
