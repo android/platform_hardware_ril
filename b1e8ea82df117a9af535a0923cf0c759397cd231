@@ -213,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "096e446e_8f681cc9",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-01T01:00:01Z",
+      "side": 1,
+      "message": "If java side doesn\u0027t care about exact value and it is used only for logging then we don\u0027t need RETRY_ON_NEW_CELL_48 to RETRY_ON_NEW_CELL_63. We can have only one value here filled using condition stmt.",
+      "parentUuid": "eb416256_537398f5",
+      "range": {
+        "startLine": 1484,
+        "startChar": 44,
+        "endLine": 1516,
+        "endChar": 94
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "08e83c2a_6bbe09f2",
         "filename": "include/telephony/ril.h",
         "patchSetId": 6
