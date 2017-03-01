@@ -117,6 +117,30 @@
     },
     {
       "key": {
+        "uuid": "d9ceca3c_04cb18c4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-01T00:15:59Z",
+      "side": 1,
+      "message": "I felt keeping this as in int help in extending error easily.\n\nAlso I see some error codes are repeated for same description. So the same will confuse from an enum pov.\n\nAlso won\u0027t we have to do conversion from hidl to framework when we receive. Thinking if the added code really adds value.",
+      "parentUuid": "f70a8ef2_7e29aba0",
+      "range": {
+        "startLine": 1484,
+        "startChar": 44,
+        "endLine": 1516,
+        "endChar": 94
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "08e83c2a_6bbe09f2",
         "filename": "include/telephony/ril.h",
         "patchSetId": 6
@@ -128,6 +152,30 @@
       "writtenOn": "2017-02-28T23:00:34Z",
       "side": 1,
       "message": "enum?",
+      "range": {
+        "startLine": 1531,
+        "startChar": 45,
+        "endLine": 1537,
+        "endChar": 75
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f46b4283_2cce416c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1537,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-01T00:15:59Z",
+      "side": 1,
+      "message": "same as above",
+      "parentUuid": "08e83c2a_6bbe09f2",
       "range": {
         "startLine": 1531,
         "startChar": 45,
