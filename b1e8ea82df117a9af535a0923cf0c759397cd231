@@ -237,6 +237,30 @@
     },
     {
       "key": {
+        "uuid": "4b70c5bb_768c20f0",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-01T01:00:41Z",
+      "side": 1,
+      "message": "I don\u0027t have a strong opinion, but I think avoiding enum is ok. This is just used for logging purposes, and if the value is other than 0 or 1 we don\u0027t even log what the exact value is. So looks like framework doesn\u0027t really care, but we can leave the comment in here in case we decide to log it later.",
+      "parentUuid": "eb416256_537398f5",
+      "range": {
+        "startLine": 1484,
+        "startChar": 44,
+        "endLine": 1516,
+        "endChar": 94
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "08e83c2a_6bbe09f2",
         "filename": "include/telephony/ril.h",
         "patchSetId": 6
