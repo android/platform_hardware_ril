@@ -165,6 +165,54 @@
     },
     {
       "key": {
+        "uuid": "eb416256_537398f5",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-01T00:50:47Z",
+      "side": 1,
+      "message": "RETRY_ON_NEW_CELL_48\nRETRY_ON_NEW_CELL_49\nRETRY_ON_NEW_CELL_50\netc.\n\nIdeally they have separate meanings in the 3GPP spec so we don\u0027t need to do this, but it\u0027s easily possible.",
+      "parentUuid": "fd2598e8_810f6dd2",
+      "range": {
+        "startLine": 1484,
+        "startChar": 44,
+        "endLine": 1516,
+        "endChar": 94
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "20689cb7_0f93c2ac",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-01T00:50:47Z",
+      "side": 1,
+      "message": "extending easily just means the vendor is returning codes we don\u0027t handle because it\u0027s not in our code base.  This is a problem, not a feature.\n\nDuplicated values are not a problem - see other response.  Really they probably have subtly different meanings we should catch\n\nAmit, do you have an opinion?",
+      "parentUuid": "d9ceca3c_04cb18c4",
+      "range": {
+        "startLine": 1484,
+        "startChar": 44,
+        "endLine": 1516,
+        "endChar": 94
+      },
+      "revId": "b1e8ea82df117a9af535a0923cf0c759397cd231",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "08e83c2a_6bbe09f2",
         "filename": "include/telephony/ril.h",
         "patchSetId": 6
