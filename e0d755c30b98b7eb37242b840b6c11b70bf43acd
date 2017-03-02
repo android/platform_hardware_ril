@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c17dae70_a36b1cae",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3828,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-02T06:21:06Z",
+      "side": 1,
+      "message": "it won\u0027t. From above check we already know that numStrings is 4*x",
+      "parentUuid": "5b17c4e0_a81e3545",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b94a369_9c8bf016",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
