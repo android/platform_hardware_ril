@@ -91,6 +91,24 @@
     },
     {
       "key": {
+        "uuid": "0f473d6b_c8939514",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3828,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-02T19:53:33Z",
+      "side": 1,
+      "message": "Sorry..I was looking at OPERATOR..and not QUERY_AVAILABLE...looks fine now",
+      "parentUuid": "3c4c34fa_c9c90b6c",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b94a369_9c8bf016",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
