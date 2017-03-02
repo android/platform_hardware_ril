@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "65f493ac_78b58c80",
+        "filename": "libril/ril_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-03-02T20:34:54Z",
+      "side": 0,
+      "message": "I intended put it because I don\u0027t want people in the future thought this is a typo, but fine if you think it\u0027s not necessary.",
+      "range": {
+        "startLine": 78,
+        "startChar": 80,
+        "endLine": 78,
+        "endChar": 123
+      },
+      "revId": "31dd81c85c4702d46c17c5093320b61f56a7c8b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e973d5ab_fc5796ae",
+        "filename": "libril/ril_internal.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-03-02T20:34:54Z",
+      "side": 0,
+      "message": "in another CL or?",
+      "range": {
+        "startLine": 92,
+        "startChar": 4,
+        "endLine": 92,
+        "endChar": 36
+      },
+      "revId": "31dd81c85c4702d46c17c5093320b61f56a7c8b1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
