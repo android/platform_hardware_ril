@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd5adc82_a50ad82f",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 4444,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-02T20:39:21Z",
+      "side": 0,
+      "message": "delete",
+      "range": {
+        "startLine": 4444,
+        "startChar": 4,
+        "endLine": 4444,
+        "endChar": 28
+      },
+      "revId": "7d07f2d0ef90ad5bc21cf5e46b832fa36e77b1d6",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
