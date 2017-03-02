@@ -1,0 +1,8 @@
+Presubmit-Verified-1: Treehugger Robot <treehugger-gerrit@google.com>
+Verified+1: Bo Hu <bohu@google.com>
+Code-Review+2: Yurii Zubrytskyi <zyy@google.com>
+Submitted-by: Bo Hu <bohu@google.com>
+Submitted-at: Thu, 02 Mar 2017 18:03:30 +0000
+Reviewed-on: https://android-review.googlesource.com/346137
+Project: platform/hardware/ril
+Branch: refs/heads/master
