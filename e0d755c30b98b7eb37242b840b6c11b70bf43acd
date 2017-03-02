@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "3c4c34fa_c9c90b6c",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3828,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-02T19:39:11Z",
+      "side": 1,
+      "message": "When you look at original code, the responses are sent by vendor ril as an array of strings. At that time when we handled the responses we just send them as an array of string without checking whether it is a multiple of 4 or not. Now with this new code which was done for hidl, let us say we use a ril which sends 5 strings this would send failure instead of handling the same and in earlier code it would have worked just fine.",
+      "parentUuid": "c32ab20e_3aefa580",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b94a369_9c8bf016",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
@@ -102,6 +120,23 @@
       "side": 1,
       "message": "i/4 also will work.. wanted to use different counter for better readability.. any issues?",
       "parentUuid": "7b94a369_9c8bf016",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98155e41_57d92b81",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3831,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-02T19:39:11Z",
+      "side": 1,
+      "message": "I was trying to look at old RIL.h it expected only 3 entries and not 4. How I-is this working fine for you?",
       "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
