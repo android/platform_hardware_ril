@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "c32ab20e_3aefa580",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3828,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-02T19:28:05Z",
+      "side": 1,
+      "message": "What is the concern here when there is an explicit check for 4*x?",
+      "parentUuid": "93324745_e493a935",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b94a369_9c8bf016",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "writtenOn": "2017-03-02T04:01:00Z",
       "side": 1,
       "message": "isn\u0027t i/4 enough?",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f63a8305_30566809",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3830,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-02T19:28:05Z",
+      "side": 1,
+      "message": "i/4 also will work.. wanted to use different counter for better readability.. any issues?",
+      "parentUuid": "7b94a369_9c8bf016",
       "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
