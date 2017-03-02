@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5b17c4e0_a81e3545",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3828,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-02T04:01:00Z",
+      "side": 1,
+      "message": "I think original code has more issues. The check is just for i \u003c numStrings but inside it fetches memory till i + 3, this will lead to invlid memory access",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b94a369_9c8bf016",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3830,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-02T04:01:00Z",
+      "side": 1,
+      "message": "isn\u0027t i/4 enough?",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
