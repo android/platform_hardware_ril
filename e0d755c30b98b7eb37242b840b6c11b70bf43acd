@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "93324745_e493a935",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3828,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-02T06:31:50Z",
+      "side": 1,
+      "message": "Is this code backward compatible then? I believe earlier it was just array of strings...and we didn\u0027t have such a restriction.",
+      "parentUuid": "c17dae70_a36b1cae",
+      "revId": "e0d755c30b98b7eb37242b840b6c11b70bf43acd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b94a369_9c8bf016",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
