@@ -22,6 +22,7 @@
 
 namespace radio {
 void registerService(RIL_RadioFunctions *callbacks, android::CommandInfo *commands);
+
 int getIccCardStatusResponse(android::Parcel &p, int slotId, int requestNumber, int responseType,
                             int token, RIL_Errno e, void *response, size_t responselen);
 
