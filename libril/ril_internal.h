@@ -87,8 +87,7 @@ typedef struct RequestInfo {
 
 typedef struct CommandInfo {
     int requestNumber;
-    // todo: change parcel to serial
-    int(*responseFunction) (Parcel &p, int slotId, int requestNumber, int responseType, int token,
+    int(*responseFunction) (int slotId, int responseType, int token,
             RIL_Errno e, void *response, size_t responselen);
 } CommandInfo;
 

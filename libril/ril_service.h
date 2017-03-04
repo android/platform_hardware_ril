@@ -23,689 +23,689 @@
 namespace radio {
 void registerService(RIL_RadioFunctions *callbacks, android::CommandInfo *commands);
 
-int getIccCardStatusResponse(android::Parcel &p, int slotId, int requestNumber, int responseType,
+int getIccCardStatusResponse(int slotId, int responseType,
                             int token, RIL_Errno e, void *response, size_t responselen);
 
-int supplyIccPinForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int supplyIccPinForAppResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int supplyIccPukForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int supplyIccPukForAppResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int supplyIccPin2ForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int supplyIccPin2ForAppResponse(int slotId,
                                int responseType, int serial, RIL_Errno e, void *response,
                                size_t responselen);
 
-int supplyIccPuk2ForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int supplyIccPuk2ForAppResponse(int slotId,
                                int responseType, int serial, RIL_Errno e, void *response,
                                size_t responselen);
 
-int changeIccPinForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int changeIccPinForAppResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int changeIccPin2ForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int changeIccPin2ForAppResponse(int slotId,
                                int responseType, int serial, RIL_Errno e, void *response,
                                size_t responselen);
 
-int supplyNetworkDepersonalizationResponse(android::Parcel &p, int slotId, int requestNumber,
+int supplyNetworkDepersonalizationResponse(int slotId,
                                           int responseType, int serial, RIL_Errno e,
                                           void *response, size_t responselen);
 
-int getCurrentCallsResponse(android::Parcel &p, int slotId, int requestNumber,
+int getCurrentCallsResponse(int slotId,
                            int responseType, int serial, RIL_Errno e, void *response,
                            size_t responselen);
 
-int dialResponse(android::Parcel &p, int slotId, int requestNumber,
+int dialResponse(int slotId,
                 int responseType, int serial, RIL_Errno e, void *response, size_t responselen);
 
-int getIMSIForAppResponse(android::Parcel &p, int slotId, int requestNumber, int responseType,
+int getIMSIForAppResponse(int slotId, int responseType,
                          int serial, RIL_Errno e, void *response, size_t responselen);
 
-int hangupConnectionResponse(android::Parcel &p, int slotId, int requestNumber, int responseType,
+int hangupConnectionResponse(int slotId, int responseType,
                             int serial, RIL_Errno e, void *response, size_t responselen);
 
-int hangupWaitingOrBackgroundResponse(android::Parcel &p, int slotId, int requestNumber,
+int hangupWaitingOrBackgroundResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int hangupForegroundResumeBackgroundResponse(android::Parcel &p, int slotId, int requestNumber,
+int hangupForegroundResumeBackgroundResponse(int slotId,
                                             int responseType, int serial, RIL_Errno e,
                                             void *response, size_t responselen);
 
-int switchWaitingOrHoldingAndActiveResponse(android::Parcel &p, int slotId, int requestNumber,
+int switchWaitingOrHoldingAndActiveResponse(int slotId,
                                            int responseType, int serial, RIL_Errno e,
                                            void *response, size_t responselen);
 
-int conferenceResponse(android::Parcel &p, int slotId, int requestNumber, int responseType,
+int conferenceResponse(int slotId, int responseType,
                       int serial, RIL_Errno e, void *response, size_t responselen);
 
-int rejectCallResponse(android::Parcel &p, int slotId, int requestNumber, int responseType,
+int rejectCallResponse(int slotId, int responseType,
                       int serial, RIL_Errno e, void *response, size_t responselen);
 
-int getLastCallFailCauseResponse(android::Parcel &p, int slotId, int requestNumber,
+int getLastCallFailCauseResponse(int slotId,
                                 int responseType, int serial, RIL_Errno e, void *response,
                                 size_t responselen);
 
-int getSignalStrengthResponse(android::Parcel &p, int slotId, int requestNumber,
+int getSignalStrengthResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responseLen);
 
-int getVoiceRegistrationStateResponse(android::Parcel &p, int slotId, int requestNumber,
+int getVoiceRegistrationStateResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int getDataRegistrationStateResponse(android::Parcel &p, int slotId, int requestNumber,
+int getDataRegistrationStateResponse(int slotId,
                                     int responseType, int serial, RIL_Errno e, void *response,
                                     size_t responselen);
 
-int getOperatorResponse(android::Parcel &p, int slotId, int requestNumber,
+int getOperatorResponse(int slotId,
                        int responseType, int serial, RIL_Errno e, void *response,
                        size_t responselen);
 
-int setRadioPowerResponse(android::Parcel &p, int slotId, int requestNumber,
+int setRadioPowerResponse(int slotId,
                          int responseType, int serial, RIL_Errno e, void *response,
                          size_t responselen);
 
-int sendDtmfResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendDtmfResponse(int slotId,
                     int responseType, int serial, RIL_Errno e, void *response,
                     size_t responselen);
 
-int sendSmsResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendSmsResponse(int slotId,
                    int responseType, int serial, RIL_Errno e, void *response,
                    size_t responselen);
 
-int sendSMSExpectMoreResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendSMSExpectMoreResponse(int slotId,
                              int responseType, int serial, RIL_Errno e, void *response,
                              size_t responselen);
 
-int setupDataCallResponse(android::Parcel &p, int slotId, int requestNumber,
+int setupDataCallResponse(int slotId,
                           int responseType, int serial, RIL_Errno e, void *response,
                           size_t responseLen);
 
-int iccIOForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int iccIOForAppResponse(int slotId,
                        int responseType, int serial, RIL_Errno e, void *response,
                        size_t responselen);
 
-int sendUssdResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendUssdResponse(int slotId,
                     int responseType, int serial, RIL_Errno e, void *response,
                     size_t responselen);
 
-int cancelPendingUssdResponse(android::Parcel &p, int slotId, int requestNumber,
+int cancelPendingUssdResponse(int slotId,
                              int responseType, int serial, RIL_Errno e, void *response,
                              size_t responselen);
 
-int getClirResponse(android::Parcel &p, int slotId, int requestNumber,
+int getClirResponse(int slotId,
                    int responseType, int serial, RIL_Errno e, void *response, size_t responselen);
 
-int setClirResponse(android::Parcel &p, int slotId, int requestNumber,
+int setClirResponse(int slotId,
                    int responseType, int serial, RIL_Errno e, void *response, size_t responselen);
 
-int getCallForwardStatusResponse(android::Parcel &p, int slotId, int requestNumber,
+int getCallForwardStatusResponse(int slotId,
                                 int responseType, int serial, RIL_Errno e, void *response,
                                 size_t responselen);
 
-int setCallForwardResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCallForwardResponse(int slotId,
                           int responseType, int serial, RIL_Errno e, void *response,
                           size_t responselen);
 
-int getCallWaitingResponse(android::Parcel &p, int slotId, int requestNumber,
+int getCallWaitingResponse(int slotId,
                           int responseType, int serial, RIL_Errno e, void *response,
                           size_t responselen);
 
-int setCallWaitingResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCallWaitingResponse(int slotId,
                           int responseType, int serial, RIL_Errno e, void *response,
                           size_t responselen);
 
-int acknowledgeLastIncomingGsmSmsResponse(android::Parcel &p, int slotId, int requestNumber,
+int acknowledgeLastIncomingGsmSmsResponse(int slotId,
                                          int responseType, int serial, RIL_Errno e, void *response,
                                          size_t responselen);
 
-int acceptCallResponse(android::Parcel &p, int slotId, int requestNumber,
+int acceptCallResponse(int slotId,
                       int responseType, int serial, RIL_Errno e, void *response,
                       size_t responselen);
 
-int deactivateDataCallResponse(android::Parcel &p, int slotId, int requestNumber,
+int deactivateDataCallResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int getFacilityLockForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int getFacilityLockForAppResponse(int slotId,
                                  int responseType, int serial, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int setFacilityLockForAppResponse(android::Parcel &p, int slotId, int requestNumber,
+int setFacilityLockForAppResponse(int slotId,
                                  int responseType, int serial, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int setBarringPasswordResponse(android::Parcel &p, int slotId, int requestNumber,
+int setBarringPasswordResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int getNetworkSelectionModeResponse(android::Parcel &p, int slotId, int requestNumber,
+int getNetworkSelectionModeResponse(int slotId,
                                    int responseType, int serial, RIL_Errno e, void *response,
                                    size_t responselen);
 
-int setNetworkSelectionModeAutomaticResponse(android::Parcel &p, int slotId, int requestNumber,
+int setNetworkSelectionModeAutomaticResponse(int slotId,
                                             int responseType, int serial, RIL_Errno e,
                                             void *response, size_t responselen);
 
-int setNetworkSelectionModeManualResponse(android::Parcel &p, int slotId, int requestNumber,
+int setNetworkSelectionModeManualResponse(int slotId,
                                          int responseType, int serial, RIL_Errno e, void *response,
                                          size_t responselen);
 
-int getAvailableNetworksResponse(android::Parcel &p, int slotId, int requestNumber,
+int getAvailableNetworksResponse(int slotId,
                                 int responseType, int serial, RIL_Errno e, void *response,
                                 size_t responselen);
 
-int startDtmfResponse(android::Parcel &p, int slotId, int requestNumber,
+int startDtmfResponse(int slotId,
                      int responseType, int serial, RIL_Errno e, void *response,
                      size_t responselen);
 
-int stopDtmfResponse(android::Parcel &p, int slotId, int requestNumber,
+int stopDtmfResponse(int slotId,
                     int responseType, int serial, RIL_Errno e, void *response,
                     size_t responselen);
 
-int getBasebandVersionResponse(android::Parcel &p, int slotId, int requestNumber,
+int getBasebandVersionResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int separateConnectionResponse(android::Parcel &p, int slotId, int requestNumber,
+int separateConnectionResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int setMuteResponse(android::Parcel &p, int slotId, int requestNumber,
+int setMuteResponse(int slotId,
                    int responseType, int serial, RIL_Errno e, void *response,
                    size_t responselen);
 
-int getMuteResponse(android::Parcel &p, int slotId, int requestNumber,
+int getMuteResponse(int slotId,
                    int responseType, int serial, RIL_Errno e, void *response,
                    size_t responselen);
 
-int getClipResponse(android::Parcel &p, int slotId, int requestNumber,
+int getClipResponse(int slotId,
                    int responseType, int serial, RIL_Errno e, void *response,
                    size_t responselen);
 
-int getDataCallListResponse(android::Parcel &p, int slotId, int requestNumber,
+int getDataCallListResponse(int slotId,
                             int responseType, int serial, RIL_Errno e,
                             void *response, size_t responseLen);
 
-int setSuppServiceNotificationsResponse(android::Parcel &p, int slotId, int requestNumber,
+int setSuppServiceNotificationsResponse(int slotId,
                                        int responseType, int serial, RIL_Errno e, void *response,
                                        size_t responselen);
 
-int writeSmsToSimResponse(android::Parcel &p, int slotId, int requestNumber,
+int writeSmsToSimResponse(int slotId,
                          int responseType, int serial, RIL_Errno e, void *response,
                          size_t responselen);
 
-int deleteSmsOnSimResponse(android::Parcel &p, int slotId, int requestNumber,
+int deleteSmsOnSimResponse(int slotId,
                           int responseType, int serial, RIL_Errno e, void *response,
                           size_t responselen);
 
-int setBandModeResponse(android::Parcel &p, int slotId, int requestNumber,
+int setBandModeResponse(int slotId,
                        int responseType, int serial, RIL_Errno e, void *response,
                        size_t responselen);
 
-int getAvailableBandModesResponse(android::Parcel &p, int slotId, int requestNumber,
+int getAvailableBandModesResponse(int slotId,
                                  int responseType, int serial, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int sendEnvelopeResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendEnvelopeResponse(int slotId,
                         int responseType, int serial, RIL_Errno e, void *response,
                         size_t responselen);
 
-int sendTerminalResponseToSimResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendTerminalResponseToSimResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int handleStkCallSetupRequestFromSimResponse(android::Parcel &p, int slotId, int requestNumber,
+int handleStkCallSetupRequestFromSimResponse(int slotId,
                                             int responseType, int serial, RIL_Errno e,
                                             void *response, size_t responselen);
 
-int explicitCallTransferResponse(android::Parcel &p, int slotId, int requestNumber,
+int explicitCallTransferResponse(int slotId,
                                 int responseType, int serial, RIL_Errno e, void *response,
                                 size_t responselen);
 
-int setPreferredNetworkTypeResponse(android::Parcel &p, int slotId, int requestNumber,
+int setPreferredNetworkTypeResponse(int slotId,
                                    int responseType, int serial, RIL_Errno e, void *response,
                                    size_t responselen);
 
-int getPreferredNetworkTypeResponse(android::Parcel &p, int slotId, int requestNumber,
+int getPreferredNetworkTypeResponse(int slotId,
                                    int responseType, int serial, RIL_Errno e, void *response,
                                    size_t responselen);
 
-int getNeighboringCidsResponse(android::Parcel &p, int slotId, int requestNumber,
+int getNeighboringCidsResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int setLocationUpdatesResponse(android::Parcel &p, int slotId, int requestNumber,
+int setLocationUpdatesResponse(int slotId,
                               int responseType, int serial, RIL_Errno e, void *response,
                               size_t responselen);
 
-int setCdmaSubscriptionSourceResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCdmaSubscriptionSourceResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int setCdmaRoamingPreferenceResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCdmaRoamingPreferenceResponse(int slotId,
                                     int responseType, int serial, RIL_Errno e, void *response,
                                     size_t responselen);
 
-int getCdmaRoamingPreferenceResponse(android::Parcel &p, int slotId, int requestNumber,
+int getCdmaRoamingPreferenceResponse(int slotId,
                                     int responseType, int serial, RIL_Errno e, void *response,
                                     size_t responselen);
 
-int setTTYModeResponse(android::Parcel &p, int slotId, int requestNumber,
+int setTTYModeResponse(int slotId,
                       int responseType, int serial, RIL_Errno e, void *response,
                       size_t responselen);
 
-int getTTYModeResponse(android::Parcel &p, int slotId, int requestNumber,
+int getTTYModeResponse(int slotId,
                       int responseType, int serial, RIL_Errno e, void *response,
                       size_t responselen);
 
-int setPreferredVoicePrivacyResponse(android::Parcel &p, int slotId, int requestNumber,
+int setPreferredVoicePrivacyResponse(int slotId,
                                     int responseType, int serial, RIL_Errno e, void *response,
                                     size_t responselen);
 
-int getPreferredVoicePrivacyResponse(android::Parcel &p, int slotId, int requestNumber,
+int getPreferredVoicePrivacyResponse(int slotId,
                                     int responseType, int serial, RIL_Errno e, void *response,
                                     size_t responselen);
 
-int sendCDMAFeatureCodeResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendCDMAFeatureCodeResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responselen);
 
-int sendBurstDtmfResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendBurstDtmfResponse(int slotId,
                          int responseType, int serial, RIL_Errno e, void *response,
                          size_t responselen);
 
-int sendCdmaSmsResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendCdmaSmsResponse(int slotId,
                        int responseType, int serial, RIL_Errno e, void *response,
                        size_t responselen);
 
-int acknowledgeLastIncomingCdmaSmsResponse(android::Parcel &p, int slotId, int requestNumber,
+int acknowledgeLastIncomingCdmaSmsResponse(int slotId,
                                           int responseType, int serial, RIL_Errno e, void *response,
                                           size_t responselen);
 
-int getGsmBroadcastConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+int getGsmBroadcastConfigResponse(int slotId,
                                  int responseType, int serial, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int setGsmBroadcastConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+int setGsmBroadcastConfigResponse(int slotId,
                                  int responseType, int serial, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int setGsmBroadcastActivationResponse(android::Parcel &p, int slotId, int requestNumber,
+int setGsmBroadcastActivationResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int getCdmaBroadcastConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+int getCdmaBroadcastConfigResponse(int slotId,
                                   int responseType, int serial, RIL_Errno e, void *response,
                                   size_t responselen);
 
-int setCdmaBroadcastConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCdmaBroadcastConfigResponse(int slotId,
                                   int responseType, int serial, RIL_Errno e, void *response,
                                   size_t responselen);
 
-int setCdmaBroadcastActivationResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCdmaBroadcastActivationResponse(int slotId,
                                       int responseType, int serial, RIL_Errno e,
                                       void *response, size_t responselen);
 
-int getCDMASubscriptionResponse(android::Parcel &p, int slotId, int requestNumber,
+int getCDMASubscriptionResponse(int slotId,
                                int responseType, int serial, RIL_Errno e, void *response,
                                size_t responselen);
 
-int writeSmsToRuimResponse(android::Parcel &p, int slotId, int requestNumber,
+int writeSmsToRuimResponse(int slotId,
                           int responseType, int serial, RIL_Errno e, void *response,
                           size_t responselen);
 
-int deleteSmsOnRuimResponse(android::Parcel &p, int slotId, int requestNumber,
+int deleteSmsOnRuimResponse(int slotId,
                            int responseType, int serial, RIL_Errno e, void *response,
                            size_t responselen);
 
-int getDeviceIdentityResponse(android::Parcel &p, int slotId, int requestNumber,
+int getDeviceIdentityResponse(int slotId,
                              int responseType, int serial, RIL_Errno e, void *response,
                              size_t responselen);
 
-int exitEmergencyCallbackModeResponse(android::Parcel &p, int slotId, int requestNumber,
+int exitEmergencyCallbackModeResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int getSmscAddressResponse(android::Parcel &p, int slotId, int requestNumber,
+int getSmscAddressResponse(int slotId,
                           int responseType, int serial, RIL_Errno e, void *response,
                           size_t responselen);
 
-int setCdmaBroadcastActivationResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCdmaBroadcastActivationResponse(int slotId,
                                       int responseType, int serial, RIL_Errno e,
                                       void *response, size_t responselen);
 
-int setSmscAddressResponse(android::Parcel &p, int slotId, int requestNumber,
+int setSmscAddressResponse(int slotId,
                           int responseType, int serial, RIL_Errno e,
                           void *response, size_t responselen);
 
-int reportSmsMemoryStatusResponse(android::Parcel &p, int slotId, int requestNumber,
+int reportSmsMemoryStatusResponse(int slotId,
                                  int responseType, int serial, RIL_Errno e,
                                  void *response, size_t responselen);
 
-int reportStkServiceIsRunningResponse(android::Parcel &p, int slotId, int requestNumber,
+int reportStkServiceIsRunningResponse(int slotId,
                                       int responseType, int serial, RIL_Errno e,
                                       void *response, size_t responseLen);
 
-int getCdmaSubscriptionSourceResponse(android::Parcel &p, int slotId, int requestNumber,
+int getCdmaSubscriptionSourceResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int requestIsimAuthenticationResponse(android::Parcel &p, int slotId, int requestNumber,
+int requestIsimAuthenticationResponse(int slotId,
                                      int responseType, int serial, RIL_Errno e, void *response,
                                      size_t responselen);
 
-int acknowledgeIncomingGsmSmsWithPduResponse(android::Parcel &p, int slotId, int requestNumber,
+int acknowledgeIncomingGsmSmsWithPduResponse(int slotId,
                                             int responseType, int serial, RIL_Errno e,
                                             void *response, size_t responselen);
 
-int sendEnvelopeWithStatusResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendEnvelopeWithStatusResponse(int slotId,
                                   int responseType, int serial, RIL_Errno e, void *response,
                                   size_t responselen);
 
-int getVoiceRadioTechnologyResponse(android::Parcel &p, int slotId, int requestNumber,
+int getVoiceRadioTechnologyResponse(int slotId,
                                    int responseType, int serial, RIL_Errno e,
                                    void *response, size_t responselen);
 
-int getCellInfoListResponse(android::Parcel &p, int slotId,
-                            int requestNumber, int responseType,
+int getCellInfoListResponse(int slotId,
+                            int responseType,
                             int serial, RIL_Errno e, void *response,
                             size_t responseLen);
 
-int setCellInfoListRateResponse(android::Parcel &p, int slotId, int requestNumber,
+int setCellInfoListRateResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responselen);
 
-int setInitialAttachApnResponse(android::Parcel &p, int slotId, int requestNumber,
+int setInitialAttachApnResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responselen);
 
-int getImsRegistrationStateResponse(android::Parcel &p, int slotId, int requestNumber,
+int getImsRegistrationStateResponse(int slotId,
                                    int responseType, int serial, RIL_Errno e,
                                    void *response, size_t responselen);
 
-int sendImsSmsResponse(android::Parcel &p, int slotId, int requestNumber, int responseType,
+int sendImsSmsResponse(int slotId, int responseType,
                       int serial, RIL_Errno e, void *response, size_t responselen);
 
-int iccTransmitApduBasicChannelResponse(android::Parcel &p, int slotId, int requestNumber,
+int iccTransmitApduBasicChannelResponse(int slotId,
                                        int responseType, int serial, RIL_Errno e,
                                        void *response, size_t responselen);
 
-int iccOpenLogicalChannelResponse(android::Parcel &p, int slotId, int requestNumber,
+int iccOpenLogicalChannelResponse(int slotId,
                                   int responseType, int serial, RIL_Errno e, void *response,
                                   size_t responselen);
 
 
-int iccCloseLogicalChannelResponse(android::Parcel &p, int slotId, int requestNumber,
+int iccCloseLogicalChannelResponse(int slotId,
                                   int responseType, int serial, RIL_Errno e,
                                   void *response, size_t responselen);
 
-int iccTransmitApduLogicalChannelResponse(android::Parcel &p, int slotId, int requestNumber,
+int iccTransmitApduLogicalChannelResponse(int slotId,
                                          int responseType, int serial, RIL_Errno e,
                                          void *response, size_t responselen);
 
-int nvReadItemResponse(android::Parcel &p, int slotId, int requestNumber,
+int nvReadItemResponse(int slotId,
                       int responseType, int serial, RIL_Errno e,
                       void *response, size_t responselen);
 
 
-int nvWriteItemResponse(android::Parcel &p, int slotId, int requestNumber,
+int nvWriteItemResponse(int slotId,
                        int responseType, int serial, RIL_Errno e,
                        void *response, size_t responselen);
 
-int nvWriteCdmaPrlResponse(android::Parcel &p, int slotId, int requestNumber,
+int nvWriteCdmaPrlResponse(int slotId,
                           int responseType, int serial, RIL_Errno e,
                           void *response, size_t responselen);
 
-int nvResetConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+int nvResetConfigResponse(int slotId,
                          int responseType, int serial, RIL_Errno e,
                          void *response, size_t responselen);
 
-int setUiccSubscriptionResponse(android::Parcel &p, int slotId, int requestNumber,
+int setUiccSubscriptionResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responselen);
 
-int setDataAllowedResponse(android::Parcel &p, int slotId, int requestNumber,
+int setDataAllowedResponse(int slotId,
                           int responseType, int serial, RIL_Errno e,
                           void *response, size_t responselen);
 
-int getHardwareConfigResponse(android::Parcel &p, int slotId, int requestNumber,
+int getHardwareConfigResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responseLen);
 
-int requestIccSimAuthenticationResponse(android::Parcel &p, int slotId, int requestNumber,
+int requestIccSimAuthenticationResponse(int slotId,
                                        int responseType, int serial, RIL_Errno e,
                                        void *response, size_t responselen);
 
-int setDataProfileResponse(android::Parcel &p, int slotId, int requestNumber,
+int setDataProfileResponse(int slotId,
                           int responseType, int serial, RIL_Errno e,
                           void *response, size_t responselen);
 
-int requestShutdownResponse(android::Parcel &p, int slotId, int requestNumber,
+int requestShutdownResponse(int slotId,
                            int responseType, int serial, RIL_Errno e,
                            void *response, size_t responselen);
 
-int getRadioCapabilityResponse(android::Parcel &p, int slotId, int requestNumber,
+int getRadioCapabilityResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responseLen);
 
-int setRadioCapabilityResponse(android::Parcel &p, int slotId, int requestNumber,
+int setRadioCapabilityResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responseLen);
 
-int startLceServiceResponse(android::Parcel &p, int slotId, int requestNumber,
+int startLceServiceResponse(int slotId,
                            int responseType, int serial, RIL_Errno e,
                            void *response, size_t responselen);
 
-int stopLceServiceResponse(android::Parcel &p, int slotId, int requestNumber,
+int stopLceServiceResponse(int slotId,
                           int responseType, int serial, RIL_Errno e,
                           void *response, size_t responselen);
 
-int pullLceDataResponse(android::Parcel &p, int slotId, int requestNumber,
+int pullLceDataResponse(int slotId,
                         int responseType, int serial, RIL_Errno e,
                         void *response, size_t responseLen);
 
-int getModemActivityInfoResponse(android::Parcel &p, int slotId, int requestNumber,
+int getModemActivityInfoResponse(int slotId,
                                 int responseType, int serial, RIL_Errno e,
                                 void *response, size_t responselen);
 
-int setAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber,
+int setAllowedCarriersResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
-int getAllowedCarriersResponse(android::Parcel &p, int slotId, int requestNumber,
+int getAllowedCarriersResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
-int sendDeviceStateResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendDeviceStateResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
-int setIndicationFilterResponse(android::Parcel &p, int slotId, int requestNumber,
+int setIndicationFilterResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
-int setSimCardPowerResponse(android::Parcel &p, int slotId, int requestNumber,
+int setSimCardPowerResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
 void acknowledgeRequest(int slotId, int serial);
 
-int radioStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int radioStateChangedInd(int slotId,
                           int indicationType, int token, RIL_Errno e, void *response,
                           size_t responseLen);
 
-int callStateChangedInd(android::Parcel &p, int slotId, int requestNumber, int indType, int token,
+int callStateChangedInd(int slotId, int indType, int token,
                         RIL_Errno e, void *response, size_t responselen);
 
-int networkStateChangedInd(android::Parcel &p, int slotId, int requestNumber, int indType,
+int networkStateChangedInd(int slotId, int indType,
                                 int token, RIL_Errno e, void *response, size_t responselen);
 
-int newSmsInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int newSmsInd(int slotId, int indicationType,
               int token, RIL_Errno e, void *response, size_t responselen);
 
-int newSmsStatusReportInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int newSmsStatusReportInd(int slotId, int indicationType,
                           int token, RIL_Errno e, void *response, size_t responselen);
 
-int newSmsOnSimInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int newSmsOnSimInd(int slotId, int indicationType,
                    int token, RIL_Errno e, void *response, size_t responselen);
 
-int onUssdInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int onUssdInd(int slotId, int indicationType,
               int token, RIL_Errno e, void *response, size_t responselen);
 
-int nitzTimeReceivedInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int nitzTimeReceivedInd(int slotId, int indicationType,
                         int token, RIL_Errno e, void *response, size_t responselen);
 
-int currentSignalStrengthInd(android::Parcel &p, int slotId, int requestNumber,
+int currentSignalStrengthInd(int slotId,
                              int indicationType, int token, RIL_Errno e,
                              void *response, size_t responselen);
 
-int dataCallListChangedInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int dataCallListChangedInd(int slotId, int indicationType,
                            int token, RIL_Errno e, void *response, size_t responselen);
 
-int suppSvcNotifyInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int suppSvcNotifyInd(int slotId, int indicationType,
                      int token, RIL_Errno e, void *response, size_t responselen);
 
-int stkSessionEndInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int stkSessionEndInd(int slotId, int indicationType,
                      int token, RIL_Errno e, void *response, size_t responselen);
 
-int stkProactiveCommandInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int stkProactiveCommandInd(int slotId, int indicationType,
                            int token, RIL_Errno e, void *response, size_t responselen);
 
-int stkEventNotifyInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int stkEventNotifyInd(int slotId, int indicationType,
                       int token, RIL_Errno e, void *response, size_t responselen);
 
-int stkCallSetupInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int stkCallSetupInd(int slotId, int indicationType,
                     int token, RIL_Errno e, void *response, size_t responselen);
 
-int simSmsStorageFullInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int simSmsStorageFullInd(int slotId, int indicationType,
                          int token, RIL_Errno e, void *response, size_t responselen);
 
-int simRefreshInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int simRefreshInd(int slotId, int indicationType,
                   int token, RIL_Errno e, void *response, size_t responselen);
 
-int callRingInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int callRingInd(int slotId, int indicationType,
                 int token, RIL_Errno e, void *response, size_t responselen);
 
-int simStatusChangedInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int simStatusChangedInd(int slotId, int indicationType,
                         int token, RIL_Errno e, void *response, size_t responselen);
 
-int cdmaNewSmsInd(android::Parcel &p, int slotId, int requestNumber, int indicationType,
+int cdmaNewSmsInd(int slotId, int indicationType,
                   int token, RIL_Errno e, void *response, size_t responselen);
 
-int newBroadcastSmsInd(android::Parcel &p, int slotId, int requestNumber,
+int newBroadcastSmsInd(int slotId,
                        int indicationType, int token, RIL_Errno e, void *response,
                        size_t responselen);
 
-int cdmaRuimSmsStorageFullInd(android::Parcel &p, int slotId, int requestNumber,
+int cdmaRuimSmsStorageFullInd(int slotId,
                               int indicationType, int token, RIL_Errno e, void *response,
                               size_t responselen);
 
-int restrictedStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int restrictedStateChangedInd(int slotId,
                               int indicationType, int token, RIL_Errno e, void *response,
                               size_t responselen);
 
-int enterEmergencyCallbackModeInd(android::Parcel &p, int slotId, int requestNumber,
+int enterEmergencyCallbackModeInd(int slotId,
                                   int indicationType, int token, RIL_Errno e, void *response,
                                   size_t responselen);
 
-int cdmaCallWaitingInd(android::Parcel &p, int slotId, int requestNumber,
+int cdmaCallWaitingInd(int slotId,
                        int indicationType, int token, RIL_Errno e, void *response,
                        size_t responselen);
 
-int cdmaOtaProvisionStatusInd(android::Parcel &p, int slotId, int requestNumber,
+int cdmaOtaProvisionStatusInd(int slotId,
                               int indicationType, int token, RIL_Errno e, void *response,
                               size_t responselen);
 
-int cdmaInfoRecInd(android::Parcel &p, int slotId, int requestNumber,
+int cdmaInfoRecInd(int slotId,
                    int indicationType, int token, RIL_Errno e, void *response,
                    size_t responselen);
 
-int oemHookRawInd(android::Parcel &p, int slotId, int requestNumber,
+int oemHookRawInd(int slotId,
                   int indicationType, int token, RIL_Errno e, void *response,
                   size_t responselen);
 
-int indicateRingbackToneInd(android::Parcel &p, int slotId, int requestNumber,
+int indicateRingbackToneInd(int slotId,
                             int indicationType, int token, RIL_Errno e, void *response,
                             size_t responselen);
 
-int resendIncallMuteInd(android::Parcel &p, int slotId, int requestNumber,
+int resendIncallMuteInd(int slotId,
                         int indicationType, int token, RIL_Errno e, void *response,
                         size_t responselen);
 
-int cdmaSubscriptionSourceChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int cdmaSubscriptionSourceChangedInd(int slotId,
                                      int indicationType, int token, RIL_Errno e,
                                      void *response, size_t responselen);
 
-int cdmaPrlChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int cdmaPrlChangedInd(int slotId,
                       int indicationType, int token, RIL_Errno e, void *response,
                       size_t responselen);
 
-int exitEmergencyCallbackModeInd(android::Parcel &p, int slotId, int requestNumber,
+int exitEmergencyCallbackModeInd(int slotId,
                                  int indicationType, int token, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int rilConnectedInd(android::Parcel &p, int slotId, int requestNumber,
+int rilConnectedInd(int slotId,
                     int indicationType, int token, RIL_Errno e, void *response,
                     size_t responselen);
 
-int voiceRadioTechChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int voiceRadioTechChangedInd(int slotId,
                              int indicationType, int token, RIL_Errno e, void *response,
                              size_t responselen);
 
-int cellInfoListInd(android::Parcel &p, int slotId, int requestNumber,
+int cellInfoListInd(int slotId,
                     int indicationType, int token, RIL_Errno e, void *response,
                     size_t responselen);
 
-int imsNetworkStateChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int imsNetworkStateChangedInd(int slotId,
                               int indicationType, int token, RIL_Errno e, void *response,
                               size_t responselen);
 
-int subscriptionStatusChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int subscriptionStatusChangedInd(int slotId,
                                  int indicationType, int token, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int srvccStateNotifyInd(android::Parcel &p, int slotId, int requestNumber,
+int srvccStateNotifyInd(int slotId,
                         int indicationType, int token, RIL_Errno e, void *response,
                         size_t responselen);
 
-int hardwareConfigChangedInd(android::Parcel &p, int slotId, int requestNumber,
+int hardwareConfigChangedInd(int slotId,
                              int indicationType, int token, RIL_Errno e, void *response,
                              size_t responselen);
 
-int radioCapabilityIndicationInd(android::Parcel &p, int slotId, int requestNumber,
+int radioCapabilityIndicationInd(int slotId,
                                  int indicationType, int token, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int onSupplementaryServiceIndicationInd(android::Parcel &p, int slotId, int requestNumber,
+int onSupplementaryServiceIndicationInd(int slotId,
                                         int indicationType, int token, RIL_Errno e,
                                         void *response, size_t responselen);
 
-int stkCallControlAlphaNotifyInd(android::Parcel &p, int slotId, int requestNumber,
+int stkCallControlAlphaNotifyInd(int slotId,
                                  int indicationType, int token, RIL_Errno e, void *response,
                                  size_t responselen);
 
-int lceDataInd(android::Parcel &p, int slotId, int requestNumber,
+int lceDataInd(int slotId,
                int indicationType, int token, RIL_Errno e, void *response,
                size_t responselen);
 
-int pcoDataInd(android::Parcel &p, int slotId, int requestNumber,
+int pcoDataInd(int slotId,
                int indicationType, int token, RIL_Errno e, void *response,
                size_t responselen);
 
-int modemResetInd(android::Parcel &p, int slotId, int requestNumber,
+int modemResetInd(int slotId,
                   int indicationType, int token, RIL_Errno e, void *response,
                   size_t responselen);
 
-int sendRequestRawResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendRequestRawResponse(int slotId,
                            int responseType, int serial, RIL_Errno e,
                            void *response, size_t responseLen);
 
-int sendRequestStringsResponse(android::Parcel &p, int slotId, int requestNumber,
+int sendRequestStringsResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responseLen);
 

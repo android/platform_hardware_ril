@@ -89,7 +89,7 @@ enum WakeType {DONT_WAKE, WAKE_PARTIAL};
 
 typedef struct {
     int requestNumber;
-    int (*responseFunction) (Parcel &p, int slotId, int requestNumber, int responseType, int token,
+    int (*responseFunction) (int slotId, int responseType, int token,
             RIL_Errno e, void *response, size_t responselen);
     WakeType wakeType;
 } UnsolResponseInfo;
@@ -191,8 +191,6 @@ static size_t s_lastNITZTimeDataSize;
 #endif
 
 /*******************************************************************/
-static int sendResponse (Parcel &p, RIL_SOCKET_ID socket_id);
-
 static void grabPartialWakeLock();
 void releaseWakeLock();
 static void wakeTimeoutCallback(void *);
@@ -241,56 +239,11 @@ void RIL_setRilSocketName(const char * s) {
     strncpy(rild, s, MAX_SOCKET_NAME_LENGTH);
 }
 
-static char *
-strdupReadString(Parcel &p) {
-    size_t stringlen;
-    const char16_t *s16;
-
-    s16 = p.readString16Inplace(&stringlen);
-
-    return strndup16to8(s16, stringlen);
-}
-
-static status_t
-readStringFromParcelInplace(Parcel &p, char *str, size_t maxLen) {
-    size_t s16Len;
-    const char16_t *s16;
-
-    s16 = p.readString16Inplace(&s16Len);
-    if (s16 == NULL) {
-        return NO_MEMORY;
-    }
-    size_t strLen = strnlen16to8(s16, s16Len);
-    if ((strLen + 1) > maxLen) {
-        return NO_MEMORY;
-    }
-    if (strncpy16to8(str, s16, strLen) == NULL) {
-        return NO_MEMORY;
-    } else {
-        return NO_ERROR;
-    }
-}
-
-static void writeStringToParcel(Parcel &p, const char *s) {
-    char16_t *s16;
-    size_t s16_len;
-    s16 = strdup8to16(s, &s16_len);
-    p.writeString16(s16, s16_len);
-    free(s16);
-}
-
-
 static void
 memsetString (char *s) {
     if (s != NULL) {
         memset (s, 0, strlen(s));
     }
-}
-
-void   nullParcelReleaseFunction (const uint8_t* data, size_t dataSize,
-                                    const size_t* objects, size_t objectsSize,
-                                        void* cookie) {
-    // do nothing -- the data reference lives longer than the Parcel object
 }
 
 /**
@@ -344,86 +297,6 @@ issueLocalRequest(int request, void *data, int len, RIL_SOCKET_ID socket_id) {
 
 static int
 processCommandBuffer(void *buffer, size_t buflen, RIL_SOCKET_ID socket_id) {
-    Parcel p;
-    status_t status;
-    int32_t request;
-    int32_t token;
-    RequestInfo *pRI;
-    int ret;
-    /* Hook for current context */
-    /* pendingRequestsMutextHook refer to &s_pendingRequestsMutex */
-    pthread_mutex_t* pendingRequestsMutexHook = &s_pendingRequestsMutex;
-    /* pendingRequestsHook refer to &s_pendingRequests */
-    RequestInfo**    pendingRequestsHook = &s_pendingRequests;
-
-    p.setData((uint8_t *) buffer, buflen);
-
-    // status checked at end
-    status = p.readInt32(&request);
-    status = p.readInt32 (&token);
-
-#if (SIM_COUNT >= 2)
-    if (socket_id == RIL_SOCKET_2) {
-        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket2;
-        pendingRequestsHook = &s_pendingRequests_socket2;
-    }
-#if (SIM_COUNT >= 3)
-    else if (socket_id == RIL_SOCKET_3) {
-        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket3;
-        pendingRequestsHook = &s_pendingRequests_socket3;
-    }
-#endif
-#if (SIM_COUNT >= 4)
-    else if (socket_id == RIL_SOCKET_4) {
-        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket4;
-        pendingRequestsHook = &s_pendingRequests_socket4;
-    }
-#endif
-#endif
-
-    if (status != NO_ERROR) {
-        RLOGE("invalid request block");
-        return 0;
-    }
-
-    // Received an Ack for the previous result sent to RIL.java,
-    // so release wakelock and exit
-    if (request == RIL_RESPONSE_ACKNOWLEDGEMENT) {
-        releaseWakeLock();
-        return 0;
-    }
-
-    if (request < 1 || request >= (int32_t)NUM_ELEMS(s_commands)) {
-        Parcel pErr;
-        RLOGE("unsupported request code %d token %d", request, token);
-        // FIXME this should perhaps return a response
-        pErr.writeInt32 (RESPONSE_SOLICITED);
-        pErr.writeInt32 (token);
-        pErr.writeInt32 (RIL_E_GENERIC_FAILURE);
-
-        sendResponse(pErr, socket_id);
-        return 0;
-    }
-
-    pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
-    if (pRI == NULL) {
-        RLOGE("Memory allocation failed for request %s", requestToString(request));
-        return 0;
-    }
-
-    pRI->token = token;
-    pRI->pCI = &(s_commands[request]);
-    pRI->socket_id = socket_id;
-
-    ret = pthread_mutex_lock(pendingRequestsMutexHook);
-    assert (ret == 0);
-
-    pRI->p_next = *pendingRequestsHook;
-    *pendingRequestsHook = pRI;
-
-    ret = pthread_mutex_unlock(pendingRequestsMutexHook);
-    assert (ret == 0);
-
     return 0;
 }
 
@@ -576,12 +449,6 @@ sendResponseRaw (const void *data, size_t dataSize, RIL_SOCKET_ID socket_id) {
     return 0;
 }
 
-static int
-sendResponse (Parcel &p, RIL_SOCKET_ID socket_id) {
-    printResponse;
-    return sendResponseRaw(p.data(), p.dataSize(), socket_id);
-}
-
 static void triggerEvLoop() {
     int ret;
     if (!pthread_equal(pthread_self(), s_tid_dispatch)) {
@@ -708,12 +575,11 @@ static void processCommandsCallback(int fd, short flags, void *param) {
 
 static void resendLastNITZTimeData(RIL_SOCKET_ID socket_id) {
     if (s_lastNITZTimeData != NULL) {
-        Parcel p;
         int responseType = (s_callbacks.version >= 13)
                            ? RESPONSE_UNSOLICITED_ACK_EXP
                            : RESPONSE_UNSOLICITED;
         int ret = radio::nitzTimeReceivedInd(
-            p, (int)socket_id, RIL_UNSOL_NITZ_TIME_RECEIVED, responseType, 0,
+            (int)socket_id, responseType, 0,
             RIL_E_SUCCESS, s_lastNITZTimeData, s_lastNITZTimeDataSize);
         if (ret == 0) {
             free(s_lastNITZTimeData);
@@ -1588,7 +1454,7 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
         int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
         assert(rwlockRet == 0);
 
-        ret = pRI->pCI->responseFunction(p, (int) socket_id, pRI->pCI->requestNumber,
+        ret = pRI->pCI->responseFunction((int) socket_id,
                 responseType, pRI->token, e, response, responselen);
 
         rwlockRet = pthread_rwlock_unlock(radioServiceRwlockPtr);
@@ -1736,7 +1602,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     assert(rwlockRet == 0);
 
     ret = s_unsolResponses[unsolResponseIndex].responseFunction(
-            p, (int) soc_id, unsolResponse, responseType, 0, RIL_E_SUCCESS, const_cast<void*>(data),
+            (int) soc_id, responseType, 0, RIL_E_SUCCESS, const_cast<void*>(data),
             datalen);
 
     rwlockRet = pthread_rwlock_unlock(radioServiceRwlockPtr);
