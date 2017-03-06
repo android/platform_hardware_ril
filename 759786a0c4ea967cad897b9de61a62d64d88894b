@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7077c91b_85287afe",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-06T18:04:10Z",
+      "side": 1,
+      "message": "Is this required now or do you plan to remove it in subsequent CL ?",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 20
+      },
+      "revId": "759786a0c4ea967cad897b9de61a62d64d88894b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d198cc81_a57472e6",
         "filename": "libril/ril.cpp",
         "patchSetId": 2
