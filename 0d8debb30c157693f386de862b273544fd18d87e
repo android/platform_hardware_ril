@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e059281e_c695f4bb",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1979,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-07T14:32:30Z",
+      "side": 1,
+      "message": "nit: remove extra line",
+      "revId": "0d8debb30c157693f386de862b273544fd18d87e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7dbc3d_c1bd5dba",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-07T14:32:30Z",
+      "side": 1,
+      "message": "why make a separate function if its used only in one place?",
+      "revId": "0d8debb30c157693f386de862b273544fd18d87e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
