@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "98592b99_ffeb321a",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-07T15:27:03Z",
+      "side": 1,
+      "message": "will remove in subsequent CL. There are going to be a number of clean up CLs I think.",
+      "parentUuid": "7077c91b_85287afe",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 20
+      },
+      "revId": "759786a0c4ea967cad897b9de61a62d64d88894b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d198cc81_a57472e6",
         "filename": "libril/ril.cpp",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "7dba66f3_7372da58",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1432,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-07T15:27:03Z",
+      "side": 1,
+      "message": "will do in next CL?",
+      "parentUuid": "d198cc81_a57472e6",
+      "range": {
+        "startLine": 1432,
+        "startChar": 8,
+        "endLine": 1432,
+        "endChar": 17
+      },
+      "revId": "759786a0c4ea967cad897b9de61a62d64d88894b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "feec0322_0e656b62",
         "filename": "libril/ril.cpp",
         "patchSetId": 2
@@ -59,6 +107,30 @@
       "writtenOn": "2017-03-05T18:23:20Z",
       "side": 1,
       "message": "remove",
+      "range": {
+        "startLine": 1591,
+        "startChar": 4,
+        "endLine": 1591,
+        "endChar": 13
+      },
+      "revId": "759786a0c4ea967cad897b9de61a62d64d88894b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4266950e_ea6ce5af",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1591,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-07T15:27:03Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "feec0322_0e656b62",
       "range": {
         "startLine": 1591,
         "startChar": 4,
