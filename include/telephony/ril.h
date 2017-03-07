@@ -785,6 +785,21 @@ typedef enum {
     CALL_FAIL_DIAL_MODIFIED_TO_USSD = 244, /* STK Call Control */
     CALL_FAIL_DIAL_MODIFIED_TO_SS = 245,
     CALL_FAIL_DIAL_MODIFIED_TO_DIAL = 246,
+    CALL_FAIL_RADIO_OFF = 247, /* Radio is OFF */
+    CALL_FAIL_OUT_OF_SERVICE = 248, /* No cellular coverage */
+    CALL_FAIL_NO_VALID_SIM = 249, /* No valid SIM is present */
+    CALL_FAIL_RADIO_INTERNAL_ERROR = 250, /* Internal error at Modem */
+    CALL_FAIL_NETWORK_RESP_TIMEOUT = 251, /* No response from network */
+    CALL_FAIL_NETWORK_REJECT = 252, /* Explicit network reject */
+    CALL_FAIL_RADIO_ACCESS_FAILURE = 253, /* RRC connection failure. Eg.RACH */
+    CALL_FAIL_RADIO_LINK_FAILURE = 254, /* Radio Link Failure */
+    CALL_FAIL_RADIO_LINK_LOST = 255, /* Radio link lost due to poor coverage */
+    CALL_FAIL_RADIO_UPLINK_FAILURE = 256, /* Radio uplink failure */
+    CALL_FAIL_RADIO_SETUP_FAILURE = 257, /* RRC connection setup failure */
+    CALL_FAIL_RADIO_RELEASE_NORMAL = 258, /* RRC connection release, normal */
+    CALL_FAIL_RADIO_RELEASE_ABNORMAL = 259, /* RRC connection release, abnormal */
+    CALL_FAIL_ACCESS_CLASS_BLOCKED = 260, /* Access class barring */
+    CALL_FAIL_NETWORK_DETACH = 261, /* Explicit network detach */
     CALL_FAIL_CDMA_LOCKED_UNTIL_POWER_CYCLE = 1000,
     CALL_FAIL_CDMA_DROP = 1001,
     CALL_FAIL_CDMA_INTERCEPT = 1002,
@@ -796,6 +811,25 @@ typedef enum {
     CALL_FAIL_CDMA_NOT_EMERGENCY = 1008, /* For non-emergency number dialed
                                             during emergency callback mode */
     CALL_FAIL_CDMA_ACCESS_BLOCKED = 1009, /* CDMA network access probes blocked */
+
+    /* OEM specific error codes. Used to distinguish error from
+     * CALL_FAIL_ERROR_UNSPECIFIED and help assist debugging */
+    CALL_FAIL_OEM_CAUSE_1 = 0xf001,
+    CALL_FAIL_OEM_CAUSE_2 = 0xf002,
+    CALL_FAIL_OEM_CAUSE_3 = 0xf003,
+    CALL_FAIL_OEM_CAUSE_4 = 0xf004,
+    CALL_FAIL_OEM_CAUSE_5 = 0xf005,
+    CALL_FAIL_OEM_CAUSE_6 = 0xf006,
+    CALL_FAIL_OEM_CAUSE_7 = 0xf007,
+    CALL_FAIL_OEM_CAUSE_8 = 0xf008,
+    CALL_FAIL_OEM_CAUSE_9 = 0xf009,
+    CALL_FAIL_OEM_CAUSE_10 = 0xf00a,
+    CALL_FAIL_OEM_CAUSE_11 = 0xf00b,
+    CALL_FAIL_OEM_CAUSE_12 = 0xf00c,
+    CALL_FAIL_OEM_CAUSE_13 = 0xf00d,
+    CALL_FAIL_OEM_CAUSE_14 = 0xf00e,
+    CALL_FAIL_OEM_CAUSE_15 = 0xf00f,
+
     CALL_FAIL_ERROR_UNSPECIFIED = 0xffff /* This error will be deprecated soon,
                                             vendor code should make sure to map error
                                             code to specific error */
@@ -2398,14 +2432,35 @@ typedef enum {
  * Requests the failure cause code for the most recently terminated call
  *
  * "data" is NULL
- * "response" is a "int *"
- * ((int *)response)[0] is RIL_LastCallFailCause.  GSM failure reasons are
- * mapped to cause codes defined in TS 24.008 Annex H where possible. CDMA
- * failure reasons are derived from the possible call failure scenarios
- * described in the "CDMA IS-2000 Release A (C.S0005-A v6.0)" standard.
+ * "response" is a const RIL_LastCallFailCauseInfo *
+ * RIL_LastCallFailCauseInfo contains LastCallFailCause and vendor cause.
+ * The vendor cause code must be used for debugging purpose only.
+ * The implementation must return one of the values of LastCallFailCause
+ * as mentioned below.
  *
- * The implementation should return CALL_FAIL_ERROR_UNSPECIFIED for blocked
- * MO calls by restricted state (See RIL_UNSOL_RESTRICTED_STATE_CHANGED)
+ * GSM failure reasons codes for the cause codes defined in TS 24.008 Annex H
+ * where possible.
+ * CDMA failure reasons codes for the possible call failure scenarios
+ * described in the "CDMA IS-2000 Release A (C.S0005-A v6.0)" standard.
+ * Any of the following reason codes if the call is failed or dropped due to reason
+ * mentioned with in the braces.
+ *
+ *      LastCallFailCause:RADIO_OFF (Radio is OFF)
+ *      LastCallFailCause:OUT_OF_SERVICE (No cell coverage)
+ *      LastCallFailCause:NO_VALID_SIM (No valid SIM)
+ *      LastCallFailCause:RADIO_INTERNAL_ERROR (Modem hit unexpected error scenario)
+ *      LastCallFailCause:NETWORK_RESP_TIMEOUT (No response from network)
+ *      LastCallFailCause:NETWORK_REJECT (Explicit network reject)
+ *      LastCallFailCause:RADIO_ACCESS_FAILURE (RRC connection failure. Eg.RACH)
+ *      LastCallFailCause:RADIO_LINK_FAILURE (Radio Link Failure)
+ *      LastCallFailCause:RADIO_LINK_LOST (Radio link lost due to poor coverage)
+ *      LastCallFailCause:RADIO_UPLINK_FAILURE (Radio uplink failure)
+ *      LastCallFailCause:RADIO_SETUP_FAILURE (RRC connection setup failure)
+ *      LastCallFailCause:RADIO_RELEASE_NORMAL (RRC connection release, normal)
+ *      LastCallFailCause:RADIO_RELEASE_ABNORMAL (RRC connection release, abnormal)
+ *      LastCallFailCause:ACCESS_CLASS_BLOCKED (Access class barring)
+ *      LastCallFailCause:NETWORK_DETACH (Explicit network detach)
+ *   OEM causes (LastCallFailCause:OEM_CAUSE_XX) must be used for debug purpose only
  *
  * If the implementation does not have access to the exact cause codes,
  * then it should return one of the values listed in RIL_LastCallFailCause,
