@@ -796,6 +796,40 @@ typedef enum {
     CALL_FAIL_CDMA_NOT_EMERGENCY = 1008, /* For non-emergency number dialed
                                             during emergency callback mode */
     CALL_FAIL_CDMA_ACCESS_BLOCKED = 1009, /* CDMA network access probes blocked */
+    CALL_FAIL_RADIO_OFF = 1100,
+    CALL_FAIL_OUT_OF_SRV = 1101,
+    CALL_FAIL_NO_VALID_SIM = 1102,
+    CALL_FAIL_RADIO_INTERNAL_ERROR = 1103, /* Internal error at Modem */
+    CALL_FAIL_NETWORK_RESP_TIMEOUT = 1104, /* No response from network */
+    CALL_FAIL_NETWORK_REJECT = 1105, /* Explicit network reject */
+    CALL_FAIL_RADIO_ACCESS_FAILURE = 1106, /* RRC connection failure. Eg.RACH */
+    CALL_FAIL_RADIO_LINK_FAILURE = 1107, /* Radio Link Failure */
+    CALL_FAIL_RADIO_LINK_LOST = 1108, /* Radio link lost due to poor coverage */
+    CALL_FAIL_RADIO_UPLINK_FAILURE = 1109, /* Radio uplink failure */
+    CALL_FAIL_RADIO_SETUP_FAILURE = 1110, /* RRC connection setup failure */
+    CALL_FAIL_RADIO_RELEASE_NORMAL = 1111, /* RRC connection release, normal */
+    CALL_FAIL_RADIO_RELEASE_ABNORMAL = 1112, /* RRC connection release, abnormal */
+    CALL_FAIL_ACCESS_CLASS_BLOCKED = 1113, /* Access class barring */
+    CALL_FAIL_NETWORK_DETACH = 1114, /* Explicit network detach */
+
+    /* OEM specific error codes. To be used by OEMs when they don't want to
+       reveal error code which would be replaced by CALL_FAIL_ERROR_UNSPECIFIED */
+    CALL_FAIL_OEM_CAUSE_1 = 0xf001,
+    CALL_FAIL_OEM_CAUSE_2 = 0xf002,
+    CALL_FAIL_OEM_CAUSE_3 = 0xf003,
+    CALL_FAIL_OEM_CAUSE_4 = 0xf004,
+    CALL_FAIL_OEM_CAUSE_5 = 0xf005,
+    CALL_FAIL_OEM_CAUSE_6 = 0xf006,
+    CALL_FAIL_OEM_CAUSE_7 = 0xf007,
+    CALL_FAIL_OEM_CAUSE_8 = 0xf008,
+    CALL_FAIL_OEM_CAUSE_9 = 0xf009,
+    CALL_FAIL_OEM_CAUSE_10 = 0xf00a,
+    CALL_FAIL_OEM_CAUSE_11 = 0xf00b,
+    CALL_FAIL_OEM_CAUSE_12 = 0xf00c,
+    CALL_FAIL_OEM_CAUSE_13 = 0xf00d,
+    CALL_FAIL_OEM_CAUSE_14 = 0xf00e,
+    CALL_FAIL_OEM_CAUSE_15 = 0xf00f,
+
     CALL_FAIL_ERROR_UNSPECIFIED = 0xffff /* This error will be deprecated soon,
                                             vendor code should make sure to map error
                                             code to specific error */
