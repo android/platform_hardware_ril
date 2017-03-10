@@ -5362,8 +5362,11 @@ typedef enum {
   * as if the SIM had been inserted or removed.
   *
   * "data" is int *
-  * ((int *)data)[0] is 1 for "SIM POWER UP"
   * ((int *)data)[0] is 0 for "SIM POWER DOWN"
+  * ((int *)data)[0] is 1 for "SIM POWER UP"
+  * ((int *)data)[0] is 2 for "SIM POWER UP in PASS THRU MODE"
+  * When SIM card is powered up in PASS THRU MODE, the modem does not send
+  * any command to it, and it is controlled by Telephony sending APDUs directly.
   *
   * "response" is NULL
   *
