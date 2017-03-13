@@ -37,6 +37,42 @@
     },
     {
       "key": {
+        "uuid": "ac51d2a7_dd67ada8",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-13T23:41:55Z",
+      "side": 1,
+      "message": "I can put at 247+, just wanted to place all new changes at the end. \u003e 1000 doesn\u0027t mean its CDMA specific. In case all slots are occupied we need to go to \u003e 1000 later.",
+      "parentUuid": "8b17a24e_82c29c29",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a41b779_af4689ae",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-13T23:41:55Z",
+      "side": 1,
+      "message": "Just wanted to give some space for any future addition for CDMA specific causes. I can make it 247+ as mentioned by Jack.",
+      "parentUuid": "837300bf_a137bf85",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14032e5b_9160db89",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -48,6 +84,30 @@
       "writtenOn": "2017-03-13T15:06:42Z",
       "side": 1,
       "message": "What about SERVICE ?",
+      "range": {
+        "startLine": 800,
+        "startChar": 21,
+        "endLine": 800,
+        "endChar": 24
+      },
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df98857a_0bc5be0b",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 800,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-13T23:41:55Z",
+      "side": 1,
+      "message": "Ok, i will change it",
+      "parentUuid": "14032e5b_9160db89",
       "range": {
         "startLine": 800,
         "startChar": 21,
@@ -77,6 +137,24 @@
     },
     {
       "key": {
+        "uuid": "ba907901_9eea1d99",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-13T23:41:55Z",
+      "side": 1,
+      "message": "This is specific to 3GPP RRC connection setup failure. CDMA will not send this error.",
+      "parentUuid": "d9896448_cf193c57",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ce294f63_bee01391",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -94,6 +172,24 @@
     },
     {
       "key": {
+        "uuid": "a5346ee8_03d150d4",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-13T23:41:55Z",
+      "side": 1,
+      "message": "CALL_FAIL_NORMAL is sent if network/other part ends the call normally (Layer 3 signalling). CALL_FAIL_RADIO_RELEASE_NORMAL is sent when RRC connection is released by NodeB.. the 2nd one will be treated as call drop rather rather than success call.",
+      "parentUuid": "ce294f63_bee01391",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8ca8c59d_cb28cc02",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -105,6 +201,24 @@
       "writtenOn": "2017-03-13T23:04:15Z",
       "side": 1,
       "message": "wording is a bit difficult to understand. Can we just say \"OEM specific error codes. Used to distinguish error from CALL_FAIL_ERROR_UNSPECIFIED and help assist debugging\" ?",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f9187ffa_8f9d5d93",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-13T23:41:55Z",
+      "side": 1,
+      "message": "Ok",
+      "parentUuid": "8ca8c59d_cb28cc02",
       "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
