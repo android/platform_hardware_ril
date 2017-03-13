@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14032e5b_9160db89",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 800,
+      "author": {
+        "id": 1138358
+      },
+      "writtenOn": "2017-03-13T15:06:42Z",
+      "side": 1,
+      "message": "What about SERVICE ?",
+      "range": {
+        "startLine": 800,
+        "startChar": 21,
+        "endLine": 800,
+        "endChar": 24
+      },
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
