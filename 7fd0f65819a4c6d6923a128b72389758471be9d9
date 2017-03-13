@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8b17a24e_82c29c29",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-03-13T23:11:45Z",
+      "side": 1,
+      "message": "Also are \u003e1000 all CDMA specific errors? if not, should they start from 247?\n\nIIRC, RRC is 3GPP only.",
+      "parentUuid": "837300bf_a137bf85",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14032e5b_9160db89",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
