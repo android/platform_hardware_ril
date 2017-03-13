@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "837300bf_a137bf85",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-03-13T23:04:15Z",
+      "side": 1,
+      "message": "Any reason to start from 1100 instead of 1010",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14032e5b_9160db89",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
@@ -19,6 +36,57 @@
         "endLine": 800,
         "endChar": 24
       },
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d9896448_cf193c57",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-03-13T23:04:15Z",
+      "side": 1,
+      "message": "Is this specific to UMTS calls. CDMA can also have Origination failure. But its not RRC connection setup failure. Can we get this error on CDMA?",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce294f63_bee01391",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-03-13T23:04:15Z",
+      "side": 1,
+      "message": "How is this different from CALL_FAIL_NORMAL (Value 16 above)",
+      "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8ca8c59d_cb28cc02",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-03-13T23:04:15Z",
+      "side": 1,
+      "message": "wording is a bit difficult to understand. Can we just say \"OEM specific error codes. Used to distinguish error from CALL_FAIL_ERROR_UNSPECIFIED and help assist debugging\" ?",
       "revId": "7fd0f65819a4c6d6923a128b72389758471be9d9",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
