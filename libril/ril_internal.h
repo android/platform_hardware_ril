@@ -96,6 +96,9 @@ RequestInfo * addRequestToList(int serial, int slotId, int request);
 char * RIL_getRilSocketName();
 
 void releaseWakeLock();
+
+void onNewCommandConnect(RIL_SOCKET_ID socket_id);
+
 }   // namespace android
 
 #endif //ANDROID_RIL_INTERNAL_H
