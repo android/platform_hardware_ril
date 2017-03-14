@@ -49,8 +49,6 @@ void RilSocket::sSocketListener(int fd, short flags, void *param) {
     MySocketListenParam listenParam;
     listenParam.socket = theSocket;
     listenParam.sListenParam.type = RIL_SAP_SOCKET;
-
-    listenCallback_helper(fd, flags, (void*)&listenParam);
 }
 
 void RilSocket::onNewCommandConnect() {
