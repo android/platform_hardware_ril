@@ -3285,14 +3285,15 @@ typedef enum {
  *           "current"
  *           "forbidden"
  *
- * This request must not respond until the new operator is selected
- * and registered
- *
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  ABORTED
+ *  DEVICE_IN_USE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  MODEM_ERR
  *
  */
 #define RIL_REQUEST_QUERY_AVAILABLE_NETWORKS 48
