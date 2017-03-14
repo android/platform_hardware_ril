@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9d2b5442_81f750f6",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-14T06:33:36Z",
+      "side": 1,
+      "message": "How will an application who is listening to last call fail cause use this error?",
+      "revId": "f21ba7a59bc8b080620843af1c4796b34a72d3ec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
