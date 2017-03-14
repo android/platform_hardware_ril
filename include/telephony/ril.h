@@ -3285,13 +3285,15 @@ typedef enum {
  *           "current"
  *           "forbidden"
  *
- * This request must not respond until the new operator is selected
- * and registered
- *
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
+ *  ABORTED
+ *  DEVICE_IN_USE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  MODEM_ERR
  *  GENERIC_FAILURE
  *
  */
