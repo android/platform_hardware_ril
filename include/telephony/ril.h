@@ -154,9 +154,11 @@ typedef enum {
     RIL_E_SS_MODIFIED_TO_SS = 27,               /* SS request modified to different SS request */
     RIL_E_LCE_NOT_SUPPORTED = 36,               /* LCE service not supported(36 in RILConstants.java) */
     RIL_E_NO_MEMORY = 37,                       /* Not sufficient memory to process the request */
-    RIL_E_INTERNAL_ERR = 38,                    /* Hit unexpected vendor internal error scenario */
+    RIL_E_INTERNAL_ERR = 38,                    /* Modem hit unexpected error scenario while handling
+                                                   this request */
     RIL_E_SYSTEM_ERR = 39,                      /* Hit platform or system error */
-    RIL_E_MODEM_ERR = 40,                       /* Hit unexpected modem error */
+    RIL_E_MODEM_ERR = 40,                       /* Vendor RIL got unexpected or incorrect response
+                                                   from modem for this request */
     RIL_E_INVALID_STATE = 41,                   /* Unexpected request for the current state */
     RIL_E_NO_RESOURCES = 42,                    /* Not sufficient resource to process the request */
     RIL_E_SIM_ERR = 43,                         /* Received error from SIM card */
@@ -3285,14 +3287,15 @@ typedef enum {
  *           "current"
  *           "forbidden"
  *
- * This request must not respond until the new operator is selected
- * and registered
- *
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  ABORTED
+ *  DEVICE_IN_USE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  MODEM_ERR
  *
  */
 #define RIL_REQUEST_QUERY_AVAILABLE_NETWORKS 48
