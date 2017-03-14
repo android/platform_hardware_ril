@@ -59,8 +59,6 @@ namespace android {
 #define PHONE_PROCESS "radio"
 #define BLUETOOTH_PROCESS "bluetooth"
 
-#define SOCKET_NAME_RIL_DEBUG "rild-debug"
-
 #define ANDROID_WAKE_LOCK_NAME "radio-interface"
 
 #define ANDROID_WAKE_LOCK_SECS 0
@@ -1034,58 +1032,6 @@ extern "C" void RIL_setcallbacks (const RIL_RadioFunctions *callbacks) {
 }
 
 static void startListen(RIL_SOCKET_ID socket_id, SocketListenParam* socket_listen_p) {
-    int fdListen = -1;
-    int ret;
-    char socket_name[10];
-
-    memset(socket_name, 0, sizeof(char)*10);
-
-    switch(socket_id) {
-        case RIL_SOCKET_1:
-            strncpy(socket_name, RIL_getRilSocketName(), 9);
-            break;
-    #if (SIM_COUNT >= 2)
-        case RIL_SOCKET_2:
-            strncpy(socket_name, SOCKET2_NAME_RIL, 9);
-            break;
-    #endif
-    #if (SIM_COUNT >= 3)
-        case RIL_SOCKET_3:
-            strncpy(socket_name, SOCKET3_NAME_RIL, 9);
-            break;
-    #endif
-    #if (SIM_COUNT >= 4)
-        case RIL_SOCKET_4:
-            strncpy(socket_name, SOCKET4_NAME_RIL, 9);
-            break;
-    #endif
-        default:
-            RLOGE("Socket id is wrong!!");
-            return;
-    }
-
-    RLOGI("Start to listen %s", rilSocketIdToString(socket_id));
-
-    fdListen = android_get_control_socket(socket_name);
-    if (fdListen < 0) {
-        RLOGE("Failed to get socket %s", socket_name);
-        exit(-1);
-    }
-
-    ret = listen(fdListen, 4);
-
-    if (ret < 0) {
-        RLOGE("Failed to listen on control socket '%d': %s",
-             fdListen, strerror(errno));
-        exit(-1);
-    }
-    socket_listen_p->fdListen = fdListen;
-
-    /* note: non-persistent so we can accept only one connection at a time */
-    ril_event_set (socket_listen_p->listen_event, fdListen, false,
-                listenCallback, socket_listen_p);
-
-    rilEventAddWakeup (socket_listen_p->listen_event);
 }
 
 extern "C" void
@@ -1212,39 +1158,6 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
 
     radio::registerService(&s_callbacks, s_commands);
     RLOGI("RILHIDL called registerService");
-
-#if 1
-    // start debug interface socket
-
-    char *inst = NULL;
-    if (strlen(RIL_getRilSocketName()) >= strlen(SOCKET_NAME_RIL)) {
-        inst = RIL_getRilSocketName() + strlen(SOCKET_NAME_RIL);
-    }
-
-    char rildebug[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_DEBUG;
-    if (inst != NULL) {
-        strlcat(rildebug, inst, MAX_DEBUG_SOCKET_NAME_LENGTH);
-    }
-
-    s_fdDebug = android_get_control_socket(rildebug);
-    if (s_fdDebug < 0) {
-        RLOGE("Failed to get socket : %s errno:%d", rildebug, errno);
-        exit(-1);
-    }
-
-    ret = listen(s_fdDebug, 4);
-
-    if (ret < 0) {
-        RLOGE("Failed to listen on ril debug socket '%d': %s",
-             s_fdDebug, strerror(errno));
-        exit(-1);
-    }
-
-    ril_event_set (&s_debug_event, s_fdDebug, true,
-                debugCallback, NULL);
-
-    rilEventAddWakeup (&s_debug_event);
-#endif
 
 }
 
