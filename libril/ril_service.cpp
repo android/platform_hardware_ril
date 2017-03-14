@@ -761,6 +761,9 @@ Return<void> RadioImpl::setResponseFunctions(
     ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
     assert(ret == 0);
 
+    // client is connected. Send initial indications.
+    android::onNewCommandConnect((RIL_SOCKET_ID) mSlotId);
+
     return Void();
 }
 
