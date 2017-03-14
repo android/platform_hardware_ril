@@ -59,8 +59,6 @@ namespace android {
 #define PHONE_PROCESS "radio"
 #define BLUETOOTH_PROCESS "bluetooth"
 
-#define SOCKET_NAME_RIL_DEBUG "rild-debug"
-
 #define ANDROID_WAKE_LOCK_NAME "radio-interface"
 
 #define ANDROID_WAKE_LOCK_SECS 0
@@ -125,10 +123,7 @@ static int s_fdWakeupWrite;
 
 int s_wakelock_count = 0;
 
-static struct ril_event s_commands_event;
 static struct ril_event s_wakeupfd_event;
-static struct ril_event s_listen_event;
-static SocketListenParam s_ril_param_socket;
 
 static pthread_mutex_t s_pendingRequestsMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t s_writeMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -136,30 +131,18 @@ static pthread_mutex_t s_wakeLockCountMutex = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests = NULL;
 
 #if (SIM_COUNT >= 2)
-static struct ril_event s_commands_event_socket2;
-static struct ril_event s_listen_event_socket2;
-static SocketListenParam s_ril_param_socket2;
-
 static pthread_mutex_t s_pendingRequestsMutex_socket2  = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t s_writeMutex_socket2            = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests_socket2          = NULL;
 #endif
 
 #if (SIM_COUNT >= 3)
-static struct ril_event s_commands_event_socket3;
-static struct ril_event s_listen_event_socket3;
-static SocketListenParam s_ril_param_socket3;
-
 static pthread_mutex_t s_pendingRequestsMutex_socket3  = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t s_writeMutex_socket3            = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests_socket3          = NULL;
 #endif
 
 #if (SIM_COUNT >= 4)
-static struct ril_event s_commands_event_socket4;
-static struct ril_event s_listen_event_socket4;
-static SocketListenParam s_ril_param_socket4;
-
 static pthread_mutex_t s_pendingRequestsMutex_socket4  = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t s_writeMutex_socket4            = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests_socket4          = NULL;
@@ -194,8 +177,6 @@ static size_t s_lastNITZTimeDataSize;
 static void grabPartialWakeLock();
 void releaseWakeLock();
 static void wakeTimeoutCallback(void *);
-
-static bool isDebuggable();
 
 #ifdef RIL_SHLIB
 #if defined(ANDROID_MULTI_SIM)
@@ -237,67 +218,6 @@ char * RIL_getRilSocketName() {
 extern "C"
 void RIL_setRilSocketName(const char * s) {
     strncpy(rild, s, MAX_SOCKET_NAME_LENGTH);
-}
-
-static void
-memsetString (char *s) {
-    if (s != NULL) {
-        memset (s, 0, strlen(s));
-    }
-}
-
-/**
- * To be called from dispatch thread
- * Issue a single local request, ensuring that the response
- * is not sent back up to the command process
- */
-static void
-issueLocalRequest(int request, void *data, int len, RIL_SOCKET_ID socket_id) {
-    RequestInfo *pRI;
-    int ret;
-    /* Hook for current context */
-    /* pendingRequestsMutextHook refer to &s_pendingRequestsMutex */
-    pthread_mutex_t* pendingRequestsMutexHook = &s_pendingRequestsMutex;
-    /* pendingRequestsHook refer to &s_pendingRequests */
-    RequestInfo**    pendingRequestsHook = &s_pendingRequests;
-
-#if (SIM_COUNT == 2)
-    if (socket_id == RIL_SOCKET_2) {
-        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket2;
-        pendingRequestsHook = &s_pendingRequests_socket2;
-    }
-#endif
-
-    pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
-    if (pRI == NULL) {
-        RLOGE("Memory allocation failed for request %s", requestToString(request));
-        return;
-    }
-
-    pRI->local = 1;
-    pRI->token = 0xffffffff;        // token is not used in this context
-    pRI->pCI = &(s_commands[request]);
-    pRI->socket_id = socket_id;
-
-    ret = pthread_mutex_lock(pendingRequestsMutexHook);
-    assert (ret == 0);
-
-    pRI->p_next = *pendingRequestsHook;
-    *pendingRequestsHook = pRI;
-
-    ret = pthread_mutex_unlock(pendingRequestsMutexHook);
-    assert (ret == 0);
-
-    RLOGD("C[locl]> %s", requestToString(request));
-
-    CALL_ONREQUEST(request, data, len, pRI, pRI->socket_id);
-}
-
-
-
-static int
-processCommandBuffer(void *buffer, size_t buflen, RIL_SOCKET_ID socket_id) {
-    return 0;
 }
 
 RequestInfo *
@@ -352,12 +272,6 @@ addRequestToList(int serial, int slotId, int request) {
     return pRI;
 }
 
-static void
-invalidCommandBlock (RequestInfo *pRI) {
-    RLOGE("invalid command block for token %d request %s",
-                pRI->token, requestToString(pRI->pCI->requestNumber));
-}
-
 static int
 blockingWrite(int fd, const void *buffer, size_t len) {
     size_t writeOffset = 0;
@@ -383,69 +297,6 @@ blockingWrite(int fd, const void *buffer, size_t len) {
 #if VDBG
     RLOGE("RIL Response bytes written:%d", writeOffset);
 #endif
-    return 0;
-}
-
-static int
-sendResponseRaw (const void *data, size_t dataSize, RIL_SOCKET_ID socket_id) {
-    int fd = s_ril_param_socket.fdCommand;
-    int ret;
-    uint32_t header;
-    pthread_mutex_t * writeMutexHook = &s_writeMutex;
-
-#if VDBG
-    RLOGE("Send Response to %s", rilSocketIdToString(socket_id));
-#endif
-
-#if (SIM_COUNT >= 2)
-    if (socket_id == RIL_SOCKET_2) {
-        fd = s_ril_param_socket2.fdCommand;
-        writeMutexHook = &s_writeMutex_socket2;
-    }
-#if (SIM_COUNT >= 3)
-    else if (socket_id == RIL_SOCKET_3) {
-        fd = s_ril_param_socket3.fdCommand;
-        writeMutexHook = &s_writeMutex_socket3;
-    }
-#endif
-#if (SIM_COUNT >= 4)
-    else if (socket_id == RIL_SOCKET_4) {
-        fd = s_ril_param_socket4.fdCommand;
-        writeMutexHook = &s_writeMutex_socket4;
-    }
-#endif
-#endif
-    if (fd < 0) {
-        return -1;
-    }
-
-    if (dataSize > MAX_COMMAND_BYTES) {
-        RLOGE("RIL: packet larger than %u (%u)",
-                MAX_COMMAND_BYTES, (unsigned int )dataSize);
-
-        return -1;
-    }
-
-    pthread_mutex_lock(writeMutexHook);
-
-    header = htonl(dataSize);
-
-    ret = blockingWrite(fd, (void *)&header, sizeof(header));
-
-    if (ret < 0) {
-        pthread_mutex_unlock(writeMutexHook);
-        return ret;
-    }
-
-    ret = blockingWrite(fd, data, dataSize);
-
-    if (ret < 0) {
-        pthread_mutex_unlock(writeMutexHook);
-        return ret;
-    }
-
-    pthread_mutex_unlock(writeMutexHook);
-
     return 0;
 }
 
@@ -526,53 +377,6 @@ static void onCommandsSocketClosed(RIL_SOCKET_ID socket_id) {
     assert (ret == 0);
 }
 
-static void processCommandsCallback(int fd, short flags, void *param) {
-    RecordStream *p_rs;
-    void *p_record;
-    size_t recordlen;
-    int ret;
-    SocketListenParam *p_info = (SocketListenParam *)param;
-
-    assert(fd == p_info->fdCommand);
-
-    p_rs = p_info->p_rs;
-
-    for (;;) {
-        /* loop until EAGAIN/EINTR, end of stream, or other error */
-        ret = record_stream_get_next(p_rs, &p_record, &recordlen);
-
-        if (ret == 0 && p_record == NULL) {
-            /* end-of-stream */
-            break;
-        } else if (ret < 0) {
-            break;
-        } else if (ret == 0) { /* && p_record != NULL */
-            processCommandBuffer(p_record, recordlen, p_info->socket_id);
-        }
-    }
-
-    if (ret == 0 || !(errno == EAGAIN || errno == EINTR)) {
-        /* fatal error or end-of-stream */
-        if (ret != 0) {
-            RLOGE("error on reading command socket errno:%d\n", errno);
-        } else {
-            RLOGW("EOS.  Closing command socket.");
-        }
-
-        close(fd);
-        p_info->fdCommand = -1;
-
-        ril_event_del(p_info->commands_event);
-
-        record_stream_free(p_rs);
-
-        /* start listening for new connections again */
-        rilEventAddWakeup(&s_listen_event);
-
-        onCommandsSocketClosed(p_info->socket_id);
-    }
-}
-
 static void resendLastNITZTimeData(RIL_SOCKET_ID socket_id) {
     if (s_lastNITZTimeData != NULL) {
         int responseType = (s_callbacks.version >= 13)
@@ -588,7 +392,7 @@ static void resendLastNITZTimeData(RIL_SOCKET_ID socket_id) {
     }
 }
 
-static void onNewCommandConnect(RIL_SOCKET_ID socket_id) {
+void onNewCommandConnect(RIL_SOCKET_ID socket_id) {
     // Inform we are connected and the ril version
     int rilVer = s_callbacks.version;
     RIL_UNSOL_RESPONSE(RIL_UNSOL_RIL_CONNECTED,
@@ -616,336 +420,6 @@ static void onNewCommandConnect(RIL_SOCKET_ID socket_id) {
     }
 
 }
-
-static void listenCallback (int fd, short flags, void *param) {
-    int ret;
-    int err;
-    int is_phone_socket;
-    int fdCommand = -1;
-    const char* processName;
-    RecordStream *p_rs;
-    MySocketListenParam* listenParam;
-    RilSocket *sapSocket = NULL;
-    socketClient *sClient = NULL;
-
-    SocketListenParam *p_info = (SocketListenParam *)param;
-
-    if(RIL_SAP_SOCKET == p_info->type) {
-        listenParam = (MySocketListenParam *)param;
-        sapSocket = listenParam->socket;
-    }
-
-    struct sockaddr_un peeraddr;
-    socklen_t socklen = sizeof (peeraddr);
-
-    struct ucred creds;
-    socklen_t szCreds = sizeof(creds);
-
-    struct passwd *pwd = NULL;
-
-    if(NULL == sapSocket) {
-        assert (p_info->fdCommand < 0);
-        assert (fd == p_info->fdListen);
-        processName = PHONE_PROCESS;
-    } else {
-        assert (sapSocket->getCommandFd() < 0);
-        assert (fd == sapSocket->getListenFd());
-        processName = BLUETOOTH_PROCESS;
-    }
-
-
-    fdCommand = accept(fd, (sockaddr *) &peeraddr, &socklen);
-
-    if (fdCommand < 0 ) {
-        RLOGE("Error on accept() errno:%d", errno);
-        /* start listening for new connections again */
-        if(NULL == sapSocket) {
-            rilEventAddWakeup(p_info->listen_event);
-        } else {
-            rilEventAddWakeup(sapSocket->getListenEvent());
-        }
-        return;
-    }
-
-    /* check the credential of the other side and only accept socket from
-     * phone process
-     */
-    errno = 0;
-    is_phone_socket = 0;
-
-    err = getsockopt(fdCommand, SOL_SOCKET, SO_PEERCRED, &creds, &szCreds);
-
-    if (err == 0 && szCreds > 0) {
-        errno = 0;
-        pwd = getpwuid(creds.uid);
-        if (pwd != NULL) {
-            if (strcmp(pwd->pw_name, processName) == 0) {
-                is_phone_socket = 1;
-            } else {
-                RLOGE("RILD can't accept socket from process %s", pwd->pw_name);
-            }
-        } else {
-            RLOGE("Error on getpwuid() errno: %d", errno);
-        }
-    } else {
-        RLOGD("Error on getsockopt() errno: %d", errno);
-    }
-
-    if (!is_phone_socket) {
-        RLOGE("RILD must accept socket from %s", processName);
-
-        close(fdCommand);
-        fdCommand = -1;
-
-        if(NULL == sapSocket) {
-            onCommandsSocketClosed(p_info->socket_id);
-
-            /* start listening for new connections again */
-            rilEventAddWakeup(p_info->listen_event);
-        } else {
-            sapSocket->onCommandsSocketClosed();
-
-            /* start listening for new connections again */
-            rilEventAddWakeup(sapSocket->getListenEvent());
-        }
-
-        return;
-    }
-
-    ret = fcntl(fdCommand, F_SETFL, O_NONBLOCK);
-
-    if (ret < 0) {
-        RLOGE ("Error setting O_NONBLOCK errno:%d", errno);
-    }
-
-    if(NULL == sapSocket) {
-        RLOGI("libril: new connection to %s", rilSocketIdToString(p_info->socket_id));
-
-        p_info->fdCommand = fdCommand;
-        p_rs = record_stream_new(p_info->fdCommand, MAX_COMMAND_BYTES);
-        p_info->p_rs = p_rs;
-
-        ril_event_set (p_info->commands_event, p_info->fdCommand, 1,
-        p_info->processCommandsCallback, p_info);
-        rilEventAddWakeup (p_info->commands_event);
-
-        onNewCommandConnect(p_info->socket_id);
-    } else {
-        RLOGI("libril: new connection");
-
-        sapSocket->setCommandFd(fdCommand);
-        p_rs = record_stream_new(sapSocket->getCommandFd(), MAX_COMMAND_BYTES);
-        sClient = new socketClient(sapSocket,p_rs);
-        ril_event_set (sapSocket->getCallbackEvent(), sapSocket->getCommandFd(), 1,
-        sapSocket->getCommandCb(), sClient);
-
-        rilEventAddWakeup(sapSocket->getCallbackEvent());
-        sapSocket->onNewCommandConnect();
-    }
-}
-
-static void freeDebugCallbackArgs(int number, char **args) {
-    for (int i = 0; i < number; i++) {
-        if (args[i] != NULL) {
-            free(args[i]);
-        }
-    }
-    free(args);
-}
-
-static void debugCallback (int fd, short flags, void *param) {
-    int acceptFD, option;
-    struct sockaddr_un peeraddr;
-    socklen_t socklen = sizeof (peeraddr);
-    int data;
-    unsigned int qxdm_data[6];
-    const char *deactData[1] = {"1"};
-    char *actData[1];
-    RIL_Dial dialData;
-    int hangupData[1] = {1};
-    int number;
-    char **args;
-    RIL_SOCKET_ID socket_id = RIL_SOCKET_1;
-    int sim_id = 0;
-
-    RLOGI("debugCallback for socket %s", rilSocketIdToString(socket_id));
-
-    acceptFD = accept (fd,  (sockaddr *) &peeraddr, &socklen);
-
-    if (acceptFD < 0) {
-        RLOGE ("error accepting on debug port: %d\n", errno);
-        return;
-    }
-
-    if (recv(acceptFD, &number, sizeof(int), 0) != sizeof(int)) {
-        RLOGE ("error reading on socket: number of Args: \n");
-        close(acceptFD);
-        return;
-    }
-
-    if (number < 0) {
-        RLOGE ("Invalid number of arguments: \n");
-        close(acceptFD);
-        return;
-    }
-
-    args = (char **) calloc(number, sizeof(char*));
-    if (args == NULL) {
-        RLOGE("Memory allocation failed for debug args");
-        close(acceptFD);
-        return;
-    }
-
-    for (int i = 0; i < number; i++) {
-        int len;
-        if (recv(acceptFD, &len, sizeof(int), 0) != sizeof(int)) {
-            RLOGE ("error reading on socket: Len of Args: \n");
-            freeDebugCallbackArgs(i, args);
-            close(acceptFD);
-            return;
-        }
-        if (len == INT_MAX || len < 0) {
-            RLOGE("Invalid value of len: \n");
-            freeDebugCallbackArgs(i, args);
-            close(acceptFD);
-            return;
-        }
-
-        // +1 for null-term
-        args[i] = (char *) calloc(len + 1, sizeof(char));
-        if (args[i] == NULL) {
-            RLOGE("Memory allocation failed for debug args");
-            freeDebugCallbackArgs(i, args);
-            close(acceptFD);
-            return;
-        }
-        if (recv(acceptFD, args[i], sizeof(char) * len, 0)
-            != (int)sizeof(char) * len) {
-            RLOGE ("error reading on socket: Args[%d] \n", i);
-            freeDebugCallbackArgs(i, args);
-            close(acceptFD);
-            return;
-        }
-        char * buf = args[i];
-        buf[len] = 0;
-        if ((i+1) == number) {
-            /* The last argument should be sim id 0(SIM1)~3(SIM4) */
-            sim_id = atoi(args[i]);
-            switch (sim_id) {
-                case 0:
-                    socket_id = RIL_SOCKET_1;
-                    break;
-            #if (SIM_COUNT >= 2)
-                case 1:
-                    socket_id = RIL_SOCKET_2;
-                    break;
-            #endif
-            #if (SIM_COUNT >= 3)
-                case 2:
-                    socket_id = RIL_SOCKET_3;
-                    break;
-            #endif
-            #if (SIM_COUNT >= 4)
-                case 3:
-                    socket_id = RIL_SOCKET_4;
-                    break;
-            #endif
-                default:
-                    socket_id = RIL_SOCKET_1;
-                    break;
-            }
-        }
-    }
-
-    switch (atoi(args[0])) {
-        case 0:
-            RLOGI ("Connection on debug port: issuing reset.");
-            issueLocalRequest(RIL_REQUEST_RESET_RADIO, NULL, 0, socket_id);
-            break;
-        case 1:
-            RLOGI ("Connection on debug port: issuing radio power off.");
-            data = 0;
-            issueLocalRequest(RIL_REQUEST_RADIO_POWER, &data, sizeof(int), socket_id);
-            // Close the socket
-            if (socket_id == RIL_SOCKET_1 && s_ril_param_socket.fdCommand > 0) {
-                close(s_ril_param_socket.fdCommand);
-                s_ril_param_socket.fdCommand = -1;
-            }
-        #if (SIM_COUNT == 2)
-            else if (socket_id == RIL_SOCKET_2 && s_ril_param_socket2.fdCommand > 0) {
-                close(s_ril_param_socket2.fdCommand);
-                s_ril_param_socket2.fdCommand = -1;
-            }
-        #endif
-            break;
-        case 2:
-            RLOGI ("Debug port: issuing unsolicited voice network change.");
-            RIL_UNSOL_RESPONSE(RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED, NULL, 0, socket_id);
-            break;
-        case 3:
-            RLOGI ("Debug port: QXDM log enable.");
-            qxdm_data[0] = 65536;     // head.func_tag
-            qxdm_data[1] = 16;        // head.len
-            qxdm_data[2] = 1;         // mode: 1 for 'start logging'
-            qxdm_data[3] = 32;        // log_file_size: 32megabytes
-            qxdm_data[4] = 0;         // log_mask
-            qxdm_data[5] = 8;         // log_max_fileindex
-            issueLocalRequest(RIL_REQUEST_OEM_HOOK_RAW, qxdm_data,
-                              6 * sizeof(int), socket_id);
-            break;
-        case 4:
-            RLOGI ("Debug port: QXDM log disable.");
-            qxdm_data[0] = 65536;
-            qxdm_data[1] = 16;
-            qxdm_data[2] = 0;          // mode: 0 for 'stop logging'
-            qxdm_data[3] = 32;
-            qxdm_data[4] = 0;
-            qxdm_data[5] = 8;
-            issueLocalRequest(RIL_REQUEST_OEM_HOOK_RAW, qxdm_data,
-                              6 * sizeof(int), socket_id);
-            break;
-        case 5:
-            RLOGI("Debug port: Radio On");
-            data = 1;
-            issueLocalRequest(RIL_REQUEST_RADIO_POWER, &data, sizeof(int), socket_id);
-            sleep(2);
-            // Set network selection automatic.
-            issueLocalRequest(RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC, NULL, 0, socket_id);
-            break;
-        case 6:
-            RLOGI("Debug port: Setup Data Call, Apn :%s\n", args[1]);
-            actData[0] = args[1];
-            issueLocalRequest(RIL_REQUEST_SETUP_DATA_CALL, &actData,
-                              sizeof(actData), socket_id);
-            break;
-        case 7:
-            RLOGI("Debug port: Deactivate Data Call");
-            issueLocalRequest(RIL_REQUEST_DEACTIVATE_DATA_CALL, &deactData,
-                              sizeof(deactData), socket_id);
-            break;
-        case 8:
-            RLOGI("Debug port: Dial Call");
-            dialData.clir = 0;
-            dialData.address = args[1];
-            issueLocalRequest(RIL_REQUEST_DIAL, &dialData, sizeof(dialData), socket_id);
-            break;
-        case 9:
-            RLOGI("Debug port: Answer Call");
-            issueLocalRequest(RIL_REQUEST_ANSWER, NULL, 0, socket_id);
-            break;
-        case 10:
-            RLOGI("Debug port: End Call");
-            issueLocalRequest(RIL_REQUEST_HANGUP, &hangupData,
-                              sizeof(hangupData), socket_id);
-            break;
-        default:
-            RLOGE ("Invalid request");
-            break;
-    }
-    freeDebugCallbackArgs(number, args);
-    close(acceptFD);
-}
-
 
 static void userTimerCallback (int fd, short flags, void *param) {
     UserCallbackInfo *p_info;
@@ -1033,61 +507,6 @@ extern "C" void RIL_setcallbacks (const RIL_RadioFunctions *callbacks) {
     memcpy(&s_callbacks, callbacks, sizeof (RIL_RadioFunctions));
 }
 
-static void startListen(RIL_SOCKET_ID socket_id, SocketListenParam* socket_listen_p) {
-    int fdListen = -1;
-    int ret;
-    char socket_name[10];
-
-    memset(socket_name, 0, sizeof(char)*10);
-
-    switch(socket_id) {
-        case RIL_SOCKET_1:
-            strncpy(socket_name, RIL_getRilSocketName(), 9);
-            break;
-    #if (SIM_COUNT >= 2)
-        case RIL_SOCKET_2:
-            strncpy(socket_name, SOCKET2_NAME_RIL, 9);
-            break;
-    #endif
-    #if (SIM_COUNT >= 3)
-        case RIL_SOCKET_3:
-            strncpy(socket_name, SOCKET3_NAME_RIL, 9);
-            break;
-    #endif
-    #if (SIM_COUNT >= 4)
-        case RIL_SOCKET_4:
-            strncpy(socket_name, SOCKET4_NAME_RIL, 9);
-            break;
-    #endif
-        default:
-            RLOGE("Socket id is wrong!!");
-            return;
-    }
-
-    RLOGI("Start to listen %s", rilSocketIdToString(socket_id));
-
-    fdListen = android_get_control_socket(socket_name);
-    if (fdListen < 0) {
-        RLOGE("Failed to get socket %s", socket_name);
-        exit(-1);
-    }
-
-    ret = listen(fdListen, 4);
-
-    if (ret < 0) {
-        RLOGE("Failed to listen on control socket '%d': %s",
-             fdListen, strerror(errno));
-        exit(-1);
-    }
-    socket_listen_p->fdListen = fdListen;
-
-    /* note: non-persistent so we can accept only one connection at a time */
-    ril_event_set (socket_listen_p->listen_event, fdListen, false,
-                listenCallback, socket_listen_p);
-
-    rilEventAddWakeup (socket_listen_p->listen_event);
-}
-
 extern "C" void
 RIL_register (const RIL_RadioFunctions *callbacks) {
     int ret;
@@ -1115,62 +534,6 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
 
     memcpy(&s_callbacks, callbacks, sizeof (RIL_RadioFunctions));
 
-    /* Initialize socket1 parameters */
-    s_ril_param_socket = {
-                        RIL_SOCKET_1,             /* socket_id */
-                        -1,                       /* fdListen */
-                        -1,                       /* fdCommand */
-                        PHONE_PROCESS,            /* processName */
-                        &s_commands_event,        /* commands_event */
-                        &s_listen_event,          /* listen_event */
-                        processCommandsCallback,  /* processCommandsCallback */
-                        NULL,                     /* p_rs */
-                        RIL_TELEPHONY_SOCKET      /* type */
-                        };
-
-#if (SIM_COUNT >= 2)
-    s_ril_param_socket2 = {
-                        RIL_SOCKET_2,               /* socket_id */
-                        -1,                         /* fdListen */
-                        -1,                         /* fdCommand */
-                        PHONE_PROCESS,              /* processName */
-                        &s_commands_event_socket2,  /* commands_event */
-                        &s_listen_event_socket2,    /* listen_event */
-                        processCommandsCallback,    /* processCommandsCallback */
-                        NULL,                       /* p_rs */
-                        RIL_TELEPHONY_SOCKET        /* type */
-                        };
-#endif
-
-#if (SIM_COUNT >= 3)
-    s_ril_param_socket3 = {
-                        RIL_SOCKET_3,               /* socket_id */
-                        -1,                         /* fdListen */
-                        -1,                         /* fdCommand */
-                        PHONE_PROCESS,              /* processName */
-                        &s_commands_event_socket3,  /* commands_event */
-                        &s_listen_event_socket3,    /* listen_event */
-                        processCommandsCallback,    /* processCommandsCallback */
-                        NULL,                       /* p_rs */
-                        RIL_TELEPHONY_SOCKET        /* type */
-                        };
-#endif
-
-#if (SIM_COUNT >= 4)
-    s_ril_param_socket4 = {
-                        RIL_SOCKET_4,               /* socket_id */
-                        -1,                         /* fdListen */
-                        -1,                         /* fdCommand */
-                        PHONE_PROCESS,              /* processName */
-                        &s_commands_event_socket4,  /* commands_event */
-                        &s_listen_event_socket4,    /* listen_event */
-                        processCommandsCallback,    /* processCommandsCallback */
-                        NULL,                       /* p_rs */
-                        RIL_TELEPHONY_SOCKET        /* type */
-                        };
-#endif
-
-
     s_registerCalled = 1;
 
     RLOGI("s_registerCalled flag set, %d", s_started);
@@ -1185,66 +548,8 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
                 == s_unsolResponses[i].requestNumber);
     }
 
-    // New rild impl calls RIL_startEventLoop() first
-    // old standalone impl wants it here.
-
-    if (s_started == 0) {
-        RIL_startEventLoop();
-    }
-
-    // start listen socket1
-    startListen(RIL_SOCKET_1, &s_ril_param_socket);
-
-#if (SIM_COUNT >= 2)
-    // start listen socket2
-    startListen(RIL_SOCKET_2, &s_ril_param_socket2);
-#endif /* (SIM_COUNT == 2) */
-
-#if (SIM_COUNT >= 3)
-    // start listen socket3
-    startListen(RIL_SOCKET_3, &s_ril_param_socket3);
-#endif /* (SIM_COUNT == 3) */
-
-#if (SIM_COUNT >= 4)
-    // start listen socket4
-    startListen(RIL_SOCKET_4, &s_ril_param_socket4);
-#endif /* (SIM_COUNT == 4) */
-
     radio::registerService(&s_callbacks, s_commands);
     RLOGI("RILHIDL called registerService");
-
-#if 1
-    // start debug interface socket
-
-    char *inst = NULL;
-    if (strlen(RIL_getRilSocketName()) >= strlen(SOCKET_NAME_RIL)) {
-        inst = RIL_getRilSocketName() + strlen(SOCKET_NAME_RIL);
-    }
-
-    char rildebug[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_DEBUG;
-    if (inst != NULL) {
-        strlcat(rildebug, inst, MAX_DEBUG_SOCKET_NAME_LENGTH);
-    }
-
-    s_fdDebug = android_get_control_socket(rildebug);
-    if (s_fdDebug < 0) {
-        RLOGE("Failed to get socket : %s errno:%d", rildebug, errno);
-        exit(-1);
-    }
-
-    ret = listen(s_fdDebug, 4);
-
-    if (ret < 0) {
-        RLOGE("Failed to listen on ril debug socket '%d': %s",
-             s_fdDebug, strerror(errno));
-        exit(-1);
-    }
-
-    ril_event_set (&s_debug_event, s_fdDebug, true,
-                debugCallback, NULL);
-
-    rilEventAddWakeup (&s_debug_event);
-#endif
 
 }
 
@@ -1339,30 +644,10 @@ checkAndDequeueRequestInfoIfAck(struct RequestInfo *pRI, bool isAck) {
     return ret;
 }
 
-static int findFd(int socket_id) {
-    int fd = s_ril_param_socket.fdCommand;
-#if (SIM_COUNT >= 2)
-    if (socket_id == RIL_SOCKET_2) {
-        fd = s_ril_param_socket2.fdCommand;
-    }
-#if (SIM_COUNT >= 3)
-    if (socket_id == RIL_SOCKET_3) {
-        fd = s_ril_param_socket3.fdCommand;
-    }
-#endif
-#if (SIM_COUNT >= 4)
-    if (socket_id == RIL_SOCKET_4) {
-        fd = s_ril_param_socket4.fdCommand;
-    }
-#endif
-#endif
-    return fd;
-}
-
 extern "C" void
 RIL_onRequestAck(RIL_Token t) {
     RequestInfo *pRI;
-    int ret, fd;
+    int ret;
 
     size_t errorOffset;
     RIL_SOCKET_ID socket_id = RIL_SOCKET_1;
@@ -1375,7 +660,6 @@ RIL_onRequestAck(RIL_Token t) {
     }
 
     socket_id = pRI->socket_id;
-    fd = findFd(socket_id);
 
 #if VDBG
     RLOGD("Request Ack, %s", rilSocketIdToString(socket_id));
@@ -1399,7 +683,6 @@ extern "C" void
 RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responselen) {
     RequestInfo *pRI;
     int ret;
-    int fd;
     size_t errorOffset;
     RIL_SOCKET_ID socket_id = RIL_SOCKET_1;
 
@@ -1411,7 +694,6 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
     }
 
     socket_id = pRI->socket_id;
-    fd = findFd(socket_id);
 #if VDBG
     RLOGD("RequestComplete, %s", rilSocketIdToString(socket_id));
 #endif
@@ -1429,8 +711,6 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
         pRI->token, requestToString(pRI->pCI->requestNumber));
 
     if (pRI->cancelled == 0) {
-        Parcel p;
-
         int responseType;
         if (s_callbacks.version >= 13 && pRI->wasAckSent == 1) {
             // If ack was already sent, then this call is an asynchronous response. So we need to
@@ -1440,12 +720,6 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
         } else {
             responseType = RESPONSE_SOLICITED;
         }
-        p.writeInt32 (responseType);
-
-        p.writeInt32 (pRI->token);
-        errorOffset = p.dataPosition();
-
-        p.writeInt32 (e);
 
         // there is a response payload, no matter success or not.
         RLOGE ("Calling responseFunction() for token %d", pRI->token);
@@ -1588,7 +862,6 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
 
     appendPrintBuf("[UNSL]< %s", requestToString(unsolResponse));
 
-    Parcel p;
     int responseType;
     if (s_callbacks.version >= 13
                 && s_unsolResponses[unsolResponseIndex].wakeType == WAKE_PARTIAL) {
@@ -1627,7 +900,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
 
 #if VDBG
     RLOGI("%s UNSOLICITED: %s length:%d", rilSocketIdToString(soc_id),
-            requestToString(unsolResponse), p.dataSize());
+            requestToString(unsolResponse), datalen);
 #endif
 
     if (ret != 0 && unsolResponse == RIL_UNSOL_NITZ_TIME_RECEIVED) {
@@ -2044,26 +1317,10 @@ rilSocketIdToString(RIL_SOCKET_ID socket_id)
     }
 }
 
-/*
- * Returns true for a debuggable build.
- */
-static bool isDebuggable() {
-    char debuggable[PROP_VALUE_MAX];
-    property_get("ro.debuggable", debuggable, "0");
-    if (strcmp(debuggable, "1") == 0) {
-        return true;
-    }
-    return false;
-}
-
 } /* namespace android */
 
 void rilEventAddWakeup_helper(struct ril_event *ev) {
     android::rilEventAddWakeup(ev);
-}
-
-void listenCallback_helper(int fd, short flags, void *param) {
-    android::listenCallback(fd, flags, param);
 }
 
 int blockingWrite_helper(int fd, void *buffer, size_t len) {
