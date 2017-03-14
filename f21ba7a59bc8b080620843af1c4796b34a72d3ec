@@ -16,6 +16,24 @@
       "revId": "f21ba7a59bc8b080620843af1c4796b34a72d3ec",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "795e50f7_fc723981",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-14T17:49:29Z",
+      "side": 1,
+      "message": "Sooraj, This is meant only for OEMs apps like Telephony monitor and not for third party apps because third party apps cannot decode it.",
+      "parentUuid": "9d2b5442_81f750f6",
+      "revId": "f21ba7a59bc8b080620843af1c4796b34a72d3ec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
