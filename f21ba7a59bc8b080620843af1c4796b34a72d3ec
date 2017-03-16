@@ -34,6 +34,23 @@
       "revId": "f21ba7a59bc8b080620843af1c4796b34a72d3ec",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "545553aa_4f92420b",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-16T17:03:06Z",
+      "side": 1,
+      "message": "More of a strategy question. If we keep this error code, how do we force vendors to switch to new error code? Or how do we confirm if vendor has completely switched to new error code.",
+      "revId": "f21ba7a59bc8b080620843af1c4796b34a72d3ec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
