@@ -51,6 +51,24 @@
       "revId": "f21ba7a59bc8b080620843af1c4796b34a72d3ec",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "543cf467_f8a597a9",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-16T18:06:57Z",
+      "side": 1,
+      "message": "May be VTS can capture that.",
+      "parentUuid": "545553aa_4f92420b",
+      "revId": "f21ba7a59bc8b080620843af1c4796b34a72d3ec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
