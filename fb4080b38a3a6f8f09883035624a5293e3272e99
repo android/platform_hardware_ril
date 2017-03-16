@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "869d19fd_456ac41c",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-16T22:52:03Z",
+      "side": 0,
+      "message": "code in radiooptions.c, is that still valid?",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86778ec9_467577d6",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-16T22:52:03Z",
+      "side": 0,
+      "message": "We should remove the sepolicy related changes as well.",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89b814dc_c69a7dc3",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-16T22:52:03Z",
+      "side": 0,
+      "message": "same as above",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}

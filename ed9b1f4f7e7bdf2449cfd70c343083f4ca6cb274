@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "08eae8c7_3cc86453",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-16T22:52:03Z",
+      "side": 1,
+      "message": "do we need to change the need to conert slot to socket?",
+      "revId": "ed9b1f4f7e7bdf2449cfd70c343083f4ca6cb274",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
