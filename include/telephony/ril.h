@@ -75,7 +75,9 @@ extern "C" {
  * RIL_VERSION = 15 : New commands added:
  *                    RIL_REQUEST_SEND_DEVICE_STATE,
  *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER,
- *                    RIL_REQUEST_SET_SIM_CARD_POWER
+ *                    RIL_REQUEST_SET_SIM_CARD_POWER,
+ *                    RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION,
+ *                    RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
  *                    The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
  *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
  *                    New data structure RIL_DataRegistrationStateResponse,
@@ -5321,6 +5323,34 @@ typedef enum {
   *  INVALID_ARGUMENTS
   */
 #define RIL_REQUEST_SET_SIM_CARD_POWER 140
+
+/**
+ * RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Provide Carrier specific information to the modem that will be used to
+ * encrypt the IMSI and IMPI. Sent by the framework during boot, carrier
+ * switch and everytime we receive a new certificate.
+ *
+ * "carrierKey" is const uint8_t*
+ *
+ * "response" is NULL
+ *
+ * Expected modem behavior:
+ * Provide the appropriate error code, if there was a problem.
+ * The framework will only log the return code. If we making this call
+ * we expect this API to be supported, so if we get RIL_E_REQUEST_NOT_SUPPORTED
+ * back, we will throw a critical error.
+ *
+ * Valid errors:
+ *  RIL_E_SUCCESS
+ *  RIL_E_RADIO_NOT_AVAILABLE
+ *  SIM_ABSENT
+ *  RIL_E_REQUEST_NOT_SUPPORTED
+ *  INVALID_ARGUMENTS
+ *  MODEM_INTERNAL_FAILURE
+ */
+#define RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION 141
+
 /***********************************************************************/
 
 /**
@@ -5951,6 +5981,15 @@ typedef enum {
   *
   */
 #define RIL_UNSOL_PCO_DATA 1046
+
+/**
+ * RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Called when the modem needs Carrier specific information that will
+ * be used to encrypt IMSI and IMPI.
+ *
+ */
+#define RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION 1047
 
 /***********************************************************************/
 
