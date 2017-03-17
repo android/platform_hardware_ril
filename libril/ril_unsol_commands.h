@@ -61,3 +61,8 @@
     {RIL_UNSOL_STK_CC_ALPHA_NOTIFY, radio::stkCallControlAlphaNotifyInd, WAKE_PARTIAL},
     {RIL_UNSOL_LCEDATA_RECV, radio::lceDataInd, WAKE_PARTIAL},
     {RIL_UNSOL_PCO_DATA, radio::pcoDataInd, WAKE_PARTIAL},
+<<<<<<< HEAD
+=======
+    {RIL_UNSOL_MODEM_RESTART, radio::modemResetInd, WAKE_PARTIAL},
+    {RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION, radio::carrierInfoForImsiEncryption, WAKE_PARTIAL},
+>>>>>>> e47a789... RIL changes to allow the modem to query the framework for the key.

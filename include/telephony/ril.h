@@ -75,7 +75,9 @@ extern "C" {
  * RIL_VERSION = 15 : New commands added:
  *                    RIL_REQUEST_SEND_DEVICE_STATE,
  *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER,
- *                    RIL_REQUEST_SET_SIM_CARD_POWER
+ *                    RIL_REQUEST_SET_SIM_CARD_POWER,
+ *                    RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION,
+ *                    RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
  *                    The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
  *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
  *                    New data structure RIL_DataRegistrationStateResponse,
@@ -5321,6 +5323,34 @@ typedef enum {
   *  INVALID_ARGUMENTS
   */
 #define RIL_REQUEST_SET_SIM_CARD_POWER 140
+
+/**
+ * RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Provide Carrier specific information to the modem that will be used to
+ * encrypt the IMSI and IMPI. Sent by the framework during boot, carrier
+ * switch and everytime we receive a new certificate.
+ *
+ * "carrierKey" is const uint8_t*
+ *
+ * "response" is NULL
+ *
+ * Expected modem behavior:
+ * Provide the appropriate error code, if there was a problem.
+ * The framework will only log the return code. If we making this call
+ * we expect this API to be supported, so if we get RIL_E_REQUEST_NOT_SUPPORTED
+ * back, we will throw a critical error.
+ *
+ * Valid errors:
+ *  RIL_E_SUCCESS
+ *  RIL_E_RADIO_NOT_AVAILABLE
+ *  SIM_ABSENT
+ *  RIL_E_REQUEST_NOT_SUPPORTED
+ *  INVALID_ARGUMENTS
+ *  MODEM_INTERNAL_FAILURE
+ */
+#define RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION 141
+
 /***********************************************************************/
 
 /**
@@ -5952,6 +5982,41 @@ typedef enum {
   */
 #define RIL_UNSOL_PCO_DATA 1046
 
+<<<<<<< HEAD
+=======
+ /**
+  * RIL_UNSOL_MODEM_RESTART
+  *
+  * Called when there is a modem reset.
+  *
+  * "reason" is "const char *" containing the reason for the reset. It
+  * could be a crash signature if the restart was due to a crash or some
+  * string such as "user-initiated restart" or "AT command initiated
+  * restart" that explains the cause of the modem restart.
+  *
+  * When modem restarts, one of the following radio state transitions will happen
+  * 1) RADIO_STATE_ON->RADIO_STATE_UNAVAILABLE->RADIO_STATE_ON or
+  * 2) RADIO_STATE_OFF->RADIO_STATE_UNAVAILABLE->RADIO_STATE_OFF
+  * This message can be sent either just before the RADIO_STATE changes to RADIO_STATE_UNAVAILABLE
+  * or just after but should never be sent after the RADIO_STATE changes from UNAVAILABLE to
+  * AVAILABLE(RADIO_STATE_ON/RADIO_STATE_OFF) again.
+  *
+  * It should NOT be sent after the RADIO_STATE changes to AVAILABLE after the
+  * modem restart as that could be interpreted as a second modem reset by the
+  * framework.
+  */
+#define RIL_UNSOL_MODEM_RESTART 1047
+
+/**
+ * RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Called when the modem needs Carrier specific information that will
+ * be used to encrypt IMSI and IMPI.
+ *
+ */
+#define RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION 1048
+
+>>>>>>> e47a789... RIL changes to allow the modem to query the framework for the key.
 /***********************************************************************/
 
 
