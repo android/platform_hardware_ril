@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ef87acad_82a85c77",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 2463,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-17T17:04:40Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "efae0e40_cc0615eb",
+      "range": {
+        "startLine": 2463,
+        "startChar": 3,
+        "endLine": 2463,
+        "endChar": 5
+      },
+      "revId": "9e36045ffd5a72bd420574bc16f5c7aad76b51a8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ad6bf30b_489b38e6",
         "filename": "include/telephony/ril.h",
         "patchSetId": 6
@@ -36,6 +60,30 @@
       "writtenOn": "2017-03-17T17:01:57Z",
       "side": 1,
       "message": "Is this different then your newly added comments above ? Do we still need this ?",
+      "range": {
+        "startLine": 2465,
+        "startChar": 3,
+        "endLine": 2468,
+        "endChar": 22
+      },
+      "revId": "9e36045ffd5a72bd420574bc16f5c7aad76b51a8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6b94781_8b4f9352",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 2468,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-03-17T17:04:40Z",
+      "side": 1,
+      "message": "Yes, its better to keep this until we remove the ERROR_UNSPECIFIED and list all possible causes and reason when it should be used. As mentioned before we will do it as separate effort.",
+      "parentUuid": "ad6bf30b_489b38e6",
       "range": {
         "startLine": 2465,
         "startChar": 3,
