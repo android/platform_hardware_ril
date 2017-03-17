@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9584c808_2b8a73d9",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 5741,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-17T00:13:28Z",
+      "side": 1,
+      "message": "a named constant may be nice but not required..",
+      "range": {
+        "startLine": 5741,
+        "startChar": 45,
+        "endLine": 5741,
+        "endChar": 50
+      },
+      "revId": "2c3f030af2d3ccdc2f886b8bac3ae4526cfefb5b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
