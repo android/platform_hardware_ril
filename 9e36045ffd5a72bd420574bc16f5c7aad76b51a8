@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "efae0e40_cc0615eb",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 2463,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-17T17:01:57Z",
+      "side": 1,
+      "message": "proper indentation",
+      "range": {
+        "startLine": 2463,
+        "startChar": 3,
+        "endLine": 2463,
+        "endChar": 5
+      },
+      "revId": "9e36045ffd5a72bd420574bc16f5c7aad76b51a8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ad6bf30b_489b38e6",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 2468,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-17T17:01:57Z",
+      "side": 1,
+      "message": "Is this different then your newly added comments above ? Do we still need this ?",
+      "range": {
+        "startLine": 2465,
+        "startChar": 3,
+        "endLine": 2468,
+        "endChar": 22
+      },
+      "revId": "9e36045ffd5a72bd420574bc16f5c7aad76b51a8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
