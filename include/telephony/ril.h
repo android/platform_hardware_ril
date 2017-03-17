@@ -75,7 +75,9 @@ extern "C" {
  * RIL_VERSION = 15 : New commands added:
  *                    RIL_REQUEST_SEND_DEVICE_STATE,
  *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER,
- *                    RIL_REQUEST_SET_SIM_CARD_POWER
+ *                    RIL_REQUEST_SET_SIM_CARD_POWER,
+ *                    RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION,
+ *                    RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
  *                    The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
  *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
  *                    New data structure RIL_DataRegistrationStateResponse,
@@ -730,6 +732,16 @@ typedef struct {
                                          * all carriers with the same mcc/mnc are allowed.
                                          */
 } RIL_CarrierRestrictions;
+
+typedef struct {
+  const uint8_t * carrierKey;            /* Public Key from the Carrier used to encrypt the
+                                          * IMSI/IMPI.
+                                          */
+  const char * KeyIdentifier;            /* The keyIdentifier Attribute value pair that helps
+                                          * a server locate the private key to decrypt the
+                                          * permanent identity.
+                                          */
+} RIL_CarrierInfoForImsiEncryption;
 
 /* See RIL_REQUEST_LAST_CALL_FAIL_CAUSE */
 typedef enum {
@@ -5329,6 +5341,28 @@ typedef struct {
   *  INVALID_ARGUMENTS
   */
 #define RIL_REQUEST_SET_SIM_CARD_POWER 140
+
+/**
+ * RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Provide Carrier specific information to the modem that will be used to
+ * encrypt the IMSI and IMPI. Sent by the framework during boot, carrier
+ * switch and everytime we receive a new certificate.
+ *
+ * "data" is the RIL_CarrierInfoForImsiEncryption * structure.
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  RIL_E_SUCCESS
+ *  RIL_E_RADIO_NOT_AVAILABLE
+ *  SIM_ABSENT
+ *  RIL_E_REQUEST_NOT_SUPPORTED
+ *  INVALID_ARGUMENTS
+ *  MODEM_INTERNAL_FAILURE
+ */
+#define RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION 141
+
 /***********************************************************************/
 
 /**
@@ -5959,6 +5993,17 @@ typedef struct {
   *
   */
 #define RIL_UNSOL_PCO_DATA 1046
+
+/**
+ * RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Called when the modem needs Carrier specific information that will
+ * be used to encrypt IMSI and IMPI.
+ *
+ * "data" is NULL
+ *
+ */
+#define RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION 1047
 
 /***********************************************************************/
 
