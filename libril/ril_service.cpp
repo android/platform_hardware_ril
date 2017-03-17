@@ -56,12 +56,14 @@ struct OemHookImpl;
 sp<RadioImpl> radioService[SIM_COUNT];
 sp<OemHookImpl> oemHookService[SIM_COUNT];
 // counter used for synchronization. It is incremented every time response callbacks are updated.
-volatile int32_t mCounter[SIM_COUNT];
+volatile int32_t mCounterRadio[SIM_COUNT];
+volatile int32_t mCounterOemHook[SIM_COUNT];
 #else
 sp<RadioImpl> radioService[1];
 sp<OemHookImpl> oemHookService[1];
 // counter used for synchronization. It is incremented every time response callbacks are updated.
-volatile int32_t mCounter[1];
+volatile int32_t mCounterRadio[1];
+volatile int32_t mCounterOemHook[1];
 #endif
 
 static pthread_rwlock_t radioServiceRwlock = PTHREAD_RWLOCK_INITIALIZER;
@@ -695,7 +697,7 @@ bool dispatchIccApdu(int serial, int slotId, int request, const SimApdu& message
     return true;
 }
 
-void checkReturnStatus(int32_t slotId, Return<void>& ret) {
+void checkReturnStatus(int32_t slotId, Return<void>& ret, bool isRadioService) {
     if (ret.isOk() == false) {
         RLOGE("checkReturnStatus: unable to call response/indication callback");
         // Remote process hosting the callbacks must be dead. Reset the callback objects;
@@ -705,7 +707,7 @@ void checkReturnStatus(int32_t slotId, Return<void>& ret) {
         // Caller should already hold rdlock, release that first
         // note the current counter to avoid overwriting updates made by another thread before
         // write lock is acquired.
-        int counter = mCounter[slotId];
+        int counter = isRadioService ? mCounterRadio[slotId] : mCounterOemHook[slotId];
         pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock(slotId);
         int ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
         assert(ret == 0);
@@ -715,12 +717,15 @@ void checkReturnStatus(int32_t slotId, Return<void>& ret) {
         assert(ret == 0);
 
         // make sure the counter value has not changed
-        if (counter == mCounter[slotId]) {
-            radioService[slotId]->mRadioResponse = NULL;
-            radioService[slotId]->mRadioIndication = NULL;
-            oemHookService[slotId]->mOemHookResponse = NULL;
-            oemHookService[slotId]->mOemHookIndication = NULL;
-            mCounter[slotId]++;
+        if (counter == (isRadioService ? mCounterRadio[slotId] : mCounterOemHook[slotId])) {
+            if (isRadioService) {
+                radioService[slotId]->mRadioResponse = NULL;
+                radioService[slotId]->mRadioIndication = NULL;
+            } else {
+                oemHookService[slotId]->mOemHookResponse = NULL;
+                oemHookService[slotId]->mOemHookIndication = NULL;
+            }
+            isRadioService ? mCounterRadio[slotId]++ : mCounterOemHook[slotId]++;
         } else {
             RLOGE("checkReturnStatus: not resetting responseFunctions as they likely "
                     "got updated on another thread");
@@ -737,7 +742,7 @@ void checkReturnStatus(int32_t slotId, Return<void>& ret) {
 }
 
 void RadioImpl::checkReturnStatus(Return<void>& ret) {
-    ::checkReturnStatus(mSlotId, ret);
+    ::checkReturnStatus(mSlotId, ret, true);
 }
 
 Return<void> RadioImpl::setResponseFunctions(
@@ -751,7 +756,7 @@ Return<void> RadioImpl::setResponseFunctions(
 
     mRadioResponse = radioResponseParam;
     mRadioIndication = radioIndicationParam;
-    mCounter[mSlotId]++;
+    mCounterRadio[mSlotId]++;
 
     ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
     assert(ret == 0);
@@ -2361,7 +2366,7 @@ Return<void> OemHookImpl::setResponseFunctions(
 
     mOemHookResponse = oemHookResponseParam;
     mOemHookIndication = oemHookIndicationParam;
-    mCounter[mSlotId]++;
+    mCounterOemHook[mSlotId]++;
 
     ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
     assert(ret == 0);
@@ -5733,7 +5738,7 @@ int radio::sendRequestRawResponse(int slotId,
         }
         Return<void> retStatus = oemHookService[slotId]->mOemHookResponse->
                 sendRequestRawResponse(responseInfo, data);
-        checkReturnStatus(slotId, retStatus);
+        checkReturnStatus(slotId, retStatus, false);
     } else {
         RLOGE("sendRequestRawResponse: oemHookService[%d]->mOemHookResponse == NULL",
                 slotId);
@@ -5766,7 +5771,7 @@ int radio::sendRequestStringsResponse(int slotId,
         Return<void> retStatus
                 = oemHookService[slotId]->mOemHookResponse->sendRequestStringsResponse(
                 responseInfo, data);
-        checkReturnStatus(slotId, retStatus);
+        checkReturnStatus(slotId, retStatus, false);
     } else {
         RLOGE("sendRequestStringsResponse: oemHookService[%d]->mOemHookResponse == "
                 "NULL", slotId);
@@ -7280,7 +7285,7 @@ int radio::oemHookRawInd(int slotId,
         RLOGD("oemHookRawInd");
         Return<void> retStatus = oemHookService[slotId]->mOemHookIndication->oemHookRaw(
                 convertIntToRadioIndicationType(indicationType), data);
-        checkReturnStatus(slotId, retStatus);
+        checkReturnStatus(slotId, retStatus, false);
     } else {
         RLOGE("oemHookRawInd: oemHookService[%d]->mOemHookIndication == NULL", slotId);
     }
