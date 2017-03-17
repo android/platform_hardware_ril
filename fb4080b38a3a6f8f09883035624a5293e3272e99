@@ -108,6 +108,24 @@
     },
     {
       "key": {
+        "uuid": "33939cac_81ceb2bb",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-17T21:27:04Z",
+      "side": 0,
+      "message": "Hmm - we don\u0027t want to remove all sepolicy changes - just the ones related to the socket, correct?  Rild is still a thing..",
+      "parentUuid": "4ce07522_18131e33",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89b814dc_c69a7dc3",
         "filename": "rild/rild.rc",
         "patchSetId": 4
@@ -155,6 +173,24 @@
       "side": 0,
       "message": "I am not sure about that. Not clear if there are other sockets used, although I don\u0027t see anything in the code. Will check.",
       "parentUuid": "3aa30028_736d8c65",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "db140bfd_50da5b39",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-17T21:27:04Z",
+      "side": 0,
+      "message": "are you sure we want to remove this?  Isn\u0027t this what lets rild send debug messages to log?",
+      "parentUuid": "89b814dc_c69a7dc3",
       "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
