@@ -104,6 +104,24 @@
       "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3aa30028_736d8c65",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-03-17T05:22:24Z",
+      "side": 0,
+      "message": "And all socket related in rild.te?",
+      "parentUuid": "89b814dc_c69a7dc3",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
