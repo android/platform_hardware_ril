@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fe330640_21a7c22c",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-17T00:26:02Z",
+      "side": 0,
+      "message": "that\u0027s not used now. Will remove in the next CL. (there will be more cleanup on top of this; this one is tested in its current state so I\u0027d rather submit it first).",
+      "parentUuid": "869d19fd_456ac41c",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86778ec9_467577d6",
         "filename": "rild/rild.rc",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-16T22:52:03Z",
       "side": 0,
       "message": "We should remove the sepolicy related changes as well.",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ce07522_18131e33",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-17T00:26:02Z",
+      "side": 0,
+      "message": "Good point. Will do that once all sockets are removed.\n\nI believe the following lines need to be deleted. Anything else?\n\nhttps://cs.corp.google.com/android/system/sepolicy/public/radio.te?l\u003d9\nhttps://cs.corp.google.com/android/system/sepolicy/private/bluetooth.te?l\u003d52\n\nAnd the socket related lines from here:\nhttps://cs.corp.google.com/android/system/sepolicy/private/file_contexts",
+      "parentUuid": "86778ec9_467577d6",
       "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
