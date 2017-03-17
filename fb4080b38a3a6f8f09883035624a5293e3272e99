@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "8051f4fb_5270dc0a",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-03-17T03:55:14Z",
+      "side": 0,
+      "message": "I see in \nsystem/sepolicy/public/file.te\nsystem/sepolicy/private/app.te\n\nas well",
+      "parentUuid": "4ce07522_18131e33",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89b814dc_c69a7dc3",
         "filename": "rild/rild.rc",
         "patchSetId": 4
