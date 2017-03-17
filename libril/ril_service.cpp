@@ -16,7 +16,10 @@
 
 #define LOG_TAG "RILC"
 
-#include <android/hardware/radio/1.0/IRadio.h>
+#include <android/hardware/radio/1.1/IRadio.h>
+#include <android/hardware/radio/1.1/IRadioResponse.h>
+#include <android/hardware/radio/1.1/IRadioIndication.h>
+
 #include <android/hardware/radio/deprecated/1.0/IOemHook.h>
 
 #include <hwbinder/IPCThreadState.h>
@@ -99,7 +102,7 @@ void convertRilDataCallListToHal(void *response, size_t responseLen,
 
 void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<CellInfo>& records);
 
-struct RadioImpl : public IRadio {
+struct RadioImpl : public ::android::hardware::radio::V1_1::IRadio {
     int32_t mSlotId;
     sp<IRadioResponse> mRadioResponse;
     sp<IRadioIndication> mRadioIndication;
@@ -424,6 +427,10 @@ struct RadioImpl : public IRadio {
     Return<void> setSimCardPower(int32_t serial, bool powerUp);
 
     Return<void> responseAcknowledgement();
+
+    Return<void> setCarrierInfoForImsiEncryption(int32_t serial,
+            const ::android::hardware::hidl_vec<uint8_t>& carrierKey,
+            const hidl_string& keyIdentifier);
 
     void checkReturnStatus(Return<void>& ret);
 };
@@ -2671,6 +2678,14 @@ Return<void> OemHookImpl::sendRequestStrings(int32_t serial,
     RLOGD("OemHookImpl::sendRequestStrings: serial %d", serial);
 #endif
     dispatchStrings(serial, mSlotId, RIL_REQUEST_OEM_HOOK_STRINGS, data);
+    return Void();
+}
+
+Return<void> RadioImpl::setCarrierInfoForImsiEncryption(int32_t serial,
+        const ::android::hardware::hidl_vec<uint8_t>& carrierKey,
+        const hidl_string& keyIdentifier) {
+    RLOGD("setCarrierInfoForImsiEncryption: serial %d", serial);
+    dispatchRaw(serial, mSlotId, RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION, carrierKey);
     return Void();
 }
 
@@ -6238,6 +6253,32 @@ int radio::sendDeviceStateResponse(int slotId,
     return 0;
 }
 
+int radio::setCarrierInfoForImsiEncryptionResponse(int slotId,
+                               int responseType, int serial, RIL_Errno e,
+                               void *response, size_t responseLen) {
+    RLOGD("setCarrierInfoForImsiEncryptionResponse: serial %d", serial);
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<sp<::android::hardware::radio::V1_1::IRadioResponse>> ret =
+            ::android::hardware::radio::V1_1::IRadioResponse::castFrom(
+            radioService[slotId]->mRadioResponse);
+        if (ret.isOk()) {
+            sp<::android::hardware::radio::V1_1::IRadioResponse> radioResponseV1_1 = ret;
+            Return<void> retStatus
+                   = radioResponseV1_1->setCarrierInfoForImsiEncryptionResponse(responseInfo);
+            radioService[slotId]->checkReturnStatus(retStatus);
+        } else {
+            RLOGE("setCarrierInfoForImsiEncryptionResponse: ret.isOk() == false for "
+                    "radioService[%d]" , slotId);
+        }
+    } else {
+        RLOGE("setCarrierInfoForImsiEncryptionResponse: radioService[%d]->mRadioResponse == NULL",
+                slotId);
+    }
+    return 0;
+}
+
 int radio::setIndicationFilterResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen) {
@@ -7927,6 +7968,34 @@ int radio::modemResetInd(int slotId,
     return 0;
 }
 
+int radio::carrierInfoForImsiEncryption(int slotId,
+                                  int indicationType, int token, RIL_Errno e, void *response,
+                                  size_t responseLen) {
+    if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndication != NULL) {
+        if (response == NULL || responseLen == 0) {
+            RLOGE("carrierInfoForImsiEncryption: invalid response");
+            return 0;
+        }
+        RLOGD("carrierInfoForImsiEncryption");
+        Return<sp<::android::hardware::radio::V1_1::IRadioIndication>> ret =
+            ::android::hardware::radio::V1_1::IRadioIndication::castFrom(
+            radioService[slotId]->mRadioIndication);
+        if (ret.isOk()) {
+            sp<::android::hardware::radio::V1_1::IRadioIndication> radioIndicationV1_1 = ret;
+            Return<void> retStatus = radioIndicationV1_1->carrierInfoForImsiEncryption(
+                    convertIntToRadioIndicationType(indicationType));
+            radioService[slotId]->checkReturnStatus(retStatus);
+        } else {
+            RLOGE("carrierInfoForImsiEncryptionResponse: ret.isOk() == false for radioService[%d]",
+                    slotId);
+        }
+    } else {
+        RLOGE("carrierInfoForImsiEncryption: radioService[%d]->mRadioIndication == NULL", slotId);
+    }
+
+    return 0;
+}
+
 int radio::oemHookRawInd(int slotId,
                          int indicationType, int token, RIL_Errno e, void *response,
                          size_t responseLen) {
@@ -7981,7 +8050,8 @@ void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands
         radioService[i]->mSlotId = i;
         oemHookService[i] = new OemHookImpl;
         oemHookService[i]->mSlotId = i;
-        RLOGD("registerService: starting IRadio %s", serviceNames[i]);
+        RLOGD("registerService: starting android::hardware::radio::V1_1::IRadio %s",
+                serviceNames[i]);
         android::status_t status = radioService[i]->registerAsService(serviceNames[i]);
         status = oemHookService[i]->registerAsService(serviceNames[i]);
 
