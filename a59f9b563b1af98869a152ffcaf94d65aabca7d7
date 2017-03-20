@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0362e910_2ebadd57",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 5371,
+      "author": {
+        "id": 1138138
+      },
+      "writtenOn": "2017-03-20T18:25:25Z",
+      "side": 1,
+      "message": "Since first param is already an int, do you want to just reuse it?\n0\u003dpower-up normal\n1\u003dpower down\n2\u003dpower up pass-thru",
+      "range": {
+        "startLine": 5371,
+        "startChar": 2,
+        "endLine": 5371,
+        "endChar": 3
+      },
+      "revId": "a59f9b563b1af98869a152ffcaf94d65aabca7d7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
