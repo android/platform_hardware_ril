@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "6f31c4dd_f13cce14",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 5367,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-20T20:33:33Z",
+      "side": 1,
+      "message": "Do we expect pass-through mode to work with the sim is powered down?  That seems strange.\n\nShould we do as Grace suggests and just add a 2 value for the first int indicating powered-up but unavailable for general use?",
+      "range": {
+        "startLine": 5367,
+        "startChar": 18,
+        "endLine": 5367,
+        "endChar": 19
+      },
+      "revId": "a59f9b563b1af98869a152ffcaf94d65aabca7d7",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0362e910_2ebadd57",
         "filename": "include/telephony/ril.h",
         "patchSetId": 1
