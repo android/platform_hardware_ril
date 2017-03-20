@@ -126,6 +126,24 @@
     },
     {
       "key": {
+        "uuid": "d42ac740_09fe574d",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-20T21:47:25Z",
+      "side": 0,
+      "message": "Yes, will only remove socket related ones.",
+      "parentUuid": "33939cac_81ceb2bb",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89b814dc_c69a7dc3",
         "filename": "rild/rild.rc",
         "patchSetId": 4
@@ -191,6 +209,24 @@
       "side": 0,
       "message": "are you sure we want to remove this?  Isn\u0027t this what lets rild send debug messages to log?",
       "parentUuid": "89b814dc_c69a7dc3",
+      "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcac7c07_a30632b6",
+        "filename": "rild/rild.rc",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-20T21:47:25Z",
+      "side": 0,
+      "message": "no, this socket isn\u0027t used anymore. It was used only for radiooptions which is not used now.",
+      "parentUuid": "db140bfd_50da5b39",
       "revId": "fb4080b38a3a6f8f09883035624a5293e3272e99",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
