@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcc81f50_e41c014c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 5369,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-22T18:20:29Z",
+      "side": 1,
+      "message": "Need documentation about what\u0027s expected of the SIM - do we get a new sim-state notification?  Do other commands fail with a new error code?  Is emergency-call still available?, etc.",
+      "range": {
+        "startLine": 5369,
+        "startChar": 21,
+        "endLine": 5369,
+        "endChar": 22
+      },
+      "revId": "00440171fddf41f14c902fab4ec55780b0ebfb44",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
