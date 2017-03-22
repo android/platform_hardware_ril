@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6714df8_6ffcf75b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-22T17:07:26Z",
+      "side": 1,
+      "message": "Basic description of the CL should be shorter and just one line. You can add more lines below but first one should communicate what the change is.\n\nFor eg, here you can say \"Removing GENERIC_FAILURE from API documentation in ril.h\"\n\nAnd in the next line you can add more details like this error should never be returned.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 55
+      },
+      "revId": "1bc31adebe37b7d974dfa44d7b6fe7914565b668",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
