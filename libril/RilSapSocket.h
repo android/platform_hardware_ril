@@ -99,11 +99,6 @@ class RilSapSocket : public RilSocket {
         static void printList();
 
         /**
-         * Clean up method to be called on command close.
-         */
-        void onCommandsSocketClosed(void);
-
-        /**
          * Dispatches the request to the lower layers.
          * It calls the on request function.
          *
@@ -129,16 +124,6 @@ class RilSapSocket : public RilSocket {
 
     protected:
         /**
-         * Process each record read from the socket and
-         * push a new request created from that record to
-         * the dispatch request queue.
-         *
-         * @param The record data.
-         * @param The record length.
-         */
-        void pushRecord(void *record, size_t recordlen);
-
-        /**
          * Socket handler to be called when a request has
          * been completed.
          *
@@ -162,19 +147,6 @@ class RilSapSocket : public RilSocket {
         void *data, size_t datalen);
 
         /**
-         * Method to send response to SAP. It does an atomic write operation on the
-         * socket.
-         *
-         * @param the response header with the payload.
-         */
-        void sendResponse(MsgHeader *hdr);
-
-        /**
-         * A loop for processing the requests in the request dispatch queue.
-         */
-        void *processRequestsLoop(void);
-
-        /**
          * Class method to add the sap socket to the list of sockets.
          * Does nothing if the socket is already present in the list.
          * Otherwise, calls the constructor of the parent class(To startlistening)
@@ -190,18 +162,6 @@ class RilSapSocket : public RilSocket {
          * @return true if exists, false otherwise.
          */
         static bool SocketExists(const char *socketName);
-
-        /**
-         * Send a clean up SAP DISCONNECT if the socket disconnects before doing a SAP
-         * disconnect.
-         */
-        void sendDisconnect(void);
-
-        /**
-         * Dispatch the clean up disconnect request.
-         */
-        void dispatchDisconnect(MsgHeader *req);
-
 
     private:
         /**

@@ -1,5 +1,4 @@
 service ril-daemon /vendor/bin/hw/rild
     class main
-    socket sap_uim_socket1 stream 660 bluetooth bluetooth
     user root
     group radio cache inet misc audio log readproc wakelock

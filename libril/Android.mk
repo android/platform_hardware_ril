@@ -6,7 +6,6 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= \
     ril.cpp \
     ril_event.cpp\
-    RilSocket.cpp \
     RilSapSocket.cpp \
     ril_service.cpp \
     sap_service.cpp
@@ -14,7 +13,6 @@ LOCAL_SRC_FILES:= \
 LOCAL_SHARED_LIBRARIES := \
     liblog \
     libutils \
-    libbinder \
     libcutils \
     libhardware_legacy \
     librilutils \
