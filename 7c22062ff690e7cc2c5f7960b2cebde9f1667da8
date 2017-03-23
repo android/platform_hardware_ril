@@ -22,6 +22,30 @@
       "revId": "7c22062ff690e7cc2c5f7960b2cebde9f1667da8",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9603e784_806326d7",
+        "filename": "libril/RilSocket.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-23T17:31:51Z",
+      "side": 0,
+      "message": "Yes, I didn\u0027t want to move code around. This will be removed too and code added to RilSapSocket.h (currently it extends this).",
+      "parentUuid": "aad3babe_66765dd6",
+      "range": {
+        "startLine": 36,
+        "startChar": 6,
+        "endLine": 36,
+        "endChar": 15
+      },
+      "revId": "7c22062ff690e7cc2c5f7960b2cebde9f1667da8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
