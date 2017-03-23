@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aad3babe_66765dd6",
+        "filename": "libril/RilSocket.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-23T17:30:07Z",
+      "side": 0,
+      "message": "you delete the whole RilSocket.cpp but leave the .h?",
+      "range": {
+        "startLine": 36,
+        "startChar": 6,
+        "endLine": 36,
+        "endChar": 15
+      },
+      "revId": "7c22062ff690e7cc2c5f7960b2cebde9f1667da8",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
