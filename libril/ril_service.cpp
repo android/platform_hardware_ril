@@ -493,15 +493,23 @@ void sendErrorResponse(RequestInfo *pRI, RIL_Errno err) {
             (int) RadioResponseType::SOLICITED, pRI->token, err, NULL, 0);
 }
 
+bool copyHidlStringToRil(char **dest, const hidl_string &src, RequestInfo *pRI) {
+    return copyHidlStringToRil(dest, src, pRI, false);
+}
+
 /**
  * Copies over src to dest. If memory allocation fails, responseFunction() is called for the
  * request with error RIL_E_NO_MEMORY.
  * Returns true on success, and false on failure.
  */
-bool copyHidlStringToRil(char **dest, const hidl_string &src, RequestInfo *pRI) {
+bool copyHidlStringToRil(char **dest, const hidl_string &src, RequestInfo *pRI, bool allowEmpty) {
     size_t len = src.size();
     if (len == 0) {
-        *dest = NULL;
+        if (allowEmpty == true) {
+            *dest = '\0';
+        } else {
+            *dest = NULL;
+        }
         return true;
     }
     *dest = (char *) calloc(len + 1, sizeof(char));
@@ -550,6 +558,10 @@ bool dispatchString(int serial, int slotId, int request, const char * str) {
 }
 
 bool dispatchStrings(int serial, int slotId, int request, int countStrings, ...) {
+    return dispatchStrings(serial, slotId, request, false, countStrings, ...);
+}
+
+bool dispatchStrings(int serial, int slotId, int request, bool allowEmpty, int countStrings, ...) {
     RequestInfo *pRI = android::addRequestToList(serial, slotId, request);
     if (pRI == NULL) {
         return false;
@@ -566,7 +578,7 @@ bool dispatchStrings(int serial, int slotId, int request, int countStrings, ...)
     va_start(ap, countStrings);
     for (int i = 0; i < countStrings; i++) {
         const char* str = va_arg(ap, const char *);
-        if (!copyHidlStringToRil(&pStrings[i], hidl_string(str), pRI)) {
+        if (!copyHidlStringToRil(&pStrings[i], hidl_string(str), pRI, allowEmpty)) {
             va_end(ap);
             for (int j = 0; j < i; j++) {
                 memsetAndFreeStrings(1, pStrings[j]);
@@ -819,7 +831,7 @@ Return<void> RadioImpl::supplyIccPinForApp(int32_t serial, const hidl_string& pi
 #if VDBG
     RLOGD("supplyIccPinForApp: serial %d", serial);
 #endif
-    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PIN,
+    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PIN, true,
             2, pin.c_str(), aid.c_str());
     return Void();
 }
@@ -829,7 +841,7 @@ Return<void> RadioImpl::supplyIccPukForApp(int32_t serial, const hidl_string& pu
 #if VDBG
     RLOGD("supplyIccPukForApp: serial %d", serial);
 #endif
-    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PUK,
+    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PUK, true,
             3, puk.c_str(), pin.c_str(), aid.c_str());
     return Void();
 }
@@ -839,7 +851,7 @@ Return<void> RadioImpl::supplyIccPin2ForApp(int32_t serial, const hidl_string& p
 #if VDBG
     RLOGD("supplyIccPin2ForApp: serial %d", serial);
 #endif
-    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PIN2,
+    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PIN2, true,
             2, pin2.c_str(), aid.c_str());
     return Void();
 }
@@ -849,7 +861,7 @@ Return<void> RadioImpl::supplyIccPuk2ForApp(int32_t serial, const hidl_string& p
 #if VDBG
     RLOGD("supplyIccPuk2ForApp: serial %d", serial);
 #endif
-    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PUK2,
+    dispatchStrings(serial, mSlotId, RIL_REQUEST_ENTER_SIM_PUK2, true,
             3, puk2.c_str(), pin2.c_str(), aid.c_str());
     return Void();
 }
