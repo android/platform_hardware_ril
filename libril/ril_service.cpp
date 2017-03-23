@@ -472,7 +472,11 @@ void sendErrorResponse(RequestInfo *pRI, RIL_Errno err) {
  */
 bool copyHidlStringToRil(char **dest, const hidl_string &src, RequestInfo *pRI) {
     size_t len = src.size();
-    if (len == 0) {
+    if (len == 0 &&
+        (pRI->pCI->requestNumber != RIL_REQUEST_ENTER_SIM_PIN) &&
+        (pRI->pCI->requestNumber != RIL_REQUEST_ENTER_SIM_PUK) &&
+        (pRI->pCI->requestNumber != RIL_REQUEST_ENTER_SIM_PIN2) &&
+        (pRI->pCI->requestNumber != RIL_REQUEST_ENTER_SIM_PUK2)) {
         *dest = NULL;
         return true;
     }
@@ -482,7 +486,9 @@ bool copyHidlStringToRil(char **dest, const hidl_string &src, RequestInfo *pRI) 
         sendErrorResponse(pRI, RIL_E_NO_MEMORY);
         return false;
     }
-    strncpy(*dest, src, len + 1);
+    if (len > 0) {
+        strncpy(*dest, src, len + 1);
+    }
     return true;
 }
 
