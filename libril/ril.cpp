@@ -831,7 +831,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     }
 
 #if VDBG
-    RLOGI("%s UNSOLICITED: %s length:%d", rilSocketIdToString(soc_id),
+    RLOGI("%s UNSOLICITED: %s length:%zu", rilSocketIdToString(soc_id),
             requestToString(unsolResponse), datalen);
 #endif
 

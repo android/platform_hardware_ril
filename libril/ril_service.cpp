@@ -19,6 +19,7 @@
 #include <android/hardware/radio/1.1/IRadio.h>
 #include <android/hardware/radio/1.1/IRadioResponse.h>
 #include <android/hardware/radio/1.1/IRadioIndication.h>
+#include <android/hardware/radio/1.1/types.h>
 
 #include <android/hardware/radio/deprecated/1.0/IOemHook.h>
 
@@ -30,9 +31,6 @@
 #include <inttypes.h>
 
 #define INVALID_HEX_CHAR 16
-
-// Enable verbose logging
-#define VDBG 0
 
 using namespace android::hardware::radio::V1_0;
 using namespace android::hardware::radio::deprecated::V1_0;
@@ -425,6 +423,8 @@ struct RadioImpl : public ::android::hardware::radio::V1_1::IRadio {
     Return<void> setIndicationFilter(int32_t serial, int32_t indicationFilter);
 
     Return<void> setSimCardPower(int32_t serial, bool powerUp);
+    Return<void> setSimCardPower_1_1(int32_t serial,
+            const ::android::hardware::radio::V1_1::CardPowerState state);
 
     Return<void> responseAcknowledgement();
 
@@ -2656,6 +2656,15 @@ Return<void> RadioImpl::setSimCardPower(int32_t serial, bool powerUp) {
     RLOGD("setSimCardPower: serial %d", serial);
 #endif
     dispatchInts(serial, mSlotId, RIL_REQUEST_SET_SIM_CARD_POWER, 1, BOOL_TO_INT(powerUp));
+    return Void();
+}
+
+Return<void> RadioImpl::setSimCardPower_1_1(int32_t serial,
+        const ::android::hardware::radio::V1_1::CardPowerState state) {
+#if VDBG
+    RLOGD("setSimCardPower_1_1: serial %d state %d", serial, state);
+#endif
+    dispatchInts(serial, mSlotId, RIL_REQUEST_SET_SIM_CARD_POWER, 1, state);
     return Void();
 }
 
@@ -6319,7 +6328,6 @@ int radio::setIndicationFilterResponse(int slotId,
     return 0;
 }
 
-
 int radio::setSimCardPowerResponse(int slotId,
                                    int responseType, int serial, RIL_Errno e,
                                    void *response, size_t responseLen) {
@@ -6330,13 +6338,25 @@ int radio::setSimCardPowerResponse(int slotId,
     if (radioService[slotId]->mRadioResponse != NULL) {
         RadioResponseInfo responseInfo = {};
         populateResponseInfo(responseInfo, serial, responseType, e);
-        Return<void> retStatus
-                = radioService[slotId]->mRadioResponse->setSimCardPowerResponse(responseInfo);
-        radioService[slotId]->checkReturnStatus(retStatus);
+        Return<sp<::android::hardware::radio::V1_1::IRadioResponse>> ret =
+            ::android::hardware::radio::V1_1::IRadioResponse::castFrom(
+            radioService[slotId]->mRadioResponse);
+        if (ret.isOk()) {
+            sp<::android::hardware::radio::V1_1::IRadioResponse> radioResponseV1_1 = ret;
+            Return<void> retStatus
+                   = radioResponseV1_1->setSimCardPowerResponse_1_1(responseInfo);
+            radioService[slotId]->checkReturnStatus(retStatus);
+        } else {
+            RLOGD("setSimCardPowerResponse: ret.isOK() == false for radioService[%d]",
+                    slotId);
+            Return<void> retStatus
+                    = radioService[slotId]->mRadioResponse->setSimCardPowerResponse(responseInfo);
+            radioService[slotId]->checkReturnStatus(retStatus);
+        }
     } else {
-        RLOGE("setSimCardPowerResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+        RLOGE("setSimCardPowerResponse: radioService[%d]->mRadioResponse == NULL",
+                slotId);
     }
-
     return 0;
 }
 
