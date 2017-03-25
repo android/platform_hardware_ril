@@ -722,7 +722,9 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
         }
 
         // there is a response payload, no matter success or not.
+#if VDBG
         RLOGE ("Calling responseFunction() for token %d", pRI->token);
+#endif
 
         pthread_rwlock_t *radioServiceRwlockPtr = radio::getRadioServiceRwlock((int) socket_id);
         int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
