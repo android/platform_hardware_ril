@@ -76,7 +76,8 @@ struct SapImpl : public ISap {
 
 void SapImpl::checkReturnStatus(Return<void>& ret) {
     if (ret.isOk() == false) {
-        RLOGE("checkReturnStatus: unable to call response/indication callback");
+        RLOGE("checkReturnStatus: unable to call response/indication callback: %s",
+              ret.description().c_str());
         // Remote process (SapRilReceiver.java) hosting the callback must be dead. Reset the
         // callback object; there's no other recovery to be done here. When the client process is
         // back up, it will call setCallback()
