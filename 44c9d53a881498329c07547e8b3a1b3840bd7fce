@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "834b44e2_292eb850",
+        "filename": "libril/sap_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1061212
+      },
+      "writtenOn": "2017-03-28T16:44:15Z",
+      "side": 1,
+      "message": "new line please.",
+      "range": {
+        "startLine": 79,
+        "startChar": 84,
+        "endLine": 79,
+        "endChar": 111
+      },
+      "revId": "44c9d53a881498329c07547e8b3a1b3840bd7fce",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
