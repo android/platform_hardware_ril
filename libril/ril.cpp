@@ -105,7 +105,9 @@ extern "C" const char * radioStateToString(RIL_RadioState);
 extern "C" const char * rilSocketIdToString(RIL_SOCKET_ID socket_id);
 
 extern "C"
-char rild[MAX_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL;
+char ril_service_name_base[MAX_SERVICE_NAME_LENGTH] = RIL_SERVICE_NAME_BASE;
+extern "C"
+char ril_service_name[MAX_SERVICE_NAME_LENGTH] = RIL1_SERVICE_NAME;
 /*******************************************************************/
 
 RIL_RadioFunctions s_callbacks = {0, NULL, NULL, NULL, NULL, NULL};
@@ -211,13 +213,13 @@ static UnsolResponseInfo s_unsolResponses[] = {
 #include "ril_unsol_commands.h"
 };
 
-char * RIL_getRilSocketName() {
-    return rild;
+char * RIL_getServiceName() {
+    return ril_service_name;
 }
 
 extern "C"
-void RIL_setRilSocketName(const char * s) {
-    strncpy(rild, s, MAX_SOCKET_NAME_LENGTH);
+void RIL_setServiceName(const char * s) {
+    strncpy(ril_service_name, s, MAX_SERVICE_NAME_LENGTH);
 }
 
 RequestInfo *
@@ -272,34 +274,6 @@ addRequestToList(int serial, int slotId, int request) {
     return pRI;
 }
 
-static int
-blockingWrite(int fd, const void *buffer, size_t len) {
-    size_t writeOffset = 0;
-    const uint8_t *toWrite;
-
-    toWrite = (const uint8_t *)buffer;
-
-    while (writeOffset < len) {
-        ssize_t written;
-        do {
-            written = write (fd, toWrite + writeOffset,
-                                len - writeOffset);
-        } while (written < 0 && ((errno == EINTR) || (errno == EAGAIN)));
-
-        if (written >= 0) {
-            writeOffset += written;
-        } else {   // written < 0
-            RLOGE ("RIL Response: unexpected error on write errno:%d", errno);
-            close(fd);
-            return -1;
-        }
-    }
-#if VDBG
-    RLOGE("RIL Response bytes written:%d", writeOffset);
-#endif
-    return 0;
-}
-
 static void triggerEvLoop() {
     int ret;
     if (!pthread_equal(pthread_self(), s_tid_dispatch)) {
@@ -331,50 +305,6 @@ static void processWakeupCallback(int fd, short flags, void *param) {
     do {
         ret = read(s_fdWakeupRead, &buff, sizeof(buff));
     } while (ret > 0 || (ret < 0 && errno == EINTR));
-}
-
-static void onCommandsSocketClosed(RIL_SOCKET_ID socket_id) {
-    int ret;
-    RequestInfo *p_cur;
-    /* Hook for current context
-       pendingRequestsMutextHook refer to &s_pendingRequestsMutex */
-    pthread_mutex_t * pendingRequestsMutexHook = &s_pendingRequestsMutex;
-    /* pendingRequestsHook refer to &s_pendingRequests */
-    RequestInfo **    pendingRequestsHook = &s_pendingRequests;
-
-#if (SIM_COUNT >= 2)
-    if (socket_id == RIL_SOCKET_2) {
-        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket2;
-        pendingRequestsHook = &s_pendingRequests_socket2;
-    }
-#if (SIM_COUNT >= 3)
-    else if (socket_id == RIL_SOCKET_3) {
-        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket3;
-        pendingRequestsHook = &s_pendingRequests_socket3;
-    }
-#endif
-#if (SIM_COUNT >= 4)
-    else if (socket_id == RIL_SOCKET_4) {
-        pendingRequestsMutexHook = &s_pendingRequestsMutex_socket4;
-        pendingRequestsHook = &s_pendingRequests_socket4;
-    }
-#endif
-#endif
-    /* mark pending requests as "cancelled" so we dont report responses */
-    ret = pthread_mutex_lock(pendingRequestsMutexHook);
-    assert (ret == 0);
-
-    p_cur = *pendingRequestsHook;
-
-    for (p_cur = *pendingRequestsHook
-            ; p_cur != NULL
-            ; p_cur  = p_cur->p_next
-    ) {
-        p_cur->cancelled = 1;
-    }
-
-    ret = pthread_mutex_unlock(pendingRequestsMutexHook);
-    assert (ret == 0);
 }
 
 static void resendLastNITZTimeData(RIL_SOCKET_ID socket_id) {
@@ -564,18 +494,18 @@ RIL_register_socket (RIL_RadioFunctions *(*Init)(const struct RIL_Env *, int, ch
 
         switch(socketType) {
             case RIL_SAP_SOCKET:
-                RilSapSocket::initSapSocket("sap_uim_socket1", UimFuncs);
+                RilSapSocket::initSapSocket(RIL1_SERVICE_NAME, UimFuncs);
 
 #if (SIM_COUNT >= 2)
-                RilSapSocket::initSapSocket("sap_uim_socket2", UimFuncs);
+                RilSapSocket::initSapSocket(RIL2_SERVICE_NAME, UimFuncs);
 #endif
 
 #if (SIM_COUNT >= 3)
-                RilSapSocket::initSapSocket("sap_uim_socket3", UimFuncs);
+                RilSapSocket::initSapSocket(RIL3_SERVICE_NAME, UimFuncs);
 #endif
 
 #if (SIM_COUNT >= 4)
-                RilSapSocket::initSapSocket("sap_uim_socket4", UimFuncs);
+                RilSapSocket::initSapSocket(RIL4_SERVICE_NAME, UimFuncs);
 #endif
                 break;
             default:;
@@ -1320,11 +1250,3 @@ rilSocketIdToString(RIL_SOCKET_ID socket_id)
 }
 
 } /* namespace android */
-
-void rilEventAddWakeup_helper(struct ril_event *ev) {
-    android::rilEventAddWakeup(ev);
-}
-
-int blockingWrite_helper(int fd, void *buffer, size_t len) {
-    return android::blockingWrite(fd, buffer, len);
-}

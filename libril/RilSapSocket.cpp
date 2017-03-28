@@ -30,15 +30,6 @@
 
 static RilSapSocket::RilSapSocketList *head = NULL;
 
-void ril_sap_on_request_complete (
-        RIL_Token t, RIL_Errno e,
-        void *response, size_t responselen
-);
-
-void ril_sap_on_unsolicited_response (
-        int unsolResponse, const void *data,
-        size_t datalen
-);
 extern "C" void
 RIL_requestTimedCallback (RIL_TimedCallback callback, void *param,
         const struct timeval *relativeTime);
@@ -121,14 +112,14 @@ RilSapSocket *RilSapSocket::getSocketById(RIL_SOCKET_ID socketId) {
 void RilSapSocket::initSapSocket(const char *socketName,
         RIL_RadioFunctions *uimFuncs) {
 
-    if (strcmp(socketName, "sap_uim_socket1") == 0) {
+    if (strcmp(socketName, RIL1_SERVICE_NAME) == 0) {
         if(!SocketExists(socketName)) {
             addSocketToList(socketName, RIL_SOCKET_1, uimFuncs);
         }
     }
 
 #if (SIM_COUNT >= 2)
-    if (strcmp(socketName, "sap_uim_socket2") == 0) {
+    if (strcmp(socketName, RIL2_SERVICE_NAME) == 0) {
         if(!SocketExists(socketName)) {
             addSocketToList(socketName, RIL_SOCKET_2, uimFuncs);
         }
@@ -136,7 +127,7 @@ void RilSapSocket::initSapSocket(const char *socketName,
 #endif
 
 #if (SIM_COUNT >= 3)
-    if (strcmp(socketName, "sap_uim_socket3") == 0) {
+    if (strcmp(socketName, RIL3_SERVICE_NAME) == 0) {
         if(!SocketExists(socketName)) {
             addSocketToList(socketName, RIL_SOCKET_3, uimFuncs);
         }
@@ -144,7 +135,7 @@ void RilSapSocket::initSapSocket(const char *socketName,
 #endif
 
 #if (SIM_COUNT >= 4)
-    if (strcmp(socketName, "sap_uim_socket4") == 0) {
+    if (strcmp(socketName, RIL4_SERVICE_NAME) == 0) {
         if(!SocketExists(socketName)) {
             addSocketToList(socketName, RIL_SOCKET_4, uimFuncs);
         }
@@ -203,49 +194,6 @@ RilSapSocket::RilSapSocket(const char *socketName,
     if (inputUimFuncs) {
         uimFuncs = inputUimFuncs;
     }
-}
-
-#define BYTES_PER_LINE 16
-
-#define NIBBLE_TO_HEX(n) ({ \
-  uint8_t __n = (uint8_t) (n) & 0x0f; \
-  __nibble >= 10 ? 'A' + __n - 10: '0' + __n; \
-})
-
-#define HEX_HIGH(b) ({ \
-  uint8_t __b = (uint8_t) (b); \
-  uint8_t __nibble = (__b >> 4) & 0x0f; \
-  NIBBLE_TO_HEX(__nibble); \
-})
-
-#define HEX_LOW(b) ({ \
-  uint8_t __b = (uint8_t) (b); \
-  uint8_t __nibble = __b & 0x0f; \
-  NIBBLE_TO_HEX(__nibble); \
-})
-
-void log_hex(const char *who, const uint8_t *buffer, int length) {
-    char out[80];
-    int source = 0;
-    int dest = 0;
-    int dest_len = sizeof(out);
-    int per_line = 0;
-
-    do {
-        dest += sprintf(out, "%8.8s [%8.8x] ", who, source);
-        for(; source < length && dest_len - dest > 3 && per_line < BYTES_PER_LINE; source++,
-        per_line ++) {
-            out[dest++] = HEX_HIGH(buffer[source]);
-            out[dest++] = HEX_LOW(buffer[source]);
-            out[dest++] = ' ';
-        }
-        if (dest < dest_len && (per_line == BYTES_PER_LINE || source >= length)) {
-            out[dest++] = 0;
-            per_line = 0;
-            dest = 0;
-            RLOGD("%s\n", out);
-        }
-    } while(source < length && dest < dest_len);
 }
 
 void RilSapSocket::dispatchRequest(MsgHeader *req) {

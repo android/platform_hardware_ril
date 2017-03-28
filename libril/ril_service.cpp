@@ -7931,26 +7931,13 @@ void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands
     using namespace android::hardware;
     int simCount = 1;
     const char *serviceNames[] = {
-            android::RIL_getRilSocketName()
+            android::RIL_getServiceName()
             #if (SIM_COUNT >= 2)
-            , SOCKET2_NAME_RIL
+            , RIL2_SERVICE_NAME
             #if (SIM_COUNT >= 3)
-            , SOCKET3_NAME_RIL
+            , RIL3_SERVICE_NAME
             #if (SIM_COUNT >= 4)
-            , SOCKET4_NAME_RIL
-            #endif
-            #endif
-            #endif
-            };
-
-    const char *oemHookServiceNames[] = {
-            OEM_HOOK_SERVICE_NAME
-            #if (SIM_COUNT >= 2)
-            , OEM_HOOK2_SERVICE_NAME
-            #if (SIM_COUNT >= 3)
-            , OEM_HOOK3_SERVICE_NAME
-            #if (SIM_COUNT >= 4)
-            , OEM_HOOK4_SERVICE_NAME
+            , RIL4_SERVICE_NAME
             #endif
             #endif
             #endif
@@ -7972,7 +7959,7 @@ void radio::registerService(RIL_RadioFunctions *callbacks, CommandInfo *commands
         oemHookService[i]->mSlotId = i;
         RLOGD("registerService: starting IRadio %s", serviceNames[i]);
         android::status_t status = radioService[i]->registerAsService(serviceNames[i]);
-        status = oemHookService[i]->registerAsService(oemHookServiceNames[i]);
+        status = oemHookService[i]->registerAsService(serviceNames[i]);
 
         ret = pthread_rwlock_unlock(radioServiceRwlockPtr);
         assert(ret == 0);

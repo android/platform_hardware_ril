@@ -47,7 +47,8 @@ static void usage(const char *argv0) {
     exit(EXIT_FAILURE);
 }
 
-extern char rild[MAX_SOCKET_NAME_LENGTH];
+extern char ril_service_name_base[MAX_SERVICE_NAME_LENGTH];
+extern char ril_service_name[MAX_SERVICE_NAME_LENGTH];
 
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
 extern void rilc_thread_pool ();
@@ -60,7 +61,7 @@ extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
 
 extern void RIL_onRequestAck(RIL_Token t);
 
-extern void RIL_setRilSocketName(char *);
+extern void RIL_setServiceName(char *);
 
 #if defined(ANDROID_MULTI_SIM)
 extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
@@ -193,8 +194,9 @@ int main(int argc, char **argv) {
         exit(0);
     }
     if (strncmp(clientId, "0", MAX_CLIENT_ID_LENGTH)) {
-        strlcat(rild, clientId, MAX_SOCKET_NAME_LENGTH);
-        RIL_setRilSocketName(rild);
+        strncpy(ril_service_name, ril_service_name_base, MAX_SERVICE_NAME_LENGTH);
+        strncat(ril_service_name, clientId, MAX_SERVICE_NAME_LENGTH);
+        RIL_setServiceName(ril_service_name);
     }
 
     if (rilLibPath == NULL) {

@@ -919,13 +919,13 @@ void sap::registerService(RIL_RadioFunctions *callbacks) {
     using namespace android::hardware;
     int simCount = 1;
     const char *serviceNames[] = {
-        "sap_uim_socket1"
+        android::RIL_getServiceName()
         #if (SIM_COUNT >= 2)
-        , "sap_uim_socket2"
+        , RIL2_SERVICE_NAME
         #if (SIM_COUNT >= 3)
-        , "sap_uim_socket3"
+        , RIL3_SERVICE_NAME
         #if (SIM_COUNT >= 4)
-        , "sap_uim_socket4"
+        , RIL4_SERVICE_NAME
         #endif
         #endif
         #endif
