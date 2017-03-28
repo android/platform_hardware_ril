@@ -47,7 +47,8 @@ static void usage(const char *argv0) {
     exit(EXIT_FAILURE);
 }
 
-extern char rild[MAX_SOCKET_NAME_LENGTH];
+extern char radio_service_name_base[MAX_SOCKET_NAME_LENGTH];
+extern char radio_service_name[MAX_SOCKET_NAME_LENGTH];
 
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
 extern void rilc_thread_pool ();
@@ -193,8 +194,9 @@ int main(int argc, char **argv) {
         exit(0);
     }
     if (strncmp(clientId, "0", MAX_CLIENT_ID_LENGTH)) {
-        strlcat(rild, clientId, MAX_SOCKET_NAME_LENGTH);
-        RIL_setRilSocketName(rild);
+        strncpy(radio_service_name, radio_service_name_base, MAX_CLIENT_ID_LENGTH);
+        strncat(radio_service_name, clientId, MAX_CLIENT_ID_LENGTH);
+        RIL_setRilSocketName(radio_service_name);
     }
 
     if (rilLibPath == NULL) {
