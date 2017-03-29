@@ -48,6 +48,54 @@
     },
     {
       "key": {
+        "uuid": "619f5b42_d36e7f9b",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-29T23:25:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6280f8da_df98a429",
+      "range": {
+        "startLine": 108,
+        "startChar": 5,
+        "endLine": 108,
+        "endChar": 10
+      },
+      "revId": "7d9982953617e8627e93d9234f9dc3fad362ebb0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e290bb12_2549f1b7",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-29T23:25:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45ddcf3c_89a5a83e",
+      "range": {
+        "startLine": 108,
+        "startChar": 33,
+        "endLine": 108,
+        "endChar": 39
+      },
+      "revId": "7d9982953617e8627e93d9234f9dc3fad362ebb0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8f46a24b_7d03099d",
         "filename": "libril/ril.cpp",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2017-03-29T04:46:12Z",
       "side": 1,
       "message": "Rename to get/set HidlServiceName",
+      "range": {
+        "startLine": 216,
+        "startChar": 7,
+        "endLine": 216,
+        "endChar": 27
+      },
+      "revId": "7d9982953617e8627e93d9234f9dc3fad362ebb0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cf4ab3f_41c8c650",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-29T23:25:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f46a24b_7d03099d",
       "range": {
         "startLine": 216,
         "startChar": 7,
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "3c89a0be_c3e14f3c",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-29T23:25:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dd98c10_3b8cf9c1",
+      "range": {
+        "startLine": 197,
+        "startChar": 61,
+        "endLine": 197,
+        "endChar": 81
+      },
+      "revId": "7d9982953617e8627e93d9234f9dc3fad362ebb0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e2339a7_b9f8a3a8",
         "filename": "rild/rild.c",
         "patchSetId": 1
@@ -105,6 +201,30 @@
       "writtenOn": "2017-03-29T04:46:12Z",
       "side": 1,
       "message": "MAX_SOCKET_NAME_LENGTH",
+      "range": {
+        "startLine": 198,
+        "startChar": 46,
+        "endLine": 198,
+        "endChar": 66
+      },
+      "revId": "7d9982953617e8627e93d9234f9dc3fad362ebb0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5342b6ce_4a3a255c",
+        "filename": "rild/rild.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-29T23:25:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e2339a7_b9f8a3a8",
       "range": {
         "startLine": 198,
         "startChar": 46,
