@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d93404e0_b406809f",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-03-30T00:27:17Z",
+      "side": 1,
+      "message": "RIL1_SERVICE_NAME?  HIDL1 sounds like you\u0027re enumerating hidls, but it\u0027s really SLOT or RIL that is being enumerated.",
+      "range": {
+        "startLine": 110,
+        "startChar": 50,
+        "endLine": 110,
+        "endChar": 68
+      },
+      "revId": "146732c872951088ca0861d1e6559b54d853c141",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
