@@ -22,6 +22,30 @@
       "revId": "146732c872951088ca0861d1e6559b54d853c141",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d24693c_006e7f14",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-03-30T00:38:59Z",
+      "side": 1,
+      "message": "Since this is the name of all services (radio, oemhook, sap), I wanted a generic name. RIL in my head corresponds more to radio, but I guess it\u0027s the overall interface? Will rename.",
+      "parentUuid": "d93404e0_b406809f",
+      "range": {
+        "startLine": 110,
+        "startChar": 50,
+        "endLine": 110,
+        "endChar": 68
+      },
+      "revId": "146732c872951088ca0861d1e6559b54d853c141",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
