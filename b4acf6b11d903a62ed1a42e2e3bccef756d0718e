@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bb2eac0_0b7a3bcd",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 5335,
+      "author": {
+        "id": 1062130
+      },
+      "writtenOn": "2017-04-04T19:02:40Z",
+      "side": 1,
+      "message": "Need key identifier AVP (attribute value pair) in addition to the key.\n\nThis is an optional field in the certificate, and if present needs to be used by the modem during encryption.",
+      "range": {
+        "startLine": 5335,
+        "startChar": 1,
+        "endLine": 5335,
+        "endChar": 2
+      },
+      "revId": "b4acf6b11d903a62ed1a42e2e3bccef756d0718e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d28bdd7_232954d6",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 5990,
+      "author": {
+        "id": 1062130
+      },
+      "writtenOn": "2017-04-04T19:02:40Z",
+      "side": 1,
+      "message": "Need a refresh indication (1 or 0) to let the framework know if it needs to refresh its carrier key, in case network responds with 16384 - generic failure during EAP/IKE procedure. At this point modem will indicate via unsol message to framework to refresh its key from the carrier.",
+      "revId": "b4acf6b11d903a62ed1a42e2e3bccef756d0718e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
