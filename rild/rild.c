@@ -26,7 +26,7 @@
 
 #include <telephony/ril.h>
 #define LOG_TAG "RILD"
-#include <utils/Log.h>
+#include <log/log.h>
 #include <cutils/properties.h>
 #include <cutils/sockets.h>
 #include <sys/capability.h>
