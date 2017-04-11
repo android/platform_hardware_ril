@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "272c6263_fc058e64",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 15
+      },
+      "lineNbr": 2091,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-11T03:48:36Z",
+      "side": 1,
+      "message": "Remove this. This is causing the treehugger failure:\nhardware/ril/libril/ril_service.cpp:2091:50: error: cannot cast from type \u0027const android::hardware::hidl_string\u0027 to pointer type \u0027const char *\u0027\n        if (!copyHidlStringToRil(\u0026params.aidPtr, (const char *)aid, pRI)) {\n                                                 ^~~~~~~~~~~~~~~~~\n1 error generated.",
+      "range": {
+        "startLine": 2091,
+        "startChar": 49,
+        "endLine": 2091,
+        "endChar": 63
+      },
+      "revId": "b2ed52b415775badaf7387ee988c5f271b732364",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
