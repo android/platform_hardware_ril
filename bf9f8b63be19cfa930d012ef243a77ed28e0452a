@@ -1,0 +1,199 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ebc49dd_a9917d14",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5322,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "use this format to describe what is passed in?",
+      "range": {
+        "startLine": 5320,
+        "startChar": 0,
+        "endLine": 5322,
+        "endChar": 46
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "177773a4_8c08d3a7",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5991,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "Add a \"data is\" comment like other unsol indications.",
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f74c6e6_f40bd007",
+        "filename": "libril/Android.mk",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "not sure if we really need both 1.0 and 1.1\nNow that things are compiling fine, can you try removing 1.0?",
+      "range": {
+        "startLine": 19,
+        "startChar": 4,
+        "endLine": 19,
+        "endChar": 32
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "39064a37_6462236d",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "not needed",
+      "range": {
+        "startLine": 107,
+        "startChar": 7,
+        "endLine": 107,
+        "endChar": 41
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2739988_d105e4f0",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "not needed",
+      "range": {
+        "startLine": 108,
+        "startChar": 7,
+        "endLine": 108,
+        "endChar": 41
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8967d8b2_8f315543",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "same here and other places. we have a using statement for V1_0 above, so this isn\u0027t needed.",
+      "range": {
+        "startLine": 111,
+        "startChar": 32,
+        "endLine": 111,
+        "endChar": 66
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28f813e4_2ce6cc68",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 6260,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "Steven, is this typecast for 1.0 to 1.1 for IRadioResponse fine?",
+      "range": {
+        "startLine": 6258,
+        "startChar": 8,
+        "endLine": 6260,
+        "endChar": 59
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7986d7e0_f93c373e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 8036,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "long line",
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f945ebb_850e0149",
+        "filename": "libril/ril_service.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 718,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-13T20:44:05Z",
+      "side": 1,
+      "message": "indentation doesn\u0027t match other functions.",
+      "range": {
+        "startLine": 712,
+        "startChar": 0,
+        "endLine": 718,
+        "endChar": 60
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
