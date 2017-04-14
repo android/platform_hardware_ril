@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f98764e2_4f73f26e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1614,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-14T17:38:33Z",
+      "side": 1,
+      "message": "And if you do that, maybe do it everywhere constructCdmaSms() is called and get rid of memset from that function.",
+      "parentUuid": "2965d11b_f395ee23",
+      "range": {
+        "startLine": 1614,
+        "startChar": 25,
+        "endLine": 1614,
+        "endChar": 29
+      },
+      "revId": "16f5aa26ca3d7bea3b3911ae72e1fcb6b3ec0005",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e65452f4_74d0daf9",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
@@ -54,6 +78,24 @@
       "side": 1,
       "message": "I think they are the same\n\n-1 in byte \u003d 0xFF\n-1 in int \u003d 0xFFFFFFFF\n\nAlso memeset.c in libc has already optimized to handle this very efficiently so there is no need to have our own for-loop to handle this.\n\nOne thing I don\u0027t understand, why -1 not 0? Seems to be different from other structs we use.",
       "parentUuid": "e65452f4_74d0daf9",
+      "revId": "16f5aa26ca3d7bea3b3911ae72e1fcb6b3ec0005",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d07d679_c97a45bb",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3366,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-14T17:38:33Z",
+      "side": 1,
+      "message": "Oh right, they are the same.\n0 is a valid value for these fields; -1 is to indicate no value.",
+      "parentUuid": "7a6d66c5_61eae6ef",
       "revId": "16f5aa26ca3d7bea3b3911ae72e1fcb6b3ec0005",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
