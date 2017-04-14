@@ -504,20 +504,14 @@ bool dispatchVoid(int serial, int slotId, int request) {
     return true;
 }
 
-bool dispatchString(int serial, int slotId, int request, const char * str) {
+bool dispatchString(int serial, int slotId, int request, const char *str) {
     RequestInfo *pRI = android::addRequestToList(serial, slotId, request);
     if (pRI == NULL) {
         return false;
     }
 
-    char *pString;
-    if (!copyHidlStringToRil(&pString, str, pRI)) {
-        return false;
-    }
+    s_vendorFunctions->onRequest(request, (void *) str, sizeof(const char *), pRI);
 
-    s_vendorFunctions->onRequest(request, pString, sizeof(char *), pRI);
-
-    memsetAndFreeStrings(1, pString);
     return true;
 }
 
@@ -527,8 +521,8 @@ bool dispatchStrings(int serial, int slotId, int request, int countStrings, ...)
         return false;
     }
 
-    char **pStrings;
-    pStrings = (char **)calloc(countStrings, sizeof(char *));
+    const char **pStrings;
+    pStrings = (const char **) calloc(countStrings, sizeof(const char *));
     if (pStrings == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
         sendErrorResponse(pRI, RIL_E_NO_MEMORY);
@@ -537,27 +531,15 @@ bool dispatchStrings(int serial, int slotId, int request, int countStrings, ...)
     va_list ap;
     va_start(ap, countStrings);
     for (int i = 0; i < countStrings; i++) {
-        const char* str = va_arg(ap, const char *);
-        if (!copyHidlStringToRil(&pStrings[i], hidl_string(str), pRI)) {
-            va_end(ap);
-            for (int j = 0; j < i; j++) {
-                memsetAndFreeStrings(1, pStrings[j]);
-            }
-            free(pStrings);
-            return false;
-        }
+        pStrings[i] = va_arg(ap, const char *);
     }
     va_end(ap);
 
-    s_vendorFunctions->onRequest(request, pStrings, countStrings * sizeof(char *), pRI);
+    s_vendorFunctions->onRequest(request, pStrings, countStrings * sizeof(const char *), pRI);
 
     if (pStrings != NULL) {
-        for (int i = 0 ; i < countStrings ; i++) {
-            memsetAndFreeStrings(1, pStrings[i]);
-        }
-
 #ifdef MEMSET_FREED
-        memset(pStrings, 0, countStrings * sizeof(char *));
+        memset(pStrings, 0, countStrings * sizeof(const char *));
 #endif
         free(pStrings);
     }
@@ -571,8 +553,8 @@ bool dispatchStrings(int serial, int slotId, int request, const hidl_vec<hidl_st
     }
 
     int countStrings = data.size();
-    char **pStrings;
-    pStrings = (char **)calloc(countStrings, sizeof(char *));
+    const char **pStrings;
+    pStrings = (const char **) calloc(countStrings, sizeof(const char *));
     if (pStrings == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
         sendErrorResponse(pRI, RIL_E_NO_MEMORY);
@@ -580,24 +562,14 @@ bool dispatchStrings(int serial, int slotId, int request, const hidl_vec<hidl_st
     }
 
     for (int i = 0; i < countStrings; i++) {
-        if (!copyHidlStringToRil(&pStrings[i], data[i], pRI)) {
-            for (int j = 0; j < i; j++) {
-                memsetAndFreeStrings(1, pStrings[j]);
-            }
-            free(pStrings);
-            return false;
-        }
+        pStrings[i] = data[i].c_str();
     }
 
-    s_vendorFunctions->onRequest(request, pStrings, countStrings * sizeof(char *), pRI);
+    s_vendorFunctions->onRequest(request, pStrings, countStrings * sizeof(const char *), pRI);
 
     if (pStrings != NULL) {
-        for (int i = 0 ; i < countStrings ; i++) {
-            memsetAndFreeStrings(1, pStrings[i]);
-        }
-
 #ifdef MEMSET_FREED
-        memset(pStrings, 0, countStrings * sizeof(char *));
+        memset(pStrings, 0, countStrings * sizeof(const char *));
 #endif
         free(pStrings);
     }
@@ -679,8 +651,7 @@ bool dispatchIccApdu(int serial, int slotId, int request, const SimApdu& message
         return false;
     }
 
-    RIL_SIM_APDU apdu;
-    memset (&apdu, 0, sizeof(RIL_SIM_APDU));
+    RIL_SIM_APDU apdu = {};
 
     apdu.sessionid = message.sessionId;
     apdu.cla = message.cla;
@@ -1110,7 +1081,7 @@ Return<void> RadioImpl::iccIOForApp(int32_t serial, const IccIo& iccIo) {
         return Void();
     }
 
-    RIL_SIM_IO_v6 rilIccIo;
+    RIL_SIM_IO_v6 rilIccIo = {};
     rilIccIo.command = iccIo.command;
     rilIccIo.fileid = iccIo.fileId;
     if (!copyHidlStringToRil(&rilIccIo.path, iccIo.path, pRI)) {
@@ -1580,8 +1551,6 @@ Return<void> RadioImpl::sendBurstDtmf(int32_t serial, const hidl_string& dtmf, i
 }
 
 void constructCdmaSms(RIL_CDMA_SMS_Message &rcsm, const CdmaSmsMessage& sms) {
-    memset(&rcsm, 0, sizeof(rcsm));
-
     rcsm.uTeleserviceID = sms.teleserviceId;
     rcsm.bIsServicePresent = BOOL_TO_INT(sms.isServicePresent);
     rcsm.uServicecategory = sms.serviceCategory;
@@ -1621,7 +1590,7 @@ Return<void> RadioImpl::sendCdmaSms(int32_t serial, const CdmaSmsMessage& sms) {
         return Void();
     }
 
-    RIL_CDMA_SMS_Message rcsm;
+    RIL_CDMA_SMS_Message rcsm = {};
     constructCdmaSms(rcsm, sms);
 
     s_vendorFunctions->onRequest(pRI->pCI->requestNumber, &rcsm, sizeof(rcsm), pRI);
@@ -1904,13 +1873,16 @@ Return<void> RadioImpl::setInitialAttachApn(int32_t serial, const DataProfileInf
                 (isRoaming ? dataProfileInfo.roamingProtocol : dataProfileInfo.protocol);
 
         if (!copyHidlStringToRil(&iaa.protocol, protocol, pRI)) {
+            memsetAndFreeStrings(1, iaa.apn);
             return Void();
         }
         iaa.authtype = (int) dataProfileInfo.authType;
         if (!copyHidlStringToRil(&iaa.username, dataProfileInfo.user, pRI)) {
+            memsetAndFreeStrings(2, iaa.apn, iaa.protocol);
             return Void();
         }
         if (!copyHidlStringToRil(&iaa.password, dataProfileInfo.password, pRI)) {
+            memsetAndFreeStrings(3, iaa.apn, iaa.protocol, iaa.username);
             return Void();
         }
 
@@ -1924,16 +1896,20 @@ Return<void> RadioImpl::setInitialAttachApn(int32_t serial, const DataProfileInf
             return Void();
         }
         if (!copyHidlStringToRil(&iaa.protocol, dataProfileInfo.protocol, pRI)) {
+            memsetAndFreeStrings(1, iaa.apn);
             return Void();
         }
         if (!copyHidlStringToRil(&iaa.roamingProtocol, dataProfileInfo.roamingProtocol, pRI)) {
+            memsetAndFreeStrings(2, iaa.apn, iaa.protocol);
             return Void();
         }
         iaa.authtype = (int) dataProfileInfo.authType;
         if (!copyHidlStringToRil(&iaa.username, dataProfileInfo.user, pRI)) {
+            memsetAndFreeStrings(3, iaa.apn, iaa.protocol, iaa.roamingProtocol);
             return Void();
         }
         if (!copyHidlStringToRil(&iaa.password, dataProfileInfo.password, pRI)) {
+            memsetAndFreeStrings(4, iaa.apn, iaa.protocol, iaa.roamingProtocol, iaa.username);
             return Void();
         }
         iaa.supportedTypesBitmask = dataProfileInfo.supportedApnTypesBitmap;
@@ -1943,10 +1919,14 @@ Return<void> RadioImpl::setInitialAttachApn(int32_t serial, const DataProfileInf
 
         if (!convertMvnoTypeToString(dataProfileInfo.mvnoType, iaa.mvnoType)) {
             sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+            memsetAndFreeStrings(5, iaa.apn, iaa.protocol, iaa.roamingProtocol, iaa.username,
+                    iaa.password);
             return Void();
         }
 
         if (!copyHidlStringToRil(&iaa.mvnoMatchData, dataProfileInfo.mvnoMatchData, pRI)) {
+            memsetAndFreeStrings(5, iaa.apn, iaa.protocol, iaa.roamingProtocol, iaa.username,
+                    iaa.password);
             return Void();
         }
 
@@ -1983,7 +1963,7 @@ bool dispatchImsGsmSms(const ImsSmsMessage& message, RequestInfo *pRI) {
         return false;
     }
 
-    pStrings = (char **)calloc(countStrings, sizeof(char *));
+    pStrings = (char **) calloc(countStrings, sizeof(char *));
     if (pStrings == NULL) {
         RLOGE("dispatchImsGsmSms: Memory allocation failed for request %s",
                 requestToString(pRI->pCI->requestNumber));
@@ -1991,30 +1971,12 @@ bool dispatchImsGsmSms(const ImsSmsMessage& message, RequestInfo *pRI) {
         return false;
     }
 
-    if (!copyHidlStringToRil(&pStrings[0], message.gsmMessage[0].smscPdu, pRI)) {
-#ifdef MEMSET_FREED
-        memset(pStrings, 0, datalen);
-#endif
-        free(pStrings);
-        return false;
-    }
-
-    if (!copyHidlStringToRil(&pStrings[1], message.gsmMessage[0].pdu, pRI)) {
-        memsetAndFreeStrings(1, pStrings[0]);
-#ifdef MEMSET_FREED
-        memset(pStrings, 0, datalen);
-#endif
-        free(pStrings);
-        return false;
-    }
+    pStrings[0] = (char *) message.gsmMessage[0].smscPdu.c_str();
+    pStrings[1] = (char *) message.gsmMessage[0].pdu.c_str();
 
     rism.message.gsmMessage = pStrings;
     s_vendorFunctions->onRequest(pRI->pCI->requestNumber, &rism, sizeof(RIL_RadioTechnologyFamily) +
             sizeof(uint8_t) + sizeof(int32_t) + dataLen, pRI);
-
-    for (int i = 0 ; i < countStrings ; i++) {
-        memsetAndFreeStrings(1, pStrings[i]);
-    }
 
 #ifdef MEMSET_FREED
     memset(pStrings, 0, datalen);
@@ -2025,8 +1987,8 @@ bool dispatchImsGsmSms(const ImsSmsMessage& message, RequestInfo *pRI) {
 }
 
 bool dispatchImsCdmaSms(const ImsSmsMessage& message, RequestInfo *pRI) {
-    RIL_IMS_SMS_Message rism;
-    RIL_CDMA_SMS_Message rcsm;
+    RIL_IMS_SMS_Message rism = {};
+    RIL_CDMA_SMS_Message rcsm = {};
 
     if (message.cdmaMessage.size() != 1) {
         RLOGE("dispatchImsCdmaSms: Invalid len %s", requestToString(pRI->pCI->requestNumber));
@@ -2090,8 +2052,7 @@ Return<void> RadioImpl::iccOpenLogicalChannel(int32_t serial, const hidl_string&
             return Void();
         }
 
-        RIL_OpenChannelParams params;
-        memset (&params, 0, sizeof(RIL_OpenChannelParams));
+        RIL_OpenChannelParams params = {};
 
         params.p2 = p2;
 
@@ -2131,8 +2092,7 @@ Return<void> RadioImpl::nvReadItem(int32_t serial, NvItem itemId) {
         return Void();
     }
 
-    RIL_NV_ReadItem nvri;
-    memset (&nvri, 0, sizeof(nvri));
+    RIL_NV_ReadItem nvri = {};
     nvri.itemID = (RIL_NV_Item) itemId;
 
     s_vendorFunctions->onRequest(pRI->pCI->requestNumber, &nvri, sizeof(nvri), pRI);
@@ -2148,8 +2108,7 @@ Return<void> RadioImpl::nvWriteItem(int32_t serial, const NvWriteItem& item) {
         return Void();
     }
 
-    RIL_NV_WriteItem nvwi;
-    memset (&nvwi, 0, sizeof(nvwi));
+    RIL_NV_WriteItem nvwi = {};
 
     nvwi.itemID = (RIL_NV_Item) item.itemId;
 
@@ -2226,8 +2185,7 @@ Return<void> RadioImpl::requestIccSimAuthentication(int32_t serial, int32_t auth
         return Void();
     }
 
-    RIL_SimAuthentication pf;
-    memset (&pf, 0, sizeof(pf));
+    RIL_SimAuthentication pf = {};
 
     pf.authContext = authContext;
 
@@ -2467,8 +2425,7 @@ Return<void> RadioImpl::setRadioCapability(int32_t serial, const RadioCapability
         return Void();
     }
 
-    RIL_RadioCapability rilRc;
-    memset (&rilRc, 0, sizeof(rilRc));
+    RIL_RadioCapability rilRc = {};
 
     // TODO : set rilRc.version using HIDL version ?
     rilRc.session = rc.session;
@@ -3363,11 +3320,7 @@ void fillCellIdentityFromVoiceRegStateResponseString(CellIdentity &cellIdentity,
         int numStrings, char** response) {
 
     RIL_CellIdentity_v16 rilCellIdentity;
-    int32_t *tmp = (int32_t*)&rilCellIdentity;
-
-    for (size_t i = 0; i < sizeof(RIL_CellIdentity_v16)/sizeof(int32_t); i++) {
-        tmp[i] = -1;
-    }
+    memset(&rilCellIdentity, -1, sizeof(RIL_CellIdentity_v16));
 
     rilCellIdentity.cellInfoType = getCellInfoTypeRadioTechnology(response[3]);
     switch(rilCellIdentity.cellInfoType) {
@@ -3432,11 +3385,7 @@ void fillCellIdentityFromDataRegStateResponseString(CellIdentity &cellIdentity,
         int numStrings, char** response) {
 
     RIL_CellIdentity_v16 rilCellIdentity;
-    int32_t *tmp = (int32_t*)&rilCellIdentity;
-
-    for (size_t i = 0; i < sizeof(RIL_CellIdentity_v16)/sizeof(int32_t); i++) {
-        tmp[i] = -1;
-    }
+    memset(&rilCellIdentity, -1, sizeof(RIL_CellIdentity_v16));
 
     rilCellIdentity.cellInfoType = getCellInfoTypeRadioTechnology(response[3]);
     switch(rilCellIdentity.cellInfoType) {
