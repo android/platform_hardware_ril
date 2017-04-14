@@ -538,7 +538,7 @@ bool dispatchStrings(int serial, int slotId, int request, int countStrings, ...)
     va_start(ap, countStrings);
     for (int i = 0; i < countStrings; i++) {
         const char* str = va_arg(ap, const char *);
-        if (!copyHidlStringToRil(&pStrings[i], str, pRI)) {
+        if (!copyHidlStringToRil(&pStrings[i], hidl_string(str), pRI)) {
             va_end(ap);
             for (int j = 0; j < i; j++) {
                 memsetAndFreeStrings(1, pStrings[j]);
@@ -1027,13 +1027,22 @@ Return<void> RadioImpl::sendSMSExpectMore(int32_t serial, const GsmSmsMessage& m
     return Void();
 }
 
-const char *convertMvnoTypeToString(MvnoType type) {
+static bool convertMvnoTypeToString(MvnoType type, char *&str) {
     switch (type) {
-        case MvnoType::IMSI: return "imsi";
-        case MvnoType::GID: return "gid";
-        case MvnoType::SPN: return "spn";
-        default: return NULL;
+        case MvnoType::IMSI:
+            str = (char *)"imsi";
+            return true;
+        case MvnoType::GID:
+            str = (char *)"gid";
+            return true;
+        case MvnoType::SPN:
+            str = (char *)"spn";
+            return true;
+        case MvnoType::NONE:
+            str = (char *)"";
+            return true;
     }
+    return false;
 }
 
 Return<void> RadioImpl::setupDataCall(int32_t serial, RadioTechnology radioTechnology,
@@ -1056,8 +1065,8 @@ Return<void> RadioImpl::setupDataCall(int32_t serial, RadioTechnology radioTechn
             std::to_string((int) dataProfileInfo.authType).c_str(),
             protocol.c_str());
     } else if (s_vendorFunctions->version >= 15) {
-        const char *mvnoTypeStr = convertMvnoTypeToString(dataProfileInfo.mvnoType);
-        if (mvnoTypeStr == NULL) {
+        char *mvnoTypeStr = NULL;
+        if (!convertMvnoTypeToString(dataProfileInfo.mvnoType, mvnoTypeStr)) {
             RequestInfo *pRI = android::addRequestToList(serial, mSlotId,
                     RIL_REQUEST_SETUP_DATA_CALL);
             if (pRI != NULL) {
@@ -1076,11 +1085,11 @@ Return<void> RadioImpl::setupDataCall(int32_t serial, RadioTechnology radioTechn
             dataProfileInfo.roamingProtocol.c_str(),
             std::to_string(dataProfileInfo.supportedApnTypesBitmap).c_str(),
             std::to_string(dataProfileInfo.bearerBitmap).c_str(),
-            BOOL_TO_INT(modemCognitive),
+            modemCognitive ? "1" : "0",
             std::to_string(dataProfileInfo.mtu).c_str(),
             mvnoTypeStr,
             dataProfileInfo.mvnoMatchData.c_str(),
-            BOOL_TO_INT(roamingAllowed));
+            roamingAllowed ? "1" : "0");
     } else {
         RLOGE("Unsupported RIL version %d, min version expected 4", s_vendorFunctions->version);
         RequestInfo *pRI = android::addRequestToList(serial, mSlotId,
@@ -1932,10 +1941,7 @@ Return<void> RadioImpl::setInitialAttachApn(int32_t serial, const DataProfileInf
         iaa.modemCognitive = BOOL_TO_INT(modemCognitive);
         iaa.mtu = dataProfileInfo.mtu;
 
-        // Note that there is no need for memory allocation/free.
-        iaa.mvnoType = (char *) convertMvnoTypeToString(dataProfileInfo.mvnoType);
-        if (iaa.mvnoType == NULL) {
-            sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+        if (!copyHidlStringToRil(&iaa.mvnoMatchData, dataProfileInfo.mvnoMatchData, pRI)) {
             return Void();
         }
 
@@ -2397,12 +2403,10 @@ Return<void> RadioImpl::setDataProfile(int32_t serial, const hidl_vec<DataProfil
                 success = false;
             }
 
-            if (success) {
-                dataProfiles[i].mvnoType = (char *) convertMvnoTypeToString(profiles[i].mvnoType);
-                if (dataProfiles[i].mvnoType == NULL) {
-                    sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
-                    success = false;
-                }
+            if (success && !convertMvnoTypeToString(profiles[i].mvnoType, 
+                    dataProfiles[i].mvnoType)) {
+                sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+                success = false;
             }
 
             if (!success) {
