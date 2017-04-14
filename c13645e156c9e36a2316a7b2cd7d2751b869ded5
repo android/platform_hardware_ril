@@ -22,6 +22,30 @@
       "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "67d89141_251172a9",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-04-14T17:10:26Z",
+      "side": 1,
+      "message": "there is, but I want to avoid it and for better documentation so we get reminded this param is actually converted to hidl_string.",
+      "parentUuid": "e5c1a180_0226c855",
+      "range": {
+        "startLine": 541,
+        "startChar": 47,
+        "endLine": 541,
+        "endChar": 63
+      },
+      "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
