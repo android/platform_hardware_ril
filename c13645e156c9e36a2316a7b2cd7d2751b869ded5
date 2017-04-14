@@ -118,6 +118,30 @@
       "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fcfa2a97_baf24588",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-04-14T18:07:46Z",
+      "side": 1,
+      "message": "ok. seems this is more related to the other memory CL. I\u0027ll upload a patch there.",
+      "parentUuid": "fa973eec_b4d6b414",
+      "range": {
+        "startLine": 541,
+        "startChar": 47,
+        "endLine": 541,
+        "endChar": 63
+      },
+      "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
