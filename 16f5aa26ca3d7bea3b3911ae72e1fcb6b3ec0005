@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6d66c5_61eae6ef",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3366,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-04-14T17:27:15Z",
+      "side": 1,
+      "message": "I think they are the same\n\n-1 in byte \u003d 0xFF\n-1 in int \u003d 0xFFFFFFFF\n\nAlso memeset.c in libc has already optimized to handle this very efficiently so there is no need to have our own for-loop to handle this.\n\nOne thing I don\u0027t understand, why -1 not 0? Seems to be different from other structs we use.",
+      "parentUuid": "e65452f4_74d0daf9",
+      "revId": "16f5aa26ca3d7bea3b3911ae72e1fcb6b3ec0005",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f8aaf656_aba96da4",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
