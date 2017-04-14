@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "33a2614f_5a1b9e66",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1974,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-04-14T22:01:26Z",
+      "side": 1,
+      "message": "This line actually broke MO SMS. hidl_string can\u0027t be null so smscPdu is actually an empty string. In copyHidlStringToRil we convert empty string into NULL.\n\nModem only accepts NULL but not empty string so it fails the command. It will be nice if modem could be more flexible to handle it, but at this point I am going to revert all copyHidlStringToRil related changes in this CL.",
+      "range": {
+        "startLine": 1974,
+        "startChar": 4,
+        "endLine": 1974,
+        "endChar": 65
+      },
+      "revId": "a2f234b1bffb09d0cc3fbd703d66df9ddefd4b4e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
