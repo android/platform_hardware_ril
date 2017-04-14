@@ -46,6 +46,30 @@
       "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff73b0d7_990c400d",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-14T17:24:36Z",
+      "side": 1,
+      "message": "The way hidl_string typecasts are defined, I think this means an additional copy. And if that\u0027s the case we should probably avoid it.",
+      "parentUuid": "67d89141_251172a9",
+      "range": {
+        "startLine": 541,
+        "startChar": 47,
+        "endLine": 541,
+        "endChar": 63
+      },
+      "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
