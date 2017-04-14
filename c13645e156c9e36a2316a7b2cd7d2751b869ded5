@@ -70,6 +70,30 @@
       "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b61df75c_11aaf52e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-04-14T17:36:47Z",
+      "side": 1,
+      "message": "I think before and after change, there are always extra copies.\n\nHere is the function signature of copyHidlStringToRil\nbool copyHidlStringToRil(char **dest, const hidl_string \u0026src, RequestInfo *pRI);\n\nBut before we actually passed in are (char **, const char *, RequestInfo *), so the compiler automatically creates a temp hidl_string for us.\n\nIf we really want to avoid extra copy, we should not allocate another string and directly copy the string pointer to the array of string pointer pStrings we created. I can upload another patch for reference.",
+      "parentUuid": "ff73b0d7_990c400d",
+      "range": {
+        "startLine": 541,
+        "startChar": 47,
+        "endLine": 541,
+        "endChar": 63
+      },
+      "revId": "c13645e156c9e36a2316a7b2cd7d2751b869ded5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
