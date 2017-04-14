@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "39198e1a_1c98fcde",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-04-14T04:11:20Z",
+      "side": 1,
+      "message": "not fixing anything but just avoid c++ implicit conversion",
+      "range": {
+        "startLine": 541,
+        "startChar": 47,
+        "endLine": 541,
+        "endChar": 63
+      },
+      "revId": "0f88ac902728bdde575c951ec074ff1f7d9f57c3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "974159c4_e69cff17",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1937,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-04-14T04:11:20Z",
+      "side": 1,
+      "message": "these early bail out without calling memsetAndFreeStrings will probably cause memory leak. Need to fix in another CL.",
+      "range": {
+        "startLine": 1937,
+        "startChar": 12,
+        "endLine": 1937,
+        "endChar": 26
+      },
+      "revId": "0f88ac902728bdde575c951ec074ff1f7d9f57c3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
