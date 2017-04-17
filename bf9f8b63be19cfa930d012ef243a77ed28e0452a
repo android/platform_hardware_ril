@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "08481e9b_8f5c8814",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5991,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-17T15:36:56Z",
+      "side": 1,
+      "message": "ping",
+      "parentUuid": "177773a4_8c08d3a7",
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f74c6e6_f40bd007",
         "filename": "libril/Android.mk",
         "patchSetId": 4
