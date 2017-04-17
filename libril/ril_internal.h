@@ -17,8 +17,6 @@
 #ifndef ANDROID_RIL_INTERNAL_H
 #define ANDROID_RIL_INTERNAL_H
 
-#include <binder/Parcel.h>
-
 namespace android {
 
 #define RIL_SERVICE_NAME_BASE "slot"
