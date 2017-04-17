@@ -65,6 +65,30 @@
     },
     {
       "key": {
+        "uuid": "2587f4bb_49a83b52",
+        "filename": "libril/Android.mk",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-17T02:22:28Z",
+      "side": 1,
+      "message": "get the following error: \n\nout/target/product/marlin/obj_arm/SHARED_LIBRARIES/libril_intermediates/sap_service.o:hardware/ril/libril/sap_service.cpp:construction vtable for android::hardware::radio::V1_0::ISap-in-SapImpl: error: undefined reference to \u0027android::hardware::radio::V1_0::ISap::ping()\u0027\nout/target/product/marlin/obj_arm/SHARED_LIBRARIES/libril_intermediates/sap_service.o:hardware/ril/libril/sap_service.cpp:construction vtable for android::hardware::radio::V1_0::ISap-in-SapImpl: error: undefined reference to \u0027android::hardware::radio::V1_0::ISap::getDebugInfo(std::__1::function\u003cvoid (android::hidl::base::V1_0::DebugInfo const\u0026)\u003e)\u0027\nout/target/product/marlin/obj_arm/SHARED_LIBRARIES/libril_intermediates/sap_service.o:hardware/ril/libril/sap_service.cpp:construction vtable for android::hardware::radio::V1_0::ISap-in-SapImpl: error: undefined reference to \u0027android::hardware::radio::V1_0::ISap::notifySyspropsChanged()\u0027\nout/target/product/marlin/obj_arm/SHARED_LIBRARIES/libril_intermediates/sap_service.o:hardware/ril/libril/sap_service.cpp:construction vtable for android::hardware::radio::V1_0::ISap-in-SapImpl: error: undefined reference to \u0027android::hardware::radio::V1_0::ISap::unlinkToDeath(android::sp\u003candroid::hardware::hidl_death_recipient",
+      "parentUuid": "9f74c6e6_f40bd007",
+      "range": {
+        "startLine": 19,
+        "startChar": 4,
+        "endLine": 19,
+        "endChar": 32
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "39064a37_6462236d",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 4
@@ -76,6 +100,30 @@
       "writtenOn": "2017-04-13T20:44:05Z",
       "side": 1,
       "message": "not needed",
+      "range": {
+        "startLine": 107,
+        "startChar": 7,
+        "endLine": 107,
+        "endChar": 41
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "06a98432_c31a44ad",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-17T02:22:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39064a37_6462236d",
       "range": {
         "startLine": 107,
         "startChar": 7,
@@ -111,6 +159,30 @@
     },
     {
       "key": {
+        "uuid": "c21723b7_ac2fba9c",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-17T02:22:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2739988_d105e4f0",
+      "range": {
+        "startLine": 108,
+        "startChar": 7,
+        "endLine": 108,
+        "endChar": 41
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8967d8b2_8f315543",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 4
@@ -122,6 +194,30 @@
       "writtenOn": "2017-04-13T20:44:05Z",
       "side": 1,
       "message": "same here and other places. we have a using statement for V1_0 above, so this isn\u0027t needed.",
+      "range": {
+        "startLine": 111,
+        "startChar": 32,
+        "endLine": 111,
+        "endChar": 66
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b66d3a18_e5380893",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-17T02:22:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8967d8b2_8f315543",
       "range": {
         "startLine": 111,
         "startChar": 32,
@@ -174,6 +270,24 @@
     },
     {
       "key": {
+        "uuid": "a6459c36_bc536295",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 8036,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-17T02:22:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7986d7e0_f93c373e",
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f945ebb_850e0149",
         "filename": "libril/ril_service.h",
         "patchSetId": 4
@@ -185,6 +299,30 @@
       "writtenOn": "2017-04-13T20:44:05Z",
       "side": 1,
       "message": "indentation doesn\u0027t match other functions.",
+      "range": {
+        "startLine": 712,
+        "startChar": 0,
+        "endLine": 718,
+        "endChar": 60
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f0baba7_4295159d",
+        "filename": "libril/ril_service.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 718,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-17T02:22:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f945ebb_850e0149",
       "range": {
         "startLine": 712,
         "startChar": 0,
