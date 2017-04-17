@@ -271,6 +271,53 @@
     },
     {
       "key": {
+        "uuid": "8cf9b693_9f6f6cbe",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 6260,
+      "author": {
+        "id": 1120458
+      },
+      "writtenOn": "2017-04-17T15:42:53Z",
+      "side": 1,
+      "message": "100% note. This is a reinterpret cast (I highly recommend always using the C++ cast operators).\n\nInstead, use V1_0::IRadioResponse::castFrom(...-\u003e....get())",
+      "parentUuid": "28f813e4_2ce6cc68",
+      "range": {
+        "startLine": 6258,
+        "startChar": 8,
+        "endLine": 6260,
+        "endChar": 59
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8324672b_9a3c6248",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 6262,
+      "author": {
+        "id": 1120458
+      },
+      "writtenOn": "2017-04-17T15:42:53Z",
+      "side": 1,
+      "message": "note, you must support 1.0 + 1.1 hals",
+      "range": {
+        "startLine": 6262,
+        "startChar": 18,
+        "endLine": 6262,
+        "endChar": 35
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7986d7e0_f93c373e",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 4
