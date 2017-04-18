@@ -22,6 +22,30 @@
       "revId": "40afa52f2d5b5d8f1d700acbbfd94b8c3eb2a5ed",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6368731b_8ee43875",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 5352,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-18T19:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59f619ee_109c9768",
+      "range": {
+        "startLine": 5352,
+        "startChar": 13,
+        "endLine": 5352,
+        "endChar": 60
+      },
+      "revId": "40afa52f2d5b5d8f1d700acbbfd94b8c3eb2a5ed",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }

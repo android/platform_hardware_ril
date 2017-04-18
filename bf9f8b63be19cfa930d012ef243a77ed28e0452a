@@ -60,6 +60,24 @@
     },
     {
       "key": {
+        "uuid": "d167b7db_1a0a649e",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5991,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-18T19:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08481e9b_8f5c8814",
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f74c6e6_f40bd007",
         "filename": "libril/Android.mk",
         "patchSetId": 4
@@ -283,6 +301,30 @@
       "side": 1,
       "message": "100% note. This is a reinterpret cast (I highly recommend always using the C++ cast operators).\n\nInstead, use V1_0::IRadioResponse::castFrom(...-\u003e....get())",
       "parentUuid": "28f813e4_2ce6cc68",
+      "range": {
+        "startLine": 6258,
+        "startChar": 8,
+        "endLine": 6260,
+        "endChar": 59
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "733fb618_00a27dca",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 6260,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-18T19:18:40Z",
+      "side": 1,
+      "message": "I see 2 castFrom methods in my generated files and compiler complains about disambiguation.\n\nhardware/ril/libril/ril_service.cpp:6260:13: error: call to \u0027castFrom\u0027 is ambiguous\n            ::android::hardware::radio::V1_1::IRadioResponse::castFrom(\n            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nout/soong/.intermediates/hardware/interfaces/radio/1.1/android.hardware.radio@1.1_genc++_headers/gen/android/hardware/radio/1.1/IRadioResponse.h:50:71: note: candidate function\n    static ::android::hardware::Return\u003c::android::sp\u003cIRadioResponse\u003e\u003e castFrom(const ::android::sp\u003cIRadioResponse\u003e\u0026 parent, bool emitError \u003d false);\n                                                                      ^\nout/soong/.intermediates/hardware/interfaces/radio/1.1/android.hardware.radio@1.1_genc++_headers/gen/android/hardware/radio/1.1/IRadioResponse.h:51:71: note: candidate function\n    static ::android::hardware::Return\u003c::android::sp\u003cIRadioResponse\u003e\u003e castFrom(const ::android::sp\u003c::android::hardware::radio::V1_0::IRadioResponse\u003e\u0026 parent, bool emitError \u003d false);\n                                                                      ^\nout/soong/.intermediates/hardware/interfaces/radio/1.1/android.hardware.radio@1.1_genc++_headers/gen/android/hardware/radio/1.1/IRadioResponse.h:52:71: note: candidate function\n    static ::android::hardware::Return\u003c::android::sp\u003cIRadioResponse\u003e\u003e castFrom(const ::android::sp\u003c::android::hidl::base::V1_0::IBase\u003e\u0026 parent, bool emitError \u003d false);",
+      "parentUuid": "8cf9b693_9f6f6cbe",
       "range": {
         "startLine": 6258,
         "startChar": 8,
