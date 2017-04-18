@@ -337,6 +337,30 @@
     },
     {
       "key": {
+        "uuid": "05383f3f_4836de76",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 6260,
+      "author": {
+        "id": 1121838
+      },
+      "writtenOn": "2017-04-18T19:25:56Z",
+      "side": 1,
+      "message": "talked offline, Pankaj just need to remove a .get() call",
+      "parentUuid": "733fb618_00a27dca",
+      "range": {
+        "startLine": 6258,
+        "startChar": 8,
+        "endLine": 6260,
+        "endChar": 59
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8324672b_9a3c6248",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 4
