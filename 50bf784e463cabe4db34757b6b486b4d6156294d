@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6d407607_67db168d",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-18T22:32:09Z",
+      "side": 1,
+      "message": "delete",
+      "range": {
+        "startLine": 759,
+        "startChar": 28,
+        "endLine": 759,
+        "endChar": 62
+      },
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5dfdfeb6_f1474179",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-18T22:32:09Z",
+      "side": 1,
+      "message": "delete",
+      "range": {
+        "startLine": 760,
+        "startChar": 28,
+        "endLine": 760,
+        "endChar": 62
+      },
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc469ff4_709c5a52",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 6271,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-18T22:32:09Z",
+      "side": 1,
+      "message": "Steven, can you please check if this looks ok?",
+      "range": {
+        "startLine": 6263,
+        "startChar": 8,
+        "endLine": 6271,
+        "endChar": 9
+      },
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ced1500b_2bee925a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 7977,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-18T22:32:09Z",
+      "side": 1,
+      "message": "typecast needs to be fixed here as well.",
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
