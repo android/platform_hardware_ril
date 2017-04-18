@@ -318,6 +318,30 @@
     },
     {
       "key": {
+        "uuid": "8bbfe2e9_4d4f011e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 6262,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-18T18:03:04Z",
+      "side": 1,
+      "message": "yes we support both. This API is supported only by 1.1",
+      "parentUuid": "8324672b_9a3c6248",
+      "range": {
+        "startLine": 6262,
+        "startChar": 18,
+        "endLine": 6262,
+        "endChar": 35
+      },
+      "revId": "bf9f8b63be19cfa930d012ef243a77ed28e0452a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7986d7e0_f93c373e",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 4
