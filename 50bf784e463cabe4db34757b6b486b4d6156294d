@@ -48,6 +48,29 @@
     },
     {
       "key": {
+        "uuid": "5bee9f80_84079324",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 6266,
+      "author": {
+        "id": 1120458
+      },
+      "writtenOn": "2017-04-19T23:02:38Z",
+      "side": 1,
+      "message": "ret.isOk() \u0026\u0026 ret !\u003d nullptr.\n\nret \u003d\u003d nullptr \u003d\u003e you should check the 1.0 case",
+      "range": {
+        "startLine": 6266,
+        "startChar": 12,
+        "endLine": 6266,
+        "endChar": 21
+      },
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cc469ff4_709c5a52",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 7
