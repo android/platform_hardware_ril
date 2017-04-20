@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "2f8a0809_2f0f848b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-20T16:35:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d407607_67db168d",
+      "range": {
+        "startLine": 759,
+        "startChar": 28,
+        "endLine": 759,
+        "endChar": 62
+      },
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5dfdfeb6_f1474179",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 7
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "307115b1_c438210f",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-20T16:35:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5dfdfeb6_f1474179",
+      "range": {
+        "startLine": 760,
+        "startChar": 28,
+        "endLine": 760,
+        "endChar": 62
+      },
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5bee9f80_84079324",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 7
@@ -59,6 +107,30 @@
       "writtenOn": "2017-04-19T23:02:38Z",
       "side": 1,
       "message": "ret.isOk() \u0026\u0026 ret !\u003d nullptr.\n\nret \u003d\u003d nullptr \u003d\u003e you should check the 1.0 case",
+      "range": {
+        "startLine": 6266,
+        "startChar": 12,
+        "endLine": 6266,
+        "endChar": 21
+      },
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5b377331_8684558b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 6266,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-20T16:35:57Z",
+      "side": 1,
+      "message": "ret !\u003d nullptr is not correct, since ret is an object (and in c++ they cannot be null).",
+      "parentUuid": "5bee9f80_84079324",
       "range": {
         "startLine": 6266,
         "startChar": 12,
@@ -105,6 +177,24 @@
       "writtenOn": "2017-04-18T22:32:09Z",
       "side": 1,
       "message": "typecast needs to be fixed here as well.",
+      "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc87bb6c_a35e2410",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 7977,
+      "author": {
+        "id": 1072138
+      },
+      "writtenOn": "2017-04-20T16:35:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ced1500b_2bee925a",
       "revId": "50bf784e463cabe4db34757b6b486b4d6156294d",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
