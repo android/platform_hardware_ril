@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c581096_863f58f1",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 6273,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-20T16:24:20Z",
+      "side": 1,
+      "message": "that\u0027s not correct. Just say not version 1.1 or ret.isOk() \u003d\u003d false or something.",
+      "range": {
+        "startLine": 6272,
+        "startChar": 60,
+        "endLine": 6273,
+        "endChar": 27
+      },
+      "revId": "b1c9c4915d26832c449a1b80473117c891cc28a9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
