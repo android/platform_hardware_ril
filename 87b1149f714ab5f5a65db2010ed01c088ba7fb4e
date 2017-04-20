@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7a46e80_0ea24524",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 6272,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-20T16:38:16Z",
+      "side": 1,
+      "message": "Sorry should have noticed this earlier. Avoid \\ and use \" like at line 6381.",
+      "range": {
+        "startLine": 6272,
+        "startChar": 84,
+        "endLine": 6272,
+        "endChar": 85
+      },
+      "revId": "87b1149f714ab5f5a65db2010ed01c088ba7fb4e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
