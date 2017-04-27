@@ -4970,6 +4970,7 @@ typedef struct {
  *
  * Valid errors:
  *  SUCCESS
+ *  INVALID_ARGUMENTS
  *  RADIO_NOT_AVAILABLE
  */
 #define RIL_REQUEST_NV_RESET_CONFIG 121
