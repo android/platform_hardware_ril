@@ -6171,8 +6171,12 @@ int radio::getAllowedCarriersResponse(int slotId,
         populateResponseInfo(responseInfo, serial, responseType, e);
         CarrierRestrictions carrierInfo = {};
         bool allAllowed = true;
-        if (response == NULL || responseLen != sizeof(RIL_CarrierRestrictions)) {
-            RLOGE("getAllowedCarriersResponse Invalid response: NULL");
+        if (response == NULL) {
+#if VDBG
+            RLOGD("getAllowedCarriersResponse response is NULL: all allowed");
+#endif
+        } else if (responseLen != sizeof(RIL_CarrierRestrictions)) {
+            RLOGE("getAllowedCarriersResponse Invalid response");
             if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
         } else {
             RIL_CarrierRestrictions *pCr = (RIL_CarrierRestrictions *)response;
