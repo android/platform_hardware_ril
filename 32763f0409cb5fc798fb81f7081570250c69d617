@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ec49a463_7c1bb6f3",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2192,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-04-30T22:19:44Z",
+      "side": 1,
+      "message": "use the ril.h enum instead.",
+      "range": {
+        "startLine": 2192,
+        "startChar": 23,
+        "endLine": 2192,
+        "endChar": 24
+      },
+      "revId": "32763f0409cb5fc798fb81f7081570250c69d617",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
