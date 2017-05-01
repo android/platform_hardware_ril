@@ -22,6 +22,30 @@
       "revId": "32763f0409cb5fc798fb81f7081570250c69d617",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "872d1569_d754ea82",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2192,
+      "author": {
+        "id": 1141163
+      },
+      "writtenOn": "2017-05-01T00:27:49Z",
+      "side": 1,
+      "message": "There is no enum defined in RIL.h. Just comments so didi the same here.",
+      "parentUuid": "ec49a463_7c1bb6f3",
+      "range": {
+        "startLine": 2192,
+        "startChar": 23,
+        "endLine": 2192,
+        "endChar": 24
+      },
+      "revId": "32763f0409cb5fc798fb81f7081570250c69d617",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
