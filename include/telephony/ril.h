@@ -86,6 +86,9 @@ extern "C" {
  *                    used in RIL_REQUEST_DATA_REGISTRATION_STATE and
  *                    RIL_REQUEST_VOICE_REGISTRATION_STATE respectively.
  *                    New data structure RIL_OpenChannelParams.
+ *                    RIL_REQUEST_START_NETWORK_SCAN
+ *                    RIL_REQUEST_STOP_NETWORK_SCAN
+ *                    RIL_UNSOL_NETWORK_SCAN_RESULT
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -100,6 +103,9 @@ extern "C" {
 #define MAX_DEBUG_SOCKET_NAME_LENGTH 12
 #define MAX_QEMU_PIPE_NAME_LENGTH  11
 #define MAX_UUID_LENGTH 64
+#define MAX_BANDS 8
+#define MAX_CHANNELS 32
+#define MAX_RADIO_ACCESS_NETWORKS 8
 
 
 typedef void * RIL_Token;
@@ -2027,6 +2033,135 @@ typedef struct {
     int p2;        /* P2 parameter (described in ISO 7816-4)
                       P2Constants:NO_P2 if to be ignored */
 } RIL_OpenChannelParams;
+
+typedef enum {
+    RIL_ONE_SHOT = 0x01, // Performs the scan only once
+    RIL_PERIODIC = 0x02  // Performs the scan periodically until cancelled
+} RIL_ScanType;
+
+typedef enum {
+    GERAN = 0x01,   // GSM EDGE Radio Access Network
+    UTRAN = 0x02,   // Universal Terrestrial Radio Access Network
+    EUTRAN = 0x03,  // Evolved Universal Terrestrial Radio Access Network
+} RIL_RadioAccessNetworks;
+
+typedef enum {
+    GERAN_BAND_T380 = 1,
+    GERAN_BAND_T410 = 2,
+    GERAN_BAND_450 = 3,
+    GERAN_BAND_480 = 4,
+    GERAN_BAND_710 = 5,
+    GERAN_BAND_750 = 6,
+    GERAN_BAND_T810 = 7,
+    GERAN_BAND_850 = 8,
+    GERAN_BAND_P900 = 9,
+    GERAN_BAND_E900 = 10,
+    GERAN_BAND_R900 = 11,
+    GERAN_BAND_DCS1800 = 12,
+    GERAN_BAND_PCS1900 = 13,
+    GERAN_BAND_ER900 = 14,
+} RIL_GeranBands;
+
+typedef enum {
+    UTRAN_BAND_1 = 1,
+    UTRAN_BAND_2 = 2,
+    UTRAN_BAND_3 = 3,
+    UTRAN_BAND_4 = 4,
+    UTRAN_BAND_5 = 5,
+    UTRAN_BAND_6 = 6,
+    UTRAN_BAND_7 = 7,
+    UTRAN_BAND_8 = 8,
+    UTRAN_BAND_9 = 9,
+    UTRAN_BAND_10 = 10,
+    UTRAN_BAND_11 = 11,
+    UTRAN_BAND_12 = 12,
+    UTRAN_BAND_13 = 13,
+    UTRAN_BAND_14 = 14,
+    UTRAN_BAND_19 = 19,
+    UTRAN_BAND_20 = 20,
+    UTRAN_BAND_21 = 21,
+    UTRAN_BAND_22 = 22,
+    UTRAN_BAND_25 = 25,
+    UTRAN_BAND_26 = 26,
+} RIL_UtranBands;
+
+typedef enum {
+    EUTRAN_BAND_1 = 1,
+    EUTRAN_BAND_2 = 2,
+    EUTRAN_BAND_3 = 3,
+    EUTRAN_BAND_4 = 4,
+    EUTRAN_BAND_5 = 5,
+    EUTRAN_BAND_6 = 6,
+    EUTRAN_BAND_7 = 7,
+    EUTRAN_BAND_8 = 8,
+    EUTRAN_BAND_9 = 9,
+    EUTRAN_BAND_10 = 10,
+    EUTRAN_BAND_11 = 11,
+    EUTRAN_BAND_12 = 12,
+    EUTRAN_BAND_13 = 13,
+    EUTRAN_BAND_14 = 14,
+    EUTRAN_BAND_17 = 17,
+    EUTRAN_BAND_18 = 18,
+    EUTRAN_BAND_19 = 19,
+    EUTRAN_BAND_20 = 20,
+    EUTRAN_BAND_21 = 21,
+    EUTRAN_BAND_22 = 22,
+    EUTRAN_BAND_23 = 23,
+    EUTRAN_BAND_24 = 24,
+    EUTRAN_BAND_25 = 25,
+    EUTRAN_BAND_26 = 26,
+    EUTRAN_BAND_27 = 27,
+    EUTRAN_BAND_28 = 28,
+    EUTRAN_BAND_30 = 30,
+    EUTRAN_BAND_31 = 31,
+    EUTRAN_BAND_33 = 33,
+    EUTRAN_BAND_34 = 34,
+    EUTRAN_BAND_35 = 35,
+    EUTRAN_BAND_36 = 36,
+    EUTRAN_BAND_37 = 37,
+    EUTRAN_BAND_38 = 38,
+    EUTRAN_BAND_39 = 39,
+    EUTRAN_BAND_40 = 40,
+    EUTRAN_BAND_41 = 41,
+    EUTRAN_BAND_42 = 42,
+    EUTRAN_BAND_43 = 43,
+    EUTRAN_BAND_44 = 44,
+    EUTRAN_BAND_45 = 45,
+    EUTRAN_BAND_46 = 46,
+    EUTRAN_BAND_47 = 47,
+    EUTRAN_BAND_48 = 48,
+    EUTRAN_BAND_65 = 65,
+    EUTRAN_BAND_66 = 66,
+    EUTRAN_BAND_68 = 68,
+    EUTRAN_BAND_70 = 70,
+} RIL_EutranBands;
+
+typedef struct {
+    RIL_RadioAccessNetworks radio_access_network; // The type of network to scan.
+    union {
+        RIL_GeranBands geran_bands[MAX_BANDS];
+        RIL_UtranBands utran_bands[MAX_BANDS];
+        RIL_EutranBands eutran_bands[MAX_BANDS];
+    } bands;
+    uint32_t channels[MAX_CHANNELS];              // Frequency channels to scan
+} RIL_RadioAccessSpecifier;
+
+typedef struct {
+    RIL_ScanType type;                                              // Type of the scan
+    RIL_RadioAccessSpecifier specifiers[MAX_RADIO_ACCESS_NETWORKS]; // Radio access networks
+                                                                    // with bands/channels.
+} RIL_NetworkScanRequest;
+
+typedef enum {
+    PARTIAL = 0x01,   // The result contains a part of the scan results
+    COMPLETE = 0x02,  // The result contains the last part of the scan results
+} RIL_ScanStatus;
+
+typedef struct {
+    RIL_ScanStatus status;          // The status of the scan
+    uint32_t network_infos_length;  // Total length of RIL_CellInfo
+    RIL_CellInfo* network_infos;    // List of network information
+} RIL_NetworkScanResult;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -5364,6 +5499,50 @@ typedef struct {
  */
 #define RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION 141
 
+/**
+ * RIL_REQUEST_START_NETWORK_SCAN
+ *
+ * Starts a new network scan
+ *
+ * Request to start a network scan with specified radio access networks with frequency bands and/or
+ * channels.
+ *
+ * "data" is a const RIL_NetworkScanRequest *.
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  OPERATION_NOT_ALLOWED
+ *  DEVICE_IN_USE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  MODEM_ERR
+ *  INVALID_ARGUMENTS
+ *  REQUEST_NOT_SUPPORTED
+ *
+ */
+#define RIL_REQUEST_START_NETWORK_SCAN 142
+
+/**
+ * RIL_REQUEST_STOP_NETWORK_SCAN
+ *
+ * Stops an ongoing network scan
+ *
+ * Request to stop the ongoing network scan. Since the modem can only perform one scan at a time,
+ * there is no parameter for this request.
+ *
+ * "data" is NULL
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  INTERNAL_ERR
+ *  MODEM_ERR
+ *
+ */
+#define RIL_REQUEST_STOP_NETWORK_SCAN 143
+
 /***********************************************************************/
 
 /**
@@ -6028,6 +6207,17 @@ typedef struct {
  *
  */
 #define RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION 1048
+
+/**
+ * RIL_UNSOL_NETWORK_SCAN_RESULT
+ *
+ * Returns incremental result for the network scan which is started by
+ * RIL_REQUEST_START_NETWORK_SCAN, sent to report results, status, or errors.
+ *
+ * "data" is NULL
+ * "response" is a const RIL_NetworkScanResult *
+ */
+#define RIL_UNSOL_NETWORK_SCAN_RESULT 1049
 
 /***********************************************************************/
 

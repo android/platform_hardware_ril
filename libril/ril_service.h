@@ -199,6 +199,14 @@ int getAvailableNetworksResponse(int slotId,
                                 int responseType, int serial, RIL_Errno e, void *response,
                                 size_t responselen);
 
+int startNetworkScanResponse(int slotId,
+                             int responseType, int serial, RIL_Errno e, void *response,
+                             size_t responselen);
+
+int stopNetworkScanResponse(int slotId,
+                            int responseType, int serial, RIL_Errno e, void *response,
+                            size_t responselen);
+
 int startDtmfResponse(int slotId,
                      int responseType, int serial, RIL_Errno e, void *response,
                      size_t responselen);
@@ -700,6 +708,10 @@ int pcoDataInd(int slotId,
 int modemResetInd(int slotId,
                   int indicationType, int token, RIL_Errno e, void *response,
                   size_t responselen);
+
+int networkScanResultInd(int slotId,
+                         int indicationType, int token, RIL_Errno e, void *response,
+                         size_t responselen);
 
 int sendRequestRawResponse(int slotId,
                            int responseType, int serial, RIL_Errno e,
