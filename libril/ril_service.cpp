@@ -42,6 +42,7 @@ using ::android::hardware::Return;
 using ::android::hardware::hidl_string;
 using ::android::hardware::hidl_vec;
 using ::android::hardware::hidl_array;
+using ::android::hardware::radio::V1_1::NetworkScanRequest;
 using ::android::hardware::Void;
 using android::CommandInfo;
 using android::RequestInfo;
@@ -235,6 +236,10 @@ struct RadioImpl : public ::android::hardware::radio::V1_1::IRadio {
             const ::android::hardware::hidl_string& operatorNumeric);
 
     Return<void> getAvailableNetworks(int32_t serial);
+
+    Return<void> startNetworkScan(int32_t serial, const NetworkScanRequest& request);
+
+    Return<void> stopNetworkScan(int32_t serial);
 
     Return<void> startDtmf(int32_t serial,
             const ::android::hardware::hidl_string& s);
@@ -1310,6 +1315,24 @@ Return<void> RadioImpl::getAvailableNetworks(int32_t serial) {
     RLOGD("getAvailableNetworks: serial %d", serial);
 #endif
     dispatchVoid(serial, mSlotId, RIL_REQUEST_QUERY_AVAILABLE_NETWORKS);
+    return Void();
+}
+
+Return<void> RadioImpl::startNetworkScan(int32_t serial, const NetworkScanRequest& request) {
+#if VDBG
+    RLOGD("startNetworkScan: serial %d", serial);
+#endif
+    // TODO(b/30954762): Add implementation to start network scan.
+    dispatchVoid(serial, mSlotId, RIL_REQUEST_START_NETWORK_SCAN);
+    return Void();
+}
+
+Return<void> RadioImpl::stopNetworkScan(int32_t serial) {
+#if VDBG
+    RLOGD("stopNetworkScan: serial %d", serial);
+#endif
+    // TODO(b/30954762): Add implementation to stop network scan.
+    dispatchVoid(serial, mSlotId, RIL_REQUEST_STOP_NETWORK_SCAN);
     return Void();
 }
 
@@ -4299,6 +4322,24 @@ int radio::getAvailableNetworksResponse(int slotId,
                 slotId);
     }
 
+    return 0;
+}
+
+int radio::startNetworkScanResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                    void *response, size_t responseLen) {
+#if VDBG
+    RLOGD("startNetworkScanResponse: serial %d", serial);
+#endif
+    // TODO(b/30954762): Add implementation to generate startNetworkScanResponse.
+    return 0;
+}
+
+int radio::stopNetworkScanResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                   void *response, size_t responseLen) {
+#if VDBG
+    RLOGD("stopNetworkScanResponse: serial %d", serial);
+#endif
+    // TODO(b/30954762): Add implementation to generate stopNetworkScanResponse.
     return 0;
 }
 
@@ -7984,6 +8025,16 @@ int radio::modemResetInd(int slotId,
         RLOGE("modemResetInd: radioService[%d]->mRadioIndication == NULL", slotId);
     }
 
+    return 0;
+}
+
+int radio::networkScanResultInd(int slotId,
+                                int indicationType, int token, RIL_Errno e, void *response,
+                                size_t responselen) {
+#if VDBG
+    RLOGD("networkScanResultInd");
+#endif
+    // TODO(b/30954762): Add implementation for networkScanResultInd.
     return 0;
 }
 
