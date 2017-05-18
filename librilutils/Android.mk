@@ -1,6 +1,9 @@
 # Copyright 2013 The Android Open Source Project
 
 LOCAL_PATH:= $(call my-dir)
+
+PROTO_PATH := $(LOCAL_PATH)/proto
+
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
@@ -14,9 +17,15 @@ LOCAL_C_INCLUDES += \
 LOCAL_EXPORT_C_INCLUDE_DIRS := \
     $(LOCAL_PATH)/../include
 
+LOCAL_PROTOC_OPTIMIZE_OPTIONS := -f $(LOCAL_PATH)/proto/sap-api.options
 LOCAL_PROTOC_OPTIMIZE_TYPE := nanopb-c-enable_malloc
 
 LOCAL_MODULE:= librilutils
+
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+LOCAL_EXPORT_C_INCLUDE_DIRS += $(call local-generated-sources-dir)/proto/
+
+LOCAL_PROTOC_FLAGS := --proto_path=$(PROTO_PATH)
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -36,9 +45,14 @@ LOCAL_C_INCLUDES += \
 LOCAL_EXPORT_C_INCLUDE_DIRS := \
     $(LOCAL_PATH)/../include
 
+LOCAL_PROTOC_OPTIMIZE_OPTIONS := -f $(LOCAL_PATH)/proto/sap-api.options
 LOCAL_PROTOC_OPTIMIZE_TYPE := nanopb-c-enable_malloc
 
 LOCAL_MODULE:= librilutils_static
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+LOCAL_EXPORT_C_INCLUDE_DIRS += $(call local-generated-sources-dir)/proto/
+
+LOCAL_PROTOC_FLAGS := --proto_path=$(PROTO_PATH)
 
 include $(BUILD_STATIC_LIBRARY)
 

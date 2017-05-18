@@ -20,7 +20,7 @@
 #include <telephony/ril.h>
 #include <ril_internal.h>
 #include <RilSapSocket.h>
-#include <hardware/ril/librilutils/proto/sap-api.pb.h>
+#include <proto/sap-api.pb.h>
 
 namespace sap {
 
