@@ -711,6 +711,50 @@ bool dispatchIccApdu(int serial, int slotId, int request, const SimApdu& message
     return true;
 }
 
+bool dispatchScanRequest(int serial, int slotId, int request, const NetworkScanRequest& scan) {
+    RequestInfo *pRI = android::addRequestToList(serial, slotId, request);
+    if (pRI == NULL) {
+        return false;
+    }
+
+    RIL_NetworkScanRequest scan_request;
+
+    scan_request.type = (RIL_ScanType) scan.type;
+    scan_request.interval = scan.interval;
+    scan_request.specifiers_length = scan.specifiers.size();
+    for (size_t i = 0; i < scan.specifiers.size(); ++i) {
+        const ::android::hardware::radio::V1_1::RadioAccessSpecifier& ras_from = scan.specifiers[i];
+        RIL_RadioAccessSpecifier& ras_to = scan_request.specifiers[i];
+
+        ras_to.radio_access_network = (RIL_RadioAccessNetworks) ras_from.radioAccessNetwork;
+        ras_to.channels_length = ras_from.channels.size();
+        std::copy(ras_from.channels.begin(), ras_from.channels.end(), ras_to.channels);
+        const std::vector<uint32_t> * bands = nullptr;
+        switch (scan.specifiers[i].radioAccessNetwork) {
+            case ::android::hardware::radio::V1_1::RadioAccessNetworks::GERAN:
+                ras_to.bands_length = ras_from.geranBands.size();
+                bands = (std::vector<uint32_t> *) &ras_from.geranBands;
+                break;
+            case ::android::hardware::radio::V1_1::RadioAccessNetworks::UTRAN:
+                ras_to.bands_length = ras_from.utranBands.size();
+                bands = (std::vector<uint32_t> *) &ras_from.utranBands;
+                break;
+            case ::android::hardware::radio::V1_1::RadioAccessNetworks::EUTRAN:
+                ras_to.bands_length = ras_from.eutranBands.size();
+                bands = (std::vector<uint32_t> *) &ras_from.eutranBands;
+                break;
+            default:
+                return false;
+        }
+        // safe to copy to geran_bands because it's a union member
+        std::memcpy(&ras_to.bands.geran_bands, bands, ras_to.bands_length * sizeof(uint32_t));
+    }
+
+    s_vendorFunctions->onRequest(request, &scan_request, sizeof(scan_request), pRI);
+
+    return true;
+}
+
 void checkReturnStatus(int32_t slotId, Return<void>& ret, bool isRadioService) {
     if (ret.isOk() == false) {
         RLOGE("checkReturnStatus: unable to call response/indication callback");
@@ -1322,8 +1366,7 @@ Return<void> RadioImpl::startNetworkScan(int32_t serial, const NetworkScanReques
 #if VDBG
     RLOGD("startNetworkScan: serial %d", serial);
 #endif
-    // TODO(b/30954762): Add implementation to start network scan.
-    dispatchVoid(serial, mSlotId, RIL_REQUEST_START_NETWORK_SCAN);
+    dispatchScanRequest(serial, mSlotId, RIL_REQUEST_START_NETWORK_SCAN, request);
     return Void();
 }
 
@@ -1331,7 +1374,6 @@ Return<void> RadioImpl::stopNetworkScan(int32_t serial) {
 #if VDBG
     RLOGD("stopNetworkScan: serial %d", serial);
 #endif
-    // TODO(b/30954762): Add implementation to stop network scan.
     dispatchVoid(serial, mSlotId, RIL_REQUEST_STOP_NETWORK_SCAN);
     return Void();
 }
@@ -4339,7 +4381,24 @@ int radio::startNetworkScanResponse(int slotId, int responseType, int serial, RI
 #if VDBG
     RLOGD("startNetworkScanResponse: serial %d", serial);
 #endif
-    // TODO(b/30954762): Add implementation to generate startNetworkScanResponse.
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<sp<::android::hardware::radio::V1_1::IRadioResponse>> ret =
+            ::android::hardware::radio::V1_1::IRadioResponse::castFrom(
+            radioService[slotId]->mRadioResponse);
+        if (ret.isOk()) {
+            sp<::android::hardware::radio::V1_1::IRadioResponse> radioResponseV1_1 = ret;
+            Return<void> retStatus = radioResponseV1_1->startNetworkScanResponse(responseInfo);
+            radioService[slotId]->checkReturnStatus(retStatus);
+        } else {
+            RLOGD("startNetworkScanResponse: ret.isOK() == false for radioService[%d]", slotId);
+        }
+    } else {
+        RLOGE("startNetworkScanResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
     return 0;
 }
 
@@ -4348,7 +4407,24 @@ int radio::stopNetworkScanResponse(int slotId, int responseType, int serial, RIL
 #if VDBG
     RLOGD("stopNetworkScanResponse: serial %d", serial);
 #endif
-    // TODO(b/30954762): Add implementation to generate stopNetworkScanResponse.
+
+    if (radioService[slotId]->mRadioResponse != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        Return<sp<::android::hardware::radio::V1_1::IRadioResponse>> ret =
+            ::android::hardware::radio::V1_1::IRadioResponse::castFrom(
+            radioService[slotId]->mRadioResponse);
+        if (ret.isOk()) {
+            sp<::android::hardware::radio::V1_1::IRadioResponse> radioResponseV1_1 = ret;
+            Return<void> retStatus = radioResponseV1_1->stopNetworkScanResponse(responseInfo);
+            radioService[slotId]->checkReturnStatus(retStatus);
+        } else {
+            RLOGD("stopNetworkScanResponse: ret.isOK() == false for radioService[%d]", slotId);
+        }
+    } else {
+        RLOGE("stopNetworkScanResponse: radioService[%d]->mRadioResponse == NULL", slotId);
+    }
+
     return 0;
 }
 
@@ -8050,11 +8126,46 @@ int radio::modemResetInd(int slotId,
 
 int radio::networkScanResultInd(int slotId,
                                 int indicationType, int token, RIL_Errno e, void *response,
-                                size_t responselen) {
+                                size_t responseLen) {
 #if VDBG
     RLOGD("networkScanResultInd");
 #endif
-    // TODO(b/30954762): Add implementation for networkScanResultInd.
+    if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndication != NULL) {
+        if (response == NULL || responseLen == 0) {
+            RLOGE("networkScanResultInd: invalid response");
+            return 0;
+        }
+        RLOGD("networkScanResultInd");
+
+#if VDBG
+        RLOGD("networkScanResultInd");
+#endif
+
+        Return<sp<::android::hardware::radio::V1_1::IRadioIndication>> ret =
+            ::android::hardware::radio::V1_1::IRadioIndication::castFrom(
+            radioService[slotId]->mRadioIndication);
+        if (ret.isOk()) {
+            RIL_NetworkScanResult *networkScanResult = (RIL_NetworkScanResult *) response;
+
+            ::android::hardware::radio::V1_1::NetworkScanResult result;
+            result.status =
+                    (::android::hardware::radio::V1_1::ScanStatus) networkScanResult->status;
+            result.error = (RadioError) e;
+            convertRilCellInfoListToHal(
+                    networkScanResult->network_infos,
+                    networkScanResult->network_infos_length * sizeof(RIL_CellInfo_v12),
+                    result.networkInfos);
+
+            sp<::android::hardware::radio::V1_1::IRadioIndication> radioIndicationV1_1 = ret;
+            Return<void> retStatus = radioIndicationV1_1->networkScanResult(
+                    convertIntToRadioIndicationType(indicationType), result);
+            radioService[slotId]->checkReturnStatus(retStatus);
+        } else {
+            RLOGE("networkScanResultInd: ret.isOk() == false for radioService[%d]", slotId);
+        }
+    } else {
+        RLOGE("networkScanResultInd: radioService[%d]->mRadioIndication == NULL", slotId);
+    }
     return 0;
 }
 
