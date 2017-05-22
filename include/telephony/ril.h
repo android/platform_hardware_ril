@@ -2138,16 +2138,22 @@ typedef enum {
 
 typedef struct {
     RIL_RadioAccessNetworks radio_access_network; // The type of network to scan.
+    uint32_t bands_length;                        // Length of bands
     union {
         RIL_GeranBands geran_bands[MAX_BANDS];
         RIL_UtranBands utran_bands[MAX_BANDS];
         RIL_EutranBands eutran_bands[MAX_BANDS];
     } bands;
+    uint32_t channels_length;                     // Length of channels
     uint32_t channels[MAX_CHANNELS];              // Frequency channels to scan
 } RIL_RadioAccessSpecifier;
 
 typedef struct {
     RIL_ScanType type;                                              // Type of the scan
+    int32_t interval;                                               // Time interval in seconds
+                                                                    // between periodic scans, only
+                                                                    // valid when type=RIL_PERIODIC
+    uint32_t specifiers_length;                                     // Length of specifiers
     RIL_RadioAccessSpecifier specifiers[MAX_RADIO_ACCESS_NETWORKS]; // Radio access networks
                                                                     // with bands/channels.
 } RIL_NetworkScanRequest;
@@ -2158,9 +2164,9 @@ typedef enum {
 } RIL_ScanStatus;
 
 typedef struct {
-    RIL_ScanStatus status;          // The status of the scan
-    uint32_t network_infos_length;  // Total length of RIL_CellInfo
-    RIL_CellInfo* network_infos;    // List of network information
+    RIL_ScanStatus status;              // The status of the scan
+    uint32_t network_infos_length;      // Total length of RIL_CellInfo
+    RIL_CellInfo_v12* network_infos;    // List of network information
 } RIL_NetworkScanResult;
 
 /**
