@@ -2148,6 +2148,9 @@ typedef struct {
 
 typedef struct {
     RIL_ScanType type;                                              // Type of the scan
+    int32_t interval;                                               // Time interval in seconds
+                                                                    // between periodic scans, only
+                                                                    // valid when type=RIL_PERIODIC
     RIL_RadioAccessSpecifier specifiers[MAX_RADIO_ACCESS_NETWORKS]; // Radio access networks
                                                                     // with bands/channels.
 } RIL_NetworkScanRequest;
@@ -2158,9 +2161,9 @@ typedef enum {
 } RIL_ScanStatus;
 
 typedef struct {
-    RIL_ScanStatus status;          // The status of the scan
-    uint32_t network_infos_length;  // Total length of RIL_CellInfo
-    RIL_CellInfo* network_infos;    // List of network information
+    RIL_ScanStatus status;              // The status of the scan
+    uint32_t network_infos_length;      // Total length of RIL_CellInfo
+    RIL_CellInfo_v12* network_infos;    // List of network information
 } RIL_NetworkScanResult;
 
 /**
