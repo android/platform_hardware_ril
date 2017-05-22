@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c11e81d_da16987a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-05-22T21:42:25Z",
+      "side": 1,
+      "message": "not really the right place for input validation",
+      "range": {
+        "startLine": 719,
+        "startChar": 0,
+        "endLine": 721,
+        "endChar": 5
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3bf15749_88a3a98b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-05-22T21:42:25Z",
+      "side": 1,
+      "message": "I don\u0027t think this is the appropriate place to do input validation.  Please move to a higher API level.",
+      "range": {
+        "startLine": 728,
+        "startChar": 8,
+        "endLine": 733,
+        "endChar": 9
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c11b160_0dc41f0e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-05-22T21:42:25Z",
+      "side": 1,
+      "message": "how does the receiver (vendor impl) know how many channels hold real data?  Should there be a channel count passed?",
+      "range": {
+        "startLine": 737,
+        "startChar": 0,
+        "endLine": 737,
+        "endChar": 84
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1bfbe92_f6aefdfd",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-05-22T21:42:25Z",
+      "side": 1,
+      "message": "ditto - should there be a number bands param?",
+      "range": {
+        "startLine": 742,
+        "startChar": 0,
+        "endLine": 742,
+        "endChar": 69
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1e654f28_af960978",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 8167,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-05-22T21:42:25Z",
+      "side": 1,
+      "message": "should we do this early - convering the list when we don\u0027t have a callback function for the result seems silly",
+      "range": {
+        "startLine": 8167,
+        "startChar": 0,
+        "endLine": 8167,
+        "endChar": 25
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
