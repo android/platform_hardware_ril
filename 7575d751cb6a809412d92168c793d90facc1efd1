@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1bd964bd_598a1895",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-23T00:03:17Z",
+      "side": 1,
+      "message": "Moved to the Telephony.",
+      "parentUuid": "7c11e81d_da16987a",
+      "range": {
+        "startLine": 719,
+        "startChar": 0,
+        "endLine": 721,
+        "endChar": 5
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3bf15749_88a3a98b",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2017-05-22T21:42:25Z",
       "side": 1,
       "message": "I don\u0027t think this is the appropriate place to do input validation.  Please move to a higher API level.",
+      "range": {
+        "startLine": 728,
+        "startChar": 8,
+        "endLine": 733,
+        "endChar": 9
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ace78557_7777c51e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-23T00:03:17Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "3bf15749_88a3a98b",
       "range": {
         "startLine": 728,
         "startChar": 8,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "b6062da6_e37a5622",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-23T00:03:17Z",
+      "side": 1,
+      "message": "Added channles_length",
+      "parentUuid": "2c11b160_0dc41f0e",
+      "range": {
+        "startLine": 737,
+        "startChar": 0,
+        "endLine": 737,
+        "endChar": 84
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b1bfbe92_f6aefdfd",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 2
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "32bfd888_981a61b9",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-23T00:03:17Z",
+      "side": 1,
+      "message": "Added bands_length",
+      "parentUuid": "b1bfbe92_f6aefdfd",
+      "range": {
+        "startLine": 742,
+        "startChar": 0,
+        "endLine": 742,
+        "endChar": 69
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1e654f28_af960978",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 2
@@ -105,6 +201,30 @@
       "writtenOn": "2017-05-22T21:42:25Z",
       "side": 1,
       "message": "should we do this early - convering the list when we don\u0027t have a callback function for the result seems silly",
+      "range": {
+        "startLine": 8167,
+        "startChar": 0,
+        "endLine": 8167,
+        "endChar": 25
+      },
+      "revId": "7575d751cb6a809412d92168c793d90facc1efd1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5a69e80_8fbb3583",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 8167,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-23T00:03:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e654f28_af960978",
       "range": {
         "startLine": 8167,
         "startChar": 0,
