@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "d07f4748_114f3324",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 2141,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-05-24T23:01:03Z",
+      "side": 1,
+      "message": "as a nit I\u0027d put the channel length by the channel array.",
+      "range": {
+        "startLine": 2141,
+        "startChar": 0,
+        "endLine": 2141,
+        "endChar": 68
+      },
+      "revId": "abf451fa717015f583bb3804a2954738d42db112",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7bf3f40a_fa8c20ee",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 3
