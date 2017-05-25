@@ -22,6 +22,30 @@
       "revId": "eb863787b99232545cdedf2bdf8d18265fda2094",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5b580c76_c965d2ea",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 1060151
+      },
+      "writtenOn": "2017-05-25T21:48:56Z",
+      "side": 1,
+      "message": "This was not intended to be checked in. It\u0027s an example of how the code can be cleaned up by using a few pointers and some built-in copy methods.",
+      "parentUuid": "4a20e0db_4bd4de7f",
+      "range": {
+        "startLine": 747,
+        "startChar": 55,
+        "endLine": 747,
+        "endChar": 60
+      },
+      "revId": "eb863787b99232545cdedf2bdf8d18265fda2094",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
