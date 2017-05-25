@@ -5528,6 +5528,49 @@ typedef struct {
  */
 #define RIL_REQUEST_STOP_NETWORK_SCAN 143
 
+/**
+ * RIL_REQUEST_START_KEEPALIVE
+ *
+ * Start a keepalive session
+ *
+ * Request that the modem begin sending keepalive packets on a particular
+ * data call, with a specified source, destination, and format.
+ *
+ * "data" is a const RIL_RequestKeepalive
+ * "response" is an integer handle
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  NO_MEMORY
+ *  INVALID_ARGUMENTS
+ *  REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  MODEM_ERR
+ *
+ */
+#define RIL_REQUEST_START_KEEPALIVE 143
+
+/**
+ * RIL_REQUEST_STOP_KEEPALIVE
+ *
+ * Stops an ongoing keepalive session
+ *
+ * Requests that a keepalive session with the given handle be stopped.
+ * there is no parameter for this request.
+ *
+ * "data" is an integer handle
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  INVALID_ARGUMENTS
+ *  REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  MODEM_ERR
+ *
+ */
+#define RIL_REQUEST_STOP_KEEPALIVE 144
+
 /***********************************************************************/
 
 /**
@@ -6204,6 +6247,14 @@ typedef struct {
  */
 #define RIL_UNSOL_NETWORK_SCAN_RESULT 1049
 
+/**
+ * RIL_UNSOL_KEEPALIVE_STATUS
+ *
+ * "data" is NULL
+ * "response" is a const RIL_KeepaliveStatus *
+ */
+#define RIL_UNSOL_KEEPALIVE_STATUS 1050
+
 /***********************************************************************/
 
 
@@ -6363,6 +6414,36 @@ typedef struct {
     char *contents;             /* Carrier-defined content.  It is binary, opaque and
                                    loosely defined in LTE Layer 3 spec 24.008 */
 } RIL_PCO_Data;
+
+typedef enum {
+    NATT_IPV4 = 0,              /* Keepalive specified by RFC 3948 Sec. 2.3 using IPv4 */
+    NATT_IPV6 = 1               /* Keepalive specified by RFC 3948 Sec. 2.3 using IPv6 */
+} RIL_KeepaliveType;
+
+#define MAX_INADDR_LEN 16
+typedef struct {
+    RIL_KeepaliveType type;                  /* Type of keepalive packet */
+    char sourceAddress[MAX_INADDR_LEN];      /* Source address in network-byte order */
+    int sourcePort;                          /* Source port if applicable, or 0x7FFFFFFF;
+                                                the maximum value is 65535 */
+    char destinationAddress[MAX_INADDR_LEN]; /* Destination address in network-byte order */
+    int destinationPort;                     /* Destination port if applicable or 0x7FFFFFFF;
+                                                the maximum value is 65535 */
+    int maxKeepaliveIntervalMillis;          /* Maximum milliseconds between two packets */
+    char *apn;                               /* Null-terminated APN string identifying the
+                                                bearer for keepalives. The maximum length for
+                                                this field is 150 bytes */
+} RIL_KeepaliveRequest;
+
+typedef enum {
+    KEEPALIVE_OK,
+    KEEPALIVE_ERROR
+} RIL_KeepaliveStatusCode;
+
+typedef struct {
+    uint32_t sessionHandle;
+    RIL_KeepaliveStatusCode code;
+} RIL_KeepaliveStatus;
 
 #ifdef RIL_SHLIB
 struct RIL_Env {
