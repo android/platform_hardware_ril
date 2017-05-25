@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "043d4c62_0309d134",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 2141,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-25T18:58:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d07f4748_114f3324",
+      "range": {
+        "startLine": 2141,
+        "startChar": 0,
+        "endLine": 2141,
+        "endChar": 68
+      },
+      "revId": "abf451fa717015f583bb3804a2954738d42db112",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7bf3f40a_fa8c20ee",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-05-24T22:39:01Z",
       "side": 1,
       "message": "You can safely reinterpret_cast\u003c\u003e away all this nastiness. The underlying object is a vector\u003cint32\u003e in all cases.",
+      "range": {
+        "startLine": 732,
+        "startChar": 8,
+        "endLine": 736,
+        "endChar": 55
+      },
+      "revId": "abf451fa717015f583bb3804a2954738d42db112",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "575bca85_07594578",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-25T18:58:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bf3f40a_fa8c20ee",
       "range": {
         "startLine": 732,
         "startChar": 8,
