@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a20e0db_4bd4de7f",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-25T21:42:00Z",
+      "side": 1,
+      "message": "This does not compile since the geran_bands is defined as RIL_GeranBands[]\n\nerror: assigning to \u0027RIL_GeranBands\u0027 from incompatible type \u0027const unsigned int\u0027",
+      "range": {
+        "startLine": 747,
+        "startChar": 55,
+        "endLine": 747,
+        "endChar": 60
+      },
+      "revId": "eb863787b99232545cdedf2bdf8d18265fda2094",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
