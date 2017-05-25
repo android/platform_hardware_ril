@@ -41,6 +41,7 @@ using ::android::hardware::hidl_string;
 using ::android::hardware::hidl_vec;
 using ::android::hardware::hidl_array;
 using ::android::hardware::radio::V1_1::NetworkScanRequest;
+using ::android::hardware::radio::V1_1::KeepaliveRequest;
 using ::android::hardware::Void;
 using android::CommandInfo;
 using android::RequestInfo;
@@ -426,6 +427,10 @@ struct RadioImpl : public ::android::hardware::radio::V1_1::IRadio {
     Return<void> sendDeviceState(int32_t serial, DeviceStateType deviceStateType, bool state);
 
     Return<void> setIndicationFilter(int32_t serial, int32_t indicationFilter);
+
+    Return<void> startKeepalive(int32_t serial, const KeepaliveRequest& keepalive);
+
+    Return<void> stopKeepalive(int32_t serial, int32_t sessionHandle);
 
     Return<void> setSimCardPower(int32_t serial, bool powerUp);
     Return<void> setSimCardPower_1_1(int32_t serial,
@@ -2741,6 +2746,17 @@ Return<void> RadioImpl::setCarrierInfoForImsiEncryption(int32_t serial,
     dispatchRaw(serial, mSlotId, RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION, carrierKey);
     return Void();
 }
+
+Return<void> RadioImpl::startKeepalive(int32_t serial, const KeepaliveRequest& keepalive) {
+    RLOGD("startKeepalive: serial %d", serial);
+    return Void();
+}
+
+Return<void> RadioImpl::stopKeepalive(int32_t serial, int32_t sessionHandle) {
+    RLOGD("stopKeepalive: serial %d", serial);
+    return Void();
+}
+
 
 /***************************************************************************************************
  * RESPONSE FUNCTIONS
