@@ -1,0 +1,141 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "15692f28_11959697",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-28T01:52:54Z",
+      "side": 1,
+      "message": "Separate function isn\u0027t needed. Implement this directly in startNetworkScan().",
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "737366a6_19051c6b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-28T01:52:54Z",
+      "side": 1,
+      "message": "Check bound on size.",
+      "range": {
+        "startLine": 725,
+        "startChar": 27,
+        "endLine": 725,
+        "endChar": 49
+      },
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d9f8c685_e8607fb3",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-28T01:52:54Z",
+      "side": 1,
+      "message": "same here and below",
+      "range": {
+        "startLine": 730,
+        "startChar": 51,
+        "endLine": 730,
+        "endChar": 55
+      },
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "442153e2_4e6d393a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-28T01:52:54Z",
+      "side": 1,
+      "message": "This creates a vector and copies over values to it resulting in an extra copy. Although I guess given the size of the vectors/arrays, this is fine.",
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "abfeb366_52f27c0e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 4379,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-28T01:52:54Z",
+      "side": 1,
+      "message": "Can you move these to right above sendRequestRawResponse() so that all 1.1 responses are together.",
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ecab0553_8e1c8fb6",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 4389,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-28T01:52:54Z",
+      "side": 1,
+      "message": "Should be 8 spaces",
+      "range": {
+        "startLine": 4389,
+        "startChar": 8,
+        "endLine": 4389,
+        "endChar": 12
+      },
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7818f9b_2c250644",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 4415,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-28T01:52:54Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
