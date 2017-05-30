@@ -84,6 +84,30 @@
     },
     {
       "key": {
+        "uuid": "9b3b6081_8fdd0dd3",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1002609
+      },
+      "writtenOn": "2017-05-30T19:03:43Z",
+      "side": 1,
+      "message": "Robert was wrong.\n\nIt looked like you were input checking, but what Amit\u0027s talking about here is bounds checking so you don\u0027t write outside your array.\n\nI do think you should validate the input elsewhere, but you should also be defensive when writing to memory like this and limit yourself to the array length.",
+      "parentUuid": "4cd7319f_824554da",
+      "range": {
+        "startLine": 725,
+        "startChar": 27,
+        "endLine": 725,
+        "endChar": 49
+      },
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d9f8c685_e8607fb3",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 7
