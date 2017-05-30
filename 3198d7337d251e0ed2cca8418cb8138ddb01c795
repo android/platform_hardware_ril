@@ -232,6 +232,24 @@
     },
     {
       "key": {
+        "uuid": "de463c70_480920b2",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-05-30T22:53:24Z",
+      "side": 1,
+      "message": "I see, Thanks for the clarification!\nSince the vector size is small, is it ok to keep it like this?",
+      "parentUuid": "225efa73_7621555b",
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "abfeb366_52f27c0e",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 7
