@@ -214,6 +214,24 @@
     },
     {
       "key": {
+        "uuid": "225efa73_7621555b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-05-30T22:45:46Z",
+      "side": 1,
+      "message": "typecast from hidl_vec to vector creates a copy.",
+      "parentUuid": "5e3270ba_5ac23600",
+      "revId": "3198d7337d251e0ed2cca8418cb8138ddb01c795",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "abfeb366_52f27c0e",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 7
