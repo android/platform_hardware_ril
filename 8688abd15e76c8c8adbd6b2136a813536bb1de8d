@@ -22,6 +22,30 @@
       "revId": "8688abd15e76c8c8adbd6b2136a813536bb1de8d",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7d17cd4_f4727f34",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 1376,
+      "author": {
+        "id": 1148298
+      },
+      "writtenOn": "2017-06-01T16:35:25Z",
+      "side": 1,
+      "message": "std::copy requires that the type of the vector\u003c\u003e must be the same, so we can use std::copy for the channel (vector\u003cuint32\u003e -\u003e vector\u003cuint32\u003e),but not here (vector\u003cuint32\u003e -\u003e vector\u003cgeran_bands\u003e)",
+      "parentUuid": "1c9b5fcc_9ecf5d46",
+      "range": {
+        "startLine": 1376,
+        "startChar": 13,
+        "endLine": 1376,
+        "endChar": 19
+      },
+      "revId": "8688abd15e76c8c8adbd6b2136a813536bb1de8d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
