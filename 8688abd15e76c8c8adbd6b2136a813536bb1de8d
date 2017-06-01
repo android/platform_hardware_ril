@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c9b5fcc_9ecf5d46",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 1376,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-06-01T05:00:44Z",
+      "side": 1,
+      "message": "is copy a better API to use for this?",
+      "range": {
+        "startLine": 1376,
+        "startChar": 13,
+        "endLine": 1376,
+        "endChar": 19
+      },
+      "revId": "8688abd15e76c8c8adbd6b2136a813536bb1de8d",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
