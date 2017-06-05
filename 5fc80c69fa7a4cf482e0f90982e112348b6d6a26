@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cffee6c4_d712248b",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 5548,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-06-05T13:16:30Z",
+      "side": 1,
+      "message": "144",
+      "range": {
+        "startLine": 5548,
+        "startChar": 36,
+        "endLine": 5548,
+        "endChar": 39
+      },
+      "revId": "5fc80c69fa7a4cf482e0f90982e112348b6d6a26",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b2d1c42d_57313d67",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 5566,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-06-05T13:16:30Z",
+      "side": 1,
+      "message": "145",
+      "range": {
+        "startLine": 5566,
+        "startChar": 35,
+        "endLine": 5566,
+        "endChar": 38
+      },
+      "revId": "5fc80c69fa7a4cf482e0f90982e112348b6d6a26",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f82b8f0d_19c075a5",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 6427,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-06-05T13:16:30Z",
+      "side": 1,
+      "message": "nit: delete space",
+      "range": {
+        "startLine": 6427,
+        "startChar": 8,
+        "endLine": 6427,
+        "endChar": 20
+      },
+      "revId": "5fc80c69fa7a4cf482e0f90982e112348b6d6a26",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
