@@ -1372,7 +1372,9 @@ Return<void> RadioImpl::startNetworkScan(int32_t serial, const NetworkScanReques
                 return Void();
         }
         // safe to copy to geran_bands because it's a union member
-        std::memcpy(&ras_to.bands.geran_bands, bands, ras_to.bands_length * sizeof(uint32_t));
+        for (size_t idx = 0; idx < ras_to.bands_length; ++idx) {
+          ras_to.bands.geran_bands[idx] = (RIL_GeranBands) (*bands)[idx];
+        }
     }
 
     s_vendorFunctions->onRequest(
