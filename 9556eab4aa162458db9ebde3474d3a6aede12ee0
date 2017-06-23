@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4348e9c4_cfb29b11",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1376,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2017-06-23T17:12:17Z",
+      "side": 1,
+      "message": "4 spaces please.",
+      "range": {
+        "startLine": 1376,
+        "startChar": 8,
+        "endLine": 1376,
+        "endChar": 10
+      },
+      "revId": "9556eab4aa162458db9ebde3474d3a6aede12ee0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
