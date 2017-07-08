@@ -41,8 +41,6 @@ using ::android::hardware::Return;
 using ::android::hardware::hidl_string;
 using ::android::hardware::hidl_vec;
 using ::android::hardware::hidl_array;
-using ::android::hardware::radio::V1_1::NetworkScanRequest;
-using ::android::hardware::radio::V1_1::KeepaliveRequest;
 using ::android::hardware::Void;
 using android::CommandInfo;
 using android::RequestInfo;
@@ -248,7 +246,7 @@ struct RadioImpl : public V1_1::IRadio {
 
     Return<void> getAvailableNetworks(int32_t serial);
 
-    Return<void> startNetworkScan(int32_t serial, const NetworkScanRequest& request);
+    Return<void> startNetworkScan(int32_t serial, const V1_1::NetworkScanRequest& request);
 
     Return<void> stopNetworkScan(int32_t serial);
 
@@ -440,7 +438,7 @@ struct RadioImpl : public V1_1::IRadio {
 
     Return<void> setIndicationFilter(int32_t serial, int32_t indicationFilter);
 
-    Return<void> startKeepalive(int32_t serial, const KeepaliveRequest& keepalive);
+    Return<void> startKeepalive(int32_t serial, const V1_1::KeepaliveRequest& keepalive);
 
     Return<void> stopKeepalive(int32_t serial, int32_t sessionHandle);
 
@@ -451,7 +449,7 @@ struct RadioImpl : public V1_1::IRadio {
     Return<void> responseAcknowledgement();
 
     Return<void> setCarrierInfoForImsiEncryption(int32_t serial,
-            const ::android::hardware::radio::V1_1::ImsiEncryptionInfo& message);
+            const V1_1::ImsiEncryptionInfo& message);
 
     void checkReturnStatus(Return<void>& ret);
 };
@@ -1343,7 +1341,7 @@ Return<void> RadioImpl::getAvailableNetworks(int32_t serial) {
     return Void();
 }
 
-Return<void> RadioImpl::startNetworkScan(int32_t serial, const NetworkScanRequest& request) {
+Return<void> RadioImpl::startNetworkScan(int32_t serial, const V1_1::NetworkScanRequest& request) {
 #if VDBG
     RLOGD("startNetworkScan: serial %d", serial);
 #endif
@@ -2793,6 +2791,102 @@ Return<void> RadioImpl::setSimCardPower_1_1(int32_t serial, const V1_1::CardPowe
     return Void();
 }
 
+Return<void> RadioImpl::setCarrierInfoForImsiEncryption(int32_t serial,
+        const V1_1::ImsiEncryptionInfo& data) {
+#if VDBG
+    RLOGD("setCarrierInfoForImsiEncryption: serial %d", serial);
+#endif
+    RequestInfo *pRI = android::addRequestToList(
+            serial, mSlotId, RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION);
+    if (pRI == NULL) {
+        return Void();
+    }
+
+    RIL_CarrierInfoForImsiEncryption imsiEncryption = {};
+
+    if (!copyHidlStringToRil(&imsiEncryption.mnc, data.mnc, pRI)) {
+        return Void();
+    }
+    if (!copyHidlStringToRil(&imsiEncryption.mcc, data.mcc, pRI)) {
+        memsetAndFreeStrings(1, imsiEncryption.mnc);
+        return Void();
+    }
+    if (!copyHidlStringToRil(&imsiEncryption.keyIdentifier, data.keyIdentifier, pRI)) {
+        memsetAndFreeStrings(2, imsiEncryption.mnc, imsiEncryption.mcc);
+        return Void();
+    }
+    int32_t lSize = data.carrierKey.size();
+    imsiEncryption.carrierKey = new uint8_t[lSize];
+    memcpy(imsiEncryption.carrierKey, data.carrierKey.data(), lSize);
+    imsiEncryption.expirationTime = data.expirationTime;
+    CALL_ONREQUEST(pRI->pCI->requestNumber, &imsiEncryption,
+            sizeof(RIL_CarrierInfoForImsiEncryption), pRI, mSlotId);
+    delete(imsiEncryption.carrierKey);
+    return Void();
+}
+
+Return<void> RadioImpl::startKeepalive(int32_t serial, const V1_1::KeepaliveRequest& keepalive) {
+#if VDBG
+    RLOGD("%s(): %d", __FUNCTION__, serial);
+#endif
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_START_KEEPALIVE);
+    if (pRI == NULL) {
+        return Void();
+    }
+
+    RIL_KeepaliveRequest kaReq = {};
+
+    kaReq.type = static_cast<RIL_KeepaliveType>(keepalive.type);
+    switch(kaReq.type) {
+        case NATT_IPV4:
+            if (keepalive.sourceAddress.size() != 4 ||
+                    keepalive.destinationAddress.size() != 4) {
+                RLOGE("Invalid address for keepalive!");
+                sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+                return Void();
+            }
+            break;
+        case NATT_IPV6:
+            if (keepalive.sourceAddress.size() != 16 ||
+                    keepalive.destinationAddress.size() != 16) {
+                RLOGE("Invalid address for keepalive!");
+                sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+                return Void();
+            }
+            break;
+        default:
+            RLOGE("Unknown packet keepalive type!");
+            sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+            return Void();
+    }
+
+    ::memcpy(kaReq.sourceAddress, keepalive.sourceAddress.data(), keepalive.sourceAddress.size());
+    kaReq.sourcePort = keepalive.sourcePort;
+
+    ::memcpy(kaReq.destinationAddress,
+            keepalive.destinationAddress.data(), keepalive.destinationAddress.size());
+    kaReq.destinationPort = keepalive.destinationPort;
+
+    kaReq.maxKeepaliveIntervalMillis = keepalive.maxKeepaliveIntervalMillis;
+    kaReq.cid = keepalive.cid; // This is the context ID of the data call
+
+    CALL_ONREQUEST(pRI->pCI->requestNumber, &kaReq, sizeof(RIL_KeepaliveRequest), pRI, mSlotId);
+    return Void();
+}
+
+Return<void> RadioImpl::stopKeepalive(int32_t serial, int32_t sessionHandle) {
+#if VDBG
+    RLOGD("%s(): %d", __FUNCTION__, serial);
+#endif
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_STOP_KEEPALIVE);
+    if (pRI == NULL) {
+        return Void();
+    }
+
+    CALL_ONREQUEST(pRI->pCI->requestNumber, &sessionHandle, sizeof(uint32_t), pRI, mSlotId);
+    return Void();
+}
+
 Return<void> RadioImpl::responseAcknowledgement() {
     android::releaseWakeLock();
     return Void();
@@ -2835,43 +2929,6 @@ Return<void> OemHookImpl::sendRequestStrings(int32_t serial,
     dispatchStrings(serial, mSlotId, RIL_REQUEST_OEM_HOOK_STRINGS, data);
     return Void();
 }
-
-Return<void> RadioImpl::setCarrierInfoForImsiEncryption(int32_t serial,
-        const ::android::hardware::radio::V1_1::ImsiEncryptionInfo& data) {
-    RLOGD("setCarrierInfoForImsiEncryption: serial %d", serial);
-    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION);
-    RIL_CarrierInfoForImsiEncryption imsiEncryption = {};
-
-    if (!copyHidlStringToRil(&imsiEncryption.mnc, data.mnc, pRI)) {
-        return Void();
-    }
-    if (!copyHidlStringToRil(&imsiEncryption.mcc, data.mcc, pRI)) {
-        memsetAndFreeStrings(1, imsiEncryption.mnc);
-        return Void();
-    }
-    if (!copyHidlStringToRil(&imsiEncryption.keyIdentifier, data.keyIdentifier, pRI)) {
-        memsetAndFreeStrings(2, imsiEncryption.mnc, imsiEncryption.mcc);
-        return Void();
-    }
-    int32_t lSize = data.carrierKey.size();
-    imsiEncryption.carrierKey = new uint8_t[lSize];
-    memcpy(imsiEncryption.carrierKey, data.carrierKey.data(), lSize);
-    imsiEncryption.expirationTime = data.expirationTime;
-    s_vendorFunctions->onRequest(pRI->pCI->requestNumber, &imsiEncryption, sizeof(RIL_CarrierInfoForImsiEncryption), pRI);
-    delete(imsiEncryption.carrierKey);
-    return Void();
-}
-
-Return<void> RadioImpl::startKeepalive(int32_t serial, const KeepaliveRequest& keepalive) {
-    RLOGD("startKeepalive: serial %d", serial);
-    return Void();
-}
-
-Return<void> RadioImpl::stopKeepalive(int32_t serial, int32_t sessionHandle) {
-    RLOGD("stopKeepalive: serial %d", serial);
-    return Void();
-}
-
 
 /***************************************************************************************************
  * RESPONSE FUNCTIONS
@@ -6598,6 +6655,60 @@ int radio::stopNetworkScanResponse(int slotId, int responseType, int serial, RIL
     return 0;
 }
 
+void convertRilKeepaliveStatusToHal(const RIL_KeepaliveStatus *rilStatus,
+        V1_1::KeepaliveStatus& halStatus) {
+    halStatus.sessionHandle = rilStatus->sessionHandle;
+    halStatus.code = static_cast<V1_1::KeepaliveStatusCode>(rilStatus->code);
+}
+
+int radio::startKeepaliveResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                    void *response, size_t responseLen) {
+#if VDBG
+    RLOGD("%s(): %d", __FUNCTION__, serial);
+#endif
+    RadioResponseInfo responseInfo = {};
+    populateResponseInfo(responseInfo, serial, responseType, e);
+
+    // If we don't have a radio service, there's nothing we can do
+    if (radioService[slotId]->mRadioResponseV1_1 == NULL) {
+        RLOGE("%s: radioService[%d]->mRadioResponseV1_1 == NULL", __FUNCTION__, slotId);
+        return 0;
+    }
+
+    V1_1::KeepaliveStatus ks = {};
+    if (response == NULL || responseLen != sizeof(V1_1::KeepaliveStatus)) {
+        RLOGE("%s: invalid response - %d", __FUNCTION__, static_cast<int>(e));
+        if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+    } else {
+        convertRilKeepaliveStatusToHal(static_cast<RIL_KeepaliveStatus*>(response), ks);
+    }
+
+    Return<void> retStatus =
+            radioService[slotId]->mRadioResponseV1_1->startKeepaliveResponse(responseInfo, ks);
+    radioService[slotId]->checkReturnStatus(retStatus);
+    return 0;
+}
+
+int radio::stopKeepaliveResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                    void *response, size_t responseLen) {
+#if VDBG
+    RLOGD("%s(): %d", __FUNCTION__, serial);
+#endif
+    RadioResponseInfo responseInfo = {};
+    populateResponseInfo(responseInfo, serial, responseType, e);
+
+    // If we don't have a radio service, there's nothing we can do
+    if (radioService[slotId]->mRadioResponseV1_1 == NULL) {
+        RLOGE("%s: radioService[%d]->mRadioResponseV1_1 == NULL", __FUNCTION__, slotId);
+        return 0;
+    }
+
+    Return<void> retStatus =
+            radioService[slotId]->mRadioResponseV1_1->stopKeepaliveResponse(responseInfo);
+    radioService[slotId]->checkReturnStatus(retStatus);
+    return 0;
+}
+
 int radio::sendRequestRawResponse(int slotId,
                                   int responseType, int serial, RIL_Errno e,
                                   void *response, size_t responseLen) {
@@ -6662,7 +6773,11 @@ int radio::sendRequestStringsResponse(int slotId,
     return 0;
 }
 
-// Radio Indication functions
+/***************************************************************************************************
+ * INDICATION FUNCTIONS
+ * The below function handle unsolicited messages coming from the Radio
+ * (messages for which there is no pending request)
+ **************************************************************************************************/
 
 RadioIndicationType convertIntToRadioIndicationType(int indicationType) {
     return indicationType == RESPONSE_UNSOLICITED ? (RadioIndicationType::UNSOLICITED) :
@@ -8301,6 +8416,39 @@ int radio::carrierInfoForImsiEncryption(int slotId,
                 slotId);
     }
 
+    return 0;
+}
+
+int radio::keepaliveStatusInd(int slotId,
+                         int indicationType, int token, RIL_Errno e, void *response,
+                         size_t responseLen) {
+#if VDBG
+    RLOGD("%s(): token=%d", __FUNCTION__, token);
+#endif
+    if (radioService[slotId] == NULL || radioService[slotId]->mRadioIndication == NULL) {
+        RLOGE("%s: radioService[%d]->mRadioIndication == NULL", __FUNCTION__, slotId);
+        return 0;
+    }
+
+    auto ret = V1_1::IRadioIndication::castFrom(
+        radioService[slotId]->mRadioIndication);
+    if (!ret.isOk()) {
+        RLOGE("%s: ret.isOk() == false for radioService[%d]", __FUNCTION__, slotId);
+        return 0;
+    }
+    sp<V1_1::IRadioIndication> radioIndicationV1_1 = ret;
+
+    if (response == NULL || responseLen != sizeof(V1_1::KeepaliveStatus)) {
+        RLOGE("%s: invalid response", __FUNCTION__);
+        return 0;
+    }
+
+    V1_1::KeepaliveStatus ks;
+    convertRilKeepaliveStatusToHal(static_cast<RIL_KeepaliveStatus*>(response), ks);
+
+    Return<void> retStatus = radioIndicationV1_1->keepaliveStatus(
+            convertIntToRadioIndicationType(indicationType), ks);
+    radioService[slotId]->checkReturnStatus(retStatus);
     return 0;
 }
 
