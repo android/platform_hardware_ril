@@ -2819,11 +2819,51 @@ Return<void> RadioImpl::setCarrierInfoForImsiEncryption(int32_t serial,
 
 Return<void> RadioImpl::startKeepalive(int32_t serial, const KeepaliveRequest& keepalive) {
     RLOGD("startKeepalive: serial %d", serial);
+    RIL_KeepaliveRequest kaReq = {};
+
+    kaReq.type = static_cast<RIL_KeepaliveType>(keepalive.type);
+    switch(kaReq.type) {
+        case NATT_IPV4:
+            if (keepalive.sourceAddress.size() != 4) {
+                // FIXME: Panic
+            }
+            break;
+        case NATT_IPV6:
+            if (keepalive.sourceAddress.size() != 16) {
+                // FIXME: Panic
+            }
+            break;
+        default:
+            // FIXME: something went pear shaped, everybody panic
+            break;
+    }
+
+    // We don't do this until we're sure that everything is kosher
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_START_KEEPALIVE);
+
+    ::memcpy(kaReq.sourceAddress, keepalive.sourceAddress.data(), keepalive.sourceAddress.size());
+    kaReq.sourcePort = keepalive.sourcePort;
+
+    ::memcpy(kaReq.destinationAddress,
+            keepalive.destinationAddress.data(), keepalive.destinationAddress.size());
+    kaReq.destinationPort = keepalive.destinationPort;
+
+    kaReq.maxKeepaliveIntervalMillis = keepalive.maxKeepaliveIntervalMillis;
+    kaReq.cid = keepalive.cid; // This is the context ID of the data call
+
+    s_vendorFunctions->onRequest(
+            pRI->pCI->requestNumber, &kaReq, sizeof(RIL_KeepaliveRequest), pRI);
+
     return Void();
 }
 
 Return<void> RadioImpl::stopKeepalive(int32_t serial, int32_t sessionHandle) {
     RLOGD("stopKeepalive: serial %d", serial);
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_STOP_KEEPALIVE);
+
+    s_vendorFunctions->onRequest(
+            pRI->pCI->requestNumber, &sessionHandle, sizeof(uint32_t), pRI);
+
     return Void();
 }
 
@@ -6588,7 +6628,22 @@ int radio::sendRequestStringsResponse(int slotId,
     return 0;
 }
 
-// Radio Indication functions
+int radio::startKeepaliveResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                    void *response, size_t responseLen) {
+    return 0;
+}
+
+
+int radio::stopKeepaliveResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                    void *response, size_t responseLen) {
+    return 0;
+}
+
+/***************************************************************************************************
+ * INDICATION FUNCTIONS
+ * The below function handle unsolicited messages coming from the Radio
+ * (messages for which there is no pending request)
+ **************************************************************************************************/
 
 RadioIndicationType convertIntToRadioIndicationType(int indicationType) {
     return indicationType == RESPONSE_UNSOLICITED ? (RadioIndicationType::UNSOLICITED) :
@@ -8265,6 +8320,12 @@ int radio::oemHookRawInd(int slotId,
         RLOGE("oemHookRawInd: oemHookService[%d]->mOemHookIndication == NULL", slotId);
     }
 
+    return 0;
+}
+
+int radio::keepaliveStatusInd(int slotId,
+                         int indicationType, int token, RIL_Errno e, void *response,
+                         size_t responseLen) {
     return 0;
 }
 
