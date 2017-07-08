@@ -42,6 +42,7 @@ using ::android::hardware::hidl_vec;
 using ::android::hardware::hidl_array;
 using ::android::hardware::radio::V1_1::NetworkScanRequest;
 using ::android::hardware::radio::V1_1::KeepaliveRequest;
+using ::android::hardware::radio::V1_1::KeepaliveStatus;
 using ::android::hardware::Void;
 using android::CommandInfo;
 using android::RequestInfo;
@@ -2819,11 +2820,51 @@ Return<void> RadioImpl::setCarrierInfoForImsiEncryption(int32_t serial,
 
 Return<void> RadioImpl::startKeepalive(int32_t serial, const KeepaliveRequest& keepalive) {
     RLOGD("startKeepalive: serial %d", serial);
+    RIL_KeepaliveRequest kaReq = {};
+
+    kaReq.type = static_cast<RIL_KeepaliveType>(keepalive.type);
+    switch(kaReq.type) {
+        case NATT_IPV4:
+            if (keepalive.sourceAddress.size() != 4) {
+                // FIXME: Panic
+            }
+            break;
+        case NATT_IPV6:
+            if (keepalive.sourceAddress.size() != 16) {
+                // FIXME: Panic
+            }
+            break;
+        default:
+            // FIXME: something went pear shaped, everybody panic
+            break;
+    }
+
+    // We don't do this until we're sure that everything is kosher
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_START_KEEPALIVE);
+
+    ::memcpy(kaReq.sourceAddress, keepalive.sourceAddress.data(), keepalive.sourceAddress.size());
+    kaReq.sourcePort = keepalive.sourcePort;
+
+    ::memcpy(kaReq.destinationAddress,
+            keepalive.destinationAddress.data(), keepalive.destinationAddress.size());
+    kaReq.destinationPort = keepalive.destinationPort;
+
+    kaReq.maxKeepaliveIntervalMillis = keepalive.maxKeepaliveIntervalMillis;
+    kaReq.cid = keepalive.cid; // This is the context ID of the data call
+
+    s_vendorFunctions->onRequest(
+            pRI->pCI->requestNumber, &kaReq, sizeof(RIL_KeepaliveRequest), pRI);
+
     return Void();
 }
 
 Return<void> RadioImpl::stopKeepalive(int32_t serial, int32_t sessionHandle) {
     RLOGD("stopKeepalive: serial %d", serial);
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_STOP_KEEPALIVE);
+
+    s_vendorFunctions->onRequest(
+            pRI->pCI->requestNumber, &sessionHandle, sizeof(uint32_t), pRI);
+
     return Void();
 }
 
@@ -6588,7 +6629,83 @@ int radio::sendRequestStringsResponse(int slotId,
     return 0;
 }
 
-// Radio Indication functions
+void convertRilKeepaliveStatusToHal(const RIL_KeepaliveStatus *rilStatus,
+        KeepaliveStatus& halStatus) {
+    halStatus.sessionHandle = rilStatus->sessionHandle;
+    halStatus.code = static_cast<::android::hardware::radio::V1_1::KeepaliveStatusCode>(
+            rilStatus->code);
+}
+
+int radio::startKeepaliveResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                    void *response, size_t responseLen) {
+    if (radioService[slotId]->mRadioResponse == NULL) {
+        RLOGE("%s: radioService[%d]->mRadioResponse == NULL", __FUNCTION__, slotId);
+        return 0;
+    }
+
+    auto ret = ::android::hardware::radio::V1_1::IRadioResponse::castFrom(
+            radioService[slotId]->mRadioResponse);
+
+    if (!ret.isOk()) {
+        RLOGE("%s: ret.isOk() == false for radioService[%d]", __FUNCTION__, slotId);
+        return 0;
+    }
+    sp<::android::hardware::radio::V1_1::IRadioResponse> radioResponseV1_1 = ret;
+#if VDBG
+    RLOGD("%s", __FUNCTION__);
+#endif
+
+    RadioResponseInfo responseInfo = {};
+    populateResponseInfo(responseInfo, serial, responseType, e);
+
+    if (response == NULL || responseLen != sizeof(KeepaliveStatus)) {
+        RLOGE("%s: invalid response", __FUNCTION__);
+        if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+    }
+
+    KeepaliveStatus ks;
+    convertRilKeepaliveStatusToHal(static_cast<RIL_KeepaliveStatus*>(response), ks);
+
+    Return<void> retStatus =
+            radioResponseV1_1->startKeepaliveResponse(responseInfo, ks);
+    radioService[slotId]->checkReturnStatus(retStatus);
+    return 0;
+}
+
+int radio::stopKeepaliveResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                    void *response, size_t responseLen) {
+
+    if (radioService[slotId]->mRadioResponse == NULL) {
+        RLOGE("%s: radioService[%d]->mRadioResponse == NULL", __FUNCTION__, slotId);
+        return 0;
+    }
+
+    auto ret = ::android::hardware::radio::V1_1::IRadioResponse::castFrom(
+            radioService[slotId]->mRadioResponse);
+
+    if (!ret.isOk()) {
+        RLOGE("%s: ret.isOk() == false for radioService[%d]", __FUNCTION__, slotId);
+        return 0;
+    }
+    sp<::android::hardware::radio::V1_1::IRadioResponse> radioResponseV1_1 = ret;
+#if VDBG
+    RLOGD("%s", __FUNCTION__);
+#endif
+
+    RadioResponseInfo responseInfo = {};
+    populateResponseInfo(responseInfo, serial, responseType, e);
+
+    Return<void> retStatus =
+            radioResponseV1_1->stopKeepaliveResponse(responseInfo);
+    radioService[slotId]->checkReturnStatus(retStatus);
+    return 0;
+}
+
+/***************************************************************************************************
+ * INDICATION FUNCTIONS
+ * The below function handle unsolicited messages coming from the Radio
+ * (messages for which there is no pending request)
+ **************************************************************************************************/
 
 RadioIndicationType convertIntToRadioIndicationType(int indicationType) {
     return indicationType == RESPONSE_UNSOLICITED ? (RadioIndicationType::UNSOLICITED) :
@@ -8265,6 +8382,40 @@ int radio::oemHookRawInd(int slotId,
         RLOGE("oemHookRawInd: oemHookService[%d]->mOemHookIndication == NULL", slotId);
     }
 
+    return 0;
+}
+
+int radio::keepaliveStatusInd(int slotId,
+                         int indicationType, int token, RIL_Errno e, void *response,
+                         size_t responseLen) {
+    if (radioService[slotId] == NULL || radioService[slotId]->mRadioIndication == NULL) {
+        RLOGE("%s: radioService[%d]->mRadioIndication == NULL", __FUNCTION__, slotId);
+        return 0;
+    }
+
+    auto ret = ::android::hardware::radio::V1_1::IRadioIndication::castFrom(
+        radioService[slotId]->mRadioIndication);
+    if (!ret.isOk()) {
+        RLOGE("%s: ret.isOk() == false for radioService[%d]", __FUNCTION__, slotId);
+        return 0;
+    }
+    sp<::android::hardware::radio::V1_1::IRadioIndication> radioIndicationV1_1 = ret;
+
+    if (response == NULL || responseLen != sizeof(KeepaliveStatus)) {
+        RLOGE("%s: invalid response", __FUNCTION__);
+        return 0;
+    }
+
+#if VDBG
+    RLOGD("%s", __FUNCTION__);
+#endif
+
+    KeepaliveStatus ks;
+    convertRilKeepaliveStatusToHal(static_cast<RIL_KeepaliveStatus*>(response), ks);
+
+    Return<void> retStatus = radioIndicationV1_1->keepaliveStatus(
+            convertIntToRadioIndicationType(indicationType), ks);
+    radioService[slotId]->checkReturnStatus(retStatus);
     return 0;
 }
 

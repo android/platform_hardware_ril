@@ -541,6 +541,14 @@ int setSimCardPowerResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
+int startKeepaliveResponse(int slotId,
+                           int responseType, int serial, RIL_Errno e,
+                           void *response, size_t responselen);
+
+int stopKeepaliveResponse(int slotId,
+                          int responseType, int serial, RIL_Errno e,
+                          void *response, size_t responselen);
+
 void acknowledgeRequest(int slotId, int serial);
 
 int radioStateChangedInd(int slotId,
@@ -712,6 +720,10 @@ int modemResetInd(int slotId,
 int networkScanResultInd(int slotId,
                          int indicationType, int token, RIL_Errno e, void *response,
                          size_t responselen);
+
+int keepaliveStatusInd(int slotId,
+                       int indicationType, int token, RIL_Errno e, void *response,
+                       size_t responselen);
 
 int sendRequestRawResponse(int slotId,
                            int responseType, int serial, RIL_Errno e,
