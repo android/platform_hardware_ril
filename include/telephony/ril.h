@@ -1986,7 +1986,8 @@ typedef enum {
     RIL_APN_TYPE_IA           = 0x100,        // APN type for IA Initial Attach APN
     RIL_APN_TYPE_EMERGENCY    = 0x200,        // APN type for Emergency PDN. This is not an IA apn,
                                               // but is used for access to carrier services in an
-                                              // emergency call situation.
+    RIL_APN_TYPE_XCAP         = 0x400,        // APN type for XCAP
+
     RIL_APN_TYPE_ALL          = 0xFFFFFFFF    // All APN types
 } RIL_ApnTypes;
 
