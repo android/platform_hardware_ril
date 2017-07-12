@@ -16,7 +16,7 @@
 
 #define LOG_TAG "RIL_SAP"
 
-#include <android/hardware/radio/1.0/ISap.h>
+#include <android/hardware/radio/1.1/ISap.h>
 
 #include <hwbinder/IPCThreadState.h>
 #include <hwbinder/ProcessState.h>
@@ -42,7 +42,7 @@ sp<SapImpl> sapService[SIM_COUNT];
 sp<SapImpl> sapService[1];
 #endif
 
-struct SapImpl : public ISap {
+struct SapImpl : public android::hardware::radio::V1_1::ISap {
     int32_t slotId;
     sp<ISapCallback> sapCallback;
     RIL_SOCKET_ID rilSocketId;
