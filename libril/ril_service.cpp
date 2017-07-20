@@ -16,10 +16,11 @@
 
 #define LOG_TAG "RILC"
 
-#include <android/hardware/radio/1.1/IRadio.h>
+#include <android/hardware/radio/1.2/IRadio.h>
+#include <android/hardware/radio/1.2/types.h>
+
 #include <android/hardware/radio/1.1/IRadioResponse.h>
 #include <android/hardware/radio/1.1/IRadioIndication.h>
-#include <android/hardware/radio/1.1/types.h>
 
 #include <android/hardware/radio/deprecated/1.0/IOemHook.h>
 
@@ -112,7 +113,7 @@ void convertRilDataCallListToHal(void *response, size_t responseLen,
 
 void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<CellInfo>& records);
 
-struct RadioImpl : public V1_1::IRadio {
+struct RadioImpl : public V1_2::IRadio {
     int32_t mSlotId;
     sp<IRadioResponse> mRadioResponse;
     sp<IRadioIndication> mRadioIndication;
@@ -249,6 +250,9 @@ struct RadioImpl : public V1_1::IRadio {
     Return<void> getAvailableNetworks(int32_t serial);
 
     Return<void> startNetworkScan(int32_t serial, const NetworkScanRequest& request);
+
+    Return<void> startNetworkScan_1_2(int32_t serial,
+            const V1_2::NetworkScanRequest& request);
 
     Return<void> stopNetworkScan(int32_t serial);
 
@@ -1343,37 +1347,51 @@ Return<void> RadioImpl::getAvailableNetworks(int32_t serial) {
     return Void();
 }
 
-Return<void> RadioImpl::startNetworkScan(int32_t serial, const NetworkScanRequest& request) {
-#if VDBG
-    RLOGD("startNetworkScan: serial %d", serial);
-#endif
+int fillNetworkScanRequest_1_2(const V1_2::NetworkScanRequest& request,
+        RIL_NetworkScanRequest &scanRequest,
+        RequestInfo *pRI) {
 
-    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_START_NETWORK_SCAN);
-    if (pRI == NULL) {
-        return Void();
+    if (request.mccMncs.size() > MAX_MCC_MNC_LIST_SIZE) {
+        sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+        return -1;
     }
+
+    scanRequest.maxSearchTime = request.maxSearchTime;
+    scanRequest.incrementalResults = request.incrementalResults;
+    scanRequest.incrementalResultsPeriodicity = request.incrementalResultsPeriodicity;
+    scanRequest.mccMncLength = request.mccMncs.size();
+
+    for (size_t i = 0; i < request.mccMncs.size(); ++i) {
+        scanRequest.mccMncs[i] = request.mccMncs[i].c_str();
+    }
+
+    return 0;
+}
+
+int fillNetworkScanRequest_1_1(const V1_1::NetworkScanRequest& request,
+        RIL_NetworkScanRequest &scanRequest,
+        RequestInfo *pRI) {
 
     if (request.specifiers.size() > MAX_RADIO_ACCESS_NETWORKS) {
         sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
-        return Void();
+        return -1;
     }
 
-    RIL_NetworkScanRequest scan_request = {};
+    scanRequest.type = (RIL_ScanType) request.type;
+    scanRequest.interval = request.interval;
+    scanRequest.specifiers_length = request.specifiers.size();
 
-    scan_request.type = (RIL_ScanType) request.type;
-    scan_request.interval = request.interval;
-    scan_request.specifiers_length = request.specifiers.size();
     for (size_t i = 0; i < request.specifiers.size(); ++i) {
         if (request.specifiers[i].geranBands.size() > MAX_BANDS ||
             request.specifiers[i].utranBands.size() > MAX_BANDS ||
             request.specifiers[i].eutranBands.size() > MAX_BANDS ||
             request.specifiers[i].channels.size() > MAX_CHANNELS) {
             sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
-            return Void();
+            return -1;
         }
         const V1_1::RadioAccessSpecifier& ras_from =
                 request.specifiers[i];
-        RIL_RadioAccessSpecifier& ras_to = scan_request.specifiers[i];
+        RIL_RadioAccessSpecifier& ras_to = scanRequest.specifiers[i];
 
         ras_to.radio_access_network = (RIL_RadioAccessNetworks) ras_from.radioAccessNetwork;
         ras_to.channels_length = ras_from.channels.size();
@@ -1395,7 +1413,7 @@ Return<void> RadioImpl::startNetworkScan(int32_t serial, const NetworkScanReques
                 break;
             default:
                 sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
-                return Void();
+                return -1;
         }
         // safe to copy to geran_bands because it's a union member
         for (size_t idx = 0; idx < ras_to.bands_length; ++idx) {
@@ -1403,8 +1421,53 @@ Return<void> RadioImpl::startNetworkScan(int32_t serial, const NetworkScanReques
         }
     }
 
-    s_vendorFunctions->onRequest(
-            RIL_REQUEST_START_NETWORK_SCAN, &scan_request, sizeof(scan_request), pRI);
+    return 0;
+}
+
+Return<void> RadioImpl::startNetworkScan(int32_t serial, const V1_1::NetworkScanRequest& request) {
+#if VDBG
+    RLOGD("startNetworkScan: serial %d", serial);
+#endif
+
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_START_NETWORK_SCAN);
+    if (pRI == NULL) {
+        return Void();
+    }
+
+    RIL_NetworkScanRequest scanRequest = {};
+    if (fillNetworkScanRequest_1_1(request, scanRequest, pRI) != 0) {
+        return Void();
+    }
+
+    CALL_ONREQUEST(RIL_REQUEST_START_NETWORK_SCAN, &scanRequest, sizeof(scanRequest), pRI,
+            mSlotId);
+
+    return Void();
+}
+
+Return<void> RadioImpl::startNetworkScan_1_2(int32_t serial,
+        const V1_2::NetworkScanRequest& request) {
+#if VDBG
+    RLOGD("startNetworkScan_1_2: serial %d", serial);
+#endif
+
+    RequestInfo *pRI = android::addRequestToList(serial, mSlotId, RIL_REQUEST_START_NETWORK_SCAN);
+    if (pRI == NULL) {
+        return Void();
+    }
+
+    RIL_NetworkScanRequest scanRequest = {};
+    if (fillNetworkScanRequest_1_1(
+            (const V1_1::NetworkScanRequest&)request, scanRequest, pRI) != 0) {
+        return Void();
+    }
+
+    if (fillNetworkScanRequest_1_2(request, scanRequest, pRI) != 0) {
+        return Void();
+    }
+
+    CALL_ONREQUEST(RIL_REQUEST_START_NETWORK_SCAN, &scanRequest, sizeof(scanRequest), pRI,
+            mSlotId);
 
     return Void();
 }

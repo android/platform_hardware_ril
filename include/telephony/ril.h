@@ -107,6 +107,7 @@ extern "C" {
 #define MAX_BANDS 8
 #define MAX_CHANNELS 32
 #define MAX_RADIO_ACCESS_NETWORKS 8
+#define MAX_MCC_MNC_LIST_SIZE 20
 
 
 typedef void * RIL_Token;
@@ -2171,6 +2172,35 @@ typedef struct {
     uint32_t specifiers_length;                                     // Length of specifiers
     RIL_RadioAccessSpecifier specifiers[MAX_RADIO_ACCESS_NETWORKS]; // Radio access networks
                                                                     // with bands/channels.
+
+    int32_t maxSearchTime;                  // Maximum duration of the periodic search (in seconds).
+                                            // If the search lasts maxSearchTime then
+                                            // it must be terminated.
+                                            // Default modem value should used if 0.
+
+    int32_t incrementalResults;             // Indicates whether the modem should report incremental
+                                            // results of the network scan to the client.
+                                            // 0 – Incremental results are not reported.
+                                            // 1 (default) – Incremental
+                                            // results are reported
+
+    int32_t incrementalResultsPeriodicity;  // Indicates the periodicity with which the
+                                            // modem should report incremental results
+                                            // to the client (in seconds).
+                                            // Default modem value should be
+                                            // used if 0
+
+    uint32_t mccMncLength;                     // Length of mccMncs array
+    const char *mccMncs[MAX_MCC_MNC_LIST_SIZE];// Describes the List of PLMN ids (MCC-MNC)
+                                               // If any PLMN of this list is
+                                               // found, search should end at that
+                                               // point and results with all PLMN
+                                               // found till that point should be
+                                               // sent as response. If list not
+                                               // sent, search to be completed till
+                                               // end and all PLMNs found to be
+                                               // reported.
+
 } RIL_NetworkScanRequest;
 
 typedef enum {
