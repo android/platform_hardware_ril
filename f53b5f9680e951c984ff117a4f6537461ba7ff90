@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dc3df4f1_0c3434e3",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 5336,
+      "author": {
+        "id": 1131623
+      },
+      "writtenOn": "2017-07-20T17:50:26Z",
+      "side": 1,
+      "message": "an extra space",
+      "range": {
+        "startLine": 5336,
+        "startChar": 3,
+        "endLine": 5336,
+        "endChar": 4
+      },
+      "revId": "f53b5f9680e951c984ff117a4f6537461ba7ff90",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "105069ea_51435565",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 5351,
+      "author": {
+        "id": 1131623
+      },
+      "writtenOn": "2017-07-20T17:50:26Z",
+      "side": 1,
+      "message": "same as line 5336",
+      "range": {
+        "startLine": 5351,
+        "startChar": 3,
+        "endLine": 5351,
+        "endChar": 4
+      },
+      "revId": "f53b5f9680e951c984ff117a4f6537461ba7ff90",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
