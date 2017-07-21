@@ -2899,7 +2899,7 @@ int radio::getIccCardStatusResponse(int slotId,
     if (radioService[slotId]->mRadioResponse != NULL) {
         RadioResponseInfo responseInfo = {};
         populateResponseInfo(responseInfo, serial, responseType, e);
-        CardStatus cardStatus = {};
+        CardStatus cardStatus = {CardState::ABSENT, PinState::UNKNOWN, -1, -1, -1, {}};
         RIL_CardStatus_v6 *p_cur = ((RIL_CardStatus_v6 *) response);
         if (response == NULL || responseLen != sizeof(RIL_CardStatus_v6)
                 || p_cur->gsm_umts_subscription_app_index >= p_cur->num_applications
