@@ -35,8 +35,6 @@
 #include <sys/types.h>
 #include <libril/ril_ex.h>
 
-#include <private/android_filesystem_config.h>
-
 #define LIB_PATH_PROPERTY   "rild.libpath"
 #define LIB_ARGS_PROPERTY   "rild.libargs"
 #define MAX_LIB_ARGS        16
