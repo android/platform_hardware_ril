@@ -1,0 +1,9 @@
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Sanket Padawe <sanketpadawe@google.com>
+Code-Review+1: Yuexi Ma <yuexima@google.com>
+Verified+1: Sanket Padawe <sanketpadawe@google.com>
+Submitted-by: Sanket Padawe <sanketpadawe@google.com>
+Submitted-at: Thu, 27 Jul 2017 17:21:57 +0000
+Reviewed-on: https://android-review.googlesource.com/435955
+Project: platform/hardware/ril
+Branch: refs/heads/master
