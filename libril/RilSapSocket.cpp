@@ -110,7 +110,7 @@ RilSapSocket *RilSapSocket::getSocketById(RIL_SOCKET_ID socketId) {
 }
 
 void RilSapSocket::initSapSocket(const char *socketName,
-        RIL_RadioFunctions *uimFuncs) {
+        const RIL_RadioFunctions *uimFuncs) {
 
     if (strcmp(socketName, RIL1_SERVICE_NAME) == 0) {
         if(!SocketExists(socketName)) {
@@ -144,7 +144,7 @@ void RilSapSocket::initSapSocket(const char *socketName,
 }
 
 void RilSapSocket::addSocketToList(const char *socketName, RIL_SOCKET_ID socketid,
-        RIL_RadioFunctions *uimFuncs) {
+        const RIL_RadioFunctions *uimFuncs) {
     RilSapSocket* socket = NULL;
     RilSapSocketList *current;
 
@@ -189,7 +189,7 @@ bool RilSapSocket::SocketExists(const char *socketName) {
 
 RilSapSocket::RilSapSocket(const char *socketName,
         RIL_SOCKET_ID socketId,
-        RIL_RadioFunctions *inputUimFuncs):
+        const RIL_RadioFunctions *inputUimFuncs):
         RilSocket(socketName, socketId) {
     if (inputUimFuncs) {
         uimFuncs = inputUimFuncs;

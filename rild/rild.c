@@ -53,7 +53,7 @@ extern char ril_service_name[MAX_SERVICE_NAME_LENGTH];
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
 extern void rilc_thread_pool ();
 
-extern void RIL_register_socket (RIL_RadioFunctions *(*rilUimInit)
+extern void RIL_register_socket (const RIL_RadioFunctions *(*rilUimInit)
         (const struct RIL_Env *, int, char **), RIL_SOCKET_TYPE socketType, int argc, char **argv);
 
 extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
 
     dlerror(); // Clear any previous dlerror
     rilUimInit =
-        (RIL_RadioFunctions *(*)(const struct RIL_Env *, int, char **))
+        (const RIL_RadioFunctions *(*)(const struct RIL_Env *, int, char **))
         dlsym(dlHandle, "RIL_SAP_Init");
     err_str = dlerror();
     if (err_str) {

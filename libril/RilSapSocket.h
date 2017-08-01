@@ -55,7 +55,7 @@ class RilSapSocket : public RilSocket {
      * Place holder for the radio functions returned by the initialization
      * function. Currenty only onRequest handler is being used.
      */
-    RIL_RadioFunctions* uimFuncs;
+    const RIL_RadioFunctions* uimFuncs;
 
     /**
      * Wrapper struct for handling the requests in the queue.
@@ -85,7 +85,7 @@ class RilSapSocket : public RilSocket {
          * @param Radio functions to be used by the socket.
          */
         static void initSapSocket(const char *socketName,
-        RIL_RadioFunctions *uimFuncs);
+        const RIL_RadioFunctions *uimFuncs);
 
         /**
          * Ril envoronment variable that holds the request and
@@ -153,7 +153,7 @@ class RilSapSocket : public RilSocket {
          * and add socket to the socket list.
          */
         static void addSocketToList(const char *socketName, RIL_SOCKET_ID socketid,
-        RIL_RadioFunctions *uimFuncs);
+        const RIL_RadioFunctions *uimFuncs);
 
         /**
          * Check if a socket of the given name exists in the socket list.
@@ -173,7 +173,7 @@ class RilSapSocket : public RilSocket {
          */
         RilSapSocket(const char *socketName,
         RIL_SOCKET_ID socketId,
-        RIL_RadioFunctions *inputUimFuncs);
+        const RIL_RadioFunctions *inputUimFuncs);
 
         /**
          * Class method that selects the socket on which the onRequestComplete
