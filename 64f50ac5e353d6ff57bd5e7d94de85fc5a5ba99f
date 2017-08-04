@@ -1,0 +1,8 @@
+Verified+1: Steven Moreland <smoreland@google.com>
+Presubmit-Verified-1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Amit Mahajan <amitmahajan@google.com>
+Submitted-by: Steven Moreland <smoreland@google.com>
+Submitted-at: Fri, 04 Aug 2017 19:14:47 +0000
+Reviewed-on: https://android-review.googlesource.com/451362
+Project: platform/hardware/ril
+Branch: refs/heads/master
