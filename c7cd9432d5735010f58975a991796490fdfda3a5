@@ -1,0 +1,11 @@
+Verified+1: Steven Moreland <smoreland@google.com>
+Verified+1: Yifan Hong <elsk@google.com>
+Autosubmit+1: Steven Moreland <smoreland@google.com>
+Autosubmit+1: Yifan Hong <elsk@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Elliott Hughes <enh@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Wed, 06 Sep 2017 18:50:55 +0000
+Reviewed-on: https://android-review.googlesource.com/443451
+Project: platform/hardware/ril
+Branch: refs/heads/master
