@@ -1,0 +1,9 @@
+Code-Review+2: Jack Yu <jackyu@google.com>
+Verified+1: Pengquan Meng <mpq@google.com>
+Autosubmit+1: Pengquan Meng <mpq@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Thu, 07 Sep 2017 01:54:37 +0000
+Reviewed-on: https://android-review.googlesource.com/477425
+Project: platform/hardware/ril
+Branch: refs/heads/master
