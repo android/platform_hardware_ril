@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d9a32ef_1ff2b2f1",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-09-25T23:14:42Z",
+      "side": 1,
+      "message": "If len \u003d 0 we don\u0027t want to call strncpy(dest, src, 1)",
+      "range": {
+        "startLine": 489,
+        "startChar": 19,
+        "endLine": 489,
+        "endChar": 22
+      },
+      "revId": "b26c34c31666b7c3fef8f60b4e25a971ef1b5471",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
