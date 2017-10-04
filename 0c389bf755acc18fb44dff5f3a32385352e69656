@@ -1,0 +1,11 @@
+Code-Review+1: Lorenzo Colitti <lorenzo@google.com>
+Code-Review+2: Bo Hu <bohu@google.com>
+Code-Review+2: Jack Yu <jackyu@google.com>
+Verified+1: Bo Hu <bohu@google.com>
+Autosubmit+1: Bo Hu <bohu@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Wed, 04 Oct 2017 20:28:51 +0000
+Reviewed-on: https://android-review.googlesource.com/501847
+Project: platform/hardware/ril
+Branch: refs/heads/master
