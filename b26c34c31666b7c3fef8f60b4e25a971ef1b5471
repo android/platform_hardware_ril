@@ -22,6 +22,30 @@
       "revId": "b26c34c31666b7c3fef8f60b4e25a971ef1b5471",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "000dff3e_abd0b41f",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1153084
+      },
+      "writtenOn": "2017-10-05T10:32:24Z",
+      "side": 1,
+      "message": "Yes, will make required changes to do not call this when len \u003d 0.",
+      "parentUuid": "3d9a32ef_1ff2b2f1",
+      "range": {
+        "startLine": 489,
+        "startChar": 19,
+        "endLine": 489,
+        "endChar": 22
+      },
+      "revId": "b26c34c31666b7c3fef8f60b4e25a971ef1b5471",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
