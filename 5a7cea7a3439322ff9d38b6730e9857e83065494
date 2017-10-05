@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e9da4ecf_f983374a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-05T19:37:25Z",
+      "side": 1,
+      "message": "why do we want to even allocate *dest when len \u003d\u003d0 if we\u0027re not going to strncpy anything into it?",
+      "range": {
+        "startLine": 490,
+        "startChar": 17,
+        "endLine": 490,
+        "endChar": 21
+      },
+      "revId": "5a7cea7a3439322ff9d38b6730e9857e83065494",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
