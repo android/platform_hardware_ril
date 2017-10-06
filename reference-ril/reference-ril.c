@@ -1168,11 +1168,6 @@ static void requestCdmaSubscription(int request __unused, void *data __unused,
     responseStr[3] = "8587777777"; // MIN
     responseStr[4] = "1"; // PRL Version
     RIL_onRequestComplete(t, RIL_E_SUCCESS, responseStr, count*sizeof(char*));
-
-    return;
-error:
-    RLOGE("requestRegistrationState must never return an error when radio is on");
-    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
 }
 
 static void requestCdmaGetRoamingPreference(int request __unused, void *data __unused,
@@ -2105,6 +2100,47 @@ static void requestGetHardwareConfig(void *data, size_t datalen, RIL_Token t)
    RIL_onRequestComplete(t, RIL_E_SUCCESS, &hwCfg, sizeof(hwCfg));
 }
 
+static void requestGetTtyMode(void *data, size_t datalen, RIL_Token t)
+{
+   int  ttyModeResponse;
+
+   RIL_UNUSED_PARM(data);
+   RIL_UNUSED_PARM(datalen);
+
+   ttyModeResponse = (getSIMStatus() == SIM_READY) ? 1  // TTY Full
+                                                   : 0; // TTY Off
+
+   RIL_onRequestComplete(t, RIL_E_SUCCESS, &ttyModeResponse, sizeof(ttyModeResponse));
+}
+
+static void requestGetRadioCapability(void *data, size_t datalen, RIL_Token t)
+{
+   RIL_RadioCapability radioCapability;
+
+   RIL_UNUSED_PARM(data);
+   RIL_UNUSED_PARM(datalen);
+
+   radioCapability.version = RIL_RADIO_CAPABILITY_VERSION;
+   radioCapability.session = 0;
+   radioCapability.phase   = 0;
+   radioCapability.rat     = 0;
+   radioCapability.logicalModemUuid[0] = '\0';
+   radioCapability.status  = RC_STATUS_SUCCESS;
+
+   RIL_onRequestComplete(t, RIL_E_SUCCESS, &radioCapability, sizeof(radioCapability));
+}
+
+static void requestGetMute(void *data, size_t datalen, RIL_Token t)
+{
+   int  muteResponse;
+
+   RIL_UNUSED_PARM(data);
+   RIL_UNUSED_PARM(datalen);
+
+   muteResponse = 0; // Mute disabled
+
+   RIL_onRequestComplete(t, RIL_E_SUCCESS, &muteResponse, sizeof(muteResponse));
+}
 
 /*** Callback methods from the RIL library to us ***/
 
@@ -2141,12 +2177,47 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
     /* Ignore all non-power requests when RADIO_STATE_OFF
      * (except RIL_REQUEST_GET_SIM_STATUS)
      */
-    if (sState == RADIO_STATE_OFF
-        && !(request == RIL_REQUEST_RADIO_POWER
-            || request == RIL_REQUEST_GET_SIM_STATUS)
-    ) {
-        RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
-        return;
+    if (sState == RADIO_STATE_OFF) {
+        switch(request) {
+            case RIL_REQUEST_BASEBAND_VERSION:
+            case RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE:
+            case RIL_REQUEST_CDMA_QUERY_PREFERRED_VOICE_PRIVACY_MODE:
+            case RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE:
+            case RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE:
+            case RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE:
+            case RIL_REQUEST_CDMA_SUBSCRIPTION:
+            case RIL_REQUEST_DEVICE_IDENTITY:
+            case RIL_REQUEST_EXIT_EMERGENCY_CALLBACK_MODE:
+            case RIL_REQUEST_GET_ACTIVITY_INFO:
+            case RIL_REQUEST_GET_CARRIER_RESTRICTIONS:
+            case RIL_REQUEST_GET_CURRENT_CALLS:
+            case RIL_REQUEST_GET_IMEI:
+            case RIL_REQUEST_GET_MUTE:
+            case RIL_REQUEST_GET_NEIGHBORING_CELL_IDS:
+            case RIL_REQUEST_GET_PREFERRED_NETWORK_TYPE:
+            case RIL_REQUEST_GET_RADIO_CAPABILITY:
+            case RIL_REQUEST_GET_SIM_STATUS:
+            case RIL_REQUEST_NV_RESET_CONFIG:
+            case RIL_REQUEST_QUERY_AVAILABLE_BAND_MODE:
+            case RIL_REQUEST_QUERY_NETWORK_SELECTION_MODE:
+            case RIL_REQUEST_QUERY_TTY_MODE:
+            case RIL_REQUEST_RADIO_POWER:
+            case RIL_REQUEST_SET_BAND_MODE:
+            case RIL_REQUEST_SET_CARRIER_RESTRICTIONS:
+            case RIL_REQUEST_SET_LOCATION_UPDATES:
+            case RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE:
+            case RIL_REQUEST_SET_TTY_MODE:
+            case RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE:
+            case RIL_REQUEST_STOP_LCE:
+            case RIL_REQUEST_VOICE_RADIO_TECH:
+                // Process all the above, even though the radio is off
+                break;
+
+            default:
+                // For all others, say NOT_AVAILABLE because the radio is off
+                RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+                return;
+        }
     }
 
     switch (request) {
@@ -2470,34 +2541,52 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             requestShutdown(t);
             break;
 
-        /* CDMA Specific Requests */
+        case RIL_REQUEST_QUERY_TTY_MODE:
+            requestGetTtyMode(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_GET_RADIO_CAPABILITY:
+            requestGetRadioCapability(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_GET_MUTE:
+            requestGetMute(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_SET_INITIAL_ATTACH_APN:
+        case RIL_REQUEST_ALLOW_DATA:
+        case RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION:
+        case RIL_REQUEST_SET_CLIR:
+        case RIL_REQUEST_SET_SUPP_SVC_NOTIFICATION:
+        case RIL_REQUEST_SET_BAND_MODE:
+        case RIL_REQUEST_QUERY_AVAILABLE_BAND_MODE:
+        case RIL_REQUEST_GET_NEIGHBORING_CELL_IDS:
+        case RIL_REQUEST_SET_LOCATION_UPDATES:
+        case RIL_REQUEST_SET_TTY_MODE:
+        case RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE:
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            break;
+
         case RIL_REQUEST_BASEBAND_VERSION:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaBaseBandVersion(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            requestCdmaBaseBandVersion(request, data, datalen, t);
+            break;
 
         case RIL_REQUEST_DEVICE_IDENTITY:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaDeviceIdentity(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            requestCdmaDeviceIdentity(request, data, datalen, t);
+            break;
 
         case RIL_REQUEST_CDMA_SUBSCRIPTION:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaSubscription(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            requestCdmaSubscription(request, data, datalen, t);
+            break;
 
+        case RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE:
+            requestCdmaGetSubscriptionSource(request, data, datalen, t);
+            break;
+
+        /* CDMA Specific Requests */
         case RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE:
             if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
                 requestCdmaSetSubscriptionSource(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
-
-        case RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaGetSubscriptionSource(request, data, datalen, t);
                 break;
             } // Fall-through if tech is not cdma
 
@@ -2518,6 +2607,11 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
                 requestExitEmergencyMode(data, datalen, t);
                 break;
             } // Fall-through if tech is not cdma
+
+            // Fall-through to here when the request is specific to CDMA, but
+            // our tech is not CDMA. VTS tests expect us to silently do nothing.
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            break;
 
         default:
             RLOGD("Request not supported. Tech: %d",TECH(sMdmInfo));
@@ -2716,11 +2810,6 @@ getSIMStatus()
     char *cpinResult;
 
     RLOGD("getSIMStatus(). sState: %d",sState);
-    if (sState == RADIO_STATE_OFF || sState == RADIO_STATE_UNAVAILABLE) {
-        ret = SIM_NOT_READY;
-        goto done;
-    }
-
     err = at_send_command_singleline("AT+CPIN?", "+CPIN:", &p_response);
 
     if (err != 0) {
@@ -2776,7 +2865,7 @@ getSIMStatus()
     p_response = NULL;
     cpinResult = NULL;
 
-    ret = SIM_READY;
+    ret = (sState == RADIO_STATE_ON) ? SIM_READY : SIM_NOT_READY;
 
 done:
     at_response_free(p_response);
