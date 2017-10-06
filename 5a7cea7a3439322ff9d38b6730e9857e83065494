@@ -22,6 +22,30 @@
       "revId": "5a7cea7a3439322ff9d38b6730e9857e83065494",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f2f0e1f1_de963777",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1019829
+      },
+      "writtenOn": "2017-10-06T16:48:36Z",
+      "side": 1,
+      "message": "We want to send empty string(\"\") to RIL hence allocating one byte which contains one byte \u0027\\0\u0027 of data.\n\n\n\nJust to clarify, below is the requirement:\nCurrently in ril.h interface, there is no way to get the number of remaining attempts during device power-up hence we are defining this approach of sending empty PIN value(\"\") to vendor RIL as part of RIL_REQUEST_ENTER_SIM_PIN, vendor RIL would treat as a special case and sends remaining attempts without attempting to UNLOCK the PIN.",
+      "parentUuid": "e9da4ecf_f983374a",
+      "range": {
+        "startLine": 490,
+        "startChar": 17,
+        "endLine": 490,
+        "endChar": 21
+      },
+      "revId": "5a7cea7a3439322ff9d38b6730e9857e83065494",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
