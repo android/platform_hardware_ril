@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f3311089_a3e4980a",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "I think version 15 was for O",
+      "range": {
+        "startLine": 82,
+        "startChar": 22,
+        "endLine": 82,
+        "endChar": 47
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e37e0180_0061eb26",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 5598,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "Please include a description of what this is and what it is used for.",
+      "range": {
+        "startLine": 5598,
+        "startChar": 13,
+        "endLine": 5598,
+        "endChar": 16
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "04643361_0f8c5ef3",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 5611,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "nit: indent and remove line skip",
+      "range": {
+        "startLine": 5605,
+        "startChar": 1,
+        "endLine": 5611,
+        "endChar": 12
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "78b9d7ea_e1a892cb",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2071,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "#if VDBG, #endif",
+      "range": {
+        "startLine": 2071,
+        "startChar": 0,
+        "endLine": 2071,
+        "endChar": 4
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e9aeb44_5c47bb59",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 2071,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "remove for consistency",
+      "range": {
+        "startLine": 2071,
+        "startChar": 11,
+        "endLine": 2071,
+        "endChar": 22
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c16eba9f_b0fd90f2",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 3201,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "remove for consistency",
+      "range": {
+        "startLine": 3201,
+        "startChar": 11,
+        "endLine": 3201,
+        "endChar": 18
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "74f17eb9_63f45369",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 3217,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 3217,
+        "startChar": 15,
+        "endLine": 3217,
+        "endChar": 22
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fe2c0c8_9a28eff0",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 3218,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-09T23:11:39Z",
+      "side": 1,
+      "message": "join lines?",
+      "range": {
+        "startLine": 3218,
+        "startChar": 16,
+        "endLine": 3218,
+        "endChar": 22
+      },
+      "revId": "663d5f8b83337592562bafdd80a3c7164eecbb57",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
