@@ -117,6 +117,30 @@
       "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69fbae0d_b4c59c02",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1350,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-10-11T17:48:04Z",
+      "side": 1,
+      "message": "We already have code to support 1.0 in 1.1. Which is why I thought it will be necessary as long as we decide to code libril_service.cpp. Ideally we should stop implementation at hidl. But now that we have implemented 1.0 and 1.1 with 1.0 backward compatibility, does it make sense to do 1.2 only?",
+      "parentUuid": "acda9c8d_1d02a5f1",
+      "range": {
+        "startLine": 1350,
+        "startChar": 4,
+        "endLine": 1350,
+        "endChar": 30
+      },
+      "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
