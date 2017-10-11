@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0f61190_887c080c",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-11T21:28:45Z",
+      "side": 1,
+      "message": "nit NULL",
+      "range": {
+        "startLine": 405,
+        "startChar": 35,
+        "endLine": 405,
+        "endChar": 39
+      },
+      "revId": "a7aa7b97f365aaded0c55d2b77990abcb3f90e71",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b13d9daf_dcac9000",
+        "filename": "libril/ril.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2423,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-11T21:28:45Z",
+      "side": 1,
+      "message": "replace with ,",
+      "range": {
+        "startLine": 2423,
+        "startChar": 48,
+        "endLine": 2423,
+        "endChar": 49
+      },
+      "revId": "a7aa7b97f365aaded0c55d2b77990abcb3f90e71",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
