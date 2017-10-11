@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "c6d7b70a_063a99ca",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2194,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-10-11T17:38:07Z",
+      "side": 1,
+      "message": "I didn\u0027t think it would be necessary flatten out every memory in this interface (in this case mccmnc), as you can we have many pointers in RIL interface. But specific to the list size I felt it is necessary to inform the caller about restriction as he should not assume if he can send as many as he wants.",
+      "parentUuid": "8a091e37_0d48d1da",
+      "range": {
+        "startLine": 2194,
+        "startChar": 14,
+        "endLine": 2194,
+        "endChar": 44
+      },
+      "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8f63fc9b_6ea7646e",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-10-11T17:27:36Z",
       "side": 1,
       "message": "Robert made a really good point. RIL is no longer the public interface. It\u0027s quasi-vendor code, so we only need to support what\u0027s current. No backwards compatibility required in P. Given that simplifying assumption, can we just collapse this bad boy in to a single function?",
+      "range": {
+        "startLine": 1350,
+        "startChar": 4,
+        "endLine": 1350,
+        "endChar": 30
+      },
+      "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ecd217b0_dbf7d74f",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1350,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2017-10-11T17:38:07Z",
+      "side": 1,
+      "message": "I am still trying to figure out why supporting 1.1 is bad. Is the only concern about more code?",
+      "parentUuid": "8f63fc9b_6ea7646e",
       "range": {
         "startLine": 1350,
         "startChar": 4,
