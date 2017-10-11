@@ -93,6 +93,30 @@
       "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "acda9c8d_1d02a5f1",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1350,
+      "author": {
+        "id": 1060151
+      },
+      "writtenOn": "2017-10-11T17:41:18Z",
+      "side": 1,
+      "message": "More code and more complexity are both costs. Unless they have a benefit (which in this case, the assertion is they don\u0027t), we shouldn\u0027t incur those costs.",
+      "parentUuid": "ecd217b0_dbf7d74f",
+      "range": {
+        "startLine": 1350,
+        "startChar": 4,
+        "endLine": 1350,
+        "endChar": 30
+      },
+      "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
