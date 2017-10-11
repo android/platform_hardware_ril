@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a091e37_0d48d1da",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2194,
+      "author": {
+        "id": 1060151
+      },
+      "writtenOn": "2017-10-11T17:27:36Z",
+      "side": 1,
+      "message": "Continuing the discussion about the array-of-max-length on which Robert commented...\n\nThere is already an array of RIL_RadioAccessSpecifier that likewise has a max-length. If we need to change this one, then I think we should change them both; however, I personally like anything that flattens the memory, which this does with no practical drawback.\n\nIf anything, in the future I\u0027d like to move further in the direction of flattening and start making elements like this a \u0027const char[MAX_MCC_MNC_LIST_SIZE][6]\u0027 which is more than sufficient.\n\n\ntl;dr, I\u0027m not in favor of char**",
+      "range": {
+        "startLine": 2194,
+        "startChar": 14,
+        "endLine": 2194,
+        "endChar": 44
+      },
+      "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8f63fc9b_6ea7646e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1350,
+      "author": {
+        "id": 1060151
+      },
+      "writtenOn": "2017-10-11T17:27:36Z",
+      "side": 1,
+      "message": "Robert made a really good point. RIL is no longer the public interface. It\u0027s quasi-vendor code, so we only need to support what\u0027s current. No backwards compatibility required in P. Given that simplifying assumption, can we just collapse this bad boy in to a single function?",
+      "range": {
+        "startLine": 1350,
+        "startChar": 4,
+        "endLine": 1350,
+        "endChar": 30
+      },
+      "revId": "5e536937f6244eda65511a4e82b570802c5bfba1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
