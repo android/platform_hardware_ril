@@ -134,6 +134,30 @@
       "revId": "5a7cea7a3439322ff9d38b6730e9857e83065494",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4b39c44c_ab922a54",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 793,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-12T23:43:12Z",
+      "side": 1,
+      "message": "Oops, ignore that. Just call dispatchStrings with the extra bool allowEmpty\u003dtrue",
+      "parentUuid": "590b58f4_38a28405",
+      "range": {
+        "startLine": 792,
+        "startChar": 0,
+        "endLine": 793,
+        "endChar": 53
+      },
+      "revId": "5a7cea7a3439322ff9d38b6730e9857e83065494",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
