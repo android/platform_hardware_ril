@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5471eb3e_7a22ed64",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2032,
+      "author": {
+        "id": 1081638
+      },
+      "writtenOn": "2017-10-17T18:23:44Z",
+      "side": 1,
+      "message": "Okay with the change but we want to be consistent in the entire file.\n\nFor example, here we have special handling for setInitialAttachApn. Please scan the entire file for all use cases of copyHidlStringToRil and make sure we use the new function.",
+      "range": {
+        "startLine": 2019,
+        "startChar": 0,
+        "endLine": 2032,
+        "endChar": 9
+      },
+      "revId": "fedd23b8374b05a33dcf25cf40646c3eec1074ec",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
