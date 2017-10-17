@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "1e4a6e02_f9edce10",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-17T23:35:00Z",
+      "side": 1,
+      "message": "I think this will need to be made into a new struct for compatibility:\n\ntypedef struct {\n   // same fields as RIL_Call\n   const char * codec; \n} RIL_Call_v16;\n\nIn this patch set RIL_VERSION is defined as 12 but I believe it will go up to 15 if you rebase.",
+      "range": {
+        "startLine": 390,
+        "startChar": 0,
+        "endLine": 406,
+        "endChar": 11
+      },
+      "revId": "a7aa7b97f365aaded0c55d2b77990abcb3f90e71",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b13d9daf_dcac9000",
         "filename": "libril/ril.cpp",
         "patchSetId": 2
