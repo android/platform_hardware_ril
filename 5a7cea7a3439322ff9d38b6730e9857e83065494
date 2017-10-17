@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "86f242c9_d3f9ffb4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1019829
+      },
+      "writtenOn": "2017-10-17T12:21:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25387165_ee5421f5",
+      "revId": "5a7cea7a3439322ff9d38b6730e9857e83065494",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e9da4ecf_f983374a",
         "filename": "libril/ril_service.cpp",
         "patchSetId": 2
@@ -102,6 +120,30 @@
       "side": 1,
       "message": "Actually I\u0027m not sure this belongs in the copy function. Seems like a copy function shouldn\u0027t need to encode a special case for certain requests. Instead can we modify the functions supplyIccPinForApp, supplyIccPukForApp, supplyIccPin2ForApp, supplyIccPuk2ForApp to call a new function,\n\nbool dispatchStrings(int serial, int slotId, int request, bool allowEmpty, \n        int countStrings, ...) {\n    // ...\n        if (!copyHidlStringToRil(\u0026pStrings[i], str, pRI, allowEmpty)) {\n    // ...\n}\n\nand define:\n\nbool copyHidlStringToRil(char **dest, const hidl_string \u0026src, \n        RequestInfo *pRI, boolean allowEmpty) {\n    // instead of *dest \u003d NULL we set *dest \u003d \u0027\\0\u0027 as suggested above\n}",
       "parentUuid": "021a3cdf_12fc5479",
+      "range": {
+        "startLine": 490,
+        "startChar": 17,
+        "endLine": 490,
+        "endChar": 21
+      },
+      "revId": "5a7cea7a3439322ff9d38b6730e9857e83065494",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ceb1225_9ddb5a8a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1019829
+      },
+      "writtenOn": "2017-10-17T12:21:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ea96c0_04f8f608",
       "range": {
         "startLine": 490,
         "startChar": 17,
