@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "4ae9dc75_df5dbaef",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1121198
+      },
+      "writtenOn": "2017-10-18T22:59:28Z",
+      "side": 1,
+      "message": "Oops, let me clarify this comment. WIth Project Treble this file will be frozen at the current version. That means for your change you should modify version 1.2 of types.hal.\n\nYou can do this by adding the struct Call (found in hardware/interfaces/radio/1.0/types.hal, line 1204) to version 1.2. (hardware/interfaces/radio/1.2/types.hal) with the added field \"codec.\"\n\nIn vendor code separated by the HAL you can create a RIL_Call_v16 like you have here, but that does not belong in AOSP.",
+      "parentUuid": "1e4a6e02_f9edce10",
+      "range": {
+        "startLine": 390,
+        "startChar": 0,
+        "endLine": 406,
+        "endChar": 11
+      },
+      "revId": "a7aa7b97f365aaded0c55d2b77990abcb3f90e71",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b13d9daf_dcac9000",
         "filename": "libril/ril.cpp",
         "patchSetId": 2
