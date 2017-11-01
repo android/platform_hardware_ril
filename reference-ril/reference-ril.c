@@ -17,7 +17,6 @@
 
 #include <telephony/ril_cdma_sms.h>
 #include <telephony/librilutils.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -26,6 +25,7 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <inttypes.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <alloca.h>
@@ -35,9 +35,9 @@
 #include <getopt.h>
 #include <sys/socket.h>
 #include <cutils/sockets.h>
-#include <termios.h>
 #include <sys/system_properties.h>
-#include <system/qemu_pipe.h>
+#include <termios.h>
+#include <qemu_pipe.h>
 
 #include "ril.h"
 
@@ -240,15 +240,6 @@ static int s_repollCallsCount = 0;
 static int s_expectAnswer = 0;
 #endif /* WORKAROUND_ERRONEOUS_ANSWER */
 
-// Returns true iff running this process in an emulator VM
-static bool isInEmulator(void) {
-    static int inQemu = -1;
-    if (inQemu < 0) {
-        char propValue[PROP_VALUE_MAX];
-        inQemu = (__system_property_get("ro.kernel.qemu", propValue) != 0);
-    }
-    return inQemu == 1;
-}
 
 static int s_cell_info_rate_ms = INT_MAX;
 static int s_mcc = 0;
@@ -340,6 +331,22 @@ error:
     return -1;
 }
 
+static int parseSimResponseLine(char* line, RIL_SIM_IO_Response* response) {
+    int err;
+
+    err = at_tok_start(&line);
+    if (err < 0) return err;
+    err = at_tok_nextint(&line, &response->sw1);
+    if (err < 0) return err;
+    err = at_tok_nextint(&line, &response->sw2);
+    if (err < 0) return err;
+
+    if (at_tok_hasmore(&line)) {
+        err = at_tok_nextstr(&line, &response->simResponse);
+        if (err < 0) return err;
+    }
+    return 0;
+}
 
 /** do post-AT+CFUN=1 initialization */
 static void onRadioPowerOn()
@@ -543,23 +550,27 @@ static void requestOrSendDataCallList(RIL_Token *t)
         err = at_tok_nextstr(&line, &out);
         if (err < 0)
             goto error;
-        responses[i].type = alloca(strlen(out) + 1);
-        strcpy(responses[i].type, out);
+
+        int type_size = strlen(out) + 1;
+        responses[i].type = alloca(type_size);
+        strlcpy(responses[i].type, out, type_size);
 
         // APN ignored for v5
         err = at_tok_nextstr(&line, &out);
         if (err < 0)
             goto error;
 
-        responses[i].ifname = alloca(strlen(PPP_TTY_PATH) + 1);
-        strcpy(responses[i].ifname, PPP_TTY_PATH);
+        int ifname_size = strlen(PPP_TTY_PATH) + 1;
+        responses[i].ifname = alloca(ifname_size);
+        strlcpy(responses[i].ifname, PPP_TTY_PATH, ifname_size);
 
         err = at_tok_nextstr(&line, &out);
         if (err < 0)
             goto error;
 
-        responses[i].addresses = alloca(strlen(out) + 1);
-        strcpy(responses[i].addresses, out);
+        int addresses_size = strlen(out) + 1;
+        responses[i].addresses = alloca(addresses_size);
+        strlcpy(responses[i].addresses, out, addresses_size);
 
         if (isInEmulator()) {
             /* We are in the emulator - the dns servers are listed
@@ -595,8 +606,7 @@ static void requestOrSendDataCallList(RIL_Token *t)
             }
             responses[i].dnses = dnslist;
 
-            /* There is only on gateway in the emulator */
-            responses[i].gateways = "10.0.2.2";
+            responses[i].gateways = "10.0.2.15 fe80::2";
             responses[i].mtu = DEFAULT_MTU;
         }
         else {
@@ -792,9 +802,11 @@ static void requestGetCurrentCalls(void *data __unused, size_t datalen __unused,
     }
 
     return;
+#ifdef WORKAROUND_ERRONEOUS_ANSWER
 error:
     RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
     at_response_free(p_response);
+#endif
 }
 
 static void requestDial(void *data, size_t datalen __unused, RIL_Token t)
@@ -877,9 +889,13 @@ static void requestSignalStrength(void *data __unused, size_t datalen __unused, 
     ATResponse *p_response = NULL;
     int err;
     char *line;
-    int count =0;
-    int numofElements=sizeof(RIL_SignalStrength_v6)/sizeof(int);
-    int response[numofElements];
+    int count = 0;
+    // Accept a response that is at least v6, and up to v10
+    int minNumOfElements=sizeof(RIL_SignalStrength_v6)/sizeof(int);
+    int maxNumOfElements=sizeof(RIL_SignalStrength_v10)/sizeof(int);
+    int response[maxNumOfElements];
+
+    memset(response, 0, sizeof(response));
 
     err = at_send_command_singleline("AT+CSQ", "+CSQ:", &p_response);
 
@@ -893,9 +909,9 @@ static void requestSignalStrength(void *data __unused, size_t datalen __unused, 
     err = at_tok_start(&line);
     if (err < 0) goto error;
 
-    for (count =0; count < numofElements; count ++) {
+    for (count = 0; count < maxNumOfElements; count++) {
         err = at_tok_nextint(&line, &(response[count]));
-        if (err < 0) goto error;
+        if (err < 0 && count < minNumOfElements) goto error;
     }
 
     RIL_onRequestComplete(t, RIL_E_SUCCESS, response, sizeof(response));
@@ -1064,12 +1080,6 @@ static void requestCdmaDeviceIdentity(int request __unused, void *data __unused,
 
     RIL_onRequestComplete(t, RIL_E_SUCCESS, responseStr, count*sizeof(char*));
     at_response_free(p_response);
-
-    return;
-error:
-    RLOGE("requestCdmaDeviceIdentity must never return an error when radio is on");
-    at_response_free(p_response);
-    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
 }
 
 static void requestCdmaGetSubscriptionSource(int request __unused, void *data,
@@ -1158,11 +1168,6 @@ static void requestCdmaSubscription(int request __unused, void *data __unused,
     responseStr[3] = "8587777777"; // MIN
     responseStr[4] = "1"; // PRL Version
     RIL_onRequestComplete(t, RIL_E_SUCCESS, responseStr, count*sizeof(char*));
-
-    return;
-error:
-    RLOGE("requestRegistrationState must never return an error when radio is on");
-    RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
 }
 
 static void requestCdmaGetRoamingPreference(int request __unused, void *data __unused,
@@ -1653,6 +1658,119 @@ error2:
     RIL_onRequestComplete(t, RIL_E_SMS_SEND_FAIL_RETRY, &response, sizeof(response));
 }
 
+static void requestSimOpenChannel(void *data, size_t datalen, RIL_Token t)
+{
+    ATResponse *p_response = NULL;
+    int32_t session_id;
+    int err;
+    char cmd[32];
+    char dummy;
+    char *line;
+
+    // Max length is 16 bytes according to 3GPP spec 27.007 section 8.45
+    if (data == NULL || datalen == 0 || datalen > 16) {
+        ALOGE("Invalid data passed to requestSimOpenChannel");
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+        return;
+    }
+
+    snprintf(cmd, sizeof(cmd), "AT+CCHO=%s", data);
+
+    err = at_send_command_numeric(cmd, &p_response);
+    if (err < 0 || p_response == NULL || p_response->success == 0) {
+        ALOGE("Error %d opening logical channel: %d",
+              err, p_response ? p_response->success : 0);
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+        at_response_free(p_response);
+        return;
+    }
+
+    // Ensure integer only by scanning for an extra char but expect one result
+    line = p_response->p_intermediates->line;
+    if (sscanf(line, "%" SCNd32 "%c", &session_id, &dummy) != 1) {
+        ALOGE("Invalid AT response, expected integer, was '%s'", line);
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+        return;
+    }
+
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, &session_id, sizeof(&session_id));
+    at_response_free(p_response);
+}
+
+static void requestSimCloseChannel(void *data, size_t datalen, RIL_Token t)
+{
+    ATResponse *p_response = NULL;
+    int32_t session_id;
+    int err;
+    char cmd[32];
+
+    if (data == NULL || datalen != sizeof(session_id)) {
+        ALOGE("Invalid data passed to requestSimCloseChannel");
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+        return;
+    }
+    session_id = ((int32_t *)data)[0];
+    snprintf(cmd, sizeof(cmd), "AT+CCHC=%" PRId32, session_id);
+    err = at_send_command_singleline(cmd, "+CCHC", &p_response);
+
+    if (err < 0 || p_response == NULL || p_response->success == 0) {
+        ALOGE("Error %d closing logical channel %d: %d",
+              err, session_id, p_response ? p_response->success : 0);
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+        at_response_free(p_response);
+        return;
+    }
+
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+
+    at_response_free(p_response);
+}
+
+static void requestSimTransmitApduChannel(void *data,
+                                          size_t datalen,
+                                          RIL_Token t)
+{
+    ATResponse *p_response = NULL;
+    int err;
+    char *cmd;
+    char *line;
+    size_t cmd_size;
+    RIL_SIM_IO_Response sim_response;
+    RIL_SIM_APDU *apdu = (RIL_SIM_APDU *)data;
+
+    if (apdu == NULL || datalen != sizeof(RIL_SIM_APDU)) {
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+        return;
+    }
+
+    cmd_size = 10 + (apdu->data ? strlen(apdu->data) : 0);
+    asprintf(&cmd, "AT+CGLA=%d,%zu,%02x%02x%02x%02x%02x%s",
+             apdu->sessionid, cmd_size, apdu->cla, apdu->instruction,
+             apdu->p1, apdu->p2, apdu->p3, apdu->data ? apdu->data : "");
+
+    err = at_send_command_singleline(cmd, "+CGLA", &p_response);
+    free(cmd);
+    if (err < 0 || p_response == NULL || p_response->success == 0) {
+        ALOGE("Error %d transmitting APDU: %d",
+              err, p_response ? p_response->success : 0);
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+        at_response_free(p_response);
+        return;
+    }
+
+    line = p_response->p_intermediates->line;
+    err = parseSimResponseLine(line, &sim_response);
+
+    if (err == 0) {
+        RIL_onRequestComplete(t, RIL_E_SUCCESS,
+                              &sim_response, sizeof(sim_response));
+    } else {
+        ALOGE("Error %d parsing SIM response line: %s", err, line);
+        RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
+    }
+    at_response_free(p_response);
+}
+
 static void requestSetupDataCall(void *data, size_t datalen, RIL_Token t)
 {
     const char *apn;
@@ -1831,18 +1949,9 @@ static void  requestSIM_IO(void *data, size_t datalen __unused, RIL_Token t)
 
     line = p_response->p_intermediates->line;
 
-    err = at_tok_start(&line);
-    if (err < 0) goto error;
-
-    err = at_tok_nextint(&line, &(sr.sw1));
-    if (err < 0) goto error;
-
-    err = at_tok_nextint(&line, &(sr.sw2));
-    if (err < 0) goto error;
-
-    if (at_tok_hasmore(&line)) {
-        err = at_tok_nextstr(&line, &(sr.simResponse));
-        if (err < 0) goto error;
+    err = parseSimResponseLine(line, &sr);
+    if (err < 0) {
+        goto error;
     }
 
     RIL_onRequestComplete(t, RIL_E_SUCCESS, &sr, sizeof(sr));
@@ -1991,6 +2100,47 @@ static void requestGetHardwareConfig(void *data, size_t datalen, RIL_Token t)
    RIL_onRequestComplete(t, RIL_E_SUCCESS, &hwCfg, sizeof(hwCfg));
 }
 
+static void requestGetTtyMode(void *data, size_t datalen, RIL_Token t)
+{
+   int  ttyModeResponse;
+
+   RIL_UNUSED_PARM(data);
+   RIL_UNUSED_PARM(datalen);
+
+   ttyModeResponse = (getSIMStatus() == SIM_READY) ? 1  // TTY Full
+                                                   : 0; // TTY Off
+
+   RIL_onRequestComplete(t, RIL_E_SUCCESS, &ttyModeResponse, sizeof(ttyModeResponse));
+}
+
+static void requestGetRadioCapability(void *data, size_t datalen, RIL_Token t)
+{
+   RIL_RadioCapability radioCapability;
+
+   RIL_UNUSED_PARM(data);
+   RIL_UNUSED_PARM(datalen);
+
+   radioCapability.version = RIL_RADIO_CAPABILITY_VERSION;
+   radioCapability.session = 0;
+   radioCapability.phase   = 0;
+   radioCapability.rat     = 0;
+   radioCapability.logicalModemUuid[0] = '\0';
+   radioCapability.status  = RC_STATUS_SUCCESS;
+
+   RIL_onRequestComplete(t, RIL_E_SUCCESS, &radioCapability, sizeof(radioCapability));
+}
+
+static void requestGetMute(void *data, size_t datalen, RIL_Token t)
+{
+   int  muteResponse;
+
+   RIL_UNUSED_PARM(data);
+   RIL_UNUSED_PARM(datalen);
+
+   muteResponse = 0; // Mute disabled
+
+   RIL_onRequestComplete(t, RIL_E_SUCCESS, &muteResponse, sizeof(muteResponse));
+}
 
 /*** Callback methods from the RIL library to us ***/
 
@@ -2002,9 +2152,9 @@ static void requestGetHardwareConfig(void *data, size_t datalen, RIL_Token t)
  * RIL_onRequestComplete() may be called from any thread, before or after
  * this function returns.
  *
- * Will always be called from the same thread, so returning here implies
- * that the radio is ready to process another command (whether or not
- * the previous command has completed).
+ * Because onRequest function could be called from multiple different thread,
+ * we must ensure that the underlying at_send_command_* function
+ * is atomic.
  */
 static void
 onRequest (int request, void *data, size_t datalen, RIL_Token t)
@@ -2027,12 +2177,47 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
     /* Ignore all non-power requests when RADIO_STATE_OFF
      * (except RIL_REQUEST_GET_SIM_STATUS)
      */
-    if (sState == RADIO_STATE_OFF
-        && !(request == RIL_REQUEST_RADIO_POWER
-            || request == RIL_REQUEST_GET_SIM_STATUS)
-    ) {
-        RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
-        return;
+    if (sState == RADIO_STATE_OFF) {
+        switch(request) {
+            case RIL_REQUEST_BASEBAND_VERSION:
+            case RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE:
+            case RIL_REQUEST_CDMA_QUERY_PREFERRED_VOICE_PRIVACY_MODE:
+            case RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE:
+            case RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE:
+            case RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE:
+            case RIL_REQUEST_CDMA_SUBSCRIPTION:
+            case RIL_REQUEST_DEVICE_IDENTITY:
+            case RIL_REQUEST_EXIT_EMERGENCY_CALLBACK_MODE:
+            case RIL_REQUEST_GET_ACTIVITY_INFO:
+            case RIL_REQUEST_GET_CARRIER_RESTRICTIONS:
+            case RIL_REQUEST_GET_CURRENT_CALLS:
+            case RIL_REQUEST_GET_IMEI:
+            case RIL_REQUEST_GET_MUTE:
+            case RIL_REQUEST_GET_NEIGHBORING_CELL_IDS:
+            case RIL_REQUEST_GET_PREFERRED_NETWORK_TYPE:
+            case RIL_REQUEST_GET_RADIO_CAPABILITY:
+            case RIL_REQUEST_GET_SIM_STATUS:
+            case RIL_REQUEST_NV_RESET_CONFIG:
+            case RIL_REQUEST_QUERY_AVAILABLE_BAND_MODE:
+            case RIL_REQUEST_QUERY_NETWORK_SELECTION_MODE:
+            case RIL_REQUEST_QUERY_TTY_MODE:
+            case RIL_REQUEST_RADIO_POWER:
+            case RIL_REQUEST_SET_BAND_MODE:
+            case RIL_REQUEST_SET_CARRIER_RESTRICTIONS:
+            case RIL_REQUEST_SET_LOCATION_UPDATES:
+            case RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE:
+            case RIL_REQUEST_SET_TTY_MODE:
+            case RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE:
+            case RIL_REQUEST_STOP_LCE:
+            case RIL_REQUEST_VOICE_RADIO_TECH:
+                // Process all the above, even though the radio is off
+                break;
+
+            default:
+                // For all others, say NOT_AVAILABLE because the radio is off
+                RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+                return;
+        }
     }
 
     switch (request) {
@@ -2175,6 +2360,15 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             break;
         case RIL_REQUEST_IMS_SEND_SMS:
             requestImsSendSMS(data, datalen, t);
+            break;
+        case RIL_REQUEST_SIM_OPEN_CHANNEL:
+            requestSimOpenChannel(data, datalen, t);
+            break;
+        case RIL_REQUEST_SIM_CLOSE_CHANNEL:
+            requestSimCloseChannel(data, datalen, t);
+            break;
+        case RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL:
+            requestSimTransmitApduChannel(data, datalen, t);
             break;
         case RIL_REQUEST_SETUP_DATA_CALL:
             requestSetupDataCall(data, datalen, t);
@@ -2347,34 +2541,52 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             requestShutdown(t);
             break;
 
-        /* CDMA Specific Requests */
+        case RIL_REQUEST_QUERY_TTY_MODE:
+            requestGetTtyMode(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_GET_RADIO_CAPABILITY:
+            requestGetRadioCapability(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_GET_MUTE:
+            requestGetMute(data, datalen, t);
+            break;
+
+        case RIL_REQUEST_SET_INITIAL_ATTACH_APN:
+        case RIL_REQUEST_ALLOW_DATA:
+        case RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION:
+        case RIL_REQUEST_SET_CLIR:
+        case RIL_REQUEST_SET_SUPP_SVC_NOTIFICATION:
+        case RIL_REQUEST_SET_BAND_MODE:
+        case RIL_REQUEST_QUERY_AVAILABLE_BAND_MODE:
+        case RIL_REQUEST_GET_NEIGHBORING_CELL_IDS:
+        case RIL_REQUEST_SET_LOCATION_UPDATES:
+        case RIL_REQUEST_SET_TTY_MODE:
+        case RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE:
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            break;
+
         case RIL_REQUEST_BASEBAND_VERSION:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaBaseBandVersion(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            requestCdmaBaseBandVersion(request, data, datalen, t);
+            break;
 
         case RIL_REQUEST_DEVICE_IDENTITY:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaDeviceIdentity(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            requestCdmaDeviceIdentity(request, data, datalen, t);
+            break;
 
         case RIL_REQUEST_CDMA_SUBSCRIPTION:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaSubscription(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            requestCdmaSubscription(request, data, datalen, t);
+            break;
 
+        case RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE:
+            requestCdmaGetSubscriptionSource(request, data, datalen, t);
+            break;
+
+        /* CDMA Specific Requests */
         case RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE:
             if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
                 requestCdmaSetSubscriptionSource(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
-
-        case RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaGetSubscriptionSource(request, data, datalen, t);
                 break;
             } // Fall-through if tech is not cdma
 
@@ -2395,6 +2607,11 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
                 requestExitEmergencyMode(data, datalen, t);
                 break;
             } // Fall-through if tech is not cdma
+
+            // Fall-through to here when the request is specific to CDMA, but
+            // our tech is not CDMA. VTS tests expect us to silently do nothing.
+            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            break;
 
         default:
             RLOGD("Request not supported. Tech: %d",TECH(sMdmInfo));
@@ -2593,11 +2810,6 @@ getSIMStatus()
     char *cpinResult;
 
     RLOGD("getSIMStatus(). sState: %d",sState);
-    if (sState == RADIO_STATE_OFF || sState == RADIO_STATE_UNAVAILABLE) {
-        ret = SIM_NOT_READY;
-        goto done;
-    }
-
     err = at_send_command_singleline("AT+CPIN?", "+CPIN:", &p_response);
 
     if (err != 0) {
@@ -2653,7 +2865,7 @@ getSIMStatus()
     p_response = NULL;
     cpinResult = NULL;
 
-    ret = SIM_READY;
+    ret = (sState == RADIO_STATE_ON) ? SIM_READY : SIM_NOT_READY;
 
 done:
     at_response_free(p_response);
@@ -2722,9 +2934,9 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
     RIL_CardStatus_v6 *p_card_status = malloc(sizeof(RIL_CardStatus_v6));
     p_card_status->card_state = card_state;
     p_card_status->universal_pin_state = RIL_PINSTATE_UNKNOWN;
-    p_card_status->gsm_umts_subscription_app_index = RIL_CARD_MAX_APPS;
-    p_card_status->cdma_subscription_app_index = RIL_CARD_MAX_APPS;
-    p_card_status->ims_subscription_app_index = RIL_CARD_MAX_APPS;
+    p_card_status->gsm_umts_subscription_app_index = -1;
+    p_card_status->cdma_subscription_app_index = -1;
+    p_card_status->ims_subscription_app_index = -1;
     p_card_status->num_applications = num_apps;
 
     // Initialize application status

@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-
+#ifndef SIM_COUNT
 #if defined(ANDROID_SIM_COUNT_2)
 #define SIM_COUNT 2
 #elif defined(ANDROID_SIM_COUNT_3)
@@ -44,6 +44,7 @@ extern "C" {
 
 #ifndef ANDROID_MULTI_SIM
 #define SIM_COUNT 1
+#endif
 #endif
 
 /*
@@ -66,11 +67,29 @@ extern "C" {
  *
  * RIL_VERSION = 13 : This version includes new wakelock semantics and as the first
  *                    strongly versioned version it enforces structure use.
+ *
  * RIL_VERSION = 14 : New data structures are added, namely RIL_CarrierMatchType,
  *                    RIL_Carrier, RIL_CarrierRestrictions and RIL_PCO_Data.
  *                    New commands added: RIL_REQUEST_SET_CARRIER_RESTRICTIONS,
- *                    RIL_REQUEST_SET_CARRIER_RESTRICTIONS and
- *                    RIL_UNSOL_PCO_DATA
+ *                    RIL_REQUEST_SET_CARRIER_RESTRICTIONS and RIL_UNSOL_PCO_DATA.
+ *
+ * RIL_VERSION = 15 : New commands added:
+ *                    RIL_UNSOL_MODEM_RESTART,
+ *                    RIL_REQUEST_SEND_DEVICE_STATE,
+ *                    RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER,
+ *                    RIL_REQUEST_SET_SIM_CARD_POWER,
+ *                    RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION,
+ *                    RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
+ *                    The new parameters for RIL_REQUEST_SETUP_DATA_CALL,
+ *                    Updated data structures: RIL_DataProfileInfo_v15, RIL_InitialAttachApn_v15
+ *                    New data structure RIL_DataRegistrationStateResponse,
+ *                    RIL_VoiceRegistrationStateResponse same is
+ *                    used in RIL_REQUEST_DATA_REGISTRATION_STATE and
+ *                    RIL_REQUEST_VOICE_REGISTRATION_STATE respectively.
+ *                    New data structure RIL_OpenChannelParams.
+ *                    RIL_REQUEST_START_NETWORK_SCAN
+ *                    RIL_REQUEST_STOP_NETWORK_SCAN
+ *                    RIL_UNSOL_NETWORK_SCAN_RESULT
  */
 #define RIL_VERSION 12
 #define LAST_IMPRECISE_RIL_VERSION 12 // Better self-documented name
@@ -80,11 +99,14 @@ extern "C" {
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
 
 #define MAX_RILDS 3
-#define MAX_SOCKET_NAME_LENGTH 6
+#define MAX_SERVICE_NAME_LENGTH 6
 #define MAX_CLIENT_ID_LENGTH 2
 #define MAX_DEBUG_SOCKET_NAME_LENGTH 12
 #define MAX_QEMU_PIPE_NAME_LENGTH  11
 #define MAX_UUID_LENGTH 64
+#define MAX_BANDS 8
+#define MAX_CHANNELS 32
+#define MAX_RADIO_ACCESS_NETWORKS 8
 
 
 typedef void * RIL_Token;
@@ -143,9 +165,11 @@ typedef enum {
     RIL_E_SS_MODIFIED_TO_SS = 27,               /* SS request modified to different SS request */
     RIL_E_LCE_NOT_SUPPORTED = 36,               /* LCE service not supported(36 in RILConstants.java) */
     RIL_E_NO_MEMORY = 37,                       /* Not sufficient memory to process the request */
-    RIL_E_INTERNAL_ERR = 38,                    /* Hit unexpected vendor internal error scenario */
+    RIL_E_INTERNAL_ERR = 38,                    /* Modem hit unexpected error scenario while handling
+                                                   this request */
     RIL_E_SYSTEM_ERR = 39,                      /* Hit platform or system error */
-    RIL_E_MODEM_ERR = 40,                       /* Hit unexpected modem error */
+    RIL_E_MODEM_ERR = 40,                       /* Vendor RIL got unexpected or incorrect response
+                                                   from modem for this request */
     RIL_E_INVALID_STATE = 41,                   /* Unexpected request for the current state */
     RIL_E_NO_RESOURCES = 42,                    /* Not sufficient resource to process the request */
     RIL_E_SIM_ERR = 43,                         /* Received error from SIM card */
@@ -172,6 +196,7 @@ typedef enum {
     RIL_E_DEVICE_IN_USE = 64,                   /* Operation cannot be performed because the device
                                                    is currently in use */
     RIL_E_ABORTED = 65,                         /* Operation aborted */
+    RIL_E_INVALID_RESPONSE = 66,                /* Invalid response sent by vendor code */
     // OEM specific error codes. To be used by OEM when they don't want to reveal
     // specific error codes which would be replaced by Generic failure.
     RIL_E_OEM_ERROR_1 = 501,
@@ -333,7 +358,17 @@ typedef enum {
     PREF_NET_TYPE_LTE_GSM_WCDMA            = 9, /* LTE, GSM/WCDMA */
     PREF_NET_TYPE_LTE_CMDA_EVDO_GSM_WCDMA  = 10, /* LTE, CDMA, EvDo, GSM/WCDMA */
     PREF_NET_TYPE_LTE_ONLY                 = 11, /* LTE only */
-    PREF_NET_TYPE_LTE_WCDMA                = 12  /* LTE/WCDMA */
+    PREF_NET_TYPE_LTE_WCDMA                = 12,  /* LTE/WCDMA */
+    PREF_NET_TYPE_TD_SCDMA_ONLY            = 13, /* TD-SCDMA only */
+    PREF_NET_TYPE_TD_SCDMA_WCDMA           = 14, /* TD-SCDMA and WCDMA */
+    PREF_NET_TYPE_TD_SCDMA_LTE             = 15, /* TD-SCDMA and LTE */
+    PREF_NET_TYPE_TD_SCDMA_GSM             = 16, /* TD-SCDMA and GSM */
+    PREF_NET_TYPE_TD_SCDMA_GSM_LTE         = 17, /* TD-SCDMA,GSM and LTE */
+    PREF_NET_TYPE_TD_SCDMA_GSM_WCDMA       = 18, /* TD-SCDMA, GSM/WCDMA */
+    PREF_NET_TYPE_TD_SCDMA_WCDMA_LTE       = 19, /* TD-SCDMA, WCDMA and LTE */
+    PREF_NET_TYPE_TD_SCDMA_GSM_WCDMA_LTE   = 20, /* TD-SCDMA, GSM/WCDMA and LTE */
+    PREF_NET_TYPE_TD_SCDMA_GSM_WCDMA_CDMA_EVDO_AUTO  = 21, /* TD-SCDMA, GSM/WCDMA, CDMA and EvDo */
+    PREF_NET_TYPE_TD_SCDMA_LTE_CDMA_EVDO_GSM_WCDMA   = 22  /* TD-SCDMA, LTE, CDMA, EvDo GSM/WCDMA */
 } RIL_PreferredNetworkType;
 
 /* Source for cdma subscription */
@@ -716,6 +751,20 @@ typedef struct {
                                          */
 } RIL_CarrierRestrictions;
 
+typedef struct {
+  char * mcc;                         /* MCC of the Carrier. */
+  char * mnc ;                        /* MNC of the Carrier. */
+  uint8_t * carrierKey;               /* Public Key from the Carrier used to encrypt the
+                                       * IMSI/IMPI.
+                                       */
+  char * keyIdentifier;               /* The keyIdentifier Attribute value pair that helps
+                                       * a server locate the private key to decrypt the
+                                       * permanent identity.
+                                       */
+  int64_t expirationTime;             /* Date-Time (in UTC) when the key will expire. */
+
+} RIL_CarrierInfoForImsiEncryption;
+
 /* See RIL_REQUEST_LAST_CALL_FAIL_CAUSE */
 typedef enum {
     CALL_FAIL_UNOBTAINABLE_NUMBER = 1,
@@ -773,6 +822,21 @@ typedef enum {
     CALL_FAIL_DIAL_MODIFIED_TO_USSD = 244, /* STK Call Control */
     CALL_FAIL_DIAL_MODIFIED_TO_SS = 245,
     CALL_FAIL_DIAL_MODIFIED_TO_DIAL = 246,
+    CALL_FAIL_RADIO_OFF = 247, /* Radio is OFF */
+    CALL_FAIL_OUT_OF_SERVICE = 248, /* No cellular coverage */
+    CALL_FAIL_NO_VALID_SIM = 249, /* No valid SIM is present */
+    CALL_FAIL_RADIO_INTERNAL_ERROR = 250, /* Internal error at Modem */
+    CALL_FAIL_NETWORK_RESP_TIMEOUT = 251, /* No response from network */
+    CALL_FAIL_NETWORK_REJECT = 252, /* Explicit network reject */
+    CALL_FAIL_RADIO_ACCESS_FAILURE = 253, /* RRC connection failure. Eg.RACH */
+    CALL_FAIL_RADIO_LINK_FAILURE = 254, /* Radio Link Failure */
+    CALL_FAIL_RADIO_LINK_LOST = 255, /* Radio link lost due to poor coverage */
+    CALL_FAIL_RADIO_UPLINK_FAILURE = 256, /* Radio uplink failure */
+    CALL_FAIL_RADIO_SETUP_FAILURE = 257, /* RRC connection setup failure */
+    CALL_FAIL_RADIO_RELEASE_NORMAL = 258, /* RRC connection release, normal */
+    CALL_FAIL_RADIO_RELEASE_ABNORMAL = 259, /* RRC connection release, abnormal */
+    CALL_FAIL_ACCESS_CLASS_BLOCKED = 260, /* Access class barring */
+    CALL_FAIL_NETWORK_DETACH = 261, /* Explicit network detach */
     CALL_FAIL_CDMA_LOCKED_UNTIL_POWER_CYCLE = 1000,
     CALL_FAIL_CDMA_DROP = 1001,
     CALL_FAIL_CDMA_INTERCEPT = 1002,
@@ -784,6 +848,25 @@ typedef enum {
     CALL_FAIL_CDMA_NOT_EMERGENCY = 1008, /* For non-emergency number dialed
                                             during emergency callback mode */
     CALL_FAIL_CDMA_ACCESS_BLOCKED = 1009, /* CDMA network access probes blocked */
+
+    /* OEM specific error codes. Used to distinguish error from
+     * CALL_FAIL_ERROR_UNSPECIFIED and help assist debugging */
+    CALL_FAIL_OEM_CAUSE_1 = 0xf001,
+    CALL_FAIL_OEM_CAUSE_2 = 0xf002,
+    CALL_FAIL_OEM_CAUSE_3 = 0xf003,
+    CALL_FAIL_OEM_CAUSE_4 = 0xf004,
+    CALL_FAIL_OEM_CAUSE_5 = 0xf005,
+    CALL_FAIL_OEM_CAUSE_6 = 0xf006,
+    CALL_FAIL_OEM_CAUSE_7 = 0xf007,
+    CALL_FAIL_OEM_CAUSE_8 = 0xf008,
+    CALL_FAIL_OEM_CAUSE_9 = 0xf009,
+    CALL_FAIL_OEM_CAUSE_10 = 0xf00a,
+    CALL_FAIL_OEM_CAUSE_11 = 0xf00b,
+    CALL_FAIL_OEM_CAUSE_12 = 0xf00c,
+    CALL_FAIL_OEM_CAUSE_13 = 0xf00d,
+    CALL_FAIL_OEM_CAUSE_14 = 0xf00e,
+    CALL_FAIL_OEM_CAUSE_15 = 0xf00f,
+
     CALL_FAIL_ERROR_UNSPECIFIED = 0xffff /* This error will be deprecated soon,
                                             vendor code should make sure to map error
                                             code to specific error */
@@ -986,6 +1069,35 @@ typedef enum {
   RIL_APPTYPE_CSIM    = 4,
   RIL_APPTYPE_ISIM    = 5
 } RIL_AppType;
+
+/*
+ * Please note that registration state UNKNOWN is
+ * treated as "out of service" in the Android telephony.
+ * Registration state REG_DENIED must be returned if Location Update
+ * Reject (with cause 17 - Network Failure) is received
+ * repeatedly from the network, to facilitate
+ * "managed roaming"
+ */
+typedef enum {
+    RIL_NOT_REG_AND_NOT_SEARCHING = 0,           // Not registered, MT is not currently searching
+                                                 // a new operator to register
+    RIL_REG_HOME = 1,                            // Registered, home network
+    RIL_NOT_REG_AND_SEARCHING = 2,               // Not registered, but MT is currently searching
+                                                 // a new operator to register
+    RIL_REG_DENIED = 3,                          // Registration denied
+    RIL_UNKNOWN = 4,                             // Unknown
+    RIL_REG_ROAMING = 5,                         // Registered, roaming
+    RIL_NOT_REG_AND_EMERGENCY_AVAILABLE_AND_NOT_SEARCHING = 10,   // Same as
+                                                 // RIL_NOT_REG_AND_NOT_SEARCHING but indicates that
+                                                 // emergency calls are enabled.
+    RIL_NOT_REG_AND_EMERGENCY_AVAILABLE_AND_SEARCHING = 12,  // Same as RIL_NOT_REG_AND_SEARCHING
+                                                 // but indicates that
+                                                 // emergency calls are enabled.
+    RIL_REG_DENIED_AND_EMERGENCY_AVAILABLE = 13, // Same as REG_DENIED but indicates that
+                                                 // emergency calls are enabled.
+    RIL_UNKNOWN_AND_EMERGENCY_AVAILABLE = 14,    // Same as UNKNOWN but indicates that
+                                                 // emergency calls are enabled.
+} RIL_RegState;
 
 typedef struct
 {
@@ -1257,8 +1369,8 @@ typedef struct {
     int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown */
     int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
     int cid;    /* 16-bit GSM Cell Identity described in TS 27.007, 0..65535, INT_MAX if unknown  */
-    int arfcn;  /* 16-bit GSM Absolute RF channel number, INT_MAX if unknown */
-    uint8_t bsic;/* 6-bit Base Station Identity Code, 0xFF if unknown */
+    int arfcn;  /* 16-bit GSM Absolute RF channel number; this value must be reported */
+    uint8_t bsic; /* 6-bit Base Station Identity Code; 0xFF if unknown */
 } RIL_CellIdentityGsm_v12;
 
 typedef struct {
@@ -1274,8 +1386,8 @@ typedef struct {
     int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
     int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
     int cid;    /* 28-bit UMTS Cell Identity described in TS 25.331, 0..268435455, INT_MAX if unknown  */
-    int psc;    /* 9-bit UMTS Primary Scrambling Code described in TS 25.331, 0..511, INT_MAX if unknown */
-    int uarfcn; /* 16-bit UMTS Absolute RF Channel Number, INT_MAX if unknown */
+    int psc;    /* 9-bit UMTS Primary Scrambling Code described in TS 25.331, 0..511; this value must be reported */
+    int uarfcn; /* 16-bit UMTS Absolute RF Channel Number; this value must be reported */
 } RIL_CellIdentityWcdma_v12;
 
 typedef struct {
@@ -1305,9 +1417,9 @@ typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
     int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
     int ci;     /* 28-bit Cell Identity described in TS ???, INT_MAX if unknown */
-    int pci;    /* physical cell id 0..503, INT_MAX if unknown  */
+    int pci;    /* physical cell id 0..503; this value must be reported */
     int tac;    /* 16-bit tracking area code, INT_MAX if unknown  */
-    int earfcn; /* 18-bit LTE Absolute RC Channel Number, INT_MAX if unknown */
+    int earfcn; /* 18-bit LTE Absolute RF Channel Number; this value must be reported */
 } RIL_CellIdentityLte_v12;
 
 typedef struct {
@@ -1361,6 +1473,7 @@ typedef struct {
 
 // Must be the same as CellInfo.TYPE_XXX
 typedef enum {
+  RIL_CELL_INFO_TYPE_NONE   = 0, /* indicates no cell information */
   RIL_CELL_INFO_TYPE_GSM    = 1,
   RIL_CELL_INFO_TYPE_CDMA   = 2,
   RIL_CELL_INFO_TYPE_LTE    = 3,
@@ -1404,6 +1517,100 @@ typedef struct {
     RIL_CellInfoTdscdma     tdscdma;
   } CellInfo;
 } RIL_CellInfo_v12;
+
+typedef struct {
+  RIL_CellInfoType  cellInfoType;   /* cell type for selecting from union CellInfo */
+  union {
+    RIL_CellIdentityGsm_v12 cellIdentityGsm;
+    RIL_CellIdentityWcdma_v12 cellIdentityWcdma;
+    RIL_CellIdentityLte_v12 cellIdentityLte;
+    RIL_CellIdentityTdscdma cellIdentityTdscdma;
+    RIL_CellIdentityCdma cellIdentityCdma;
+  };
+}RIL_CellIdentity_v16;
+
+typedef struct {
+    RIL_RegState regState;                // Valid reg states are RIL_NOT_REG_AND_NOT_SEARCHING,
+                                          // REG_HOME, RIL_NOT_REG_AND_SEARCHING, REG_DENIED,
+                                          // UNKNOWN, REG_ROAMING defined in RegState
+    RIL_RadioTechnology rat;              // indicates the available voice radio technology,
+                                          // valid values as defined by RadioTechnology.
+    int32_t cssSupported;                 // concurrent services support indicator. if
+                                          // registered on a CDMA system.
+                                          // 0 - Concurrent services not supported,
+                                          // 1 - Concurrent services supported
+    int32_t roamingIndicator;             // TSB-58 Roaming Indicator if registered
+                                          // on a CDMA or EVDO system or -1 if not.
+                                          // Valid values are 0-255.
+    int32_t systemIsInPrl;                // indicates whether the current system is in the
+                                          // PRL if registered on a CDMA or EVDO system or -1 if
+                                          // not. 0=not in the PRL, 1=in the PRL
+    int32_t defaultRoamingIndicator;      // default Roaming Indicator from the PRL,
+                                          // if registered on a CDMA or EVDO system or -1 if not.
+                                          // Valid values are 0-255.
+    int32_t reasonForDenial;              // reasonForDenial if registration state is 3
+                                          // (Registration denied) this is an enumerated reason why
+                                          // registration was denied. See 3GPP TS 24.008,
+                                          // 10.5.3.6 and Annex G.
+                                          // 0 - General
+                                          // 1 - Authentication Failure
+                                          // 2 - IMSI unknown in HLR
+                                          // 3 - Illegal MS
+                                          // 4 - Illegal ME
+                                          // 5 - PLMN not allowed
+                                          // 6 - Location area not allowed
+                                          // 7 - Roaming not allowed
+                                          // 8 - No Suitable Cells in this Location Area
+                                          // 9 - Network failure
+                                          // 10 - Persistent location update reject
+                                          // 11 - PLMN not allowed
+                                          // 12 - Location area not allowed
+                                          // 13 - Roaming not allowed in this Location Area
+                                          // 15 - No Suitable Cells in this Location Area
+                                          // 17 - Network Failure
+                                          // 20 - MAC Failure
+                                          // 21 - Sync Failure
+                                          // 22 - Congestion
+                                          // 23 - GSM Authentication unacceptable
+                                          // 25 - Not Authorized for this CSG
+                                          // 32 - Service option not supported
+                                          // 33 - Requested service option not subscribed
+                                          // 34 - Service option temporarily out of order
+                                          // 38 - Call cannot be identified
+                                          // 48-63 - Retry upon entry into a new cell
+                                          // 95 - Semantically incorrect message
+                                          // 96 - Invalid mandatory information
+                                          // 97 - Message type non-existent or not implemented
+                                          // 98 - Message type not compatible with protocol state
+                                          // 99 - Information element non-existent or
+                                          //      not implemented
+                                          // 100 - Conditional IE error
+                                          // 101 - Message not compatible with protocol state;
+    RIL_CellIdentity_v16 cellIdentity;    // current cell information
+}RIL_VoiceRegistrationStateResponse;
+
+
+typedef struct {
+    RIL_RegState regState;                // Valid reg states are RIL_NOT_REG_AND_NOT_SEARCHING,
+                                          // REG_HOME, RIL_NOT_REG_AND_SEARCHING, REG_DENIED,
+                                          // UNKNOWN, REG_ROAMING defined in RegState
+    RIL_RadioTechnology rat;              // indicates the available data radio technology,
+                                          // valid values as defined by RadioTechnology.
+    int32_t reasonDataDenied;             // if registration state is 3 (Registration
+                                          // denied) this is an enumerated reason why
+                                          // registration was denied. See 3GPP TS 24.008,
+                                          // Annex G.6 "Additional cause codes for GMM".
+                                          // 7 == GPRS services not allowed
+                                          // 8 == GPRS services and non-GPRS services not allowed
+                                          // 9 == MS identity cannot be derived by the network
+                                          // 10 == Implicitly detached
+                                          // 14 == GPRS services not allowed in this PLMN
+                                          // 16 == MSC temporarily not reachable
+                                          // 40 == No PDP context activated
+    int32_t maxDataCalls;                 // The maximum number of simultaneous Data Calls that
+                                          // must be established using setupDataCall().
+    RIL_CellIdentity_v16 cellIdentity;    // Current cell information
+}RIL_DataRegistrationStateResponse;
 
 /* Names of the CDMA info records (C.S0005 section 3.7.5) */
 typedef enum {
@@ -1698,6 +1905,56 @@ typedef struct {
     int enabled;
 } RIL_DataProfileInfo;
 
+typedef struct {
+    /* id of the data profile */
+    int profileId;
+    /* the APN to connect to */
+    char* apn;
+    /** one of the PDP_type values in TS 27.007 section 10.1.1.
+     * For example, "IP", "IPV6", "IPV4V6", or "PPP".
+     */
+    char* protocol;
+    /** one of the PDP_type values in TS 27.007 section 10.1.1 used on roaming network.
+     * For example, "IP", "IPV6", "IPV4V6", or "PPP".
+     */
+    char *roamingProtocol;
+    /** authentication protocol used for this PDP context
+     * (None: 0, PAP: 1, CHAP: 2, PAP&CHAP: 3)
+     */
+    int authType;
+    /* the username for APN, or NULL */
+    char* user;
+    /* the password for APN, or NULL */
+    char* password;
+    /* the profile type, TYPE_COMMON-0, TYPE_3GPP-1, TYPE_3GPP2-2 */
+    int type;
+    /* the period in seconds to limit the maximum connections */
+    int maxConnsTime;
+    /* the maximum connections during maxConnsTime */
+    int maxConns;
+    /** the required wait time in seconds after a successful UE initiated
+     * disconnect of a given PDN connection before the device can send
+     * a new PDN connection request for that given PDN
+     */
+    int waitTime;
+    /* true to enable the profile, 0 to disable, 1 to enable */
+    int enabled;
+    /* supported APN types bitmask. See RIL_ApnTypes for the value of each bit. */
+    int supportedTypesBitmask;
+    /** the bearer bitmask. See RIL_RadioAccessFamily for the value of each bit. */
+    int bearerBitmask;
+    /** maximum transmission unit (MTU) size in bytes */
+    int mtu;
+    /** the MVNO type: possible values are "imsi", "gid", "spn" */
+    char *mvnoType;
+    /** MVNO match data. Can be anything defined by the carrier. For example,
+     *        SPN like: "A MOBILE", "BEN NL", etc...
+     *        IMSI like: "302720x94", "2060188", etc...
+     *        GID like: "4E", "33", etc...
+     */
+    char *mvnoMatchData;
+} RIL_DataProfileInfo_v15;
+
 /* Tx Power Levels */
 #define RIL_NUM_TX_POWER_LEVELS     5
 
@@ -1727,6 +1984,206 @@ typedef struct {
   uint32_t rx_mode_time_ms;
 } RIL_ActivityStatsInfo;
 
+typedef enum {
+    RIL_APN_TYPE_UNKNOWN      = 0x0,          // Unknown
+    RIL_APN_TYPE_DEFAULT      = 0x1,          // APN type for default data traffic
+    RIL_APN_TYPE_MMS          = 0x2,          // APN type for MMS traffic
+    RIL_APN_TYPE_SUPL         = 0x4,          // APN type for SUPL assisted GPS
+    RIL_APN_TYPE_DUN          = 0x8,          // APN type for DUN traffic
+    RIL_APN_TYPE_HIPRI        = 0x10,         // APN type for HiPri traffic
+    RIL_APN_TYPE_FOTA         = 0x20,         // APN type for FOTA
+    RIL_APN_TYPE_IMS          = 0x40,         // APN type for IMS
+    RIL_APN_TYPE_CBS          = 0x80,         // APN type for CBS
+    RIL_APN_TYPE_IA           = 0x100,        // APN type for IA Initial Attach APN
+    RIL_APN_TYPE_EMERGENCY    = 0x200,        // APN type for Emergency PDN. This is not an IA apn,
+                                              // but is used for access to carrier services in an
+                                              // emergency call situation.
+    RIL_APN_TYPE_ALL          = 0xFFFFFFFF    // All APN types
+} RIL_ApnTypes;
+
+typedef enum {
+    RIL_DST_POWER_SAVE_MODE,        // Device power save mode (provided by PowerManager)
+                                    // True indicates the device is in power save mode.
+    RIL_DST_CHARGING_STATE,         // Device charging state (provided by BatteryManager)
+                                    // True indicates the device is charging.
+    RIL_DST_LOW_DATA_EXPECTED       // Low data expected mode. True indicates low data traffic
+                                    // is expected, for example, when the device is idle
+                                    // (e.g. not doing tethering in the background). Note
+                                    // this doesn't mean no data is expected.
+} RIL_DeviceStateType;
+
+typedef enum {
+    RIL_UR_SIGNAL_STRENGTH            = 0x01, // When this bit is set, modem should always send the
+                                              // signal strength update through
+                                              // RIL_UNSOL_SIGNAL_STRENGTH, otherwise suppress it.
+    RIL_UR_FULL_NETWORK_STATE         = 0x02, // When this bit is set, modem should always send
+                                              // RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED
+                                              // when any field in
+                                              // RIL_REQUEST_VOICE_REGISTRATION_STATE or
+                                              // RIL_REQUEST_DATA_REGISTRATION_STATE changes. When
+                                              // this bit is not set, modem should suppress
+                                              // RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED
+                                              // only when insignificant fields change
+                                              // (e.g. cell info).
+                                              // Modem should continue sending
+                                              // RIL_UNSOL_RESPONSE_VOICE_NETWORK_STATE_CHANGED
+                                              // when significant fields are updated even when this
+                                              // bit is not set. The following fields are
+                                              // considered significant, registration state and
+                                              // radio technology.
+    RIL_UR_DATA_CALL_DORMANCY_CHANGED = 0x04  // When this bit is set, modem should send the data
+                                              // call list changed unsolicited response
+                                              // RIL_UNSOL_DATA_CALL_LIST_CHANGED whenever any
+                                              // field in RIL_Data_Call_Response changes.
+                                              // Otherwise modem should suppress the unsolicited
+                                              // response when the only changed field is 'active'
+                                              // (for data dormancy). For all other fields change,
+                                              // modem should continue sending
+                                              // RIL_UNSOL_DATA_CALL_LIST_CHANGED regardless this
+                                              // bit is set or not.
+} RIL_UnsolicitedResponseFilter;
+
+typedef struct {
+    char * aidPtr; /* AID value, See ETSI 102.221 and 101.220*/
+    int p2;        /* P2 parameter (described in ISO 7816-4)
+                      P2Constants:NO_P2 if to be ignored */
+} RIL_OpenChannelParams;
+
+typedef enum {
+    RIL_ONE_SHOT = 0x01, // Performs the scan only once
+    RIL_PERIODIC = 0x02  // Performs the scan periodically until cancelled
+} RIL_ScanType;
+
+typedef enum {
+    GERAN = 0x01,   // GSM EDGE Radio Access Network
+    UTRAN = 0x02,   // Universal Terrestrial Radio Access Network
+    EUTRAN = 0x03,  // Evolved Universal Terrestrial Radio Access Network
+} RIL_RadioAccessNetworks;
+
+typedef enum {
+    GERAN_BAND_T380 = 1,
+    GERAN_BAND_T410 = 2,
+    GERAN_BAND_450 = 3,
+    GERAN_BAND_480 = 4,
+    GERAN_BAND_710 = 5,
+    GERAN_BAND_750 = 6,
+    GERAN_BAND_T810 = 7,
+    GERAN_BAND_850 = 8,
+    GERAN_BAND_P900 = 9,
+    GERAN_BAND_E900 = 10,
+    GERAN_BAND_R900 = 11,
+    GERAN_BAND_DCS1800 = 12,
+    GERAN_BAND_PCS1900 = 13,
+    GERAN_BAND_ER900 = 14,
+} RIL_GeranBands;
+
+typedef enum {
+    UTRAN_BAND_1 = 1,
+    UTRAN_BAND_2 = 2,
+    UTRAN_BAND_3 = 3,
+    UTRAN_BAND_4 = 4,
+    UTRAN_BAND_5 = 5,
+    UTRAN_BAND_6 = 6,
+    UTRAN_BAND_7 = 7,
+    UTRAN_BAND_8 = 8,
+    UTRAN_BAND_9 = 9,
+    UTRAN_BAND_10 = 10,
+    UTRAN_BAND_11 = 11,
+    UTRAN_BAND_12 = 12,
+    UTRAN_BAND_13 = 13,
+    UTRAN_BAND_14 = 14,
+    UTRAN_BAND_19 = 19,
+    UTRAN_BAND_20 = 20,
+    UTRAN_BAND_21 = 21,
+    UTRAN_BAND_22 = 22,
+    UTRAN_BAND_25 = 25,
+    UTRAN_BAND_26 = 26,
+} RIL_UtranBands;
+
+typedef enum {
+    EUTRAN_BAND_1 = 1,
+    EUTRAN_BAND_2 = 2,
+    EUTRAN_BAND_3 = 3,
+    EUTRAN_BAND_4 = 4,
+    EUTRAN_BAND_5 = 5,
+    EUTRAN_BAND_6 = 6,
+    EUTRAN_BAND_7 = 7,
+    EUTRAN_BAND_8 = 8,
+    EUTRAN_BAND_9 = 9,
+    EUTRAN_BAND_10 = 10,
+    EUTRAN_BAND_11 = 11,
+    EUTRAN_BAND_12 = 12,
+    EUTRAN_BAND_13 = 13,
+    EUTRAN_BAND_14 = 14,
+    EUTRAN_BAND_17 = 17,
+    EUTRAN_BAND_18 = 18,
+    EUTRAN_BAND_19 = 19,
+    EUTRAN_BAND_20 = 20,
+    EUTRAN_BAND_21 = 21,
+    EUTRAN_BAND_22 = 22,
+    EUTRAN_BAND_23 = 23,
+    EUTRAN_BAND_24 = 24,
+    EUTRAN_BAND_25 = 25,
+    EUTRAN_BAND_26 = 26,
+    EUTRAN_BAND_27 = 27,
+    EUTRAN_BAND_28 = 28,
+    EUTRAN_BAND_30 = 30,
+    EUTRAN_BAND_31 = 31,
+    EUTRAN_BAND_33 = 33,
+    EUTRAN_BAND_34 = 34,
+    EUTRAN_BAND_35 = 35,
+    EUTRAN_BAND_36 = 36,
+    EUTRAN_BAND_37 = 37,
+    EUTRAN_BAND_38 = 38,
+    EUTRAN_BAND_39 = 39,
+    EUTRAN_BAND_40 = 40,
+    EUTRAN_BAND_41 = 41,
+    EUTRAN_BAND_42 = 42,
+    EUTRAN_BAND_43 = 43,
+    EUTRAN_BAND_44 = 44,
+    EUTRAN_BAND_45 = 45,
+    EUTRAN_BAND_46 = 46,
+    EUTRAN_BAND_47 = 47,
+    EUTRAN_BAND_48 = 48,
+    EUTRAN_BAND_65 = 65,
+    EUTRAN_BAND_66 = 66,
+    EUTRAN_BAND_68 = 68,
+    EUTRAN_BAND_70 = 70,
+} RIL_EutranBands;
+
+typedef struct {
+    RIL_RadioAccessNetworks radio_access_network; // The type of network to scan.
+    uint32_t bands_length;                        // Length of bands
+    union {
+        RIL_GeranBands geran_bands[MAX_BANDS];
+        RIL_UtranBands utran_bands[MAX_BANDS];
+        RIL_EutranBands eutran_bands[MAX_BANDS];
+    } bands;
+    uint32_t channels_length;                     // Length of channels
+    uint32_t channels[MAX_CHANNELS];              // Frequency channels to scan
+} RIL_RadioAccessSpecifier;
+
+typedef struct {
+    RIL_ScanType type;                                              // Type of the scan
+    int32_t interval;                                               // Time interval in seconds
+                                                                    // between periodic scans, only
+                                                                    // valid when type=RIL_PERIODIC
+    uint32_t specifiers_length;                                     // Length of specifiers
+    RIL_RadioAccessSpecifier specifiers[MAX_RADIO_ACCESS_NETWORKS]; // Radio access networks
+                                                                    // with bands/channels.
+} RIL_NetworkScanRequest;
+
+typedef enum {
+    PARTIAL = 0x01,   // The result contains a part of the scan results
+    COMPLETE = 0x02,  // The result contains the last part of the scan results
+} RIL_ScanStatus;
+
+typedef struct {
+    RIL_ScanStatus status;              // The status of the scan
+    uint32_t network_infos_length;      // Total length of RIL_CellInfo
+    RIL_CellInfo_v12* network_infos;    // List of network information
+} RIL_NetworkScanResult;
+
 /**
  * RIL_REQUEST_GET_SIM_STATUS
  *
@@ -1737,7 +2194,14 @@ typedef struct {
  * "response" is const RIL_CardStatus_v6 *
  *
  * Valid errors:
- *  Must never fail
+ *
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_GET_SIM_STATUS 1
 
@@ -1757,8 +2221,14 @@ typedef struct {
  *
  * SUCCESS
  * RADIO_NOT_AVAILABLE (radio resetting)
- * GENERIC_FAILURE
  * PASSWORD_INCORRECT
+ * INTERNAL_ERR
+ * NO_MEMORY
+ * NO_RESOURCES
+ * CANCELLED
+ * INVALID_ARGUMENTS
+ * INVALID_SIM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_ENTER_SIM_PIN 2
@@ -1780,9 +2250,15 @@ typedef struct {
  *
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  PASSWORD_INCORRECT
  *     (PUK is invalid)
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_ARGUMENTS
+ *  INVALID_SIM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_ENTER_SIM_PUK 3
@@ -1804,8 +2280,14 @@ typedef struct {
  *
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  PASSWORD_INCORRECT
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_ARGUMENTS
+ *  INVALID_SIM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_ENTER_SIM_PIN2 4
@@ -1827,9 +2309,15 @@ typedef struct {
  *
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  PASSWORD_INCORRECT
  *     (PUK2 is invalid)
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_ARGUMENTS
+ *  INVALID_SIM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_ENTER_SIM_PUK2 5
@@ -1851,10 +2339,15 @@ typedef struct {
  *
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  PASSWORD_INCORRECT
  *     (old PIN is invalid)
- *
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_ARGUMENTS
+ *  INVALID_SIM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_CHANGE_SIM_PIN 6
@@ -1877,9 +2370,15 @@ typedef struct {
  *
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  PASSWORD_INCORRECT
  *     (old PIN2 is invalid)
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_ARGUMENTS
+ *  INVALID_SIM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 
@@ -1900,9 +2399,14 @@ typedef struct {
  *
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  PASSWORD_INCORRECT
  *     (code is invalid)
+ *  SIM_ABSENT
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_ENTER_NETWORK_DEPERSONALIZATION 8
@@ -1921,8 +2425,11 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
  *  NO_MEMORY
- *  GENERIC_FAILURE
  *      (request will be made again in a few hundred msec)
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_GET_CURRENT_CALLS 9
@@ -1955,9 +2462,10 @@ typedef struct {
  *  NO_NETWORK_FOUND
  *  INVALID_CALL_ID
  *  DEVICE_IN_USE
- *  MODE_NOT_SUPPORTED
+ *  OPERATION_NOT_ALLOWED
  *  ABORTED
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_DIAL 10
 
@@ -1975,7 +2483,12 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_SIM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_GET_IMSI 11
@@ -2004,7 +2517,9 @@ typedef struct {
  *  NO_MEMORY
  *  INVALID_CALL_ID
  *  INVALID_ARGUMENTS
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_HANGUP 12
@@ -2032,7 +2547,9 @@ typedef struct {
  *  NO_RESOURCES
  *  OPERATION_NOT_ALLOWED
  *  INVALID_ARGUMENTS
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND 13
@@ -2059,7 +2576,8 @@ typedef struct {
  *  OPERATION_NOT_ALLOWED
  *  INVALID_ARGUMENTS
  *  NO_RESOURCES
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND 14
@@ -2095,7 +2613,9 @@ typedef struct {
  *  INVALID_ARGUMENTS
  *  INVALID_CALL_ID
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE 15
@@ -2119,7 +2639,9 @@ typedef struct {
  *  INVALID_CALL_ID
  *  INVALID_ARGUMENTS
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_CONFERENCE 16
 
@@ -2143,7 +2665,8 @@ typedef struct {
  *  INVALID_CALL_ID
  *  OPERATION_NOT_ALLOWED
  *  INVALID_ARGUMENTS
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_UDUB 17
 
@@ -2153,14 +2676,36 @@ typedef struct {
  * Requests the failure cause code for the most recently terminated call
  *
  * "data" is NULL
- * "response" is a "int *"
- * ((int *)response)[0] is RIL_LastCallFailCause.  GSM failure reasons are
- * mapped to cause codes defined in TS 24.008 Annex H where possible. CDMA
- * failure reasons are derived from the possible call failure scenarios
- * described in the "CDMA IS-2000 Release A (C.S0005-A v6.0)" standard.
+ * "response" is a const RIL_LastCallFailCauseInfo *
+ * RIL_LastCallFailCauseInfo contains LastCallFailCause and vendor cause.
+ * The vendor cause code must be used for debugging purpose only.
+ * The implementation must return one of the values of LastCallFailCause
+ * as mentioned below.
  *
- * The implementation should return CALL_FAIL_ERROR_UNSPECIFIED for blocked
- * MO calls by restricted state (See RIL_UNSOL_RESTRICTED_STATE_CHANGED)
+ * GSM failure reasons codes for the cause codes defined in TS 24.008 Annex H
+ * where possible.
+ * CDMA failure reasons codes for the possible call failure scenarios
+ * described in the "CDMA IS-2000 Release A (C.S0005-A v6.0)" standard.
+ * Any of the following reason codes if the call is failed or dropped due to reason
+ * mentioned with in the braces.
+ *
+ *      CALL_FAIL_RADIO_OFF (Radio is OFF)
+ *      CALL_FAIL_OUT_OF_SERVICE (No cell coverage)
+ *      CALL_FAIL_NO_VALID_SIM (No valid SIM)
+ *      CALL_FAIL_RADIO_INTERNAL_ERROR (Modem hit unexpected error scenario)
+ *      CALL_FAIL_NETWORK_RESP_TIMEOUT (No response from network)
+ *      CALL_FAIL_NETWORK_REJECT (Explicit network reject)
+ *      CALL_FAIL_RADIO_ACCESS_FAILURE (RRC connection failure. Eg.RACH)
+ *      CALL_FAIL_RADIO_LINK_FAILURE (Radio Link Failure)
+ *      CALL_FAIL_RADIO_LINK_LOST (Radio link lost due to poor coverage)
+ *      CALL_FAIL_RADIO_UPLINK_FAILURE (Radio uplink failure)
+ *      CALL_FAIL_RADIO_SETUP_FAILURE (RRC connection setup failure)
+ *      CALL_FAIL_RADIO_RELEASE_NORMAL (RRC connection release, normal)
+ *      CALL_FAIL_RADIO_RELEASE_ABNORMAL (RRC connection release, abnormal)
+ *      CALL_FAIL_ACCESS_CLASS_BLOCKED (Access class barring)
+ *      CALL_FAIL_NETWORK_DETACH (Explicit network detach)
+ *
+ * OEM causes (CALL_FAIL_OEM_CAUSE_XX) must be used for debug purpose only
  *
  * If the implementation does not have access to the exact cause codes,
  * then it should return one of the values listed in RIL_LastCallFailCause,
@@ -2171,7 +2716,10 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  NO_MEMORY
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_LAST_DATA_CALL_FAIL_CAUSE
  */
@@ -2191,6 +2739,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_SIGNAL_STRENGTH 19
 
@@ -2200,124 +2756,16 @@ typedef struct {
  * Request current registration state
  *
  * "data" is NULL
- * "response" is a "char **"
- * ((const char **)response)[0] is registration state 0-6,
- *              0 - Not registered, MT is not currently searching
- *                  a new operator to register
- *              1 - Registered, home network
- *              2 - Not registered, but MT is currently searching
- *                  a new operator to register
- *              3 - Registration denied
- *              4 - Unknown
- *              5 - Registered, roaming
- *             10 - Same as 0, but indicates that emergency calls
- *                  are enabled.
- *             12 - Same as 2, but indicates that emergency calls
- *                  are enabled.
- *             13 - Same as 3, but indicates that emergency calls
- *                  are enabled.
- *             14 - Same as 4, but indicates that emergency calls
- *                  are enabled.
- *
- * ((const char **)response)[1] is LAC if registered on a GSM/WCDMA system or
- *                              NULL if not.Valid LAC are 0x0000 - 0xffff
- * ((const char **)response)[2] is CID if registered on a * GSM/WCDMA or
- *                              NULL if not.
- *                                 Valid CID are 0x00000000 - 0xffffffff
- *                                    In GSM, CID is Cell ID (see TS 27.007)
- *                                            in 16 bits
- *                                    In UMTS, CID is UMTS Cell Identity
- *                                             (see TS 25.331) in 28 bits
- * ((const char **)response)[3] indicates the available voice radio technology,
- *                              valid values as defined by RIL_RadioTechnology.
- * ((const char **)response)[4] is Base Station ID if registered on a CDMA
- *                              system or NULL if not.  Base Station ID in
- *                              decimal format
- * ((const char **)response)[5] is Base Station latitude if registered on a
- *                              CDMA system or NULL if not. Base Station
- *                              latitude is a decimal number as specified in
- *                              3GPP2 C.S0005-A v6.0. It is represented in
- *                              units of 0.25 seconds and ranges from -1296000
- *                              to 1296000, both values inclusive (corresponding
- *                              to a range of -90 to +90 degrees).
- * ((const char **)response)[6] is Base Station longitude if registered on a
- *                              CDMA system or NULL if not. Base Station
- *                              longitude is a decimal number as specified in
- *                              3GPP2 C.S0005-A v6.0. It is represented in
- *                              units of 0.25 seconds and ranges from -2592000
- *                              to 2592000, both values inclusive (corresponding
- *                              to a range of -180 to +180 degrees).
- * ((const char **)response)[7] is concurrent services support indicator if
- *                              registered on a CDMA system 0-1.
- *                                   0 - Concurrent services not supported,
- *                                   1 - Concurrent services supported
- * ((const char **)response)[8] is System ID if registered on a CDMA system or
- *                              NULL if not. Valid System ID are 0 - 32767
- * ((const char **)response)[9] is Network ID if registered on a CDMA system or
- *                              NULL if not. Valid System ID are 0 - 65535
- * ((const char **)response)[10] is the TSB-58 Roaming Indicator if registered
- *                               on a CDMA or EVDO system or NULL if not. Valid values
- *                               are 0-255.
- * ((const char **)response)[11] indicates whether the current system is in the
- *                               PRL if registered on a CDMA or EVDO system or NULL if
- *                               not. 0=not in the PRL, 1=in the PRL
- * ((const char **)response)[12] is the default Roaming Indicator from the PRL,
- *                               if registered on a CDMA or EVDO system or NULL if not.
- *                               Valid values are 0-255.
- * ((const char **)response)[13] if registration state is 3 (Registration
- *                               denied) this is an enumerated reason why
- *                               registration was denied.  See 3GPP TS 24.008,
- *                               10.5.3.6 and Annex G.
- *                                 0 - General
- *                                 1 - Authentication Failure
- *                                 2 - IMSI unknown in HLR
- *                                 3 - Illegal MS
- *                                 4 - Illegal ME
- *                                 5 - PLMN not allowed
- *                                 6 - Location area not allowed
- *                                 7 - Roaming not allowed
- *                                 8 - No Suitable Cells in this Location Area
- *                                 9 - Network failure
- *                                10 - Persistent location update reject
- *                                11 - PLMN not allowed
- *                                12 - Location area not allowed
- *                                13 - Roaming not allowed in this Location Area
- *                                15 - No Suitable Cells in this Location Area
- *                                17 - Network Failure
- *                                20 - MAC Failure
- *                                21 - Sync Failure
- *                                22 - Congestion
- *                                23 - GSM Authentication unacceptable
- *                                25 - Not Authorized for this CSG
- *                                32 - Service option not supported
- *                                33 - Requested service option not subscribed
- *                                34 - Service option temporarily out of order
- *                                38 - Call cannot be identified
- *                                48-63 - Retry upon entry into a new cell
- *                                95 - Semantically incorrect message
- *                                96 - Invalid mandatory information
- *                                97 - Message type non-existent or not implemented
- *                                98 - Message not compatible with protocol state
- *                                99 - Information element non-existent or not implemented
- *                               100 - Conditional IE error
- *                               101 - Message not compatible with protocol state
- *                               111 - Protocol error, unspecified
- * ((const char **)response)[14] is the Primary Scrambling Code of the current
- *                               cell as described in TS 25.331, in hexadecimal
- *                               format, or NULL if unknown or not registered
- *                               to a UMTS network.
- *
- * Please note that registration state 4 ("unknown") is treated
- * as "out of service" in the Android telephony system
- *
- * Registration state 3 can be returned if Location Update Reject
- * (with cause 17 - Network Failure) is received repeatedly from the network,
- * to facilitate "managed roaming"
+ * "response" is a const RIL_VoiceRegistrationStateResponse *
  *
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_VOICE_REGISTRATION_STATE 20
 
@@ -2327,46 +2775,19 @@ typedef struct {
  * Request current DATA registration state
  *
  * "data" is NULL
- * "response" is a "char **"
- * ((const char **)response)[0] is registration state 0-5 from TS 27.007 10.1.20 AT+CGREG
- * ((const char **)response)[1] is LAC if registered or NULL if not
- * ((const char **)response)[2] is CID if registered or NULL if not
- * ((const char **)response)[3] indicates the available data radio technology,
- *                              valid values as defined by RIL_RadioTechnology.
- * ((const char **)response)[4] if registration state is 3 (Registration
- *                               denied) this is an enumerated reason why
- *                               registration was denied.  See 3GPP TS 24.008,
- *                               Annex G.6 "Additonal cause codes for GMM".
- *      7 == GPRS services not allowed
- *      8 == GPRS services and non-GPRS services not allowed
- *      9 == MS identity cannot be derived by the network
- *      10 == Implicitly detached
- *      14 == GPRS services not allowed in this PLMN
- *      16 == MSC temporarily not reachable
- *      40 == No PDP context activated
- * ((const char **)response)[5] The maximum number of simultaneous Data Calls that can be
- *                              established using RIL_REQUEST_SETUP_DATA_CALL.
- *
- * The values at offsets 6..10 are optional LTE location information in decimal.
- * If a value is unknown that value may be NULL. If all values are NULL,
- * none need to be present.
- *  ((const char **)response)[6] is TAC, a 16-bit Tracking Area Code.
- *  ((const char **)response)[7] is CID, a 0-503 Physical Cell Identifier.
- *  ((const char **)response)[8] is ECI, a 28-bit E-UTRAN Cell Identifier.
- *  ((const char **)response)[9] is CSGID, a 27-bit Closed Subscriber Group Identity.
- *  ((const char **)response)[10] is TADV, a 6-bit timing advance value.
- *
- * LAC and CID are in hexadecimal format.
- * valid LAC are 0x0000 - 0xffff
- * valid CID are 0x00000000 - 0x0fffffff
- *
- * Please note that registration state 4 ("unknown") is treated
- * as "out of service" in the Android telephony system
+ * "response" is a const RIL_DataRegistrationStateResponse *
  *
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_DATA_REGISTRATION_STATE 21
 
@@ -2388,7 +2809,12 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_OPERATOR 22
 
@@ -2414,7 +2840,18 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  INVALID_STATE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  DEVICE_IN_USE
+ *  OPERATION_NOT_ALLOWED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_RADIO_POWER 23
 
@@ -2442,7 +2879,10 @@ typedef struct {
  *  MODEM_ERR
  *  INTERNAL_ERR
  *  INVALID_CALL_ID
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_DTMF_STOP, RIL_REQUEST_DTMF_START
  *
@@ -2465,7 +2905,6 @@ typedef struct {
  *
  * Based on the return error, caller decides to resend if sending sms
  * fails. SMS_SEND_FAIL_RETRY means retry (i.e. error cause is 332)
- * and GENERIC_FAILURE means no retry (i.e. error cause is 500)
  *
  * Valid errors:
  *  SUCCESS
@@ -2483,8 +2922,13 @@ typedef struct {
  *  INVALID_SMSC_ADDRESS
  *  MODEM_ERR
  *  NETWORK_ERR
+ *  OPERATION_NOT_ALLOWED
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *  MODE_NOT_SUPPORTED
- *  GENERIC_FAILURE
+ *  SIM_ABSENT
  *
  * FIXME how do we specify TP-Message-Reference if we need to resend?
  */
@@ -2509,7 +2953,6 @@ typedef struct {
  *
  * Based on the return error, caller decides to resend if sending sms
  * fails. SMS_SEND_FAIL_RETRY means retry (i.e. error cause is 332)
- * and GENERIC_FAILURE means no retry (i.e. error cause is 500)
  *
  * Valid errors:
  *  SUCCESS
@@ -2527,8 +2970,13 @@ typedef struct {
  *  NETWORK_ERR
  *  ENCODING_ERR
  *  INVALID_SMSC_ADDRESS
+ *  OPERATION_NOT_ALLOWED
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *  MODE_NOT_SUPPORTED
- *  GENERIC_FAILURE
+ *  SIM_ABSENT
  *
  */
 #define RIL_REQUEST_SEND_SMS_EXPECT_MORE 26
@@ -2568,10 +3016,30 @@ typedef struct {
  *                          1 => PAP may be performed; CHAP is never performed.
  *                          2 => CHAP may be performed; PAP is never performed.
  *                          3 => PAP / CHAP may be performed - baseband dependent.
- * ((const char **)data)[6] is the connection type to request must be one of the
+ * ((const char **)data)[6] is the non-roaming/home connection type to request. Must be one of the
  *                          PDP_type values in TS 27.007 section 10.1.1.
  *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
- * ((const char **)data)[7] Optional connection property parameters, format to be defined.
+ * ((const char **)data)[7] is the roaming connection type to request. Must be one of the
+ *                          PDP_type values in TS 27.007 section 10.1.1.
+ *                          For example, "IP", "IPV6", "IPV4V6", or "PPP".
+ * ((const char **)data)[8] is the bitmask of APN type in decimal string format. The
+ *                          bitmask will encapsulate the following values:
+ *                          ia,mms,agps,supl,hipri,fota,dun,ims,default.
+ * ((const char **)data)[9] is the bearer bitmask in decimal string format. Each bit is a
+ *                          RIL_RadioAccessFamily. "0" or NULL indicates all RATs.
+ * ((const char **)data)[10] is the boolean in string format indicating the APN setting was
+ *                           sent to the modem through RIL_REQUEST_SET_DATA_PROFILE earlier.
+ * ((const char **)data)[11] is the mtu size in bytes of the mobile interface to which
+ *                           the apn is connected.
+ * ((const char **)data)[12] is the MVNO type:
+ *                           possible values are "imsi", "gid", "spn".
+ * ((const char **)data)[13] is MVNO match data in string. Can be anything defined by the carrier.
+ *                           For example,
+ *                           SPN like: "A MOBILE", "BEN NL", etc...
+ *                           IMSI like: "302720x94", "2060188", etc...
+ *                           GID like: "4E", "33", etc...
+ * ((const char **)data)[14] is the boolean string indicating data roaming is allowed or not. "1"
+ *                           indicates data roaming is enabled by the user, "0" indicates disabled.
  *
  * "response" is a RIL_Data_Call_Response_v11
  *
@@ -2583,8 +3051,10 @@ typedef struct {
  *  For all other errors the RIL_Data_Call_Resonse_v6 is ignored.
  *
  *  Other errors could include:
- *    RADIO_NOT_AVAILABLE, GENERIC_FAILURE, OP_NOT_ALLOWED_BEFORE_REG_TO_NW,
- *    OP_NOT_ALLOWED_DURING_VOICE_CALL and REQUEST_NOT_SUPPORTED.
+ *    RADIO_NOT_AVAILABLE, OP_NOT_ALLOWED_BEFORE_REG_TO_NW,
+ *    OP_NOT_ALLOWED_DURING_VOICE_CALL, REQUEST_NOT_SUPPORTED,
+ *    INVALID_ARGUMENTS, INTERNAL_ERR, NO_MEMORY, NO_RESOURCES,
+ *    SIM_ABSENT and CANCELLED
  *
  * See also: RIL_REQUEST_DEACTIVATE_DATA_CALL
  */
@@ -2612,9 +3082,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
  *  SIM_PIN2
  *  SIM_PUK2
+ *  INVALID_SIM_STATE
+ *  SIM_ERR
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SIM_IO 28
 
@@ -2653,7 +3125,9 @@ typedef struct {
  *  ABORTED
  *  SYSTEM_ERR
  *  INVALID_STATE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_CANCEL_USSD, RIL_UNSOL_ON_USSD
  */
@@ -2677,7 +3151,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  NO_MEMORY
  *  INVALID_STATE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_CANCEL_USSD 30
@@ -2702,7 +3178,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  FDN_CHECK_FAILURE
  *  SYSTEM_ERR
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_GET_CLIR 31
 
@@ -2722,7 +3200,11 @@ typedef struct {
  *  SS_MODIFIED_TO_SS
  *  INVALID_ARGUMENTS
  *  SYSTEM_ERR
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SET_CLIR 32
 
@@ -2755,7 +3237,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  NO_MEMORY
  *  FDN_CHECK_FAILURE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_QUERY_CALL_FORWARD_STATUS 33
 
@@ -2781,7 +3265,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  INVALID_STATE
  *  FDN_CHECK_FAILURE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SET_CALL_FORWARD 34
 
@@ -2816,7 +3302,9 @@ typedef struct {
  *  NO_MEMORY
  *  FDN_CHECK_FAILURE
  *  INVALID_ARGUMENTS
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_QUERY_CALL_WAITING 35
 
@@ -2844,7 +3332,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  INVALID_STATE
  *  FDN_CHECK_FAILURE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SET_CALL_WAITING 36
 
@@ -2871,7 +3361,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SMS_ACKNOWLEDGE  37
 
@@ -2889,7 +3383,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 
 #define RIL_REQUEST_GET_IMEI 38
@@ -2908,7 +3409,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 
 #define RIL_REQUEST_GET_IMEISV 39
@@ -2935,7 +3443,9 @@ typedef struct {
  *  MODEM_ERR
  *  INTERNAL_ERR
  *  INVALID_CALL_ID
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_ANSWER 40
@@ -2962,7 +3472,15 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INVALID_CALL_ID
+ *  INVALID_STATE
+ *  INVALID_ARGUMENTS
+ *  REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  SIM_ABSENT
  *
  * See also: RIL_REQUEST_SETUP_DATA_CALL
  */
@@ -3001,7 +3519,9 @@ typedef struct {
  *  SYSTEM_ERR
  *  MODEM_ERR
  *  FDN_CHECK_FAILURE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_QUERY_FACILITY_LOCK 42
@@ -3039,7 +3559,9 @@ typedef struct {
  *  MODEM_ERR
  *  INVALID_STATE
  *  FDN_CHECK_FAILURE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_SET_FACILITY_LOCK 43
@@ -3070,7 +3592,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  SYSTEM_ERR
  *  FDN_CHECK_FAILURE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_CHANGE_BARRING_PASSWORD 44
@@ -3090,7 +3614,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  */
 #define RIL_REQUEST_QUERY_NETWORK_SELECTION_MODE 45
@@ -3111,12 +3642,17 @@ typedef struct {
  *  RADIO_NOT_AVAILABLE
  *  ILLEGAL_SIM_OR_ME
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  * Note: Returns ILLEGAL_SIM_OR_ME when the failure is permanent and
  *       no retries needed, such as illegal SIM or ME.
- *       Returns GENERIC_FAILURE for all other causes that might be
- *       fixed by retries.
  *
  */
 #define RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC 46
@@ -3137,12 +3673,18 @@ typedef struct {
  *  RADIO_NOT_AVAILABLE
  *  ILLEGAL_SIM_OR_ME
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  INVALID_STATE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  * Note: Returns ILLEGAL_SIM_OR_ME when the failure is permanent and
  *       no retries needed, such as illegal SIM or ME.
- *       Returns GENERIC_FAILURE for all other causes that might be
- *       fixed by retries.
  *
  */
 #define RIL_REQUEST_SET_NETWORK_SELECTION_MANUAL 47
@@ -3166,14 +3708,20 @@ typedef struct {
  *           "current"
  *           "forbidden"
  *
- * This request must not respond until the new operator is selected
- * and registered
- *
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  ABORTED
+ *  DEVICE_IN_USE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  CANCELLED
+ *  OPERATION_NOT_ALLOWED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  */
 #define RIL_REQUEST_QUERY_AVAILABLE_NETWORKS 48
@@ -3201,7 +3749,9 @@ typedef struct {
  *  MODEM_ERR
  *  INTERNAL_ERR
  *  INVALID_CALL_ID
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_DTMF, RIL_REQUEST_DTMF_STOP
  */
@@ -3226,7 +3776,9 @@ typedef struct {
  *  MODEM_ERR
  *  INTERNAL_ERR
  *  INVALID_CALL_ID
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_DTMF, RIL_REQUEST_DTMF_START
  */
@@ -3245,7 +3797,14 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  EMPTY_RECORD
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  */
 #define RIL_REQUEST_BASEBAND_VERSION 51
@@ -3281,7 +3840,8 @@ typedef struct {
  *  INVALID_CALL_ID
  *  INVALID_STATE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SEPARATE_CONNECTION 52
 
@@ -3305,7 +3865,10 @@ typedef struct {
  *  INVALID_ARGUMENTS
  *  NO_MEMORY
  *  REQUEST_RATE_LIMITED
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_SET_MUTE 53
@@ -3327,7 +3890,10 @@ typedef struct {
  *  SS_MODIFIED_TO_SS
  *  NO_MEMORY
  *  REQUEST_RATE_LIMITED
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_GET_MUTE 54
@@ -3353,7 +3919,9 @@ typedef struct {
  *  MODEM_ERR
  *  INTERNAL_ERR
  *  FDN_CHECK_FAILURE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 
 #define RIL_REQUEST_QUERY_CLIP 55
@@ -3381,7 +3949,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_LAST_CALL_FAIL_CAUSE
  *
@@ -3404,7 +3976,12 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  *
  * See also: RIL_UNSOL_DATA_CALL_LIST_CHANGED
  */
@@ -3426,7 +4003,6 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  REQUEST_NOT_SUPPORTED
  */
 
@@ -3487,13 +4063,17 @@ typedef struct {
 #define RIL_REQUEST_OEM_HOOK_STRINGS 60
 
 /**
- * RIL_REQUEST_SCREEN_STATE
+ * RIL_REQUEST_SCREEN_STATE - DEPRECATED
  *
  * Indicates the current state of the screen.  When the screen is off, the
  * RIL should notify the baseband to suppress certain notifications (eg,
  * signal strength and changes in LAC/CID or BID/SID/NID/latitude/longitude)
  * in an effort to conserve power.  These notifications should resume when the
  * screen is on.
+ *
+ * Note this request is deprecated. Use RIL_REQUEST_SEND_DEVICE_STATE to report the device state
+ * to the modem and use RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER to turn on/off unsolicited
+ * response from the modem in different scenarios.
  *
  * "data" is int *
  * ((int *)data)[0] is == 1 for "Screen On"
@@ -3503,7 +4083,13 @@ typedef struct {
  *
  * Valid errors:
  *  SUCCESS
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SCREEN_STATE 61
 
@@ -3531,7 +4117,9 @@ typedef struct {
  *  SYSTEM_ERR
  *  MODEM_ERR
  *  INTERNAL_ERR
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_UNSOL_SUPP_SVC_NOTIFICATION.
  */
@@ -3558,9 +4146,12 @@ typedef struct {
  *  NO_MEMORY
  *  NO_RESOURCES
  *  INVALID_MODEM_STATE
- *  MODE_NOT_SUPPORTED
+ *  OPERATION_NOT_ALLOWED
  *  INVALID_SMSC_ADDRESS
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  *
  */
 #define RIL_REQUEST_WRITE_SMS_TO_SIM 63
@@ -3584,7 +4175,12 @@ typedef struct {
  *  SYSTEM_ERR
  *  MODEM_ERR
  *  NO_SUCH_ENTRY
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  *
  */
 #define RIL_REQUEST_DELETE_SMS_ON_SIM 64
@@ -3603,7 +4199,14 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  * See also: RIL_REQUEST_QUERY_AVAILABLE_BAND_MODE
  */
@@ -3623,7 +4226,13 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  * See also: RIL_REQUEST_SET_BAND_MODE
  */
@@ -3644,7 +4253,11 @@ typedef struct {
  * Valid errors:
  *  RIL_E_SUCCESS
  *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_STK_GET_PROFILE 67
 
@@ -3662,7 +4275,11 @@ typedef struct {
  * Valid errors:
  *  RIL_E_SUCCESS
  *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
- *  RIL_E_GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_STK_SET_PROFILE 68
 
@@ -3684,7 +4301,13 @@ typedef struct {
  *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
  *  SIM_BUSY
  *  OPERATION_NOT_ALLOWED
- *  RIL_E_GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_STK_SEND_ENVELOPE_COMMAND 69
 
@@ -3703,7 +4326,12 @@ typedef struct {
  *  RIL_E_SUCCESS
  *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
  *  RIL_E_OPERATION_NOT_ALLOWED
- *  RIL_E_GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_STK_SEND_TERMINAL_RESPONSE 70
 
@@ -3725,7 +4353,11 @@ typedef struct {
  *  RIL_E_SUCCESS
  *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
  *  RIL_E_OPERATION_NOT_ALLOWED
- *  RIL_E_GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_STK_HANDLE_CALL_SETUP_REQUESTED_FROM_SIM 71
 
@@ -3750,7 +4382,9 @@ typedef struct {
  *  INVALID_CALL_ID
  *  INVALID_STATE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_EXPLICIT_CALL_TRANSFER 72
 
@@ -3767,9 +4401,16 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  OPERATION_NOT_ALLOWED
  *  MODE_NOT_SUPPORTED
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE 73
 
@@ -3787,7 +4428,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  * See also: RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE
  */
@@ -3804,7 +4452,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  NO_NETWORK_FOUND
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_GET_NEIGHBORING_CELL_IDS 75
 
@@ -3827,7 +4482,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  * See also: RIL_REQUEST_SCREEN_STATE, RIL_UNSOL_RESPONSE_NETWORK_STATE_CHANGED
  */
@@ -3847,9 +4509,13 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
  *  SIM_ABSENT
  *  SUBSCRIPTION_NOT_AVAILABLE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE
  */
@@ -3870,7 +4536,15 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  OPERATION_NOT_ALLOWED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE 78
 
@@ -3891,7 +4565,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_CDMA_QUERY_ROAMING_PREFERENCE 79
 
@@ -3914,12 +4595,14 @@ typedef struct {
  *  INVALID_ARGUMENTS
  *  MODEM_ERR
  *  INTERNAL_ERR
- *  NO_MEMOR
+ *  NO_MEMORY
  *  INVALID_ARGUMENTS
  *  MODEM_ERR
  *  INTERNAL_ERR
- *  NO_MEMORYY
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SET_TTY_MODE 80
 
@@ -3945,7 +4628,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  NO_MEMORY
  *  INVALID_ARGUMENTS
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_QUERY_TTY_MODE 81
 
@@ -3970,7 +4655,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  NO_MEMORY
  *  INVALID_CALL_ID
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_CDMA_SET_PREFERRED_VOICE_PRIVACY_MODE 82
 
@@ -3994,7 +4681,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  NO_MEMORY
  *  INVALID_ARGUMENTS
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_CDMA_QUERY_PREFERRED_VOICE_PRIVACY_MODE 83
 
@@ -4018,7 +4707,9 @@ typedef struct {
  *  INTERNAL_ERR
  *  INVALID_CALL_ID
  *  INVALID_STATE
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_CDMA_FLASH 84
@@ -4046,7 +4737,10 @@ typedef struct {
  *  MODEM_ERR
  *  INTERNAL_ERR
  *  INVALID_CALL_ID
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  OPERATION_NOT_ALLOWED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_CDMA_BURST_DTMF 85
@@ -4070,7 +4764,14 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  */
 #define RIL_REQUEST_CDMA_VALIDATE_AND_WRITE_AKEY 86
@@ -4088,7 +4789,6 @@ typedef struct {
  * fails. The CDMA error class is derived as follows,
  * SUCCESS is error class 0 (no error)
  * SMS_SEND_FAIL_RETRY is error class 2 (temporary failure)
- * and GENERIC_FAILURE is error class 3 (permanent and no retry)
  *
  * Valid errors:
  *  SUCCESS
@@ -4106,8 +4806,12 @@ typedef struct {
  *  NETWORK_ERR
  *  ENCODING_ERR
  *  INVALID_SMSC_ADDRESS
+ *  OPERATION_NOT_ALLOWED
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *  MODE_NOT_SUPPORTED
- *  GENERIC_FAILURE
+ *  SIM_ABSENT
  *
  */
 #define RIL_REQUEST_CDMA_SEND_SMS 87
@@ -4133,10 +4837,10 @@ typedef struct {
  *  SYSTEM_ERR
  *  MODEM_ERR
  *  INVALID_STATE
- *  MODE_NOT_SUPPORTED
+ *  OPERATION_NOT_ALLOWED
  *  NETWORK_NOT_READY
  *  INVALID_MODEM_STATE
- *  GENERIC_FAILURE
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_CDMA_SMS_ACKNOWLEDGE 88
@@ -4161,8 +4865,11 @@ typedef struct {
  *  NO_RESOURCES
  *  MODEM_ERR
  *  SYSTEM_ERR
- *  GENERIC_FAILURE
- *
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_GSM_GET_BROADCAST_SMS_CONFIG 89
 
@@ -4186,7 +4893,11 @@ typedef struct {
  *  REQUEST_RATE_LIMITED
  *  MODEM_ERR
  *  SYSTEM_ERR
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_GSM_SET_BROADCAST_SMS_CONFIG 90
@@ -4211,8 +4922,12 @@ typedef struct {
  *  NO_MEMORY
  *  SYSTEM_ERR
  *  REQUEST_RATE_LIMITED
- *  MODEM_ERR
- *  GENERIC_FAILURE
+*   MODEM_ERR
+*   INTERNAL_ERR
+*   NO_RESOURCES
+*   CANCELLED
+*   INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_GSM_SMS_BROADCAST_ACTIVATION 91
@@ -4237,7 +4952,11 @@ typedef struct {
  *  NO_RESOURCES
  *  MODEM_ERR
  *  SYSTEM_ERR
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_CDMA_GET_BROADCAST_SMS_CONFIG 92
@@ -4247,7 +4966,7 @@ typedef struct {
  *
  * Set CDMA Broadcast SMS config
  *
- * "data" is an const RIL_CDMA_BroadcastSmsConfigInfo **
+ * "data" is a const RIL_CDMA_BroadcastSmsConfigInfo **
  * "datalen" is count * sizeof(const RIL_CDMA_BroadcastSmsConfigInfo *)
  *
  * "response" is NULL
@@ -4262,7 +4981,11 @@ typedef struct {
  *  REQUEST_RATE_LIMITED
  *  MODEM_ERR
  *  SYSTEM_ERR
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_CDMA_SET_BROADCAST_SMS_CONFIG 93
@@ -4288,7 +5011,11 @@ typedef struct {
  *  SYSTEM_ERR
  *  REQUEST_RATE_LIMITED
  *  MODEM_ERR
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_CDMA_SMS_BROADCAST_ACTIVATION 94
@@ -4317,6 +5044,17 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RIL_E_SUBSCRIPTION_NOT_AVAILABLE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *
  */
 
 #define RIL_REQUEST_CDMA_SUBSCRIPTION 95
@@ -4343,9 +5081,12 @@ typedef struct {
  *  NO_MEMORY
  *  NO_RESOURCES
  *  INVALID_MODEM_STATE
- *  MODE_NOT_SUPPORTED
+ *  OPERATION_NOT_ALLOWED
  *  INVALID_SMSC_ADDRESS
- *  GENERIC_FAILURE
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  *
  */
 #define RIL_REQUEST_CDMA_WRITE_SMS_TO_RUIM 96
@@ -4369,8 +5110,12 @@ typedef struct {
  *  SYSTEM_ERR
  *  MODEM_ERR
  *  NO_SUCH_ENTRY
- *  GENERIC_FAILURE
- *
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  */
 #define RIL_REQUEST_CDMA_DELETE_SMS_ON_RUIM 97
 
@@ -4398,7 +5143,16 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
+ *
  */
 #define RIL_REQUEST_DEVICE_IDENTITY 98
 
@@ -4417,7 +5171,14 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  */
 #define RIL_REQUEST_EXIT_EMERGENCY_CALLBACK_MODE 99
@@ -4442,7 +5203,10 @@ typedef struct {
  *  INVALID_ARGUMENTS
  *  INVALID_MODEM_STATE
  *  NOT_PROVISIONED
- *  GENERIC_FAILURE
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  *
  */
 #define RIL_REQUEST_GET_SMSC_ADDRESS 100
@@ -4466,8 +5230,10 @@ typedef struct {
  *  REQUEST_RATE_LIMITED
  *  MODEM_ERR
  *  NO_RESOURCES
- *  GENERIC_FAILURE
- *
+ *  INTERNAL_ERR
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  */
 #define RIL_REQUEST_SET_SMSC_ADDRESS 101
 
@@ -4491,7 +5257,10 @@ typedef struct {
  *  SYSTEM_ERR
  *  REQUEST_RATE_LIMITED
  *  MODEM_ERR
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_REPORT_SMS_MEMORY_STATUS 102
@@ -4508,7 +5277,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
@@ -4527,8 +5300,12 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
  *  SUBSCRIPTION_NOT_AVAILABLE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  * See also: RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE
  */
@@ -4546,7 +5323,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_ISIM_AUTHENTICATION 105
 
@@ -4567,7 +5348,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU 106
 
@@ -4595,7 +5380,12 @@ typedef struct {
  *  RIL_E_RADIO_NOT_AVAILABLE (radio resetting)
  *  SIM_BUSY
  *  OPERATION_NOT_ALLOWED
- *  RIL_E_GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  */
 #define RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS 107
 
@@ -4603,7 +5393,7 @@ typedef struct {
  * RIL_REQUEST_VOICE_RADIO_TECH
  *
  * Query the radio technology type (3GPP/3GPP2) used for voice. Query is valid only
- * when radio state is RADIO_STATE_ON
+ * when radio state is not RADIO_STATE_UNAVAILABLE
  *
  * "data" is NULL
  * "response" is int *
@@ -4612,7 +5402,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_VOICE_RADIO_TECH 108
 
@@ -4627,6 +5421,19 @@ typedef struct {
  * "data" is NULL
  *
  * "response" is an array of  RIL_CellInfo_v12.
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  NO_NETWORK_FOUND
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
+ *
  */
 #define RIL_REQUEST_GET_CELL_INFO_LIST 109
 
@@ -4646,7 +5453,13 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE 110
 
@@ -4673,8 +5486,17 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  SUBSCRIPTION_NOT_AVAILABLE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  NOT_PROVISIONED
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
+ *
  */
 #define RIL_REQUEST_SET_INITIAL_ATTACH_APN 111
 
@@ -4701,7 +5523,12 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_IMS_REGISTRATION_STATE 112
 
@@ -4734,8 +5561,11 @@ typedef struct {
  *  NETWORK_ERR
  *  ENCODING_ERR
  *  INVALID_SMSC_ADDRESS
- *  MODE_NOT_SUPPORTED
- *  GENERIC_FAILURE
+ *  OPERATION_NOT_ALLOWED
+ *  INTERNAL_ERR
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  *
  */
 #define RIL_REQUEST_IMS_SEND_SMS 113
@@ -4756,7 +5586,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SIM_TRANSMIT_APDU_BASIC 114
 
@@ -4764,9 +5598,10 @@ typedef struct {
  * RIL_REQUEST_SIM_OPEN_CHANNEL
  *
  * Open a new logical channel and select the given application. This command
- * reflects TS 27.007 "open logical channel" operation (+CCHO).
+ * reflects TS 27.007 "open logical channel" operation (+CCHO). This request
+ * also specifies the P2 parameter (described in ISO 7816-4).
  *
- * "data" is const char * and set to AID value, See ETSI 102.221 and 101.220.
+ * "data" is a const RIL_OpenChannelParam *
  *
  * "response" is int *
  * ((int *)data)[0] contains the session id of the logical channel.
@@ -4776,9 +5611,16 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
  *  MISSING_RESOURCE
  *  NO_SUCH_ELEMENT
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  SIM_ERR
+ *  INVALID_SIM_STATE
+ *  MISSING_RESOURCE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SIM_OPEN_CHANNEL 115
 
@@ -4796,7 +5638,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SIM_CLOSE_CHANNEL 116
 
@@ -4815,7 +5661,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SIM_TRANSMIT_APDU_CHANNEL 117
 
@@ -4832,7 +5682,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_NV_READ_ITEM 118
 
@@ -4849,7 +5699,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_NV_WRITE_ITEM 119
 
@@ -4866,7 +5716,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_NV_WRITE_CDMA_PRL 120
 
@@ -4886,7 +5736,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_NV_RESET_CONFIG 121
 
@@ -4902,8 +5752,15 @@ typedef struct {
  *  Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  SUBSCRIPTION_NOT_SUPPORTED
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  */
 #define RIL_REQUEST_SET_UICC_SUBSCRIPTION  122
@@ -4924,7 +5781,16 @@ typedef struct {
  *
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  MODEM_ERR
+ *  INVALID_ARGUMENTS
+ *  DEVICE_IN_USE
+ *  INVALID_MODEM_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  */
 #define RIL_REQUEST_ALLOW_DATA  123
@@ -4938,6 +5804,10 @@ typedef struct {
  * "data" is NULL
  *
  * "response" is an array of  RIL_HardwareConfig.
+ *
+ * Valid errors:
+ * RADIO_NOT_AVAILABLE
+ * REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_GET_HARDWARE_CONFIG 124
 
@@ -4959,6 +5829,17 @@ typedef struct {
  *      int   sw1;                  Status bytes per 3GPP TS 31.102 section 7.3
  *      int   sw2;
  *      char *simResponse;          Response in Base64 format, see 3GPP TS 31.102 7.1.2
+ *
+ *  Valid errors:
+ *  RADIO_NOT_AVAILABLE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  INVALID_MODEM_STATE
+ *  INVALID_ARGUMENTS
+ *  SIM_ERR
+ *  REQUEST_NOT_SUPPORTED
  */
 #define RIL_REQUEST_SIM_AUTHENTICATION 125
 
@@ -4975,7 +5856,11 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  GENERIC_FAILURE
+ *  REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
  *
  * See also: RIL_UNSOL_DC_RT_INFO_CHANGED
  */
@@ -5004,15 +5889,20 @@ typedef struct {
  *
  * Set data profile in modem
  * Modem should erase existed profiles from framework, and apply new profiles
- * "data" is an const RIL_DataProfileInfo **
+ * "data" is a const RIL_DataProfileInfo **
  * "datalen" is count * sizeof(const RIL_DataProfileInfo *)
  * "response" is NULL
  *
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE (radio resetting)
- *  GENERIC_FAILURE
  *  SUBSCRIPTION_NOT_AVAILABLE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  */
 #define RIL_REQUEST_SET_DATA_PROFILE 128
 
@@ -5029,7 +5919,12 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_SHUTDOWN 129
 
@@ -5044,7 +5939,12 @@ typedef struct {
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  INVALID_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_GET_RADIO_CAPABILITY 130
 
@@ -5064,7 +5964,15 @@ typedef struct {
  *  SUCCESS means a RIL_UNSOL_RADIO_CAPABILITY will be sent within 30 seconds.
  *  RADIO_NOT_AVAILABLE
  *  OPERATION_NOT_ALLOWED
- *  GENERIC_FAILURE
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  MODEM_ERR
+ *  INVALID_STATE
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_SET_RADIO_CAPABILITY 131
 
@@ -5083,6 +5991,12 @@ typedef struct {
  * SUCCESS
  * RADIO_NOT_AVAILABLE
  * LCE_NOT_SUPPORTED
+ * INTERNAL_ERR
+ * REQUEST_NOT_SUPPORTED
+ * NO_MEMORY
+ * NO_RESOURCES
+ * CANCELLED
+ * SIM_ABSENT
  */
 #define RIL_REQUEST_START_LCE 132
 
@@ -5098,6 +6012,12 @@ typedef struct {
  * SUCCESS
  * RADIO_NOT_AVAILABLE
  * LCE_NOT_SUPPORTED
+ * INTERNAL_ERR
+ * NO_MEMORY
+ * NO_RESOURCES
+ * CANCELLED
+ * REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  */
 #define RIL_REQUEST_STOP_LCE 133
 
@@ -5112,6 +6032,12 @@ typedef struct {
  * SUCCESS
  * RADIO_NOT_AVAILABLE
  * LCE_NOT_SUPPORTED
+ * INTERNAL_ERR
+ * NO_MEMORY
+ * NO_RESOURCES
+ * CANCELLED
+ * REQUEST_NOT_SUPPORTED
+ *  SIM_ABSENT
  */
 #define RIL_REQUEST_PULL_LCEDATA 134
 
@@ -5131,7 +6057,13 @@ typedef struct {
  *
  * SUCCESS
  * RADIO_NOT_AVAILABLE (radio resetting)
- * GENERIC_FAILURE
+ * NO_MEMORY
+ * INTERNAL_ERR
+ * SYSTEM_ERR
+ * MODEM_ERR
+ * NOT_PROVISIONED
+ * REQUEST_NOT_SUPPORTED
+ * NO_RESOURCES CANCELLED
  */
 #define RIL_REQUEST_GET_ACTIVITY_INFO 135
 
@@ -5165,6 +6097,10 @@ typedef struct {
  *  RIL_E_INVALID_ARGUMENTS
  *  RIL_E_RADIO_NOT_AVAILABLE
  *  RIL_E_REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_SET_CARRIER_RESTRICTIONS 136
 
@@ -5183,8 +6119,208 @@ typedef struct {
  *  RIL_E_SUCCESS
  *  RIL_E_RADIO_NOT_AVAILABLE
  *  RIL_E_REQUEST_NOT_SUPPORTED
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
  */
 #define RIL_REQUEST_GET_CARRIER_RESTRICTIONS 137
+
+/**
+ * RIL_REQUEST_SEND_DEVICE_STATE
+ *
+ * Send the updated device state.
+ * Modem can perform power saving based on the provided device state.
+ * "data" is const int *
+ * ((const int*)data)[0] A RIL_DeviceStateType that specifies the device state type.
+ * ((const int*)data)[1] Specifies the state. See RIL_DeviceStateType for the definition of each
+ *                       type.
+ *
+ * "datalen" is count * sizeof(const RIL_DeviceState *)
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  INVALID_ARGUMENTS
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
+ */
+#define RIL_REQUEST_SEND_DEVICE_STATE 138
+
+/**
+ * RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER
+ *
+ * Set the unsolicited response filter
+ * This is used to prevent unnecessary application processor
+ * wake up for power saving purposes by suppressing the
+ * unsolicited responses in certain scenarios.
+ *
+ * "data" is an int *
+ *
+ * ((int *)data)[0] is a 32-bit bitmask of RIL_UnsolicitedResponseFilter
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  INVALID_ARGUMENTS (e.g. the requested filter doesn't exist)
+ *  RADIO_NOT_AVAILABLE (radio resetting)
+ *  NO_MEMORY
+ *  INTERNAL_ERR
+ *  SYSTEM_ERR
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
+ */
+#define RIL_REQUEST_SET_UNSOLICITED_RESPONSE_FILTER 139
+
+ /**
+  * RIL_REQUEST_SET_SIM_CARD_POWER
+  *
+  * Set SIM card power up or down
+  *
+  * Request is equivalent to inserting and removing the card, with
+  * an additional effect where the ability to detect card removal/insertion
+  * is disabled when the SIM card is powered down.
+  *
+  * This will generate RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED
+  * as if the SIM had been inserted or removed.
+  *
+  * "data" is int *
+  * ((int *)data)[0] is 1 for "SIM POWER UP"
+  * ((int *)data)[0] is 0 for "SIM POWER DOWN"
+  *
+  * "response" is NULL
+  *
+  * Valid errors:
+  *  SUCCESS
+  *  RADIO_NOT_AVAILABLE
+  *  REQUEST_NOT_SUPPORTED
+  *  SIM_ABSENT
+  *  INVALID_ARGUMENTS
+  *  INTERNAL_ERR
+  *  NO_MEMORY
+  *  NO_RESOURCES
+  *  CANCELLED
+  */
+#define RIL_REQUEST_SET_SIM_CARD_POWER 140
+
+/**
+ * RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Provide Carrier specific information to the modem that will be used to
+ * encrypt the IMSI and IMPI. Sent by the framework during boot, carrier
+ * switch and everytime we receive a new certificate.
+ *
+ * "data" is the RIL_CarrierInfoForImsiEncryption * structure.
+ *
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  RIL_E_SUCCESS
+ *  RIL_E_RADIO_NOT_AVAILABLE
+ *  SIM_ABSENT
+ *  RIL_E_REQUEST_NOT_SUPPORTED
+ *  INVALID_ARGUMENTS
+ *  MODEM_INTERNAL_FAILURE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ */
+#define RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION 141
+
+/**
+ * RIL_REQUEST_START_NETWORK_SCAN
+ *
+ * Starts a new network scan
+ *
+ * Request to start a network scan with specified radio access networks with frequency bands and/or
+ * channels.
+ *
+ * "data" is a const RIL_NetworkScanRequest *.
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  RADIO_NOT_AVAILABLE
+ *  OPERATION_NOT_ALLOWED
+ *  DEVICE_IN_USE
+ *  INTERNAL_ERR
+ *  NO_MEMORY
+ *  MODEM_ERR
+ *  INVALID_ARGUMENTS
+ *  REQUEST_NOT_SUPPORTED
+ *  NO_RESOURCES
+ *  CANCELLED
+ *
+ */
+#define RIL_REQUEST_START_NETWORK_SCAN 142
+
+/**
+ * RIL_REQUEST_STOP_NETWORK_SCAN
+ *
+ * Stops an ongoing network scan
+ *
+ * Request to stop the ongoing network scan. Since the modem can only perform one scan at a time,
+ * there is no parameter for this request.
+ *
+ * "data" is NULL
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  INTERNAL_ERR
+ *  MODEM_ERR
+ *  NO_MEMORY
+ *  NO_RESOURCES
+ *  CANCELLED
+ *  REQUEST_NOT_SUPPORTED
+ *
+ */
+#define RIL_REQUEST_STOP_NETWORK_SCAN 143
+
+/**
+ * RIL_REQUEST_START_KEEPALIVE
+ *
+ * Start a keepalive session
+ *
+ * Request that the modem begin sending keepalive packets on a particular
+ * data call, with a specified source, destination, and format.
+ *
+ * "data" is a const RIL_RequestKeepalive
+ * "response" is RIL_KeepaliveStatus with a valid "handle"
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  NO_RESOURCES
+ *  INVALID_ARGUMENTS
+ *
+ */
+#define RIL_REQUEST_START_KEEPALIVE 144
+
+/**
+ * RIL_REQUEST_STOP_KEEPALIVE
+ *
+ * Stops an ongoing keepalive session
+ *
+ * Requests that a keepalive session with the given handle be stopped.
+ * there is no parameter for this request.
+ *
+ * "data" is an integer handle
+ * "response" is NULL
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  INVALID_ARGUMENTS
+ *
+ */
+#define RIL_REQUEST_STOP_KEEPALIVE 145
 
 /***********************************************************************/
 
@@ -5817,6 +6953,59 @@ typedef struct {
   */
 #define RIL_UNSOL_PCO_DATA 1046
 
+ /**
+  * RIL_UNSOL_MODEM_RESTART
+  *
+  * Called when there is a modem reset.
+  *
+  * "reason" is "const char *" containing the reason for the reset. It
+  * could be a crash signature if the restart was due to a crash or some
+  * string such as "user-initiated restart" or "AT command initiated
+  * restart" that explains the cause of the modem restart.
+  *
+  * When modem restarts, one of the following radio state transitions will happen
+  * 1) RADIO_STATE_ON->RADIO_STATE_UNAVAILABLE->RADIO_STATE_ON or
+  * 2) RADIO_STATE_OFF->RADIO_STATE_UNAVAILABLE->RADIO_STATE_OFF
+  * This message can be sent either just before the RADIO_STATE changes to RADIO_STATE_UNAVAILABLE
+  * or just after but should never be sent after the RADIO_STATE changes from UNAVAILABLE to
+  * AVAILABLE(RADIO_STATE_ON/RADIO_STATE_OFF) again.
+  *
+  * It should NOT be sent after the RADIO_STATE changes to AVAILABLE after the
+  * modem restart as that could be interpreted as a second modem reset by the
+  * framework.
+  */
+#define RIL_UNSOL_MODEM_RESTART 1047
+
+/**
+ * RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
+ *
+ * Called when the modem needs Carrier specific information that will
+ * be used to encrypt IMSI and IMPI.
+ *
+ * "data" is NULL
+ *
+ */
+#define RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION 1048
+
+/**
+ * RIL_UNSOL_NETWORK_SCAN_RESULT
+ *
+ * Returns incremental result for the network scan which is started by
+ * RIL_REQUEST_START_NETWORK_SCAN, sent to report results, status, or errors.
+ *
+ * "data" is NULL
+ * "response" is a const RIL_NetworkScanResult *
+ */
+#define RIL_UNSOL_NETWORK_SCAN_RESULT 1049
+
+/**
+ * RIL_UNSOL_KEEPALIVE_STATUS
+ *
+ * "data" is NULL
+ * "response" is a const RIL_KeepaliveStatus *
+ */
+#define RIL_UNSOL_KEEPALIVE_STATUS 1050
+
 /***********************************************************************/
 
 
@@ -5921,12 +7110,39 @@ typedef struct {
 } RIL_RadioFunctions;
 
 typedef struct {
-    char *apn;
-    char *protocol;
-    int authtype;
-    char *username;
-    char *password;
+    char *apn;                  /* the APN to connect to */
+    char *protocol;             /* one of the PDP_type values in TS 27.007 section 10.1.1 used on
+                                   roaming network. For example, "IP", "IPV6", "IPV4V6", or "PPP".*/
+    int authtype;               /* authentication protocol used for this PDP context
+                                   (None: 0, PAP: 1, CHAP: 2, PAP&CHAP: 3) */
+    char *username;             /* the username for APN, or NULL */
+    char *password;             /* the password for APN, or NULL */
 } RIL_InitialAttachApn;
+
+typedef struct {
+    char *apn;                  /* the APN to connect to */
+    char *protocol;             /* one of the PDP_type values in TS 27.007 section 10.1.1 used on
+                                   home network. For example, "IP", "IPV6", "IPV4V6", or "PPP". */
+    char *roamingProtocol;      /* one of the PDP_type values in TS 27.007 section 10.1.1 used on
+                                   roaming network. For example, "IP", "IPV6", "IPV4V6", or "PPP".*/
+    int authtype;               /* authentication protocol used for this PDP context
+                                   (None: 0, PAP: 1, CHAP: 2, PAP&CHAP: 3) */
+    char *username;             /* the username for APN, or NULL */
+    char *password;             /* the password for APN, or NULL */
+    int supportedTypesBitmask;  /* supported APN types bitmask. See RIL_ApnTypes for the value of
+                                   each bit. */
+    int bearerBitmask;          /* the bearer bitmask. See RIL_RadioAccessFamily for the value of
+                                   each bit. */
+    int modemCognitive;         /* indicating the APN setting was sent to the modem through
+                                   setDataProfile earlier. */
+    int mtu;                    /* maximum transmission unit (MTU) size in bytes */
+    char *mvnoType;             /* the MVNO type: possible values are "imsi", "gid", "spn" */
+    char *mvnoMatchData;        /* MVNO match data. Can be anything defined by the carrier.
+                                   For example,
+                                     SPN like: "A MOBILE", "BEN NL", etc...
+                                     IMSI like: "302720x94", "2060188", etc...
+                                     GID like: "4E", "33", etc... */
+} RIL_InitialAttachApn_v15;
 
 typedef struct {
     int authContext;            /* P2 value of authentication command, see P2 parameter in
@@ -5938,17 +7154,46 @@ typedef struct {
 } RIL_SimAuthentication;
 
 typedef struct {
-    int cid;             /* Context ID, uniquely identifies this call */
-    char *bearer_proto;  /* One of the PDP_type values in TS 27.007 section 10.1.1.
-                            For example, "IP", "IPV6", "IPV4V6" */
-    int pco_id;          /* The protocol ID for this box.  Note that only IDs from
-                            FF00H - FFFFH are accepted.  If more than one is included
-                            from the network, multiple calls should be made to send all
-                            of them. */
-    int contents_length; /* The number of octets in the contents. */
-    char *contents;      /* Carrier-defined content.  It is binary, opaque and
-                            loosely defined in LTE Layer 3 spec 24.008 */
+    int cid;                    /* Context ID, uniquely identifies this call */
+    char *bearer_proto;         /* One of the PDP_type values in TS 27.007 section 10.1.1.
+                                   For example, "IP", "IPV6", "IPV4V6". */
+    int pco_id;                 /* The protocol ID for this box.  Note that only IDs from
+                                   FF00H - FFFFH are accepted.  If more than one is included
+                                   from the network, multiple calls should be made to send all
+                                   of them. */
+    int contents_length;        /* The number of octets in the contents. */
+    char *contents;             /* Carrier-defined content.  It is binary, opaque and
+                                   loosely defined in LTE Layer 3 spec 24.008 */
 } RIL_PCO_Data;
+
+typedef enum {
+    NATT_IPV4 = 0,              /* Keepalive specified by RFC 3948 Sec. 2.3 using IPv4 */
+    NATT_IPV6 = 1               /* Keepalive specified by RFC 3948 Sec. 2.3 using IPv6 */
+} RIL_KeepaliveType;
+
+#define MAX_INADDR_LEN 16
+typedef struct {
+    RIL_KeepaliveType type;                  /* Type of keepalive packet */
+    char sourceAddress[MAX_INADDR_LEN];      /* Source address in network-byte order */
+    int sourcePort;                          /* Source port if applicable, or 0x7FFFFFFF;
+                                                the maximum value is 65535 */
+    char destinationAddress[MAX_INADDR_LEN]; /* Destination address in network-byte order */
+    int destinationPort;                     /* Destination port if applicable or 0x7FFFFFFF;
+                                                the maximum value is 65535 */
+    int maxKeepaliveIntervalMillis;          /* Maximum milliseconds between two packets */
+    int cid;                                 /* Context ID, uniquely identifies this call */
+} RIL_KeepaliveRequest;
+
+typedef enum {
+    KEEPALIVE_ACTIVE,                       /* Keepalive session is active */
+    KEEPALIVE_INACTIVE,                     /* Keepalive session is inactive */
+    KEEPALIVE_PENDING                       /* Keepalive session status not available */
+} RIL_KeepaliveStatusCode;
+
+typedef struct {
+    uint32_t sessionHandle;
+    RIL_KeepaliveStatusCode code;
+} RIL_KeepaliveStatus;
 
 #ifdef RIL_SHLIB
 struct RIL_Env {
@@ -6039,6 +7284,8 @@ const RIL_RadioFunctions *RIL_SAP_Init(const struct RIL_Env *env, int argc, char
  * @param callbacks user-specifed callback function
  */
 void RIL_register (const RIL_RadioFunctions *callbacks);
+
+void rilc_thread_pool();
 
 
 /**

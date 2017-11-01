@@ -14,7 +14,9 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 */
+#include <sys/system_properties.h>
 
+#include "misc.h"
 /** returns 1 if line starts with prefix, 0 if it does not */
 int strStartsWith(const char *line, const char *prefix)
 {
@@ -27,3 +29,12 @@ int strStartsWith(const char *line, const char *prefix)
     return *prefix == '\0';
 }
 
+// Returns true iff running this process in an emulator VM
+bool isInEmulator(void) {
+  static int inQemu = -1;
+  if (inQemu < 0) {
+      char propValue[PROP_VALUE_MAX];
+      inQemu = (__system_property_get("ro.kernel.qemu", propValue) != 0);
+  }
+  return inQemu == 1;
+}

@@ -26,7 +26,7 @@
 
 #include <telephony/ril.h>
 #define LOG_TAG "RILD"
-#include <utils/Log.h>
+#include <log/log.h>
 #include <cutils/properties.h>
 #include <cutils/sockets.h>
 #include <sys/capability.h>
@@ -35,31 +35,28 @@
 #include <sys/types.h>
 #include <libril/ril_ex.h>
 
-#include <private/android_filesystem_config.h>
-
 #define LIB_PATH_PROPERTY   "rild.libpath"
 #define LIB_ARGS_PROPERTY   "rild.libargs"
 #define MAX_LIB_ARGS        16
-#define MAX_CAP_NUM         (CAP_TO_INDEX(CAP_LAST_CAP) + 1)
 
 static void usage(const char *argv0) {
     fprintf(stderr, "Usage: %s -l <ril impl library> [-- <args for impl library>]\n", argv0);
     exit(EXIT_FAILURE);
 }
 
-extern char rild[MAX_SOCKET_NAME_LENGTH];
+extern char ril_service_name_base[MAX_SERVICE_NAME_LENGTH];
+extern char ril_service_name[MAX_SERVICE_NAME_LENGTH];
 
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
+extern void rilc_thread_pool ();
 
-extern void RIL_register_socket (RIL_RadioFunctions *(*rilUimInit)
+extern void RIL_register_socket (const RIL_RadioFunctions *(*rilUimInit)
         (const struct RIL_Env *, int, char **), RIL_SOCKET_TYPE socketType, int argc, char **argv);
 
 extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
         void *response, size_t responselen);
 
 extern void RIL_onRequestAck(RIL_Token t);
-
-extern void RIL_setRilSocketName(char *);
 
 #if defined(ANDROID_MULTI_SIM)
 extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
@@ -96,65 +93,30 @@ static int make_argv(char * args, char ** argv) {
     return count;
 }
 
-/*
- * switchUser - Switches UID to radio, preserving CAP_NET_ADMIN capabilities.
- * Our group, cache, was set by init.
- */
-void switchUser() {
-    char debuggable[PROP_VALUE_MAX];
-
-    prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
-    if (setresuid(AID_RADIO, AID_RADIO, AID_RADIO) == -1) {
-        RLOGE("setresuid failed: %s", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    struct __user_cap_header_struct header;
-    memset(&header, 0, sizeof(header));
-    header.version = _LINUX_CAPABILITY_VERSION_3;
-    header.pid = 0;
-
-    struct __user_cap_data_struct data[MAX_CAP_NUM];
-    memset(&data, 0, sizeof(data));
-
-    data[CAP_TO_INDEX(CAP_NET_ADMIN)].effective |= CAP_TO_MASK(CAP_NET_ADMIN);
-    data[CAP_TO_INDEX(CAP_NET_ADMIN)].permitted |= CAP_TO_MASK(CAP_NET_ADMIN);
-
-    data[CAP_TO_INDEX(CAP_NET_RAW)].effective |= CAP_TO_MASK(CAP_NET_RAW);
-    data[CAP_TO_INDEX(CAP_NET_RAW)].permitted |= CAP_TO_MASK(CAP_NET_RAW);
-
-    data[CAP_TO_INDEX(CAP_BLOCK_SUSPEND)].effective |= CAP_TO_MASK(CAP_BLOCK_SUSPEND);
-    data[CAP_TO_INDEX(CAP_BLOCK_SUSPEND)].permitted |= CAP_TO_MASK(CAP_BLOCK_SUSPEND);
-
-    if (capset(&header, &data[0]) == -1) {
-        RLOGE("capset failed: %s", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    /*
-     * Debuggable build only:
-     * Set DUMPABLE that was cleared by setuid() to have tombstone on RIL crash
-     */
-    property_get("ro.debuggable", debuggable, "0");
-    if (strcmp(debuggable, "1") == 0) {
-        prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
-    }
-}
-
 int main(int argc, char **argv) {
-    const char * rilLibPath = NULL;
+    // vendor ril lib path either passed in as -l parameter, or read from rild.libpath property
+    const char *rilLibPath = NULL;
+    // ril arguments either passed in as -- parameter, or read from rild.libargs property
     char **rilArgv;
+    // handle for vendor ril lib
     void *dlHandle;
+    // Pointer to ril init function in vendor ril
     const RIL_RadioFunctions *(*rilInit)(const struct RIL_Env *, int, char **);
-    RIL_RadioFunctions *(*rilUimInit)(const struct RIL_Env *, int, char **);
+    // Pointer to sap init function in vendor ril
+    const RIL_RadioFunctions *(*rilUimInit)(const struct RIL_Env *, int, char **);
     const char *err_str = NULL;
 
+    // functions returned by ril init function in vendor ril
     const RIL_RadioFunctions *funcs;
+    // lib path from rild.libpath property (if it's read)
     char libPath[PROPERTY_VALUE_MAX];
+    // flat to indicate if -- parameters are present
     unsigned char hasLibArgs = 0;
 
     int i;
+    // ril/socket id received as -c parameter, otherwise set to 0
     const char *clientId = NULL;
+
     RLOGD("**RIL Daemon Started**");
     RLOGD("**RILd param count=%d**", argc);
 
@@ -182,8 +144,8 @@ int main(int argc, char **argv) {
         exit(0);
     }
     if (strncmp(clientId, "0", MAX_CLIENT_ID_LENGTH)) {
-        strlcat(rild, clientId, MAX_SOCKET_NAME_LENGTH);
-        RIL_setRilSocketName(rild);
+        strncpy(ril_service_name, ril_service_name_base, MAX_SERVICE_NAME_LENGTH);
+        strncat(ril_service_name, clientId, MAX_SERVICE_NAME_LENGTH);
     }
 
     if (rilLibPath == NULL) {
@@ -195,8 +157,6 @@ int main(int argc, char **argv) {
             rilLibPath = libPath;
         }
     }
-
-    switchUser();
 
     dlHandle = dlopen(rilLibPath, RTLD_NOW);
 
@@ -218,7 +178,7 @@ int main(int argc, char **argv) {
 
     dlerror(); // Clear any previous dlerror
     rilUimInit =
-        (RIL_RadioFunctions *(*)(const struct RIL_Env *, int, char **))
+        (const RIL_RadioFunctions *(*)(const struct RIL_Env *, int, char **))
         dlsym(dlHandle, "RIL_SAP_Init");
     err_str = dlerror();
     if (err_str) {
@@ -239,7 +199,7 @@ int main(int argc, char **argv) {
     }
 
     rilArgv[argc++] = "-c";
-    rilArgv[argc++] = clientId;
+    rilArgv[argc++] = (char*)clientId;
     RLOGD("RIL_Init argc = %d clientId = %s", argc, rilArgv[argc-1]);
 
     // Make sure there's a reasonable argv[0]
@@ -260,6 +220,8 @@ int main(int argc, char **argv) {
     RLOGD("RIL_register_socket completed");
 
 done:
+
+    rilc_thread_pool();
 
     RLOGD("RIL_Init starting sleep loop");
     while (true) {

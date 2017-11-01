@@ -61,12 +61,17 @@ void  AT_DUMP(const char*  prefix, const char*  buff, int  len)
 #endif
 
 /*
- * for current pending command
- * these are protected by s_commandmutex
+ * There is one reader thread |s_tid_reader| and potentially multiple writer
+ * threads. |s_commandmutex| and |s_commandcond| are used to maintain the
+ * condition that the writer thread will not read from |sp_response| until the
+ * reader thread has signaled itself is finished, etc. |s_writeMutex| is used to
+ * prevent multiple writer threads from calling at_send_command_full_nolock
+ * function at the same time.
  */
 
 static pthread_mutex_t s_commandmutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t s_commandcond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t s_writeMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static ATCommandType s_type;
 static const char *s_responsePrefix = NULL;
@@ -736,12 +741,16 @@ static int at_send_command_full (const char *command, ATCommandType type,
                     long long timeoutMsec, ATResponse **pp_outResponse)
 {
     int err;
+    bool inEmulator;
 
     if (0 != pthread_equal(s_tid_reader, pthread_self())) {
         /* cannot be called from reader thread */
         return AT_ERROR_INVALID_THREAD;
     }
-
+    inEmulator = isInEmulator();
+    if (inEmulator) {
+        pthread_mutex_lock(&s_writeMutex);
+    }
     pthread_mutex_lock(&s_commandmutex);
 
     err = at_send_command_full_nolock(command, type,
@@ -749,6 +758,9 @@ static int at_send_command_full (const char *command, ATCommandType type,
                     timeoutMsec, pp_outResponse);
 
     pthread_mutex_unlock(&s_commandmutex);
+    if (inEmulator) {
+        pthread_mutex_unlock(&s_writeMutex);
+    }
 
     if (err == AT_ERROR_TIMEOUT && s_onTimeout != NULL) {
         s_onTimeout();
@@ -888,12 +900,16 @@ int at_handshake()
 {
     int i;
     int err = 0;
+    bool inEmulator;
 
     if (0 != pthread_equal(s_tid_reader, pthread_self())) {
         /* cannot be called from reader thread */
         return AT_ERROR_INVALID_THREAD;
     }
-
+    inEmulator = isInEmulator();
+    if (inEmulator) {
+        pthread_mutex_lock(&s_writeMutex);
+    }
     pthread_mutex_lock(&s_commandmutex);
 
     for (i = 0 ; i < HANDSHAKE_RETRY_COUNT ; i++) {
@@ -914,6 +930,9 @@ int at_handshake()
     }
 
     pthread_mutex_unlock(&s_commandmutex);
+    if (inEmulator) {
+        pthread_mutex_unlock(&s_writeMutex);
+    }
 
     return err;
 }

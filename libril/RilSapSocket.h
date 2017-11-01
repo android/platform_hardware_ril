@@ -36,26 +36,10 @@
  */
 class RilSapSocket : public RilSocket {
     /**
-     * Function pointer to the ril initialization funtion.
-     *
-     * @param Ril environment variable with place request and
-     *        response handlers and timeout handler.
-     *
-     * @param Number of arguements for the initialization function.
-     *
-     * @param Arguements to the initialization function used to
-     *        generate instance id of the ril daemon.
-     *
-     * @return Radio functions with handlers for onRequest, onStateRequest,
-     *         supports, onCancel and getVersion.
-     */
-    RIL_RadioFunctions *(*UimInit)(const struct RIL_Env *, int argc, char **argv);
-
-    /**
      * Place holder for the radio functions returned by the initialization
      * function. Currenty only onRequest handler is being used.
      */
-    RIL_RadioFunctions* uimFuncs;
+    const RIL_RadioFunctions* uimFuncs;
 
     /**
      * Wrapper struct for handling the requests in the queue.
@@ -85,7 +69,7 @@ class RilSapSocket : public RilSocket {
          * @param Radio functions to be used by the socket.
          */
         static void initSapSocket(const char *socketName,
-        RIL_RadioFunctions *uimFuncs);
+        const RIL_RadioFunctions *uimFuncs);
 
         /**
          * Ril envoronment variable that holds the request and
@@ -99,9 +83,20 @@ class RilSapSocket : public RilSocket {
         static void printList();
 
         /**
-         * Clean up method to be called on command close.
+         * Dispatches the request to the lower layers.
+         * It calls the on request function.
+         *
+         * @param request The request message.
          */
-        void onCommandsSocketClosed(void);
+        void dispatchRequest(MsgHeader *request);
+
+        /**
+         * Class method to get the socket from the socket list.
+         *
+         * @param socketId Socket id.
+         * @return the sap socket.
+         */
+        static RilSapSocket* getSocketById(RIL_SOCKET_ID socketId);
 
         /**
          * Datatype to handle the socket list.
@@ -112,16 +107,6 @@ class RilSapSocket : public RilSocket {
         } RilSapSocketList;
 
     protected:
-        /**
-         * Process each record read from the socket and
-         * push a new request created from that record to
-         * the dispatch request queue.
-         *
-         * @param The record data.
-         * @param The record length.
-         */
-        void pushRecord(void *record, size_t recordlen);
-
         /**
          * Socket handler to be called when a request has
          * been completed.
@@ -146,34 +131,13 @@ class RilSapSocket : public RilSocket {
         void *data, size_t datalen);
 
         /**
-         * Class method to get the socket from the socket list.
-         *
-         * @param Socket id.
-         * @return the sap socket.
-         */
-        static RilSapSocket* getSocketById(RIL_SOCKET_ID socketId);
-
-        /**
-         * Method to send response to SAP. It does an atomic write operation on the
-         * socket.
-         *
-         * @param the response header with the payload.
-         */
-        void sendResponse(MsgHeader *hdr);
-
-        /**
-         * A loop for processing the requests in the request dispatch queue.
-         */
-        void *processRequestsLoop(void);
-
-        /**
          * Class method to add the sap socket to the list of sockets.
          * Does nothing if the socket is already present in the list.
          * Otherwise, calls the constructor of the parent class(To startlistening)
          * and add socket to the socket list.
          */
         static void addSocketToList(const char *socketName, RIL_SOCKET_ID socketid,
-        RIL_RadioFunctions *uimFuncs);
+        const RIL_RadioFunctions *uimFuncs);
 
         /**
          * Check if a socket of the given name exists in the socket list.
@@ -182,18 +146,6 @@ class RilSapSocket : public RilSocket {
          * @return true if exists, false otherwise.
          */
         static bool SocketExists(const char *socketName);
-
-        /**
-         * Send a clean up SAP DISCONNECT if the socket disconnects before doing a SAP
-         * disconnect.
-         */
-        void sendDisconnect(void);
-
-        /**
-         * Dispatch the clean up disconnect request.
-         */
-        void dispatchDisconnect(MsgHeader *req);
-
 
     private:
         /**
@@ -205,15 +157,7 @@ class RilSapSocket : public RilSocket {
          */
         RilSapSocket(const char *socketName,
         RIL_SOCKET_ID socketId,
-        RIL_RadioFunctions *inputUimFuncs);
-
-        /**
-         * Dispatches the request to the lower layers.
-         * It calls the on request function.
-         *
-         * @param The request message.
-         */
-        void dispatchRequest(MsgHeader *request);
+        const RIL_RadioFunctions *inputUimFuncs);
 
         /**
          * Class method that selects the socket on which the onRequestComplete

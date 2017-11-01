@@ -1,7 +1,5 @@
-service ril-daemon /system/bin/rild
+service ril-daemon /vendor/bin/hw/rild
     class main
-    socket rild stream 660 root radio
-    socket sap_uim_socket1 stream 660 bluetooth bluetooth
-    socket rild-debug stream 660 radio system
-    user root
+    user radio
     group radio cache inet misc audio log readproc wakelock
+    capabilities BLOCK_SUSPEND NET_ADMIN NET_RAW
