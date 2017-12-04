@@ -1984,6 +1984,25 @@ typedef struct {
   uint32_t rx_mode_time_ms;
 } RIL_ActivityStatsInfo;
 
+#define RIL_NUM_ADN_RECORDS      10
+#define RIL_MAX_NUM_AD_COUNT     4
+#define RIL_MAX_NUM_EMAIL_COUNT  2
+
+typedef struct {
+    int       record_id;
+    char*     name;
+    char*     number;
+    int       email_elements;
+    char*     email[RIL_MAX_NUM_EMAIL_COUNT];
+    int       anr_elements;
+    char*     ad_number[RIL_MAX_NUM_AD_COUNT];
+} RIL_AdnRecordInfo;
+
+typedef struct {
+    int               record_elements;
+    RIL_AdnRecordInfo adn_record_info[RIL_NUM_ADN_RECORDS];
+} RIL_AdnRecord_v1;
+
 typedef enum {
     RIL_APN_TYPE_UNKNOWN      = 0x0,          // Unknown
     RIL_APN_TYPE_DEFAULT      = 0x1,          // APN type for default data traffic
@@ -6338,6 +6357,50 @@ typedef struct {
 
 #define RIL_RESPONSE_ACKNOWLEDGEMENT 800
 
+/**
+ * RIL_REQUEST_GET_ADN_RECORD
+ *
+ * Requests ADN count record of the SIM card
+ *
+ * "data" is NULL
+ *
+ * "response" is const int *
+ * ((int *)data)[0] is the max adn count.
+ * ((int *)data)[1] is the valid adn count.
+ * ((int *)data)[2] is the max email count.
+ * ((int *)data)[3] is the valid email count.
+ * ((int *)data)[4] is the max anr count.
+ * ((int *)data)[5] is the valid anr count.
+ * ((int *)data)[6] is the max name length.
+ * ((int *)data)[7] is the max number length.
+ * ((int *)data)[8] is the max email length.
+ * ((int *)data)[9] is the max anr length.
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  MODEM_ERR
+ */
+#define RIL_REQUEST_GET_ADN_RECORD 146
+
+/**
+ * RIL_REQUEST_UPDATE_ADN_RECORD
+ *
+ * Requests to update ADN record of the SIM card
+ *
+ * "data" is RIL_AdnRecordInfo *
+ *
+ * "response" is const int *
+ *
+ * Valid errors:
+ *  SUCCESS
+ *  GENERIC_FAILURE
+ *  INTERNAL_ERR
+ *  MODEM_ERR
+ */
+#define RIL_REQUEST_UPDATE_ADN_RECORD 147
+
 /***********************************************************************/
 
 
@@ -7005,6 +7068,26 @@ typedef struct {
  * "response" is a const RIL_KeepaliveStatus *
  */
 #define RIL_UNSOL_KEEPALIVE_STATUS 1050
+
+/**
+ * RIL_UNSOL_RESPONSE_ADN_INIT_DONE
+ *
+ * Called when the ADN has already init done,
+ *
+ * "data" is NULL.
+ *
+ */
+#define RIL_UNSOL_RESPONSE_ADN_INIT_DONE 1051
+
+/**
+ * RIL_UNSOL_RESPONSE_ADN_RECORDS
+ *
+ * Called when there is a group of ADN record report,
+ *
+ * "data" is the RIL_AdnRecord_v1 structure.
+ *
+ */
+#define RIL_UNSOL_RESPONSE_ADN_RECORDS 1052
 
 /***********************************************************************/
 

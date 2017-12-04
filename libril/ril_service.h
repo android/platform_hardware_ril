@@ -741,6 +741,22 @@ int carrierInfoForImsiEncryption(int slotId,
                         int responseType, int serial, RIL_Errno e,
                         void *response, size_t responseLen);
 
+int getAdnRecordResponse(int slotId,
+                        int responseType, int serial, RIL_Errno e,
+                        void *response, size_t responselen);
+
+int updateAdnRecordResponse(int slotId,
+                        int responseType, int serial, RIL_Errno e,
+                        void *response, size_t responselen);
+
+int adnInitDoneInd(int slotId,
+                 int indicationType, int token, RIL_Errno e, void *response,
+                 size_t responselen);
+
+int adnRecordsReceivedInd(int slotId,
+                         int indicationType, int token, RIL_Errno e, void *response,
+                         size_t responselen);
+
 pthread_rwlock_t * getRadioServiceRwlock(int slotId);
 
 }   // namespace radio
