@@ -451,6 +451,10 @@ struct RadioImpl : public V1_1::IRadio {
     Return<void> setCarrierInfoForImsiEncryption(int32_t serial,
             const V1_1::ImsiEncryptionInfo& message);
 
+    Return<void> getAdnRecord(int32_t serial);
+
+    Return<void> updateAdnRecord(int32_t serial, const AdnRecordInfo& adnRecordInfo);
+
     void checkReturnStatus(Return<void>& ret);
 };
 
@@ -687,6 +691,52 @@ bool dispatchCallForwardStatus(int serial, int slotId, int request,
 
     memsetAndFreeStrings(1, cf.number);
 
+    return true;
+}
+
+bool dispatchAdnRecord(int serial, int slotId, int request,
+                              const AdnRecordInfo& adnRecordInfo) {
+    RequestInfo *pRI = android::addRequestToList(serial, slotId, request);
+    if (pRI == NULL) {
+        return false;
+    }
+
+    RIL_AdnRecordInfo adnInfo;
+    adnInfo.record_id = adnRecordInfo.recordId;
+    adnInfo.email_elements = adnRecordInfo.emailElements;
+    adnInfo.anr_elements = adnRecordInfo.anrElements;
+
+    if (!copyHidlStringToRil(&adnInfo.name, adnRecordInfo.number, pRI, true)) {
+        return false;
+    }
+
+    if (!copyHidlStringToRil(&adnInfo.number, adnRecordInfo.number, pRI, true)) {
+        return false;
+    }
+
+    for (size_t i = 0 ; i < adnInfo.email_elements ; i++) {
+        if (!copyHidlStringToRil(&adnInfo.email[i], adnRecordInfo.email[i], pRI, true)) {
+            return false;
+        }
+    }
+
+    for (size_t i = 0 ; i < adnInfo.anr_elements ; i++) {
+        if (!copyHidlStringToRil(&adnInfo.ad_number[i], adnRecordInfo.adNumber[i], pRI, true)) {
+            return false;
+        }
+    }
+
+    CALL_ONREQUEST(request, &adnInfo, sizeof(adnInfo), pRI, slotId);
+
+    memsetAndFreeStrings(2, adnInfo.name, adnInfo.number);
+
+    for (size_t i = 0 ; i < adnInfo.email_elements ; i++) {
+        memsetAndFreeStrings(1, adnInfo.email[i]);
+    }
+
+    for (size_t i = 0 ; i < adnInfo.anr_elements ; i++) {
+        memsetAndFreeStrings(1, adnInfo.ad_number[i]);
+    }
     return true;
 }
 
@@ -2875,6 +2925,23 @@ Return<void> RadioImpl::stopKeepalive(int32_t serial, int32_t sessionHandle) {
     }
 
     CALL_ONREQUEST(pRI->pCI->requestNumber, &sessionHandle, sizeof(uint32_t), pRI, mSlotId);
+    return Void();
+}
+
+Return<void> RadioImpl::getAdnRecord(int32_t serial) {
+#if VDBG
+    RLOGD("getAdnRecord: serial %d", serial);
+#endif
+    dispatchVoid(serial, mSlotId, RIL_REQUEST_GET_ADN_RECORD);
+    return Void();
+}
+
+Return<void> RadioImpl::updateAdnRecord(int32_t serial, const AdnRecordInfo& adnRecordInfo) {
+#if VDBG
+    RLOGD("getAdnRecord: serial %d", serial);
+#endif
+    dispatchAdnRecord(serial, mSlotId, RIL_REQUEST_UPDATE_ADN_RECORD,
+            adnRecordInfo);
     return Void();
 }
 
@@ -6645,6 +6712,58 @@ int radio::stopNetworkScanResponse(int slotId, int responseType, int serial, RIL
     return 0;
 }
 
+int radio::getAdnRecordResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                   void *response, size_t responseLen) {
+#if VDBG
+    RLOGD("getAdnRecordResponse: serial %d", serial);
+#endif
+
+    if (radioService[slotId]->mRadioResponseV1_1 != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        hidl_vec<uint32_t> capacity;
+        if ((response == NULL && responseLen != 0)|| responseLen % sizeof(int) != 0) {
+            RLOGE("getAdnRecordResponse Invalid response: NULL");
+            if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        } else {
+            int *pInt = (int *) response;
+            int numInts = responseLen / sizeof(int);
+            capacity.resize(numInts);
+            for (int i = 0; i < numInts; i++) {
+                capacity[i] = pInt[i];
+            }
+        }
+        Return<void> retStatus
+                = radioService[slotId]->mRadioResponseV1_1->getAdnRecordResponse(responseInfo,
+                capacity);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("getAdnRecordResponse: radioService[%d]->mRadioResponseV1_1 == NULL", slotId);
+    }
+
+    return 0;
+}
+
+int radio::updateAdnRecordResponse(int slotId, int responseType, int serial, RIL_Errno e,
+                                   void *response, size_t responseLen) {
+#if VDBG
+    RLOGD("updateAdnRecordResponse: serial %d", serial);
+#endif
+
+    if (radioService[slotId]->mRadioResponseV1_1 != NULL) {
+        RadioResponseInfo responseInfo = {};
+        populateResponseInfo(responseInfo, serial, responseType, e);
+        int ret = responseInt(responseInfo, serial, responseType, e, response, responseLen);
+        Return<void> retStatus
+                = radioService[slotId]->mRadioResponseV1_1->updateAdnRecordResponse(responseInfo, ret);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("updateAdnRecordResponse: radioService[%d]->mRadioResponseV1_1 == NULL", slotId);
+    }
+
+    return 0;
+}
+
 void convertRilKeepaliveStatusToHal(const RIL_KeepaliveStatus *rilStatus,
         V1_1::KeepaliveStatus& halStatus) {
     halStatus.sessionHandle = rilStatus->sessionHandle;
@@ -8439,6 +8558,67 @@ int radio::keepaliveStatusInd(int slotId,
     Return<void> retStatus = radioIndicationV1_1->keepaliveStatus(
             convertIntToRadioIndicationType(indicationType), ks);
     radioService[slotId]->checkReturnStatus(retStatus);
+    return 0;
+}
+
+int radio::adnInitDoneInd(int slotId,
+                                int indicationType, int token, RIL_Errno e, void *response,
+                                size_t responseLen) {
+#if VDBG
+    RLOGD("adnInitDoneInd");
+#endif
+    if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndicationV1_1 != NULL) {
+        if (response == NULL || responseLen == 0) {
+            RLOGE("adnInitDoneInd: invalid response");
+            return 0;
+        }
+        RLOGD("adnInitDoneInd");
+
+#if VDBG
+        RLOGD("adnInitDoneInd");
+#endif
+
+        Return<void> retStatus = radioService[slotId]->mRadioIndicationV1_1->adnInitDone(
+                convertIntToRadioIndicationType(indicationType));
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("adnInitDoneInd: radioService[%d]->mRadioIndicationV1_1 == NULL", slotId);
+    }
+    return 0;
+}
+
+int radio::adnRecordsReceivedInd(int slotId,
+                                int indicationType, int token, RIL_Errno e, void *response,
+                                size_t responseLen) {
+#if VDBG
+    RLOGD("adnRecordsReceivedInd");
+#endif
+    if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndicationV1_1 != NULL) {
+        if (response == NULL || responseLen == 0) {
+            RLOGE("adnRecordsReceivedInd: invalid response");
+            return 0;
+        }
+        RLOGD("adnRecordsReceivedInd");
+
+#if VDBG
+        RLOGD("adnRecordsReceivedInd");
+#endif
+        RIL_AdnRecord_v1 *adnRecords = (RIL_AdnRecord_v1 *) adnRecords;
+
+        V1_1::NetworkScanResult result;
+        result.status = (V1_1::ScanStatus) networkScanResult->status;
+        result.error = (RadioError) e;
+        convertRilCellInfoListToHal(
+                networkScanResult->network_infos,
+                networkScanResult->network_infos_length * sizeof(RIL_CellInfo_v12),
+                result.networkInfos);
+
+        Return<void> retStatus = radioService[slotId]->mRadioIndicationV1_1->adnRecordsReceived(
+                convertIntToRadioIndicationType(indicationType), result);
+        radioService[slotId]->checkReturnStatus(retStatus);
+    } else {
+        RLOGE("adnRecordsReceivedInd: radioService[%d]->mRadioIndicationV1_1 == NULL", slotId);
+    }
     return 0;
 }
 
