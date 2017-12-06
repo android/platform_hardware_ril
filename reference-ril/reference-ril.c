@@ -165,7 +165,13 @@ typedef enum {
     RUIM_READY = 8,
     RUIM_PIN = 9,
     RUIM_PUK = 10,
-    RUIM_NETWORK_PERSONALIZATION = 11
+    RUIM_NETWORK_PERSONALIZATION = 11,
+    ISIM_ABSENT = 12,
+    ISIM_NOT_READY = 13,
+    ISIM_READY = 14,
+    ISIM_PIN = 15,
+    ISIM_PUK = 16,
+    ISIM_NETWORK_PERSONALIZATION = 17,
 } SIM_Status;
 
 static void onRequest (int request, void *data, size_t datalen, RIL_Token t);
@@ -2916,7 +2922,26 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
           NULL, NULL, 0, RIL_PINSTATE_ENABLED_BLOCKED, RIL_PINSTATE_UNKNOWN },
         // RUIM_NETWORK_PERSONALIZATION = 11
         { RIL_APPTYPE_RUIM, RIL_APPSTATE_SUBSCRIPTION_PERSO, RIL_PERSOSUBSTATE_SIM_NETWORK,
-           NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN }
+           NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
+        // ISIM_ABSENT = 12
+        { RIL_APPTYPE_UNKNOWN, RIL_APPSTATE_UNKNOWN, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
+        // ISIM_NOT_READY = 13
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_DETECTED, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
+        // ISIM_READY = 14
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_READY, RIL_PERSOSUBSTATE_READY,
+          NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
+        // ISIM_PIN = 15
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_PIN, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
+        // ISIM_PUK = 16
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_PUK, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_ENABLED_BLOCKED, RIL_PINSTATE_UNKNOWN },
+        // ISIM_NETWORK_PERSONALIZATION = 17
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_SUBSCRIPTION_PERSO, RIL_PERSOSUBSTATE_SIM_NETWORK,
+          NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
+
     };
     RIL_CardState card_state;
     int num_apps;
@@ -2927,7 +2952,7 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
         num_apps = 0;
     } else {
         card_state = RIL_CARDSTATE_PRESENT;
-        num_apps = 2;
+        num_apps = 3;
     }
 
     // Allocate and initialize base card status.
@@ -2948,14 +2973,15 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
     // Pickup the appropriate application status
     // that reflects sim_status for gsm.
     if (num_apps != 0) {
-        // Only support one app, gsm
-        p_card_status->num_applications = 2;
+        p_card_status->num_applications = 3;
         p_card_status->gsm_umts_subscription_app_index = 0;
         p_card_status->cdma_subscription_app_index = 1;
+        p_card_status->ims_subscription_app_index = 2;
 
         // Get the correct app status
         p_card_status->applications[0] = app_status_array[sim_status];
         p_card_status->applications[1] = app_status_array[sim_status + RUIM_ABSENT];
+        p_card_status->applications[2] = app_status_array[sim_status + ISIM_ABSENT];
     }
 
     *pp_card_status = p_card_status;
