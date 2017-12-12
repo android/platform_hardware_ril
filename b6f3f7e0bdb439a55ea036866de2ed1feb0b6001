@@ -1,0 +1,11 @@
+Code-Review+1: Jim Kaye <jameskaye@google.com>
+Code-Review+2: Yahan Zhou <yahan@google.com>
+Code-Review+2: Bo Hu <bohu@google.com>
+Code-Review+1: Sanket Padawe <sanketpadawe@google.com>
+Verified+1: Jim Kaye <jameskaye@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Jim Kaye <jameskaye@google.com>
+Submitted-at: Tue, 12 Dec 2017 01:23:01 +0000
+Reviewed-on: https://android-review.googlesource.com/560993
+Project: platform/hardware/ril
+Branch: refs/heads/master
