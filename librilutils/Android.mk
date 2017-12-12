@@ -39,7 +39,7 @@ LOCAL_C_INCLUDES += \
 LOCAL_EXPORT_C_INCLUDE_DIRS := \
     $(LOCAL_PATH)/../include
 
-LOCAL_CFLAGS : -Wall -Wextra -Werror
+LOCAL_CFLAGS := -Wall -Wextra -Werror
 
 LOCAL_PROTOC_OPTIMIZE_TYPE := nanopb-c-enable_malloc
 

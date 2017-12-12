@@ -165,7 +165,13 @@ typedef enum {
     RUIM_READY = 8,
     RUIM_PIN = 9,
     RUIM_PUK = 10,
-    RUIM_NETWORK_PERSONALIZATION = 11
+    RUIM_NETWORK_PERSONALIZATION = 11,
+    ISIM_ABSENT = 12,
+    ISIM_NOT_READY = 13,
+    ISIM_READY = 14,
+    ISIM_PIN = 15,
+    ISIM_PUK = 16,
+    ISIM_NETWORK_PERSONALIZATION = 17,
 } SIM_Status;
 
 static void onRequest (int request, void *data, size_t datalen, RIL_Token t);
@@ -394,7 +400,7 @@ static void requestRadioPower(void *data, size_t datalen __unused, RIL_Token t)
 
     if (onOff == 0 && sState != RADIO_STATE_OFF) {
         err = at_send_command("AT+CFUN=0", &p_response);
-       if (err < 0 || p_response->success == 0) goto error;
+        if (err < 0 || p_response->success == 0) goto error;
         setRadioState(RADIO_STATE_OFF);
     } else if (onOff > 0 && sState == RADIO_STATE_OFF) {
         err = at_send_command("AT+CFUN=1", &p_response);
@@ -446,6 +452,60 @@ static void onDataCallListChanged(void *param __unused)
 static void requestDataCallList(void *data __unused, size_t datalen __unused, RIL_Token t)
 {
     requestOrSendDataCallList(&t);
+}
+
+// Hang up, reject, conference, call waiting
+static void requestCallSelection(
+                void *data __unused, size_t datalen __unused, RIL_Token t, int request)
+{
+    // 3GPP 22.030 6.5.5
+    static char hangupWaiting[]    = "AT+CHLD=0";
+    static char hangupForeground[] = "AT+CHLD=1";
+    static char switchWaiting[]    = "AT+CHLD=2";
+    static char conference[]       = "AT+CHLD=3";
+    static char reject[]           = "ATH";
+
+    char* atCommand;
+
+    if (getSIMStatus() == SIM_ABSENT) {
+        RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+        return;
+    }
+
+    switch(request) {
+        case RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND:
+            // "Releases all held calls or sets User Determined User Busy
+            //  (UDUB) for a waiting call."
+            atCommand = hangupWaiting;
+            break;
+        case RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND:
+            // "Releases all active calls (if any exist) and accepts
+            //  the other (held or waiting) call."
+            atCommand = hangupForeground;
+            break;
+        case RIL_REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE:
+            // "Places all active calls (if any exist) on hold and accepts
+            //  the other (held or waiting) call."
+            atCommand = switchWaiting;
+#ifdef WORKAROUND_ERRONEOUS_ANSWER
+            s_expectAnswer = 1;
+#endif /* WORKAROUND_ERRONEOUS_ANSWER */
+            break;
+        case RIL_REQUEST_CONFERENCE:
+            // "Adds a held call to the conversation"
+            atCommand = conference;
+            break;
+        case RIL_REQUEST_UDUB:
+            // User determined user busy (reject)
+            atCommand = reject;
+            break;
+        default:
+            assert(0);
+    }
+    at_send_command(atCommand, NULL);
+    // Success or failure is ignored by the upper layer here.
+    // It will call GET_CURRENT_CALLS and determine success that way.
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
 }
 
 static void requestOrSendDataCallList(RIL_Token *t)
@@ -844,6 +904,11 @@ static void requestWriteSmsToSim(void *data, size_t datalen __unused, RIL_Token 
     int err;
     ATResponse *p_response = NULL;
 
+    if (getSIMStatus() == SIM_ABSENT) {
+        RIL_onRequestComplete(t, RIL_E_SIM_ABSENT, NULL, 0);
+        return;
+    }
+
     p_args = (RIL_SMS_WriteArgs *)data;
 
     length = strlen(p_args->pdu)/2;
@@ -869,6 +934,10 @@ static void requestHangup(void *data, size_t datalen __unused, RIL_Token t)
     int ret;
     char *cmd;
 
+    if (getSIMStatus() == SIM_ABSENT) {
+        RIL_onRequestComplete(t, RIL_E_MODEM_ERR, NULL, 0);
+        return;
+    }
     p_line = (int *)data;
 
     // 3GPP 22.030 6.5.5
@@ -1190,7 +1259,7 @@ static void requestCdmaGetRoamingPreference(int request __unused, void *data __u
     res = at_tok_nextint(&line, &roaming_pref);
     if (res < 0) goto error;
 
-     RIL_onRequestComplete(t, RIL_E_SUCCESS, &roaming_pref, sizeof(roaming_pref));
+    RIL_onRequestComplete(t, RIL_E_SUCCESS, &roaming_pref, sizeof(roaming_pref));
     return;
 error:
     RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
@@ -1530,6 +1599,11 @@ static void requestCdmaSendSMS(void *data, size_t datalen, RIL_Token t)
     RIL_SMS_Response response;
     RIL_CDMA_SMS_Message* rcsm;
 
+    if (getSIMStatus() == SIM_ABSENT) {
+        RIL_onRequestComplete(t, RIL_E_SIM_ABSENT, NULL, 0);
+        return;
+    }
+
     RLOGD("requestCdmaSendSMS datalen=%zu, sizeof(RIL_CDMA_SMS_Message)=%zu",
             datalen, sizeof(RIL_CDMA_SMS_Message));
 
@@ -1567,6 +1641,11 @@ static void requestSendSMS(void *data, size_t datalen, RIL_Token t)
     char *cmd1, *cmd2;
     RIL_SMS_Response response;
     ATResponse *p_response = NULL;
+
+    if (getSIMStatus() == SIM_ABSENT) {
+        RIL_onRequestComplete(t, RIL_E_SIM_ABSENT, NULL, 0);
+        return;
+    }
 
     memset(&response, 0, sizeof(response));
     RLOGD("requestSendSMS datalen =%zu", datalen);
@@ -1611,7 +1690,7 @@ error2:
     RIL_onRequestComplete(t, RIL_E_SMS_SEND_FAIL_RETRY, &response, sizeof(response));
     at_response_free(p_response);
     return;
-    }
+}
 
 static void requestImsSendSMS(void *data, size_t datalen, RIL_Token t)
 {
@@ -1898,6 +1977,11 @@ static void requestSMSAcknowledge(void *data, size_t datalen __unused, RIL_Token
 {
     int ackSuccess;
     int err;
+
+    if (getSIMStatus() == SIM_ABSENT) {
+        RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+        return;
+    }
 
     ackSuccess = ((int *)data)[0];
 
@@ -2248,39 +2332,12 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             requestHangup(data, datalen, t);
             break;
         case RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND:
-            // 3GPP 22.030 6.5.5
-            // "Releases all held calls or sets User Determined User Busy
-            //  (UDUB) for a waiting call."
-            at_send_command("AT+CHLD=0", NULL);
-
-            /* success or failure is ignored by the upper layer here.
-               it will call GET_CURRENT_CALLS and determine success that way */
-            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
-            break;
         case RIL_REQUEST_HANGUP_FOREGROUND_RESUME_BACKGROUND:
-            // 3GPP 22.030 6.5.5
-            // "Releases all active calls (if any exist) and accepts
-            //  the other (held or waiting) call."
-            at_send_command("AT+CHLD=1", NULL);
-
-            /* success or failure is ignored by the upper layer here.
-               it will call GET_CURRENT_CALLS and determine success that way */
-            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
-            break;
         case RIL_REQUEST_SWITCH_WAITING_OR_HOLDING_AND_ACTIVE:
-            // 3GPP 22.030 6.5.5
-            // "Places all active calls (if any exist) on hold and accepts
-            //  the other (held or waiting) call."
-            at_send_command("AT+CHLD=2", NULL);
-
-#ifdef WORKAROUND_ERRONEOUS_ANSWER
-            s_expectAnswer = 1;
-#endif /* WORKAROUND_ERRONEOUS_ANSWER */
-
-            /* success or failure is ignored by the upper layer here.
-               it will call GET_CURRENT_CALLS and determine success that way */
-            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
-            break;
+        case RIL_REQUEST_CONFERENCE:
+        case RIL_REQUEST_UDUB:
+             requestCallSelection(data, datalen, t, request);
+             break;
         case RIL_REQUEST_ANSWER:
             at_send_command("ATA", NULL);
 
@@ -2288,27 +2345,13 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             s_expectAnswer = 1;
 #endif /* WORKAROUND_ERRONEOUS_ANSWER */
 
-            /* success or failure is ignored by the upper layer here.
-               it will call GET_CURRENT_CALLS and determine success that way */
-            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
-            break;
-        case RIL_REQUEST_CONFERENCE:
-            // 3GPP 22.030 6.5.5
-            // "Adds a held call to the conversation"
-            at_send_command("AT+CHLD=3", NULL);
-
-            /* success or failure is ignored by the upper layer here.
-               it will call GET_CURRENT_CALLS and determine success that way */
-            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
-            break;
-        case RIL_REQUEST_UDUB:
-            /* user determined user busy */
-            /* sometimes used: ATH */
-            at_send_command("ATH", NULL);
-
-            /* success or failure is ignored by the upper layer here.
-               it will call GET_CURRENT_CALLS and determine success that way */
-            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            if (getSIMStatus() != SIM_READY) {
+                RIL_onRequestComplete(t, RIL_E_MODEM_ERR, NULL, 0);
+            } else {
+                // Success or failure is ignored by the upper layer here.
+                // It will call GET_CURRENT_CALLS and determine success that way.
+                RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            }
             break;
 
         case RIL_REQUEST_SEPARATE_CONNECTION:
@@ -2316,6 +2359,10 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
                 char  cmd[12];
                 int   party = ((int*)data)[0];
 
+                if (getSIMStatus() == SIM_ABSENT) {
+                    RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+                    return;
+                }
                 // Make sure that party is in a valid range.
                 // (Note: The Telephony middle layer imposes a range of 1 to 7.
                 // It's sufficient for us to just make sure it's single digit.)
@@ -2412,6 +2459,10 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             break;
 
         case RIL_REQUEST_CANCEL_USSD:
+            if (getSIMStatus() == SIM_ABSENT) {
+                RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+                return;
+            }
             p_response = NULL;
             err = at_send_command_numeric("AT+CUSD=2", &p_response);
 
@@ -2425,7 +2476,11 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             break;
 
         case RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC:
-            at_send_command("AT+COPS=0", NULL);
+            if (getSIMStatus() == SIM_ABSENT) {
+                RIL_onRequestComplete(t, RIL_E_RADIO_NOT_AVAILABLE, NULL, 0);
+            } else {
+                at_send_command("AT+COPS=0", NULL);
+            }
             break;
 
         case RIL_REQUEST_DATA_CALL_LIST:
@@ -2583,34 +2638,49 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             requestCdmaGetSubscriptionSource(request, data, datalen, t);
             break;
 
-        /* CDMA Specific Requests */
-        case RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE:
-            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
-                requestCdmaSetSubscriptionSource(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+        case RIL_REQUEST_START_LCE:
+        case RIL_REQUEST_STOP_LCE:
+        case RIL_REQUEST_PULL_LCEDATA:
+            if (getSIMStatus() == SIM_ABSENT) {
+                RIL_onRequestComplete(t, RIL_E_SIM_ABSENT, NULL, 0);
+            } else {
+                RIL_onRequestComplete(t, RIL_E_LCE_NOT_SUPPORTED, NULL, 0);
+            }
+            break;
 
         case RIL_REQUEST_CDMA_QUERY_ROAMING_PREFERENCE:
             if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
                 requestCdmaGetRoamingPreference(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            } else {
+                RIL_onRequestComplete(t, RIL_E_REQUEST_NOT_SUPPORTED, NULL, 0);
+            }
+            break;
+
+        case RIL_REQUEST_CDMA_SET_SUBSCRIPTION_SOURCE:
+            if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
+                requestCdmaSetSubscriptionSource(request, data, datalen, t);
+            } else {
+                // VTS tests expect us to silently do nothing
+                RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            }
+            break;
 
         case RIL_REQUEST_CDMA_SET_ROAMING_PREFERENCE:
             if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
                 requestCdmaSetRoamingPreference(request, data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
+            } else {
+                // VTS tests expect us to silently do nothing
+                RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            }
+            break;
 
         case RIL_REQUEST_EXIT_EMERGENCY_CALLBACK_MODE:
             if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
                 requestExitEmergencyMode(data, datalen, t);
-                break;
-            } // Fall-through if tech is not cdma
-
-            // Fall-through to here when the request is specific to CDMA, but
-            // our tech is not CDMA. VTS tests expect us to silently do nothing.
-            RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            } else {
+                // VTS tests expect us to silently do nothing
+                RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+            }
             break;
 
         default:
@@ -2916,7 +2986,26 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
           NULL, NULL, 0, RIL_PINSTATE_ENABLED_BLOCKED, RIL_PINSTATE_UNKNOWN },
         // RUIM_NETWORK_PERSONALIZATION = 11
         { RIL_APPTYPE_RUIM, RIL_APPSTATE_SUBSCRIPTION_PERSO, RIL_PERSOSUBSTATE_SIM_NETWORK,
-           NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN }
+           NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
+        // ISIM_ABSENT = 12
+        { RIL_APPTYPE_UNKNOWN, RIL_APPSTATE_UNKNOWN, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
+        // ISIM_NOT_READY = 13
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_DETECTED, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
+        // ISIM_READY = 14
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_READY, RIL_PERSOSUBSTATE_READY,
+          NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
+        // ISIM_PIN = 15
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_PIN, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
+        // ISIM_PUK = 16
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_PUK, RIL_PERSOSUBSTATE_UNKNOWN,
+          NULL, NULL, 0, RIL_PINSTATE_ENABLED_BLOCKED, RIL_PINSTATE_UNKNOWN },
+        // ISIM_NETWORK_PERSONALIZATION = 17
+        { RIL_APPTYPE_ISIM, RIL_APPSTATE_SUBSCRIPTION_PERSO, RIL_PERSOSUBSTATE_SIM_NETWORK,
+          NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
+
     };
     RIL_CardState card_state;
     int num_apps;
@@ -2927,7 +3016,7 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
         num_apps = 0;
     } else {
         card_state = RIL_CARDSTATE_PRESENT;
-        num_apps = 2;
+        num_apps = 3;
     }
 
     // Allocate and initialize base card status.
@@ -2948,14 +3037,15 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
     // Pickup the appropriate application status
     // that reflects sim_status for gsm.
     if (num_apps != 0) {
-        // Only support one app, gsm
-        p_card_status->num_applications = 2;
+        p_card_status->num_applications = 3;
         p_card_status->gsm_umts_subscription_app_index = 0;
         p_card_status->cdma_subscription_app_index = 1;
+        p_card_status->ims_subscription_app_index = 2;
 
         // Get the correct app status
         p_card_status->applications[0] = app_status_array[sim_status];
         p_card_status->applications[1] = app_status_array[sim_status + RUIM_ABSENT];
+        p_card_status->applications[2] = app_status_array[sim_status + ISIM_ABSENT];
     }
 
     *pp_card_status = p_card_status;
