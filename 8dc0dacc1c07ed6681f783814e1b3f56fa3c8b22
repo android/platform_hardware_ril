@@ -22,6 +22,305 @@
       "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b02c0cdd_4c8a4518",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 700,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Fix indentation",
+      "range": {
+        "startLine": 700,
+        "startChar": 30,
+        "endLine": 700,
+        "endChar": 35
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "81e09b5a_d2d1a761",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 711,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Should be name",
+      "range": {
+        "startLine": 711,
+        "startChar": 58,
+        "endLine": 711,
+        "endChar": 64
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35177839_f93f8fa9",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 719,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Should we check that this is less than MAX allowed before we traverse the array?",
+      "range": {
+        "startLine": 719,
+        "startChar": 33,
+        "endLine": 719,
+        "endChar": 47
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3b40b339_6f5859a9",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Should we check that this is less than MAX allowed before we traverse the array",
+      "range": {
+        "startLine": 725,
+        "startChar": 33,
+        "endLine": 725,
+        "endChar": 45
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "594690f8_3280b212",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 2954,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "seems like the whole function call will fit in one line.",
+      "range": {
+        "startLine": 2953,
+        "startChar": 4,
+        "endLine": 2954,
+        "endChar": 27
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cef3e17d_2794cff5",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 6726,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "fix indentation",
+      "range": {
+        "startLine": 6726,
+        "startChar": 32,
+        "endLine": 6726,
+        "endChar": 35
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b0c6e019_6155be47",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 6766,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Can this response ever be empty. We have a responseIntOrEmpty function. Wondering if we should use that?",
+      "range": {
+        "startLine": 6766,
+        "startChar": 18,
+        "endLine": 6766,
+        "endChar": 29
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7e37c867_e44149e4",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 6768,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "long line",
+      "range": {
+        "startLine": 6768,
+        "startChar": 18,
+        "endLine": 6768,
+        "endChar": 103
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "282aa9f5_c1aeaf0c",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 8575,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "fix indentation",
+      "range": {
+        "startLine": 8575,
+        "startChar": 27,
+        "endLine": 8575,
+        "endChar": 32
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d0ec0fc_ef4361f9",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 8622,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Should we check for upper bound? Always safe when the length of array or string is a parameter to the function itself.",
+      "range": {
+        "startLine": 8622,
+        "startChar": 28,
+        "endLine": 8622,
+        "endChar": 38
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fc4dd533_8a97747a",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 8630,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Check size if less than some max value before using it.",
+      "range": {
+        "startLine": 8630,
+        "startChar": 32,
+        "endLine": 8630,
+        "endChar": 45
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9cd2871d_3966189c",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 8636,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "Check size is less than max value before using it.",
+      "range": {
+        "startLine": 8636,
+        "startChar": 32,
+        "endLine": 8636,
+        "endChar": 43
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16938c71_6beaff5f",
+        "filename": "libril/ril_service.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T18:36:40Z",
+      "side": 1,
+      "message": "nit: Fix indentation.",
+      "range": {
+        "startLine": 752,
+        "startChar": 0,
+        "endLine": 758,
+        "endChar": 43
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
     }
   ]
 }
