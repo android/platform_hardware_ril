@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "50e6ca2a_49298e55",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6371,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2017-12-14T17:31:44Z",
+      "side": 1,
+      "message": "The HIDL interface seemed to have more ints listed. Is this incomplete?\n\n  *   int32_t  max_adn_num      Maximum adn records possible in the phonebook\n     *   int32_t  valid_adn_num    Used adn records in the phonebook\n     *   int32_t  max_email_num    Maximum email records possible in the phonebook\n     *   int32_t  valid_email_num  Used email records possible in the phonebook\n     *   int32_t  max_ad_num       Maximum additional number records possible in the phonebook\n     *   int32_t  valid_ad_num     Used additional number records possible in the phonebook\n     *   int32_t  max_name_len     Maximum name length possible in the phonebook\n     *   int32_t  max_number_len   Maximum number length possible in the phonebook\n     *   int32_t  max_email_len    Maximum email length possible in the phonebook\n     *   int32_t  max_anr_len      Maximum additional number length possible in the phonebook",
+      "range": {
+        "startLine": 6368,
+        "startChar": 3,
+        "endLine": 6371,
+        "endChar": 41
+      },
+      "revId": "8dc0dacc1c07ed6681f783814e1b3f56fa3c8b22",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
