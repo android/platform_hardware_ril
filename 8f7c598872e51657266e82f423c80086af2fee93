@@ -1,0 +1,9 @@
+Verified+1: Jack Yu <jackyu@google.com>
+Autosubmit+1: Jack Yu <jackyu@google.com>
+Code-Review+2: Chen Xu <fionaxu@google.com>
+Presubmit-Verified-1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Jack Yu <jackyu@google.com>
+Submitted-at: Mon, 12 Feb 2018 22:37:52 +0000
+Reviewed-on: https://android-review.googlesource.com/615048
+Project: platform/hardware/ril
+Branch: refs/heads/master
