@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "45b16b4b_e4d53b0e",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1054648
+      },
+      "writtenOn": "2018-02-20T18:16:36Z",
+      "side": 1,
+      "message": "Deallocate dest and call sendErrorResponse()?",
+      "range": {
+        "startLine": 516,
+        "startChar": 8,
+        "endLine": 518,
+        "endChar": 65
+      },
+      "revId": "73ec1df0f9846af218501f3744a1ed73ab059a8f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
