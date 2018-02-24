@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e707bb1c_88e3e61b",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 6984,
+      "author": {
+        "id": 1112039
+      },
+      "writtenOn": "2018-02-24T03:00:47Z",
+      "side": 1,
+      "message": "Isn\u0027t it possible to have a race condition here? How is nitzTimeReceived synchronized?",
+      "revId": "99617b0018c0c0cad826acacad2bde092cd473e4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
