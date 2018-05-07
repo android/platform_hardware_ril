@@ -666,7 +666,7 @@ static void requestOrSendDataCallList(RIL_Token *t)
             }
             responses[i].dnses = dnslist;
 
-            responses[i].gateways = "10.0.2.15 fe80::2";
+            responses[i].gateways = "10.0.2.2 fe80::2";
             responses[i].mtu = DEFAULT_MTU;
         }
         else {
