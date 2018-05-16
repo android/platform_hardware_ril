@@ -144,8 +144,8 @@ int main(int argc, char **argv) {
         exit(0);
     }
     if (strncmp(clientId, "0", MAX_CLIENT_ID_LENGTH)) {
-        strncpy(ril_service_name, ril_service_name_base, MAX_SERVICE_NAME_LENGTH);
-        strncat(ril_service_name, clientId, MAX_SERVICE_NAME_LENGTH);
+        snprintf(ril_service_name, sizeof(ril_service_name), "%s%s", ril_service_name_base,
+                 clientId);
     }
 
     if (rilLibPath == NULL) {
