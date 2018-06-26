@@ -225,6 +225,11 @@ addRequestToList(int serial, int slotId, int request) {
 #endif
 #endif
 
+    if (request >= (int)NUM_ELEMS(s_commands)) {
+        RLOGE("Request %s not supported", requestToString(request));
+        return NULL;
+    }
+
     pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
     if (pRI == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
