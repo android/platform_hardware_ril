@@ -34,10 +34,14 @@
 #include "misc.h"
 #include <getopt.h>
 #include <sys/socket.h>
+#include <cutils/properties.h>
 #include <cutils/sockets.h>
-#include <sys/system_properties.h>
 #include <termios.h>
 #include <qemu_pipe.h>
+#include <sys/wait.h>
+#include <stdbool.h>
+#include <net/if.h>
+#include <netinet/in.h>
 
 #include "ril.h"
 
@@ -50,7 +54,10 @@ static void *noopRemoveWarning( void *a ) { return a; }
 #define MAX_AT_RESPONSE 0x1000
 
 /* pathname returned from RIL_REQUEST_SETUP_DATA_CALL / RIL_REQUEST_SETUP_DEFAULT_PDP */
-#define PPP_TTY_PATH "eth0"
+// This is used if Wifi is not supported, plain old eth0
+#define PPP_TTY_PATH_ETH0 "eth0"
+// This is used if Wifi is supported to separate radio and wifi interface
+#define PPP_TTY_PATH_RADIO0 "radio0"
 
 // Default MTU value
 #define DEFAULT_MTU 1500
@@ -354,6 +361,55 @@ static int parseSimResponseLine(char* line, RIL_SIM_IO_Response* response) {
     return 0;
 }
 
+enum InterfaceState {
+    kInterfaceUp,
+    kInterfaceDown,
+};
+
+static RIL_Errno setInterfaceState(const char* interfaceName,
+                                   enum InterfaceState state) {
+    struct ifreq request;
+    int status = 0;
+    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+    if (sock == -1) {
+        RLOGE("Failed to open interface socket: %s (%d)",
+              strerror(errno), errno);
+        return RIL_E_GENERIC_FAILURE;
+    }
+
+    memset(&request, 0, sizeof(request));
+    strncpy(request.ifr_name, interfaceName, sizeof(request.ifr_name));
+    request.ifr_name[sizeof(request.ifr_name) - 1] = '\0';
+    status = ioctl(sock, SIOCGIFFLAGS, &request);
+    if (status != 0) {
+        RLOGE("Failed to get interface flags for %s: %s (%d)",
+              interfaceName, strerror(errno), errno);
+        close(sock);
+        return RIL_E_RADIO_NOT_AVAILABLE;
+    }
+
+    bool isUp = (request.ifr_flags & IFF_UP);
+    if ((state == kInterfaceUp && isUp) || (state == kInterfaceDown && !isUp)) {
+        // Interface already in desired state
+        close(sock);
+        return RIL_E_SUCCESS;
+    }
+
+    // Simply toggle the flag since we know it's the opposite of what we want
+    request.ifr_flags ^= IFF_UP;
+
+    status = ioctl(sock, SIOCSIFFLAGS, &request);
+    if (status != 0) {
+        RLOGE("Failed to set interface flags for %s: %s (%d)",
+              interfaceName, strerror(errno), errno);
+        close(sock);
+        return RIL_E_GENERIC_FAILURE;
+    }
+
+    close(sock);
+    return RIL_E_SUCCESS;
+}
+
 /** do post-AT+CFUN=1 initialization */
 static void onRadioPowerOn()
 {
@@ -508,6 +564,18 @@ static void requestCallSelection(
     RIL_onRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
 }
 
+static bool hasWifiCapability()
+{
+    char propValue[PROP_VALUE_MAX];
+    return property_get("ro.kernel.qemu.wifi", propValue, "") > 0 &&
+           strcmp("1", propValue) == 0;
+}
+
+static const char* getRadioInterfaceName(bool hasWifi)
+{
+    return hasWifi ? PPP_TTY_PATH_RADIO0 : PPP_TTY_PATH_ETH0;
+}
+
 static void requestOrSendDataCallList(RIL_Token *t)
 {
     ATResponse *p_response;
@@ -515,6 +583,9 @@ static void requestOrSendDataCallList(RIL_Token *t)
     int err;
     int n = 0;
     char *out;
+    char propValue[PROP_VALUE_MAX];
+    bool hasWifi = hasWifiCapability();
+    const char* radioInterfaceName = getRadioInterfaceName(hasWifi);
 
     err = at_send_command_multiline ("AT+CGACT?", "+CGACT:", &p_response);
     if (err != 0 || p_response->success == 0) {
@@ -620,9 +691,9 @@ static void requestOrSendDataCallList(RIL_Token *t)
         if (err < 0)
             goto error;
 
-        int ifname_size = strlen(PPP_TTY_PATH) + 1;
+        int ifname_size = strlen(radioInterfaceName) + 1;
         responses[i].ifname = alloca(ifname_size);
-        strlcpy(responses[i].ifname, PPP_TTY_PATH, ifname_size);
+        strlcpy(responses[i].ifname, radioInterfaceName, ifname_size);
 
         err = at_tok_nextstr(&line, &out);
         if (err < 0)
@@ -655,7 +726,7 @@ static void requestOrSendDataCallList(RIL_Token *t)
                 snprintf(propName, sizeof propName, "net.eth0.dns%d", nn);
 
                 /* Ignore if undefined */
-                if (__system_property_get(propName, propValue) == 0) {
+                if (property_get(propName, propValue, "") <= 0) {
                     continue;
                 }
 
@@ -666,7 +737,16 @@ static void requestOrSendDataCallList(RIL_Token *t)
             }
             responses[i].dnses = dnslist;
 
-            responses[i].gateways = "10.0.2.2 fe80::2";
+            /* There is only one gateway in the emulator. If WiFi is
+             * configured the interface visible to RIL will be behind a NAT
+             * where the gateway is different. */
+            if (hasWifi) {
+                responses[i].gateways = "192.168.200.1";
+            } else if (property_get("net.eth0.gw", propValue, "") > 0) {
+                responses[i].gateways = propValue;
+            } else {
+                responses[i].gateways = "";
+            }
             responses[i].mtu = DEFAULT_MTU;
         }
         else {
@@ -1120,7 +1200,7 @@ static void requestCdmaBaseBandVersion(int request __unused, void *data __unused
     free(responseStr);
 }
 
-static void requestCdmaDeviceIdentity(int request __unused, void *data __unused,
+static void requestDeviceIdentity(int request __unused, void *data __unused,
                                         size_t datalen __unused, RIL_Token t)
 {
     int err;
@@ -1138,13 +1218,18 @@ static void requestCdmaDeviceIdentity(int request __unused, void *data __unused,
     responseStr[0] = "----";
     responseStr[1] = "----";
     responseStr[2] = "77777777";
+    responseStr[3] = ""; // default empty for non-CDMA
 
     err = at_send_command_numeric("AT+CGSN", &p_response);
     if (err < 0 || p_response->success == 0) {
         RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
         return;
     } else {
-        responseStr[3] = p_response->p_intermediates->line;
+        if (TECH_BIT(sMdmInfo) == MDM_CDMA) {
+            responseStr[3] = p_response->p_intermediates->line;
+        } else {
+            responseStr[0] = p_response->p_intermediates->line;
+        }
     }
 
     RIL_onRequestComplete(t, RIL_E_SUCCESS, responseStr, count*sizeof(char*));
@@ -1930,6 +2015,11 @@ static void requestSetupDataCall(void *data, size_t datalen, RIL_Token t)
         if (qmistatus < 0) goto error;
 
     } else {
+        bool hasWifi = hasWifiCapability();
+        const char* radioInterfaceName = getRadioInterfaceName(hasWifi);
+        if (setInterfaceState(radioInterfaceName, kInterfaceUp) != RIL_E_SUCCESS) {
+            goto error;
+        }
 
         if (datalen > 6 * sizeof(char *)) {
             pdp_type = ((const char **)data)[6];
@@ -1971,6 +2061,14 @@ error:
     RIL_onRequestComplete(t, RIL_E_GENERIC_FAILURE, NULL, 0);
     at_response_free(p_response);
 
+}
+
+static void requestDeactivateDataCall(RIL_Token t)
+{
+    bool hasWifi = hasWifiCapability();
+    const char* radioInterfaceName = getRadioInterfaceName(hasWifi);
+    RIL_Errno rilErrno = setInterfaceState(radioInterfaceName, kInterfaceDown);
+    RIL_onRequestComplete(t, rilErrno, NULL, 0);
 }
 
 static void requestSMSAcknowledge(void *data, size_t datalen __unused, RIL_Token t)
@@ -2132,7 +2230,7 @@ static int techFromModemType(int mdmtype)
 static void requestGetCellInfoList(void *data __unused, size_t datalen __unused, RIL_Token t)
 {
     uint64_t curTime = ril_nano_time();
-    RIL_CellInfo ci[1] =
+    RIL_CellInfo_v12 ci[1] =
     {
         { // ci[0]
             1, // cellInfoType
@@ -2146,10 +2244,13 @@ static void requestGetCellInfoList(void *data __unused, size_t datalen __unused,
                         s_mnc, // mnc
                         s_lac, // lac
                         s_cid, // cid
+                        0, //arfcn unknown
+                        0xFF, // bsic unknown
                     },
                     {  // gsm.signalStrengthGsm
                         10, // signalStrength
                         0  // bitErrorRate
+                        , INT_MAX // timingAdvance invalid value
                     }
                 }
             }
@@ -2420,6 +2521,9 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
         case RIL_REQUEST_SETUP_DATA_CALL:
             requestSetupDataCall(data, datalen, t);
             break;
+        case RIL_REQUEST_DEACTIVATE_DATA_CALL:
+            requestDeactivateDataCall(t);
+            break;
         case RIL_REQUEST_SMS_ACKNOWLEDGE:
             requestSMSAcknowledge(data, datalen, t);
             break;
@@ -2627,7 +2731,7 @@ onRequest (int request, void *data, size_t datalen, RIL_Token t)
             break;
 
         case RIL_REQUEST_DEVICE_IDENTITY:
-            requestCdmaDeviceIdentity(request, data, datalen, t);
+            requestDeviceIdentity(request, data, datalen, t);
             break;
 
         case RIL_REQUEST_CDMA_SUBSCRIPTION:
@@ -2955,19 +3059,19 @@ static int getCardStatus(RIL_CardStatus_v6 **pp_card_status) {
         { RIL_APPTYPE_UNKNOWN, RIL_APPSTATE_UNKNOWN, RIL_PERSOSUBSTATE_UNKNOWN,
           NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
         // SIM_NOT_READY = 1
-        { RIL_APPTYPE_SIM, RIL_APPSTATE_DETECTED, RIL_PERSOSUBSTATE_UNKNOWN,
+        { RIL_APPTYPE_USIM, RIL_APPSTATE_DETECTED, RIL_PERSOSUBSTATE_UNKNOWN,
           NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
         // SIM_READY = 2
-        { RIL_APPTYPE_SIM, RIL_APPSTATE_READY, RIL_PERSOSUBSTATE_READY,
+        { RIL_APPTYPE_USIM, RIL_APPSTATE_READY, RIL_PERSOSUBSTATE_READY,
           NULL, NULL, 0, RIL_PINSTATE_UNKNOWN, RIL_PINSTATE_UNKNOWN },
         // SIM_PIN = 3
-        { RIL_APPTYPE_SIM, RIL_APPSTATE_PIN, RIL_PERSOSUBSTATE_UNKNOWN,
+        { RIL_APPTYPE_USIM, RIL_APPSTATE_PIN, RIL_PERSOSUBSTATE_UNKNOWN,
           NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
         // SIM_PUK = 4
-        { RIL_APPTYPE_SIM, RIL_APPSTATE_PUK, RIL_PERSOSUBSTATE_UNKNOWN,
+        { RIL_APPTYPE_USIM, RIL_APPSTATE_PUK, RIL_PERSOSUBSTATE_UNKNOWN,
           NULL, NULL, 0, RIL_PINSTATE_ENABLED_BLOCKED, RIL_PINSTATE_UNKNOWN },
         // SIM_NETWORK_PERSONALIZATION = 5
-        { RIL_APPTYPE_SIM, RIL_APPSTATE_SUBSCRIPTION_PERSO, RIL_PERSOSUBSTATE_SIM_NETWORK,
+        { RIL_APPTYPE_USIM, RIL_APPSTATE_SUBSCRIPTION_PERSO, RIL_PERSOSUBSTATE_SIM_NETWORK,
           NULL, NULL, 0, RIL_PINSTATE_ENABLED_NOT_VERIFIED, RIL_PINSTATE_UNKNOWN },
         // RUIM_ABSENT = 6
         { RIL_APPTYPE_UNKNOWN, RIL_APPSTATE_UNKNOWN, RIL_PERSOSUBSTATE_UNKNOWN,
@@ -3429,7 +3533,7 @@ static void onUnsolicited (const char *s, const char *sms_pdu)
         } else {
             RIL_onUnsolicitedResponse (
                 RIL_UNSOL_NITZ_TIME_RECEIVED,
-                response, strlen(response));
+                response, strlen(response) + 1);
         }
         free(line);
     } else if (strStartsWith(s,"+CRING:")
