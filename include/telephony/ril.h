@@ -1360,14 +1360,18 @@ typedef struct {
 
 typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999;
+                   the most significant nibble encodes the number of digits - {2, 3, 0 (unset)};
+                   INT_MAX if unknown */
     int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
     int cid;    /* 16-bit GSM Cell Identity described in TS 27.007, 0..65535, INT_MAX if unknown  */
 } RIL_CellIdentityGsm;
 
 typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999;
+                   the most significant nibble encodes the number of digits - {2, 3, 0 (unset)};
+                   INT_MAX if unknown */
     int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
     int cid;    /* 16-bit GSM Cell Identity described in TS 27.007, 0..65535, INT_MAX if unknown  */
     int arfcn;  /* 16-bit GSM Absolute RF channel number; this value must be reported */
@@ -1376,7 +1380,9 @@ typedef struct {
 
 typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999;
+                   the most significant nibble encodes the number of digits - {2, 3, 0 (unset)};
+                   INT_MAX if unknown */
     int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
     int cid;    /* 28-bit UMTS Cell Identity described in TS 25.331, 0..268435455, INT_MAX if unknown  */
     int psc;    /* 9-bit UMTS Primary Scrambling Code described in TS 25.331, 0..511, INT_MAX if unknown */
@@ -1384,7 +1390,9 @@ typedef struct {
 
 typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999;
+                   the most significant nibble encodes the number of digits - {2, 3, 0 (unset)};
+                   INT_MAX if unknown */
     int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
     int cid;    /* 28-bit UMTS Cell Identity described in TS 25.331, 0..268435455, INT_MAX if unknown  */
     int psc;    /* 9-bit UMTS Primary Scrambling Code described in TS 25.331, 0..511; this value must be reported */
@@ -1408,7 +1416,9 @@ typedef struct {
 
 typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999;
+                   the most significant nibble encodes the number of digits - {2, 3, 0 (unset)};
+                   INT_MAX if unknown */
     int ci;     /* 28-bit Cell Identity described in TS ???, INT_MAX if unknown */
     int pci;    /* physical cell id 0..503, INT_MAX if unknown  */
     int tac;    /* 16-bit tracking area code, INT_MAX if unknown  */
@@ -1416,7 +1426,9 @@ typedef struct {
 
 typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999;
+                   the most significant nibble encodes the number of digits - {2, 3, 0 (unset)};
+                   INT_MAX if unknown */
     int ci;     /* 28-bit Cell Identity described in TS ???, INT_MAX if unknown */
     int pci;    /* physical cell id 0..503; this value must be reported */
     int tac;    /* 16-bit tracking area code, INT_MAX if unknown  */
@@ -1425,7 +1437,9 @@ typedef struct {
 
 typedef struct {
     int mcc;    /* 3-digit Mobile Country Code, 0..999, INT_MAX if unknown  */
-    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999, INT_MAX if unknown  */
+    int mnc;    /* 2 or 3-digit Mobile Network Code, 0..999;
+                   the most significant nibble encodes the number of digits - {2, 3, 0 (unset)};
+                   INT_MAX if unknown */
     int lac;    /* 16-bit Location Area Code, 0..65535, INT_MAX if unknown  */
     int cid;    /* 28-bit UMTS Cell Identity described in TS 25.331, 0..268435455, INT_MAX if unknown  */
     int cpid;    /* 8-bit Cell Parameters ID described in TS 25.331, 0..127, INT_MAX if unknown */
