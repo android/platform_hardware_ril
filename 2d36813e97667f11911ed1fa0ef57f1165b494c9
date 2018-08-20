@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d56fae72_42f0c803",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1364,
+      "author": {
+        "id": 1274073
+      },
+      "writtenOn": "2018-08-20T20:38:53Z",
+      "side": 1,
+      "message": "It should not be the most significant nibble. It should be \"the low nibble of the most significant byte\", right?",
+      "range": {
+        "startLine": 1364,
+        "startChar": 23,
+        "endLine": 1364,
+        "endChar": 39
+      },
+      "revId": "2d36813e97667f11911ed1fa0ef57f1165b494c9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
