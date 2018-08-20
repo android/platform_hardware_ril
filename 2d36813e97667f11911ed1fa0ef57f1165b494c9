@@ -22,6 +22,30 @@
       "revId": "2d36813e97667f11911ed1fa0ef57f1165b494c9",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "710dfd3c_27f3d997",
+        "filename": "include/telephony/ril.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1364,
+      "author": {
+        "id": 1060151
+      },
+      "writtenOn": "2018-08-20T20:51:40Z",
+      "side": 1,
+      "message": "I\u0027m using the most-significant nibble.",
+      "parentUuid": "d56fae72_42f0c803",
+      "range": {
+        "startLine": 1364,
+        "startChar": 23,
+        "endLine": 1364,
+        "endChar": 39
+      },
+      "revId": "2d36813e97667f11911ed1fa0ef57f1165b494c9",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
     }
   ]
 }
