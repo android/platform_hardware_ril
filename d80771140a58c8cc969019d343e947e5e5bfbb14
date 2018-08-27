@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7762fef5_cbe1d4a6",
+        "filename": "include/telephony/ril_mnc.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1060151
+      },
+      "writtenOn": "2018-08-27T19:09:51Z",
+      "side": 1,
+      "message": "Re-declare as unsigned to avoid strict mode throwing due to technically undefined behavior (left shift of a signed int for C++03 or greater).\n\nThe alternative was to cast back and forth, but this seems cleaner.",
+      "range": {
+        "startLine": 39,
+        "startChar": 4,
+        "endLine": 39,
+        "endChar": 24
+      },
+      "revId": "d80771140a58c8cc969019d343e947e5e5bfbb14",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
