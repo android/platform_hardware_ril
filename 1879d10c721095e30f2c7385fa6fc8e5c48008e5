@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c26573cd_7c1d8be3",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2902,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2018-11-25T14:02:10Z",
+      "side": 1,
+      "message": "From the code below, it seems like uninitialized value of cardStatus is only sent to the framework when response is INVALID_RESPONSE.\n\nAlthough initializing this variable is good, I am curious to know if framework incorrectly used cardStatus when response is INVALID_RESPONSE. If there is any bug or log that shows that this is the case, we should probably fix that as well.",
+      "range": {
+        "startLine": 2902,
+        "startChar": 0,
+        "endLine": 2902,
+        "endChar": 87
+      },
+      "revId": "1879d10c721095e30f2c7385fa6fc8e5c48008e5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
