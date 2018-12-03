@@ -22,6 +22,30 @@
       "revId": "1879d10c721095e30f2c7385fa6fc8e5c48008e5",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ede6e619_e6c2d1fe",
+        "filename": "libril/ril_service.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2902,
+      "author": {
+        "id": 1125174
+      },
+      "writtenOn": "2018-12-03T23:01:53Z",
+      "side": 1,
+      "message": "Author responded that the framework issue has been fixed. Agree that we can take this change as a nice to have fix.",
+      "parentUuid": "c26573cd_7c1d8be3",
+      "range": {
+        "startLine": 2902,
+        "startChar": 0,
+        "endLine": 2902,
+        "endChar": 87
+      },
+      "revId": "1879d10c721095e30f2c7385fa6fc8e5c48008e5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
