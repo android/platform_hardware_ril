@@ -16,7 +16,7 @@ LOCAL_SHARED_LIBRARIES := \
 
 # Temporary hack for broken vendor RILs.
 LOCAL_WHOLE_STATIC_LIBRARIES := \
-	librilutils_static
+	librilutils
 
 LOCAL_CFLAGS := -DRIL_SHLIB
 LOCAL_CFLAGS += -Wall -Wextra -Werror

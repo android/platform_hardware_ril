@@ -1,0 +1,5 @@
+cc_library_headers {
+    name: "ril_headers",
+    vendor: true,
+    export_include_dirs: ["include"],
+}
