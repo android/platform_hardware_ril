@@ -451,7 +451,7 @@ static void requestRadioPower(void *data, size_t datalen __unused, RIL_Token t)
     int err;
     ATResponse *p_response = NULL;
 
-    assert (datalen >= sizeof(int *));
+    assert (datalen >= sizeof(int));
     onOff = ((int *)data)[0];
 
     if (onOff == 0 && sState != RADIO_STATE_OFF) {
