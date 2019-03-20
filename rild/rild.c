@@ -224,10 +224,9 @@ int main(int argc, char **argv) {
 
     RLOGD("RIL_register_socket completed");
 
-done:
-
     rilc_thread_pool();
 
+done:
     RLOGD("RIL_Init starting sleep loop");
     while (true) {
         sleep(UINT32_MAX);
