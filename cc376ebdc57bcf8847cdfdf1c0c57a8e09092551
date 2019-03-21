@@ -1,0 +1,10 @@
+Code-Review+2: Amit Mahajan <amitmahajan@google.com>
+Code-Review+1: Roman Kiryanov <rkir@google.com>
+Verified+1: Roman Kiryanov <rkir@google.com>
+Autosubmit+1: Roman Kiryanov <rkir@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Thu, 21 Mar 2019 03:13:09 +0000
+Reviewed-on: https://android-review.googlesource.com/c/platform/hardware/ril/+/931511
+Project: platform/hardware/ril
+Branch: refs/heads/master
