@@ -16,10 +16,11 @@ cc_library {
         "-Wall",
         "-Wextra",
         "-Werror",
+        "-DPB_FIELD_32BIT"
     ],
 
     proto: {
-        type: "nanopb-c-enable_malloc",
+        type: "nanopb-c-enable_malloc-32bit",
         export_proto_headers: true,
     },
 

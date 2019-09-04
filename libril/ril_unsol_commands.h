@@ -64,3 +64,4 @@
     {RIL_UNSOL_MODEM_RESTART, radio::modemResetInd, WAKE_PARTIAL},
     {RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION, radio::carrierInfoForImsiEncryption, WAKE_PARTIAL},
     {RIL_UNSOL_NETWORK_SCAN_RESULT, radio::networkScanResultInd, WAKE_PARTIAL},
+    {RIL_UNSOL_KEEPALIVE_STATUS, radio::keepaliveStatusInd, WAKE_PARTIAL},
