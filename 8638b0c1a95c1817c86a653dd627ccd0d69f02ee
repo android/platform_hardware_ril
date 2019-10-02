@@ -22,6 +22,30 @@
       "revId": "8638b0c1a95c1817c86a653dd627ccd0d69f02ee",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43c8f1ed_894c6ee1",
+        "filename": "libril/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1120458
+      },
+      "writtenOn": "2019-10-02T18:07:34Z",
+      "side": 1,
+      "message": "In order to reduce merge conflicts, trailing \u0027\\\u0027 should be preferred. For instance, because it was missing before, an addition of a line between L23 and L24 in master would add many more steps to this being submitted.",
+      "parentUuid": "911de7f3_8393c2f2",
+      "range": {
+        "startLine": 24,
+        "startChar": 15,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "8638b0c1a95c1817c86a653dd627ccd0d69f02ee",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
