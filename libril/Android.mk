@@ -21,14 +21,13 @@ LOCAL_SHARED_LIBRARIES := \
     android.hardware.radio@1.0 \
     android.hardware.radio@1.1 \
     android.hardware.radio.deprecated@1.0 \
-    libhidlbase  \
-    libhidltransport \
-    libhwbinder
+    libhidlbase \
 
 LOCAL_STATIC_LIBRARIES := \
-    libprotobuf-c-nano-enable_malloc \
+    libprotobuf-c-nano-enable_malloc-32bit \
 
 LOCAL_CFLAGS += -Wall -Wextra -Wno-unused-parameter -Werror
+LOCAL_CFLAGS += -DPB_FIELD_32BIT
 
 ifeq ($(SIM_COUNT), 2)
     LOCAL_CFLAGS += -DANDROID_MULTI_SIM -DDSDA_RILD1
