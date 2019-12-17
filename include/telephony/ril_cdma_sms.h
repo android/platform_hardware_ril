@@ -113,7 +113,7 @@ typedef struct {
       /* Used only when digitMode is 8-bit */
     unsigned char number_of_digits;
     unsigned char digits[ RIL_CDMA_SMS_ADDRESS_MAX ];
-      /* Each byte in this array represnts a 40bit or 8-bit digit of address data */
+      /* Each byte in this array represnts a 4-bit or 8-bit digit of address data */
 } RIL_CDMA_SMS_Address;
 
 typedef enum {
