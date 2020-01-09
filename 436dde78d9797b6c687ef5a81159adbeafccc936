@@ -1,0 +1,11 @@
+Code-Review+2: Daniel Bright <dbright@google.com>
+Code-Review+2: Hall Liu <hallliu@google.com>
+Code-Review+2: Xiangyu/Malcolm Chen <refuhoo@google.com>
+Autosubmit+1: Daniel Bright <dbright@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Lint+1: Lint 🤖 <android-build-prod-ayeaye@system.gserviceaccount.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Thu, 09 Jan 2020 02:37:38 +0000
+Reviewed-on: https://android-review.googlesource.com/c/platform/hardware/ril/+/1201637
+Project: platform/hardware/ril
+Branch: refs/heads/master
