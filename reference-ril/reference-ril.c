@@ -42,6 +42,7 @@
 #include <stdbool.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <linux/vm_sockets.h>
 
 #include "ril.h"
 
@@ -220,6 +221,7 @@ static pthread_cond_t s_state_cond = PTHREAD_COND_INITIALIZER;
 static int s_port = -1;
 static const char * s_device_path = NULL;
 static int          s_device_socket = 0;
+static uint32_t s_modem_simulator_port = -1;
 
 /* trigger change to this with s_state_cond */
 static int s_closed = 0;
@@ -3718,6 +3720,25 @@ mainLoop(void *param __unused)
                 fd = qemu_pipe_open("pipe:qemud:gsm");
             } else if (s_port > 0) {
                 fd = socket_network_client("localhost", s_port, SOCK_STREAM);
+            } else if (s_modem_simulator_port >= 0) {
+              fd = socket(AF_VSOCK, SOCK_STREAM, 0);
+              if (fd < 0) {
+                 RLOGD("Can't create AF_VSOCK socket!");
+                 continue;
+              }
+              struct sockaddr_vm sa;
+              memset(&sa, 0, sizeof(struct sockaddr_vm));
+              sa.svm_family = AF_VSOCK;
+              sa.svm_cid = VMADDR_CID_HOST;
+              sa.svm_port = s_modem_simulator_port;
+
+              if (connect(fd, (struct sockaddr *)(&sa), sizeof(sa)) < 0) {
+                  RLOGD("Can't connect to port:%ud, errno: %s",
+                      s_modem_simulator_port, strerror(errno));
+                  close(fd);
+                  fd = -1;
+                  continue;
+              }
             } else if (s_device_socket) {
                 fd = socket_local_client(s_device_path,
                                          ANDROID_SOCKET_NAMESPACE_FILESYSTEM,
@@ -3772,7 +3793,8 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
 
     s_rilenv = env;
 
-    while ( -1 != (opt = getopt(argc, argv, "p:d:s:c:"))) {
+    RLOGD("RIL_Init");
+    while ( -1 != (opt = getopt(argc, argv, "p:d:s:c:m:"))) {
         switch (opt) {
             case 'p':
                 s_port = atoi(optarg);
@@ -3798,13 +3820,19 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
                 RLOGI("Client id received %s\n", optarg);
             break;
 
+            case 'm':
+              s_modem_simulator_port = strtoul(optarg, NULL, 10);
+              RLOGI("Opening modem simulator port %ud\n", s_modem_simulator_port);
+            break;
+
             default:
                 usage(argv[0]);
                 return NULL;
         }
     }
 
-    if (s_port < 0 && s_device_path == NULL && !isInEmulator()) {
+    if (s_port < 0 && s_device_path == NULL && !isInEmulator() &&
+        s_modem_simulator_port < 0) {
         usage(argv[0]);
         return NULL;
     }

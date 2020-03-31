@@ -12,7 +12,7 @@ LOCAL_SRC_FILES:= \
     at_tok.c
 
 LOCAL_SHARED_LIBRARIES := \
-    liblog libcutils libutils libril librilutils
+    liblog libcutils libutils librilutils
 
 LOCAL_STATIC_LIBRARIES := libqemu_pipe libbase
 
@@ -35,6 +35,14 @@ ifeq ($(TARGET_DEVICE),dream)
 endif
 
 LOCAL_VENDOR_MODULE:= true
+
+ifeq (true,$(ENABLE_CUTTLEFISH_RILD))
+    LOCAL_SHARED_LIBRARIES += ${CUTTLEFISH_LIBRIL_NAME}
+    LOCAL_CFLAGS += -DCUTTLEFISH_ENABLED
+else
+    LOCAL_SHARED_LIBRARIES += libril
+endif
+
 
 ifeq (foo,foo)
   #build shared library
