@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "10b55245_efd91347",
+        "filename": "reference-ril/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1293738
+      },
+      "writtenOn": "2020-04-03T19:48:40Z",
+      "side": 1,
+      "message": "where is this used? do we need ENABLE_CUTTLEFISH_RILD with the current set of changes? it looks like it would work at runtime, dynamically.",
+      "range": {
+        "startLine": 41,
+        "startChar": 21,
+        "endLine": 41,
+        "endChar": 40
+      },
+      "revId": "d38b7c509f98eeb598a223bc937b25c737f49f5f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
