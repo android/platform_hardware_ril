@@ -22,6 +22,30 @@
       "revId": "d38b7c509f98eeb598a223bc937b25c737f49f5f",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d845ddc_619cc3e8",
+        "filename": "reference-ril/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1668905
+      },
+      "writtenOn": "2020-04-26T02:36:21Z",
+      "side": 1,
+      "message": "I have submit a new commit with id 1295284, please help to review the new one, thanks.",
+      "parentUuid": "10b55245_efd91347",
+      "range": {
+        "startLine": 41,
+        "startChar": 21,
+        "endLine": 41,
+        "endChar": 40
+      },
+      "revId": "d38b7c509f98eeb598a223bc937b25c737f49f5f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
     }
   ]
 }
