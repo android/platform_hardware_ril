@@ -743,7 +743,7 @@ int carrierInfoForImsiEncryption(int slotId,
 
 pthread_rwlock_t * getRadioServiceRwlock(int slotId);
 
-void setNitzTimeReceived(int slotId, long timeReceived);
+void setNitzTimeReceived(int slotId, int64_t timeReceived);
 
 }   // namespace radio
 

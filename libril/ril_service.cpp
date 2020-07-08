@@ -8632,6 +8632,6 @@ pthread_rwlock_t * radio::getRadioServiceRwlock(int slotId) {
 }
 
 // should acquire write lock for the corresponding service before calling this
-void radio::setNitzTimeReceived(int slotId, long timeReceived) {
+void radio::setNitzTimeReceived(int slotId, int64_t timeReceived) {
     nitzTimeReceived[slotId] = timeReceived;
 }
