@@ -2226,7 +2226,7 @@ Return<void> RadioImpl::sendImsSms(int32_t serial, const ImsSmsMessage& message)
     } else if (RadioTechnologyFamily::THREE_GPP2 == message.tech) {
         dispatchImsCdmaSms(message, pRI);
     } else {
-        RLOGE("sendImsSms: Invalid radio tech %s",
+        RLOGE("sendImsSms: Invalid radio tech %d in %s", message.tech,
                 requestToString(pRI->pCI->requestNumber));
         sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
     }
