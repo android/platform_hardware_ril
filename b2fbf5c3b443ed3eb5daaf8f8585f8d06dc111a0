@@ -1,0 +1,10 @@
+Autosubmit+1: Stephen Hines <srhines@google.com>
+Code-Review+2: Pirama Arumuga Nainar <pirama@google.com>
+Code-Review+1: Amit Mahajan <amitmahajan@google.com>
+Lint+1: Lint 🤖 <android-build-prod-ayeaye@system.gserviceaccount.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Fri, 21 Aug 2020 21:25:24 +0000
+Reviewed-on: https://android-review.googlesource.com/c/platform/hardware/ril/+/1407077
+Project: platform/hardware/ril
+Branch: refs/heads/master
