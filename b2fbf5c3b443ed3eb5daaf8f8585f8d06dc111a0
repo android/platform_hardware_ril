@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0fc1c64e_c92d5e97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1010056
+      },
+      "writtenOn": "2020-08-21T19:33:50Z",
+      "side": 1,
+      "message": "I don\u0027t know why I missed that this happened in AOSP as well, but it only seems to break for me now in aosp.",
+      "revId": "b2fbf5c3b443ed3eb5daaf8f8585f8d06dc111a0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
