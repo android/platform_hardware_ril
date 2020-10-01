@@ -1838,7 +1838,7 @@ static void requestSimOpenChannel(void *data, size_t datalen, RIL_Token t)
         return;
     }
 
-    snprintf(cmd, sizeof(cmd), "AT+CCHO=%s", data);
+    snprintf(cmd, sizeof(cmd), "AT+CCHO=%s", (char*) data);
 
     err = at_send_command_numeric(cmd, &p_response);
     if (err < 0 || p_response == NULL || p_response->success == 0) {

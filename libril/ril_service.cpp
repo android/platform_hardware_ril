@@ -2221,11 +2221,9 @@ Return<void> RadioImpl::sendImsSms(int32_t serial, const ImsSmsMessage& message)
         return Void();
     }
 
-    RIL_RadioTechnologyFamily format = (RIL_RadioTechnologyFamily) message.tech;
-
-    if (RADIO_TECH_3GPP == format) {
+    if (RadioTechnologyFamily::THREE_GPP == message.tech) {
         dispatchImsGsmSms(message, pRI);
-    } else if (RADIO_TECH_3GPP2 == format) {
+    } else if (RadioTechnologyFamily::THREE_GPP2 == message.tech) {
         dispatchImsCdmaSms(message, pRI);
     } else {
         RLOGE("sendImsSms: Invalid radio tech %s",
