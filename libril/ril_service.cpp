@@ -5971,7 +5971,7 @@ int radio::getImsRegistrationStateResponse(int slotId,
         RadioResponseInfo responseInfo = {};
         populateResponseInfo(responseInfo, serial, responseType, e);
         bool isRegistered = false;
-        int ratFamily = 0;
+        RadioTechnologyFamily ratFamily = RadioTechnologyFamily::THREE_GPP;
         int numInts = responseLen / sizeof(int);
         if (response == NULL || numInts != 2) {
             RLOGE("getImsRegistrationStateResponse Invalid response: NULL");
@@ -5979,11 +5979,16 @@ int radio::getImsRegistrationStateResponse(int slotId,
         } else {
             int *pInt = (int *) response;
             isRegistered = pInt[0] == 1 ? true : false;
-            ratFamily = pInt[1];
+            // Map RIL_RadioTechnologyFamily to RadioTechnologyFamily
+            if (pInt[1] == RADIO_TECH_3GPP) {
+                ratFamily = RadioTechnologyFamily::THREE_GPP;
+            } else {
+                ratFamily = RadioTechnologyFamily::THREE_GPP2;
+            }
         }
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->getImsRegistrationStateResponse(
-                responseInfo, isRegistered, (RadioTechnologyFamily) ratFamily);
+                responseInfo, isRegistered, ratFamily);
         radioService[slotId]->checkReturnStatus(retStatus);
     } else {
         RLOGE("getImsRegistrationStateResponse: radioService[%d]->mRadioResponse == NULL",
