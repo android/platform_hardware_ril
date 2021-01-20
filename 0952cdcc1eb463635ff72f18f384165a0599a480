@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c83dfb04_8fcb2218",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1278660
+      },
+      "writtenOn": "2021-01-20T18:06:50Z",
+      "side": 1,
+      "message": "I don\u0027t think we want \"vendor.\" here.",
+      "revId": "0952cdcc1eb463635ff72f18f384165a0599a480",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
