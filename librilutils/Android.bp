@@ -1,5 +1,15 @@
 // Copyright 2013 The Android Open Source Project
 
+package {
+    default_applicable_licenses: ["hardware_ril_librilutils_license"],
+}
+
+license {
+    name: "hardware_ril_librilutils_license",
+    visibility: [":__subpackages__"],
+    license_kinds: ["SPDX-license-identifier-Apache-2.0"],
+}
+
 cc_library {
     name: "librilutils",
 
