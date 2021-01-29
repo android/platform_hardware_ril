@@ -28,13 +28,3 @@ int strStartsWith(const char *line, const char *prefix)
 
     return *prefix == '\0';
 }
-
-// Returns true iff running this process in an emulator VM
-bool isInEmulator(void) {
-  static int inQemu = -1;
-  if (inQemu < 0) {
-      char propValue[PROP_VALUE_MAX];
-      inQemu = (__system_property_get("ro.kernel.qemu", propValue) != 0);
-  }
-  return inQemu == 1;
-}

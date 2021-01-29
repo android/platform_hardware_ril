@@ -14,7 +14,7 @@ LOCAL_SRC_FILES:= \
 LOCAL_SHARED_LIBRARIES := \
     liblog libcutils libutils libril librilutils
 
-LOCAL_STATIC_LIBRARIES := libqemu_pipe libbase
+LOCAL_STATIC_LIBRARIES := libbase
 
 # for asprinf
 LOCAL_CFLAGS := -D_GNU_SOURCE
