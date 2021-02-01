@@ -37,7 +37,6 @@
 #include <cutils/properties.h>
 #include <cutils/sockets.h>
 #include <termios.h>
-#include <qemu_pipe.h>
 #include <sys/wait.h>
 #include <stdbool.h>
 #include <net/if.h>
@@ -703,59 +702,11 @@ static void requestOrSendDataCallList(RIL_Token *t)
         responses[i].addresses = alloca(addresses_size);
         strlcpy(responses[i].addresses, out, addresses_size);
 
-        if (isInEmulator()) {
-            /* We are in the emulator - the dns servers are listed
-                * by the following system properties, setup in
-                * /system/etc/init.goldfish.sh:
-                *  - net.eth0.dns1
-                *  - net.eth0.dns2
-                *  - net.eth0.dns3
-                *  - net.eth0.dns4
-                */
-            const int   dnslist_sz = 128;
-            char*       dnslist = alloca(dnslist_sz);
-            const char* separator = "";
-            int         nn;
-
-            dnslist[0] = 0;
-            for (nn = 1; nn <= 4; nn++) {
-                /* Probe net.eth0.dns<n> */
-                char  propName[PROP_NAME_MAX];
-                char  propValue[PROP_VALUE_MAX];
-
-                snprintf(propName, sizeof propName, "net.eth0.dns%d", nn);
-
-                /* Ignore if undefined */
-                if (property_get(propName, propValue, "") <= 0) {
-                    continue;
-                }
-
-                /* Append the DNS IP address */
-                strlcat(dnslist, separator, dnslist_sz);
-                strlcat(dnslist, propValue, dnslist_sz);
-                separator = " ";
-            }
-            responses[i].dnses = dnslist;
-
-            /* There is only one gateway in the emulator. If WiFi is
-             * configured the interface visible to RIL will be behind a NAT
-             * where the gateway is different. */
-            if (hasWifi) {
-                responses[i].gateways = "192.168.200.1";
-            } else if (property_get("net.eth0.gw", propValue, "") > 0) {
-                responses[i].gateways = propValue;
-            } else {
-                responses[i].gateways = "";
-            }
-            responses[i].mtu = DEFAULT_MTU;
-        }
-        else {
-            /* I don't know where we are, so use the public Google DNS
-                * servers by default and no gateway.
-                */
-            responses[i].dnses = "8.8.8.8 8.8.4.4";
-            responses[i].gateways = "";
-        }
+        /* I don't know where we are, so use the public Google DNS
+            * servers by default and no gateway.
+            */
+        responses[i].dnses = "8.8.8.8 8.8.4.4";
+        responses[i].gateways = "";
     }
 
     at_response_free(p_response);
@@ -3714,9 +3665,7 @@ mainLoop(void *param __unused)
     for (;;) {
         fd = -1;
         while  (fd < 0) {
-            if (isInEmulator()) {
-                fd = qemu_pipe_open("pipe:qemud:gsm");
-            } else if (s_port > 0) {
+            if (s_port > 0) {
                 fd = socket_network_client("localhost", s_port, SOCK_STREAM);
             } else if (s_device_socket) {
                 fd = socket_local_client(s_device_path,
@@ -3804,7 +3753,7 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
         }
     }
 
-    if (s_port < 0 && s_device_path == NULL && !isInEmulator()) {
+    if (s_port < 0 && s_device_path == NULL) {
         usage(argv[0]);
         return NULL;
     }
@@ -3853,7 +3802,7 @@ int main (int argc, char **argv)
         }
     }
 
-    if (s_port < 0 && s_device_path == NULL && !isInEmulator()) {
+    if (s_port < 0 && s_device_path == NULL) {
         usage(argv[0]);
     }
 
