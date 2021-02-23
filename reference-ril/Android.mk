@@ -42,11 +42,17 @@ ifeq (foo,foo)
       libcutils libutils
   LOCAL_CFLAGS += -DRIL_SHLIB
   LOCAL_MODULE:= libreference-ril
+  LOCAL_LICENSE_KINDS:= SPDX-license-identifier-Apache-2.0
+  LOCAL_LICENSE_CONDITIONS:= notice
+  LOCAL_NOTICE_FILE:= $(LOCAL_PATH)/NOTICE
   include $(BUILD_SHARED_LIBRARY)
 else
   #build executable
   LOCAL_SHARED_LIBRARIES += \
       libril
   LOCAL_MODULE:= reference-ril
+  LOCAL_LICENSE_KINDS:= SPDX-license-identifier-Apache-2.0
+  LOCAL_LICENSE_CONDITIONS:= notice
+  LOCAL_NOTICE_FILE:= $(LOCAL_PATH)/NOTICE
   include $(BUILD_EXECUTABLE)
 endif
