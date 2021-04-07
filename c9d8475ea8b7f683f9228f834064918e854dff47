@@ -16,6 +16,24 @@
       "message": "please replace this by BUG #",
       "revId": "c9d8475ea8b7f683f9228f834064918e854dff47",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e6a9b66_91c6fcef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1801859
+      },
+      "writtenOn": "2021-04-07T16:46:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bae2132_87466568",
+      "revId": "c9d8475ea8b7f683f9228f834064918e854dff47",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
